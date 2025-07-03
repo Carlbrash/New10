@@ -647,13 +647,22 @@ function App() {
 
   const createSiteMessage = async (messageData) => {
     try {
+      // Prepare data for backend - convert empty expires_at to null
+      const backendData = {
+        message: messageData.message,
+        message_type: messageData.message_type,
+        expires_at: messageData.expires_at && messageData.expires_at.trim() !== '' ? messageData.expires_at : null
+      };
+      
+      console.log('🔄 Creating site message with data:', backendData);
+      
       const response = await fetch(`${API_BASE_URL}/api/admin/site-message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(messageData)
+        body: JSON.stringify(backendData)
       });
 
       if (response.ok) {
