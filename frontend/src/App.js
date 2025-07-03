@@ -1251,9 +1251,14 @@ function App() {
 
   // Site Messages Banner Component
   const SiteMessagesBanner = () => {
+    console.log('🎬 SiteMessagesBanner rendered, activeSiteMessages:', activeSiteMessages);
+    
     if (!activeSiteMessages || activeSiteMessages.length === 0) {
+      console.log('⚠️ No active site messages to display');
       return null;
     }
+
+    console.log('✅ Displaying', activeSiteMessages.length, 'messages in banner');
 
     return (
       <div className="site-messages-banner">
