@@ -491,7 +491,7 @@ function App() {
       if (response.ok) {
         alert('Profile updated successfully!');
         // Refresh user data
-        fetchUserProfile();
+        fetchProfile();
         setShowSettings(false);
       } else {
         const errorData = await response.json();
