@@ -278,8 +278,12 @@ function App() {
   // Rankings search states
   const [rankingSearch, setRankingSearch] = useState('');
   const [rankingSearchResult, setRankingSearchResult] = useState(null);
-  const [showTop100Rankings, setShowTop100Rankings] = useState(false); // 'countries', 'countryDetails', 'countryRankings'
-  const [activeSiteMessages, setActiveSiteMessages] = useState([]);
+  const [showTop100Rankings, setShowTop100Rankings] = useState(false);
+  
+  // World Map states
+  const [countrySearch, setCountrySearch] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [mapView, setMapView] = useState('countries');
   const [bannerUpdateTrigger, setBannerUpdateTrigger] = useState(0);
 
   // Admin Panel States
