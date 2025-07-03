@@ -478,6 +478,7 @@ async def create_site_message(message: SiteMessage, admin_id: str = Depends(veri
     message_data["id"] = str(uuid.uuid4())
     message_data["created_by"] = admin_id
     message_data["created_at"] = datetime.utcnow()
+    message_data["is_active"] = True
     
     site_messages_collection.insert_one(message_data)
     
