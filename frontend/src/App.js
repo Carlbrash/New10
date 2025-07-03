@@ -279,12 +279,6 @@ function App() {
   const [rankingSearch, setRankingSearch] = useState('');
   const [rankingSearchResult, setRankingSearchResult] = useState(null);
   const [showTop100Rankings, setShowTop100Rankings] = useState(false); // 'countries', 'countryDetails', 'countryRankings'
-  
-  // Rankings search states
-  const [rankingSearch, setRankingSearch] = useState('');
-  const [rankingSearchResult, setRankingSearchResult] = useState(null);
-  const [showTop100Rankings, setShowTop100Rankings] = useState(false);
-  const [showTop100Rankings, setShowTop100Rankings] = useState(false);
   const [activeSiteMessages, setActiveSiteMessages] = useState([]);
   const [bannerUpdateTrigger, setBannerUpdateTrigger] = useState(0);
 
