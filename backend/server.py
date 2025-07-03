@@ -189,17 +189,26 @@ def verify_admin_token(min_role: AdminRole = AdminRole.ADMIN):
     return admin_check
 
 def calculate_user_score(user_data):
-    """Calculate user betting score based on various factors"""
-    if user_data["total_bets"] == 0:
-        return 0.0
+    """Calculate user betting score based on various factors plus manual adjustments"""
+    base_score = 0.0
     
-    win_rate = user_data["won_bets"] / user_data["total_bets"]
-    profit = user_data["total_winnings"] - user_data["total_amount"]
-    roi = profit / user_data["total_amount"] if user_data["total_amount"] > 0 else 0
+    if user_data["total_bets"] > 0:
+        win_rate = user_data["won_bets"] / user_data["total_bets"]
+        profit = user_data["total_winnings"] - user_data["total_amount"]
+        roi = profit / user_data["total_amount"] if user_data["total_amount"] > 0 else 0
+        
+        # Base score calculation from betting performance
+        base_score = (win_rate * 100) + (roi * 50) + (user_data["avg_odds"] * 10)
     
-    # Score calculation (can be modified based on the formula you'll provide)
-    score = (win_rate * 100) + (roi * 50) + (user_data["avg_odds"] * 10)
-    return max(0, score)
+    # Add manually adjusted score (from admin point adjustments)
+    manual_score = user_data.get("score", 0) or 0
+    
+    # If user has manual score adjustments, use that as the primary score
+    # Otherwise use the calculated score
+    if manual_score > base_score:
+        return manual_score
+    else:
+        return base_score
 
 # Routes
 @app.get("/api/health")
