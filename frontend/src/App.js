@@ -275,10 +275,10 @@ function App() {
   const [countryStats, setCountryStats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'gr');
-  // User search states
-  const [countrySearch, setCountrySearch] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState(null);
-  const [mapView, setMapView] = useState('countries'); // 'countries', 'countryDetails', 'countryRankings'
+  // Rankings search states
+  const [rankingSearch, setRankingSearch] = useState('');
+  const [rankingSearchResult, setRankingSearchResult] = useState(null);
+  const [showTop100Rankings, setShowTop100Rankings] = useState(false); // 'countries', 'countryDetails', 'countryRankings'
   
   // Rankings search states
   const [rankingSearch, setRankingSearch] = useState('');
