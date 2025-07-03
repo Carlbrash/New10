@@ -286,6 +286,9 @@ function App() {
   const [mapView, setMapView] = useState('countries');
   const [countryRankings, setCountryRankings] = useState([]);
   
+  // Site Messages
+  const [activeSiteMessages, setActiveSiteMessages] = useState([]);
+  const [bannerUpdateTrigger, setBannerUpdateTrigger] = useState(0);
   const [bannerUpdateTrigger, setBannerUpdateTrigger] = useState(0);
 
   // Admin Panel States
