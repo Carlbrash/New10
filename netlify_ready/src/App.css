@@ -584,211 +584,66 @@ body {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  min-height: calc(100vh - 160px);
 }
 
-/* Countries List */
-.countries-list .countries-header {
+.map-header {
   text-align: center;
   margin-bottom: 3rem;
 }
 
-.countries-header h2 {
+.map-header h2 {
   font-size: 3rem;
   color: #ffd700;
   margin-bottom: 0.5rem;
 }
 
-.countries-header p {
-  color: #ccc;
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-}
-
-.search-container {
-  position: relative;
-  max-width: 400px;
-  margin: 0 auto 2rem auto;
-}
-
-.country-search {
-  width: 100%;
-  padding: 1rem 1rem 1rem 3rem;
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.country-search:focus {
-  outline: none;
-  border-color: #ffd700;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.country-search::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.search-icon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
-  color: #ffd700;
-  pointer-events: none;
-}
-
-.no-countries-found {
-  text-align: center;
-  padding: 3rem;
+.map-header p {
   color: #ccc;
   font-size: 1.2rem;
 }
 
-.countries-grid {
+.country-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
-.country-item {
+.country-stat-card {
   background: rgba(255, 255, 255, 0.05);
   padding: 1.5rem;
   border-radius: 15px;
   border: 1px solid rgba(255, 215, 0, 0.2);
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
-.country-item:hover {
+.country-stat-card:hover {
   transform: translateY(-5px);
   border-color: rgba(255, 215, 0, 0.5);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
 }
 
-.country-flag {
-  font-size: 3rem;
-  min-width: 60px;
-  text-align: center;
-}
-
-.country-info {
-  flex: 1;
-}
-
-.country-info h3 {
+.country-stat-card h3 {
   color: #ffd700;
-  margin-bottom: 0.5rem;
-  font-size: 1.3rem;
-}
-
-.user-count {
-  color: #ccc;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.country-arrow {
-  color: #ffd700;
+  margin-bottom: 1rem;
   font-size: 1.5rem;
-  font-weight: bold;
+  text-align: center;
 }
 
-/* Country Details */
-.country-details-header {
-  margin-bottom: 3rem;
-}
-
-.back-btn {
-  background: rgba(255, 215, 0, 0.1);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  color: #ffd700;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.back-btn:hover {
-  background: rgba(255, 215, 0, 0.2);
-  border-color: #ffd700;
-}
-
-.country-title {
+.stat-row {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.country-flag-large {
-  font-size: 4rem;
-}
-
-.country-title h2 {
-  color: #ffd700;
-  font-size: 2.5rem;
-  margin: 0;
-}
-
-.country-stats-detailed {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.stat-card-large {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 2rem;
-  border-radius: 15px;
-  text-align: center;
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  backdrop-filter: blur(10px);
-}
-
-.stat-card-large .stat-number {
-  font-size: 3rem;
-  font-weight: 900;
-  color: #ffd700;
+  justify-content: space-between;
   margin-bottom: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
 }
 
-.stat-card-large .stat-label {
-  color: #ccc;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.stat-row:last-child {
+  border-bottom: none;
 }
 
-.country-actions {
-  text-align: center;
-  margin: 2rem 0;
-}
-
-/* Country Rankings */
-.country-rankings-header {
-  margin-bottom: 3rem;
-}
-
-.no-users {
-  text-align: center;
-  padding: 3rem;
-  color: #ccc;
-  font-size: 1.2rem;
+.stat-value {
+  color: #ffd700;
+  font-weight: 600;
 }
 
 /* Animations */
@@ -945,115 +800,6 @@ body {
   font-size: 0.8rem;
   display: block;
   margin-top: 0.5rem;
-}
-
-.language-selector {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  color: #ffd700;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.language-selector:hover {
-  background: rgba(255, 215, 0, 0.1);
-  border-color: #ffd700;
-  transform: translateY(-2px);
-}
-
-.lang-text {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-/* Avatar Components */
-.avatar {
-  position: relative;
-  border-radius: 50%;
-  overflow: hidden;
-  background: linear-gradient(45deg, #ffd700, #ffa500);
-  border: 2px solid rgba(255, 215, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.avatar-small {
-  width: 40px;
-  height: 40px;
-}
-
-.avatar-medium {
-  width: 60px;
-  height: 60px;
-}
-
-.avatar-large {
-  width: 80px;
-  height: 80px;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-initials {
-  font-weight: 700;
-  color: #000;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.avatar-small .avatar-initials {
-  font-size: 0.7rem;
-}
-
-.avatar-medium .avatar-initials {
-  font-size: 1rem;
-}
-
-.avatar-large .avatar-initials {
-  font-size: 1.2rem;
-}
-
-/* Player Info with Avatar */
-.player-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.player-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-
-.player-col {
-  min-width: 200px;
-}
-
-.no-players {
-  text-align: center;
-  padding: 3rem;
-  color: #ccc;
-  font-size: 1.2rem;
 }
 
 /* Responsive Design */

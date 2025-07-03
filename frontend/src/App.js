@@ -1,600 +1,1107 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import DownloadBackup from './DownloadBackup';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://5fbf7006-ac0f-4985-a813-a01f269d3d14.preview.emergentagent.com';
 
-// Icons as SVG components
-const DashboardIcon = () => (
-  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-  </svg>
-);
-
-const UsersIcon = () => (
-  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-  </svg>
-);
-
-const ContentIcon = () => (
-  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clipRule="evenodd"/>
-    <path d="M8 6h4v2H8V6zM8 10h4v2H8v-2z"/>
-  </svg>
-);
-
-const AnalyticsIcon = () => (
-  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-    <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
-  </svg>
-);
-
-const SettingsIcon = () => (
-  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-    <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"/>
-  </svg>
-);
-
-// Sidebar Component
-const Sidebar = ({ currentPath }) => {
-  const menuItems = [
-    { path: "/", icon: DashboardIcon, label: "Dashboard" },
-    { path: "/users", icon: UsersIcon, label: "Users" },
-    { path: "/content", icon: ContentIcon, label: "Content" },
-    { path: "/analytics", icon: AnalyticsIcon, label: "Analytics" },
-    { path: "/settings", icon: SettingsIcon, label: "Settings" },
-  ];
-
-  return (
-    <div className="bg-gray-900 w-64 min-h-screen p-4">
-      <div className="mb-8">
-        <h1 className="text-white text-2xl font-bold">Wobera Admin</h1>
-        <p className="text-gray-400 text-sm">Dashboard Panel</p>
-      </div>
-      
-      <nav className="space-y-2">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentPath === item.path;
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                isActive 
-                  ? "bg-blue-600 text-white" 
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
-              }`}
-            >
-              <Icon />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-      
-      <div className="mt-8 p-4 bg-gray-800 rounded-lg">
-        <div className="flex items-center space-x-3">
-          <img 
-            src="https://images.pexels.com/photos/8005453/pexels-photo-8005453.jpeg" 
-            alt="Admin"
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div>
-            <p className="text-white font-medium">Admin User</p>
-            <p className="text-gray-400 text-sm">Administrator</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Stats Card Component
-const StatsCard = ({ title, value, change, icon: Icon, color = "blue" }) => {
-  const colorClasses = {
-    blue: "bg-blue-500",
-    green: "bg-green-500",
-    purple: "bg-purple-500",
-    orange: "bg-orange-500"
-  };
-
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-6 border">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
-          {change && (
-            <p className="text-sm text-green-600 mt-1">
-              ↗ {change}% from last week
-            </p>
-          )}
-        </div>
-        <div className={`p-3 rounded-full ${colorClasses[color]}`}>
-          <Icon className="w-6 h-6 text-white" />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Dashboard Overview Component
-const Dashboard = () => {
-  const [stats, setStats] = useState(null);
-  const [analytics, setAnalytics] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [userStatsRes, analyticsRes] = await Promise.all([
-          axios.get(`${API}/admin/users/stats`),
-          axios.get(`${API}/admin/analytics/overview`)
-        ]);
-        setStats(userStatsRes.data);
-        setAnalytics(analyticsRes.data);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+// Language translations
+const translations = {
+  gr: {
+    // Navbar
+    home: 'Αρχική',
+    rankings: 'Κατατάξεις',
+    worldMap: 'Παγκόσμιος Χάρτης',
+    dashboard: 'Dashboard',
+    login: 'Σύνδεση',
+    register: 'Εγγραφή',
+    logout: 'Αποσύνδεση',
+    
+    // Hero Section
+    heroTitle: 'WoBeRa',
+    heroSubtitle: 'WORLD BETTING RANK',
+    heroDescription: 'Ανακαλύψτε τη θέση σας στον παγκόσμιο χάρτη του WoBeRa. Συμμετέχετε σε διαγωνισμούς και κατακτήστε την κορυφή του World Betting Rank.',
+    registerNow: 'ΕΓΓΡΑΦΗ ΤΩΡΑ',
+    loginBtn: 'ΣΥΝΔΕΣΗ',
+    
+    // Features
+    globalRankings: 'Παγκόσμιες Κατατάξεις',
+    globalRankingsDesc: 'Δείτε τη θέση σας στον παγκόσμιο χάρτη των καλύτερων players',
+    internationalCompetitions: 'Διεθνείς Διαγωνισμοί',
+    internationalCompetitionsDesc: 'Συμμετέχετε σε αποκλειστικούς διαγωνισμούς ανά περιοχή',
+    detailedStats: 'Λεπτομερείς Στατιστικές',
+    detailedStatsDesc: 'Παρακολουθήστε την πρόοδό σας με προηγμένα analytics',
+    
+    // Auth
+    loginTitle: 'Σύνδεση',
+    registerTitle: 'Εγγραφή',
+    username: 'Username',
+    password: 'Password',
+    email: 'Email',
+    fullName: 'Πλήρες Όνομα',
+    country: 'Χώρα',
+    avatar: 'Avatar URL (προαιρετικό)',
+    selectCountry: 'Επιλέξτε χώρα',
+    loggingIn: 'Σύνδεση...',
+    registering: 'Εγγραφή...',
+    noAccount: 'Δεν έχετε λογαριασμό;',
+    hasAccount: 'Έχετε ήδη λογαριασμό;',
+    demoCredentials: 'Δοκιμάστε με demo account:',
+    loadDemo: 'Φόρτωση Demo Στοιχείων',
+    
+    // Dashboard
+    welcomeBack: 'Καλώς ήρθες',
+    totalBets: 'Συνολικά Δελτία',
+    wonBets: 'Κερδισμένα',
+    globalPosition: 'Παγκόσμια Θέση',
+    score: 'Βαθμολογία',
+    availableCompetitions: 'Διαθέσιμοι Διαγωνισμοί',
+    participate: 'Συμμετοχή',
+    
+    // Rankings
+    globalRankingsTitle: 'Παγκόσμιες Κατατάξεις',
+    position: 'Θέση',
+    player: 'Παίκτης',
+    statistics: 'Στατιστικά',
+    
+    // World Map
+    worldMapTitle: 'Παγκόσμιος Χάρτης',
+    countryStats: 'Στατιστικά ανά χώρα',
+    totalUsers: 'Συνολικοί Χρήστες:',
+    totalBetsLabel: 'Συνολικά Δελτία:',
+    totalAmount: 'Συνολικό Ποσό:',
+    totalWinnings: 'Συνολικά Κέρδη:',
+    
+    // Countries
+    countries: {
+      'GR': 'Ελλάδα',
+      'US': 'ΗΠΑ',
+      'UK': 'Ηνωμένο Βασίλειο',
+      'DE': 'Γερμανία',
+      'FR': 'Γαλλία',
+      'IT': 'Ιταλία',
+      'ES': 'Ισπανία',
+      'BR': 'Βραζιλία',
+      'AR': 'Αργεντινή',
+      'CN': 'Κίνα',
+      'JP': 'Ιαπωνία',
+      'AU': 'Αυστραλία'
+    },
+    
+    // World Map specific
+    countriesList: 'Λίστα Χωρών',
+    countryDetails: 'Λεπτομέρειες Χώρας',
+    countryRankings: 'Κατάταξη Χώρας',
+    usersInCountry: 'χρήστες',
+    backToCountries: 'Πίσω στις Χώρες',
+    backToDetails: 'Πίσω στις Λεπτομέρειες',
+    viewCountryRankings: 'Δείτε την Κατάταξη',
+    position: 'Θέση',
+    nationalRank: 'Εθνική Κατάταξη',
+    noUsers: 'Δεν υπάρχουν χρήστες σε αυτή τη χώρα',
+    searchCountries: 'Αναζήτηση χώρας...',
+    noCountriesFound: 'Δεν βρέθηκαν χώρες',
+    
+    // Admin Panel
+    adminPanel: 'Admin Panel',
+    userManagement: 'Διαχείριση Χρηστών',
+    siteMessages: 'Μηνύματα Site',
+    competitions: 'Διαγωνισμοί',
+    adminActions: 'Admin Actions',
+    blockUser: 'Μπλοκάρισμα Χρήστη',
+    unblockUser: 'Ξεμπλοκάρισμα',
+    adjustPoints: 'Διόρθωση Πόντων',
+    createCompetition: 'Νέος Διαγωνισμός',
+    createMessage: 'Νέο Μήνυμα',
+    selectUser: 'Επιλέξτε χρήστη',
+    blockType: 'Τύπος μπλοκαρίσματος',
+    temporary: 'Προσωρινό',
+    permanent: 'Μόνιμο',
+    duration: 'Διάρκεια (ώρες)',
+    reason: 'Αιτιολογία',
+    pointsChange: 'Αλλαγή πόντων',
+    messageType: 'Τύπος μηνύματος',
+    announcement: 'Ανακοίνωση',
+    warning: 'Προειδοποίηση',
+    info: 'Πληροφορία',
+    message: 'Μήνυμα',
+    expiresAt: 'Λήγει στις (προαιρετικό)',
+    submit: 'Υποβολή',
+    cancel: 'Ακύρωση',
+    blocked: 'Μπλοκαρισμένος',
+    active: 'Ενεργός',
+    godLevel: 'God Level',
+    superAdmin: 'Super Admin',
+    adminLevel: 'Admin'
+  },
+  en: {
+    // Navbar
+    home: 'Home',
+    rankings: 'Rankings',
+    worldMap: 'World Map',
+    dashboard: 'Dashboard',
+    login: 'Login',
+    register: 'Register',
+    logout: 'Logout',
+    
+    // Hero Section
+    heroTitle: 'WoBeRa',
+    heroSubtitle: 'WORLD BETTING RANK',
+    heroDescription: 'Discover your position on the WoBeRa global map. Participate in competitions and conquer the top of the World Betting Rank.',
+    registerNow: 'REGISTER NOW',
+    loginBtn: 'LOGIN',
+    
+    // Features
+    globalRankings: 'Global Rankings',
+    globalRankingsDesc: 'See your position on the global map of the best players',
+    internationalCompetitions: 'International Competitions',
+    internationalCompetitionsDesc: 'Participate in exclusive competitions by region',
+    detailedStats: 'Detailed Statistics',
+    detailedStatsDesc: 'Track your progress with advanced analytics',
+    
+    // Auth
+    loginTitle: 'Login',
+    registerTitle: 'Register',
+    username: 'Username',
+    password: 'Password',
+    email: 'Email',
+    fullName: 'Full Name',
+    country: 'Country',
+    avatar: 'Avatar URL (optional)',
+    selectCountry: 'Select country',
+    loggingIn: 'Logging in...',
+    registering: 'Registering...',
+    noAccount: 'Don\'t have an account?',
+    hasAccount: 'Already have an account?',
+    demoCredentials: 'Try with demo account:',
+    loadDemo: 'Load Demo Credentials',
+    
+    // Dashboard
+    welcomeBack: 'Welcome back',
+    totalBets: 'Total Bets',
+    wonBets: 'Won Bets',
+    globalPosition: 'Global Position',
+    score: 'Score',
+    availableCompetitions: 'Available Competitions',
+    participate: 'Participate',
+    
+    // Rankings
+    globalRankingsTitle: 'Global Rankings',
+    position: 'Position',
+    player: 'Player',
+    statistics: 'Statistics',
+    
+    // World Map
+    worldMapTitle: 'World Map',
+    countryStats: 'Statistics by country',
+    totalUsers: 'Total Users:',
+    totalBetsLabel: 'Total Bets:',
+    totalAmount: 'Total Amount:',
+    totalWinnings: 'Total Winnings:',
+    
+    // Countries
+    countries: {
+      'GR': 'Greece',
+      'US': 'United States',
+      'UK': 'United Kingdom',
+      'DE': 'Germany',
+      'FR': 'France',
+      'IT': 'Italy',
+      'ES': 'Spain',
+      'BR': 'Brazil',
+      'AR': 'Argentina',
+      'CN': 'China',
+      'JP': 'Japan',
+      'AU': 'Australia'
+    },
+    
+    // World Map specific
+    countriesList: 'Countries List',
+    countryDetails: 'Country Details',
+    countryRankings: 'Country Rankings',
+    usersInCountry: 'users',
+    backToCountries: 'Back to Countries',
+    backToDetails: 'Back to Details',
+    viewCountryRankings: 'View Rankings',
+    position: 'Position',
+    nationalRank: 'National Ranking',
+    noUsers: 'No users in this country',
+    searchCountries: 'Search countries...',
+    noCountriesFound: 'No countries found',
+    
+    // Admin Panel
+    adminPanel: 'Admin Panel',
+    userManagement: 'User Management',
+    siteMessages: 'Site Messages',
+    competitions: 'Competitions',
+    adminActions: 'Admin Actions',
+    blockUser: 'Block User',
+    unblockUser: 'Unblock',
+    adjustPoints: 'Adjust Points',
+    createCompetition: 'New Competition',
+    createMessage: 'New Message',
+    selectUser: 'Select user',
+    blockType: 'Block type',
+    temporary: 'Temporary',
+    permanent: 'Permanent',
+    duration: 'Duration (hours)',
+    reason: 'Reason',
+    pointsChange: 'Points change',
+    messageType: 'Message type',
+    announcement: 'Announcement',
+    warning: 'Warning',
+    info: 'Information',
+    message: 'Message',
+    expiresAt: 'Expires at (optional)',
+    submit: 'Submit',
+    cancel: 'Cancel',
+    blocked: 'Blocked',
+    active: 'Active',
+    godLevel: 'God Level',
+    superAdmin: 'Super Admin',
+    adminLevel: 'Admin'
   }
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
-        <p className="text-gray-600">Welcome back! Here's what's happening with your platform.</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          title="Total Users"
-          value={analytics?.total_users || 0}
-          change={analytics?.users_growth}
-          icon={UsersIcon}
-          color="blue"
-        />
-        <StatsCard
-          title="Total Content"
-          value={analytics?.total_content || 0}
-          change={analytics?.content_growth}
-          icon={ContentIcon}
-          color="green"
-        />
-        <StatsCard
-          title="Total Views"
-          value={analytics?.total_views || 0}
-          icon={AnalyticsIcon}
-          color="purple"
-        />
-        <StatsCard
-          title="Total Likes"
-          value={analytics?.total_likes || 0}
-          icon={() => (
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"/>
-            </svg>
-          )}
-          color="orange"
-        />
-      </div>
-
-      {/* Charts and Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Popular Content */}
-        <div className="bg-white rounded-lg shadow-sm p-6 border">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Popular Content</h3>
-          {analytics?.popular_content?.length > 0 ? (
-            <div className="space-y-3">
-              {analytics.popular_content.map((content, index) => (
-                <div key={content.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-900">{content.title}</p>
-                    <p className="text-sm text-gray-500">{content.views} views</p>
-                  </div>
-                  <span className="text-2xl font-bold text-blue-600">#{index + 1}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-8">No content yet</p>
-          )}
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow-sm p-6 border">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-          {analytics?.recent_activity?.length > 0 ? (
-            <div className="space-y-3">
-              {analytics.recent_activity.map((activity, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm">
-                      <span className="font-medium">{activity.user_name}</span>
-                      {" "}
-                      <span className="text-gray-600">{activity.action.toLowerCase()}</span>
-                      {" "}
-                      <span className="text-blue-600">{activity.resource_type}</span>
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(activity.timestamp).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-8">No recent activity</p>
-          )}
-        </div>
-      </div>
-
-      {/* System Health */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">System Health</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <div className="w-12 h-12 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-              </svg>
-            </div>
-            <p className="font-medium text-gray-900">Database</p>
-            <p className="text-sm text-green-600">Healthy</p>
-          </div>
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="w-12 h-12 bg-blue-500 rounded-full mx-auto mb-2 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" clipRule="evenodd"/>
-              </svg>
-            </div>
-            <p className="font-medium text-gray-900">Server</p>
-            <p className="text-sm text-blue-600">Running</p>
-          </div>
-          <div className="text-center p-4 bg-orange-50 rounded-lg">
-            <div className="w-12 h-12 bg-orange-500 rounded-full mx-auto mb-2 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-              </svg>
-            </div>
-            <p className="font-medium text-gray-900">Memory</p>
-            <p className="text-sm text-orange-600">45% Used</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Users Management Component
-const Users = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    full_name: "",
-    role: "user",
-    status: "active"
-  });
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get(`${API}/admin/users?search=${searchTerm}`);
-      setUsers(response.data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateUser = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${API}/admin/users`, formData);
-      setShowCreateModal(false);
-      setFormData({ username: "", email: "", full_name: "", role: "user", status: "active" });
-      fetchUsers();
-    } catch (error) {
-      console.error("Error creating user:", error);
-    }
-  };
-
-  const handleDeleteUser = async (userId) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        await axios.delete(`${API}/admin/users/${userId}`);
-        fetchUsers();
-      } catch (error) {
-        console.error("Error deleting user:", error);
-      }
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600">Manage system users and their permissions</p>
-        </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Add New User
-        </button>
-      </div>
-
-      {/* Search */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border">
-        <div className="flex gap-4 items-center">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <button
-            onClick={fetchUsers}
-            className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Search
-          </button>
-        </div>
-      </div>
-
-      {/* Users Table */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.length > 0 ? users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <img 
-                        src={user.avatar_url || "https://images.unsplash.com/photo-1724435811349-32d27f4d5806?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwxfHxwcm9maWxlJTIwYXZhdGFyc3xlbnwwfHx8fDE3NTE1MDUyNzl8MA&ixlib=rb-4.1.0&q=85"} 
-                        alt={user.username}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.full_name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                      user.role === 'moderator' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.status === 'active' ? 'bg-green-100 text-green-800' :
-                      user.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(user.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => setEditingUser(user)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                    No users found. Create your first user!
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Create User Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Create New User</h2>
-            <form onSubmit={handleCreateUser} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.username}
-                  onChange={(e) => setFormData({...formData, username: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                <select
-                  value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="user">User</option>
-                  <option value="moderator">Moderator</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Create User
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Simple placeholder components for other routes
-const Content = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-gray-900">Content Management</h1>
-    <div className="bg-white rounded-lg shadow-sm p-8 border text-center">
-      <ContentIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">Content Management</h3>
-      <p className="text-gray-600">Manage articles, posts, and other content from here.</p>
-    </div>
-  </div>
-);
-
-const Analytics = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-    <div className="bg-white rounded-lg shadow-sm p-8 border text-center">
-      <AnalyticsIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">Advanced Analytics</h3>
-      <p className="text-gray-600">Detailed insights and reporting will be available here.</p>
-    </div>
-  </div>
-);
-
-const Settings = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-    <div className="bg-white rounded-lg shadow-sm p-8 border text-center">
-      <SettingsIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">System Settings</h3>
-      <p className="text-gray-600">Configure system preferences and options.</p>
-    </div>
-  </div>
-);
-
-// Layout Component
-const Layout = ({ children }) => {
-  const location = useLocation();
-  
-  return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar currentPath={location.pathname} />
-      <div className="flex-1">
-        <div className="p-8">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
 };
 
 function App() {
+  const [currentView, setCurrentView] = useState('home');
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [rankings, setRankings] = useState([]);
+  const [competitions, setCompetitions] = useState([]);
+  const [countryStats, setCountryStats] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'gr');
+  const [mapView, setMapView] = useState('countries'); // 'countries', 'countryDetails', 'countryRankings'
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [countryRankings, setCountryRankings] = useState([]);
+  const [countrySearch, setCountrySearch] = useState('');
+
+  // Get current translations
+  const t = translations[language];
+
+  // Check if user is admin
+  const isAdmin = user && user.admin_role && ['admin', 'super_admin', 'god'].includes(user.admin_role);
+  const isGod = user && user.admin_role === 'god';
+  const isSuperAdmin = user && user.admin_role === 'super_admin';
+
+  // Country flags mapping
+  const countryFlags = {
+    'GR': '🇬🇷',
+    'US': '🇺🇸', 
+    'UK': '🇬🇧',
+    'DE': '🇩🇪',
+    'FR': '🇫🇷',
+    'IT': '🇮🇹',
+    'ES': '🇪🇸',
+    'BR': '🇧🇷',
+    'AR': '🇦🇷',
+    'CN': '🇨🇳',
+    'JP': '🇯🇵',
+    'AU': '🇦🇺'
+  };
+
+  // Form states
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [registerForm, setRegisterForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    country: '',
+    full_name: '',
+    avatar_url: ''
+  });
+
+  const toggleLanguage = () => {
+    const newLang = language === 'gr' ? 'en' : 'gr';
+    setLanguage(newLang);
+    localStorage.setItem('language', newLang);
+  };
+
+  // Avatar component
+  const Avatar = ({ src, name, size = 'medium' }) => {
+    const sizeClasses = {
+      small: 'avatar-small',
+      medium: 'avatar-medium',
+      large: 'avatar-large'
+    };
+
+    const getInitials = (fullName) => {
+      if (!fullName) return '?';
+      return fullName.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
+    };
+
+    return (
+      <div className={`avatar ${sizeClasses[size]}`}>
+        {src ? (
+          <img 
+            src={src} 
+            alt={name} 
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <div className="avatar-initials" style={src ? {display: 'none'} : {display: 'flex'}}>
+          {getInitials(name)}
+        </div>
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    console.log('🔍 WoBeRa API_BASE_URL:', API_BASE_URL);
+    if (token) {
+      fetchProfile();
+      fetchRankings();
+      fetchCompetitions();
+    }
+    // Fetch country stats regardless of login status
+    fetchCountryStats();
+  }, [token]);
+  
+  // Additional useEffect to fetch rankings when navigating to Rankings
+  useEffect(() => {
+    if (currentView === 'rankings') {
+      console.log('🏆 Fetching rankings for Rankings view');
+      fetchRankings();
+    }
+    if (currentView === 'worldmap') {
+      console.log('🌍 Fetching country stats for World Map view');
+      fetchCountryStats();
+      // Reset to countries view only when first entering the world map
+      if (mapView !== 'countries') {
+        setMapView('countries');
+      }
+    }
+  }, [currentView]);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const fetchRankings = async () => {
+    try {
+      console.log('🔍 Fetching global rankings...');
+      const response = await fetch(`${API_BASE_URL}/api/rankings`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Global rankings fetched:', data.rankings.length, 'players');
+        setRankings(data.rankings);
+      } else {
+        console.error('❌ Rankings fetch failed:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching rankings:', error);
+    }
+  };
+
+  const fetchCompetitions = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/competitions`);
+      if (response.ok) {
+        const data = await response.json();
+        setCompetitions(data.competitions);
+      }
+    } catch (error) {
+      console.error('Error fetching competitions:', error);
+    }
+  };
+
+  const fetchCountryStats = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/stats/countries`);
+      if (response.ok) {
+        const data = await response.json();
+        setCountryStats(data.country_stats);
+      }
+    } catch (error) {
+      console.error('Error fetching country stats:', error);
+    }
+  };
+
+  const fetchCountryRankings = async (countryCode) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/rankings/country/${countryCode}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCountryRankings(data.rankings);
+      }
+    } catch (error) {
+      console.error('Error fetching country rankings:', error);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      console.log('Login attempt with:', { username: loginForm.username, password: '***' });
+      console.log('API URL:', `${API_BASE_URL}/api/login`);
+      
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(loginForm)
+      });
+      
+      console.log('Login response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Login successful:', data);
+        setToken(data.token);
+        localStorage.setItem('token', data.token);
+        setCurrentView('dashboard');
+        setLoginForm({ username: '', password: '' });
+      } else {
+        const errorData = await response.json();
+        console.error('Login failed:', errorData);
+        alert(`Login failed: ${errorData.detail || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert(`Login failed: ${error.message}`);
+    }
+    setLoading(false);
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      console.log('Registration attempt with:', { ...registerForm, password: '***' });
+      console.log('API URL:', `${API_BASE_URL}/api/register`);
+      
+      const response = await fetch(`${API_BASE_URL}/api/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(registerForm)
+      });
+      
+      console.log('Registration response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Registration successful:', data);
+        setToken(data.token);
+        localStorage.setItem('token', data.token);
+        setCurrentView('dashboard');
+        setRegisterForm({
+          username: '',
+          email: '',
+          password: '',
+          country: '',
+          full_name: '',
+          avatar_url: ''
+        });
+      } else {
+        const errorData = await response.json();
+        console.error('Registration failed:', errorData);
+        alert(`Registration failed: ${errorData.detail || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert(`Registration failed: ${error.message}`);
+    }
+    setLoading(false);
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('token');
+    setCurrentView('home');
+  };
+
+  const joinCompetition = async (competitionId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/competitions/${competitionId}/join`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        alert('Successfully joined competition!');
+        fetchCompetitions();
+      } else {
+        alert('Failed to join competition');
+      }
+    } catch (error) {
+      console.error('Join competition error:', error);
+      alert('Failed to join competition');
+    }
+  };
+
+  const renderHome = () => (
+    <div className="home-container">
+      <div className="hero-section">
+        <div className="hero-overlay"></div>
+        <img 
+          src="https://images.unsplash.com/photo-1567808291548-fc3ee04dbcf0" 
+          alt="Luxury Black Car" 
+          className="hero-image"
+        />
+        <div className="hero-content">
+          <h1 className="hero-title">
+            <span className="gradient-text">{t.heroTitle}</span>
+            <br />
+            <span className="hero-subtitle">{t.heroSubtitle}</span>
+          </h1>
+          <p className="hero-description">
+            {t.heroDescription}
+          </p>
+          <div className="hero-buttons">
+            <button 
+              className="btn btn-primary"
+              onClick={() => setCurrentView('register')}
+            >
+              {t.registerNow}
+            </button>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setCurrentView('login')}
+            >
+              {t.loginBtn}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div className="features-section">
+        <div className="container">
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">🏆</div>
+              <h3>{t.globalRankings}</h3>
+              <p>{t.globalRankingsDesc}</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">🌍</div>
+              <h3>{t.internationalCompetitions}</h3>
+              <p>{t.internationalCompetitionsDesc}</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">📊</div>
+              <h3>{t.detailedStats}</h3>
+              <p>{t.detailedStatsDesc}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderLogin = () => (
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">{t.loginTitle}</h2>
+        <form onSubmit={handleLogin}>
+          <div className="form-group">
+            <label>{t.username}</label>
+            <input
+              type="text"
+              value={loginForm.username}
+              onChange={(e) => setLoginForm({...loginForm, username: e.target.value})}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>{t.password}</label>
+            <input
+              type="password"
+              value={loginForm.password}
+              onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? t.loggingIn : t.loginBtn}
+          </button>
+        </form>
+        <div className="demo-section">
+          <p>{t.demoCredentials}</p>
+          <button 
+            className="btn btn-secondary"
+            onClick={() => setLoginForm({ username: 'testuser', password: 'test123' })}
+          >
+            {t.loadDemo}
+          </button>
+        </div>
+        <p className="auth-switch">
+          {t.noAccount}
+          <button onClick={() => setCurrentView('register')}>{t.register}</button>
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderRegister = () => (
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">{t.registerTitle}</h2>
+        <form onSubmit={handleRegister}>
+          <div className="form-group">
+            <label>{t.fullName}</label>
+            <input
+              type="text"
+              value={registerForm.full_name}
+              onChange={(e) => setRegisterForm({...registerForm, full_name: e.target.value})}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>{t.username}</label>
+            <input
+              type="text"
+              value={registerForm.username}
+              onChange={(e) => setRegisterForm({...registerForm, username: e.target.value})}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>{t.email}</label>
+            <input
+              type="email"
+              value={registerForm.email}
+              onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>{t.country}</label>
+            <select
+              value={registerForm.country}
+              onChange={(e) => setRegisterForm({...registerForm, country: e.target.value})}
+              required
+            >
+              <option value="">{t.selectCountry}</option>
+              {Object.entries(t.countries).map(([code, name]) => (
+                <option key={code} value={code}>{name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>{t.avatar}</label>
+            <input
+              type="url"
+              value={registerForm.avatar_url}
+              onChange={(e) => setRegisterForm({...registerForm, avatar_url: e.target.value})}
+              placeholder="https://example.com/your-photo.jpg"
+            />
+          </div>
+          <div className="form-group">
+            <label>{t.password}</label>
+            <input
+              type="password"
+              value={registerForm.password}
+              onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? t.registering : t.register}
+          </button>
+        </form>
+        <p className="auth-switch">
+          {t.hasAccount}
+          <button onClick={() => setCurrentView('login')}>{t.loginTitle}</button>
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderDashboard = () => (
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h2>{t.welcomeBack}, {user?.full_name}!</h2>
+        <div className="user-stats">
+          <div className="stat-card">
+            <div className="stat-number">{user?.total_bets || 0}</div>
+            <div className="stat-label">{t.totalBets}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{user?.won_bets || 0}</div>
+            <div className="stat-label">{t.wonBets}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{user?.rank || 'N/A'}</div>
+            <div className="stat-label">{t.globalPosition}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{Math.round(user?.score) || 0}</div>
+            <div className="stat-label">{t.score}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="dashboard-content">
+        <div className="dashboard-section">
+          <h3>{t.availableCompetitions}</h3>
+          <div className="competitions-grid">
+            {competitions.map(comp => (
+              <div key={comp.id} className="competition-card">
+                <h4>{comp.name}</h4>
+                <p>{comp.description}</p>
+                <div className="competition-details">
+                  <span className="region">{comp.region}</span>
+                  <span className="prize">€{comp.prize_pool.toLocaleString()}</span>
+                </div>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => joinCompetition(comp.id)}
+                >
+                  {t.participate}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderRankings = () => {
+    console.log('🏆 Rendering rankings, players count:', rankings.length);
+    
+    return (
+    <div className="rankings-container">
+      <div className="rankings-header">
+        <h2>{t.globalRankingsTitle}</h2>
+        <img 
+          src="https://images.unsplash.com/photo-1573684955725-34046d1ea9f3" 
+          alt="Championship Trophy" 
+          className="rankings-trophy"
+        />
+      </div>
+      <div className="rankings-table">
+        <div className="table-header">
+          <div className="rank-col">{t.position}</div>
+          <div className="player-col">{t.player}</div>
+          <div className="country-col">{t.country}</div>
+          <div className="stats-col">{t.statistics}</div>
+          <div className="score-col">{t.score}</div>
+        </div>
+        {rankings.length > 0 ? rankings.map((player, index) => (
+          <div key={player.id} className={`table-row ${index < 3 ? 'top-3' : ''}`}>
+            <div className="rank-col">
+              <span className="rank">{player.rank}</span>
+              {index === 0 && <span className="medal gold">🥇</span>}
+              {index === 1 && <span className="medal silver">🥈</span>}
+              {index === 2 && <span className="medal bronze">🥉</span>}
+            </div>
+            <div className="player-col">
+              <div className="player-info">
+                <Avatar src={player.avatar_url} name={player.full_name} size="small" />
+                <div className="player-details">
+                  <span className="player-name">{player.full_name}</span>
+                  <span className="username">@{player.username}</span>
+                </div>
+              </div>
+            </div>
+            <div className="country-col">{t.countries[player.country] || player.country}</div>
+            <div className="stats-col">
+              <span>W: {player.won_bets}</span>
+              <span>L: {player.lost_bets}</span>
+              <span>Total: {player.total_bets}</span>
+            </div>
+            <div className="score-col">{Math.round(player.score)}</div>
+          </div>
+        )) : (
+          <div className="no-players">
+            <p>Loading rankings...</p>
+          </div>
+        )}
+      </div>
+    </div>
+    );
+  };
+
+  const renderWorldMap = () => {
+    const handleCountryClick = (countryCode) => {
+      const country = countryStats.find(stat => stat._id === countryCode);
+      setSelectedCountry(country);
+      setMapView('countryDetails');
+    };
+
+    const handleViewRankings = () => {
+      if (selectedCountry) {
+        fetchCountryRankings(selectedCountry._id);
+        setMapView('countryRankings');
+      }
+    };
+
+    const renderCountriesList = () => {
+      // Filter countries based on search (support both Greek and English names)
+      const filteredCountries = countryStats.filter(stat => {
+        const greekName = (t.countries[stat._id] || stat._id).toLowerCase();
+        const englishName = (translations.en.countries[stat._id] || stat._id).toLowerCase();
+        const searchTerm = countrySearch.toLowerCase();
+        
+        return greekName.includes(searchTerm) || englishName.includes(searchTerm) || stat._id.toLowerCase().includes(searchTerm);
+      });
+
+      return (
+        <div className="countries-list">
+          <div className="countries-header">
+            <h2>{t.worldMapTitle}</h2>
+            <p>{t.countriesList}</p>
+            
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder={t.searchCountries}
+                value={countrySearch}
+                onChange={(e) => setCountrySearch(e.target.value)}
+                className="country-search"
+              />
+              <span className="search-icon">🔍</span>
+            </div>
+          </div>
+          
+          {filteredCountries.length > 0 ? (
+            <div className="countries-grid">
+              {filteredCountries.map(stat => (
+                <div 
+                  key={stat._id} 
+                  className="country-item"
+                  onClick={() => handleCountryClick(stat._id)}
+                >
+                  <div className="country-flag">
+                    {countryFlags[stat._id] || '🏳️'}
+                  </div>
+                  <div className="country-info">
+                    <h3>{t.countries[stat._id] || stat._id}</h3>
+                    <span className="user-count">
+                      {stat.total_users} {t.usersInCountry}
+                    </span>
+                  </div>
+                  <div className="country-arrow">→</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="no-countries-found">
+              <p>{t.noCountriesFound}</p>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const renderCountryDetails = () => (
+      <div className="country-details">
+        <div className="country-details-header">
+          <button 
+            className="back-btn"
+            onClick={() => setMapView('countries')}
+          >
+            ← {t.backToCountries}
+          </button>
+          <div className="country-title">
+            <span className="country-flag-large">
+              {countryFlags[selectedCountry._id] || '🏳️'}
+            </span>
+            <h2>{t.countries[selectedCountry._id] || selectedCountry._id}</h2>
+          </div>
+        </div>
+        
+        <div className="country-stats-detailed">
+          <div className="stat-card-large">
+            <div className="stat-number">{selectedCountry.total_users}</div>
+            <div className="stat-label">{t.totalUsers}</div>
+          </div>
+          <div className="stat-card-large">
+            <div className="stat-number">{selectedCountry.total_bets}</div>
+            <div className="stat-label">{t.totalBetsLabel}</div>
+          </div>
+          <div className="stat-card-large">
+            <div className="stat-number">€{Math.round(selectedCountry.total_amount)}</div>
+            <div className="stat-label">{t.totalAmount}</div>
+          </div>
+          <div className="stat-card-large">
+            <div className="stat-number">€{Math.round(selectedCountry.total_winnings)}</div>
+            <div className="stat-label">{t.totalWinnings}</div>
+          </div>
+        </div>
+
+        <div className="country-actions">
+          <button 
+            className="btn btn-primary"
+            onClick={handleViewRankings}
+          >
+            {t.viewCountryRankings}
+          </button>
+        </div>
+      </div>
+    );
+
+    const renderCountryRankings = () => (
+      <div className="country-rankings">
+        <div className="country-rankings-header">
+          <button 
+            className="back-btn"
+            onClick={() => setMapView('countryDetails')}
+          >
+            ← {t.backToDetails}
+          </button>
+          <div className="country-title">
+            <span className="country-flag-large">
+              {countryFlags[selectedCountry._id] || '🏳️'}
+            </span>
+            <h2>{t.nationalRank} - {t.countries[selectedCountry._id] || selectedCountry._id}</h2>
+          </div>
+        </div>
+
+        {countryRankings.length > 0 ? (
+          <div className="rankings-table">
+            <div className="table-header">
+              <div className="rank-col">{t.position}</div>
+              <div className="player-col">{t.player}</div>
+              <div className="stats-col">{t.statistics}</div>
+              <div className="score-col">{t.score}</div>
+            </div>
+            {countryRankings.map((player, index) => (
+              <div key={player.id} className={`table-row ${index < 3 ? 'top-3' : ''}`}>
+                <div className="rank-col">
+                  <span className="rank">{player.rank}</span>
+                  {index === 0 && <span className="medal gold">🥇</span>}
+                  {index === 1 && <span className="medal silver">🥈</span>}
+                  {index === 2 && <span className="medal bronze">🥉</span>}
+                </div>
+                <div className="player-col">
+                  <div className="player-info">
+                    <Avatar src={player.avatar_url} name={player.full_name} size="small" />
+                    <div className="player-details">
+                      <span className="player-name">{player.full_name}</span>
+                      <span className="username">@{player.username}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="stats-col">
+                  <span>W: {player.won_bets}</span>
+                  <span>L: {player.lost_bets}</span>
+                  <span>Total: {player.total_bets}</span>
+                </div>
+                <div className="score-col">{Math.round(player.score)}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="no-users">
+            <p>{t.noUsers}</p>
+          </div>
+        )}
+      </div>
+    );
+
+    return (
+      <div className="world-map-container">
+        {mapView === 'countries' && renderCountriesList()}
+        {mapView === 'countryDetails' && renderCountryDetails()}
+        {mapView === 'countryRankings' && renderCountryRankings()}
+      </div>
+    );
+  };
+
   return (
     <div className="App">
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/content" element={<Content />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
+      <nav className="navbar">
+        <div className="navbar-brand">
+          <h1>WoBeRa</h1>
+          <span className="brand-subtitle">World Betting Rank</span>
+        </div>
+        <div className="navbar-menu">
+          <button 
+            className={`nav-link ${currentView === 'home' ? 'active' : ''}`}
+            onClick={() => setCurrentView('home')}
+          >
+            {t.home}
+          </button>
+          <button 
+            className={`nav-link ${currentView === 'rankings' ? 'active' : ''}`}
+            onClick={() => setCurrentView('rankings')}
+          >
+            {t.rankings}
+          </button>
+          <button 
+            className={`nav-link ${currentView === 'worldmap' ? 'active' : ''}`}
+            onClick={() => setCurrentView('worldmap')}
+          >
+            {t.worldMap}
+          </button>
+          
+          {/* Language Selector */}
+          <button className="language-selector" onClick={toggleLanguage}>
+            {language === 'gr' ? (
+              <>
+                🇬🇷 <span className="lang-text">EL</span>
+              </>
+            ) : (
+              <>
+                🇺🇸 <span className="lang-text">EN</span>
+              </>
+            )}
+          </button>
+
+          {token ? (
+            <>
+              <button 
+                className={`nav-link ${currentView === 'dashboard' ? 'active' : ''}`}
+                onClick={() => setCurrentView('dashboard')}
+              >
+                {t.dashboard}
+              </button>
+              <button className="btn btn-logout" onClick={handleLogout}>
+                {t.logout}
+              </button>
+            </>
+          ) : (
+            <>
+              <button 
+                className="btn btn-login"
+                onClick={() => setCurrentView('login')}
+              >
+                {t.login}
+              </button>
+              <button 
+                className="btn btn-register"
+                onClick={() => setCurrentView('register')}
+              >
+                {t.register}
+              </button>
+            </>
+          )}
+        </div>
+      </nav>
+
+      <main className="main-content">
+        {currentView === 'home' && renderHome()}
+        {currentView === 'login' && renderLogin()}
+        {currentView === 'register' && renderRegister()}
+        {currentView === 'dashboard' && renderDashboard()}
+        {currentView === 'rankings' && renderRankings()}
+        {currentView === 'worldmap' && renderWorldMap()}
+        {currentView === 'download' && <DownloadBackup />}
+      </main>
     </div>
   );
 }

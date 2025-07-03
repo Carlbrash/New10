@@ -1,578 +1,744 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query, Depends
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from pymongo import MongoClient
+from bson import ObjectId
+from typing import Optional, List
 import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field, EmailStr
-from typing import List, Optional, Dict, Any
-import uuid
+import hashlib
+import jwt
 from datetime import datetime, timedelta
+import uuid
 from enum import Enum
-import asyncio
 
-
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
-
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Create the main app without a prefix
-app = FastAPI(title="Wobera Admin Dashboard API", version="1.0.0")
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-# Enums
-class UserRole(str, Enum):
+# Admin Role Levels
+class AdminRole(str, Enum):
+    GOD = "god"
+    SUPER_ADMIN = "super_admin"  
     ADMIN = "admin"
-    MODERATOR = "moderator"
     USER = "user"
 
-class UserStatus(str, Enum):
-    ACTIVE = "active"
-    INACTIVE = "inactive"
-    BANNED = "banned"
+# Environment variables
+MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+DB_NAME = os.environ.get('DB_NAME', 'betting_federation')
+SECRET_KEY = "your-secret-key-here"
 
-class ContentStatus(str, Enum):
-    DRAFT = "draft"
-    PUBLISHED = "published"
-    ARCHIVED = "archived"
+# MongoDB connection
+client = MongoClient(MONGO_URL)
+db = client[DB_NAME]
 
-class ContentType(str, Enum):
-    ARTICLE = "article"
-    POST = "post"
-    PAGE = "page"
+# Collections
+users_collection = db.users
+rankings_collection = db.rankings
+competitions_collection = db.competitions
+admin_actions_collection = db.admin_actions
+site_messages_collection = db.site_messages
 
-# Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+app = FastAPI(title="WoBeRa - World Betting Rank API")
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# User Models
-class User(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    username: str
-    email: EmailStr
-    full_name: str
-    role: UserRole = UserRole.USER
-    status: UserStatus = UserStatus.ACTIVE
-    avatar_url: Optional[str] = None
-    last_login: Optional[datetime] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-class UserCreate(BaseModel):
-    username: str
-    email: EmailStr
-    full_name: str
-    role: UserRole = UserRole.USER
-    status: UserStatus = UserStatus.ACTIVE
-    avatar_url: Optional[str] = None
-
-class UserUpdate(BaseModel):
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    full_name: Optional[str] = None
-    role: Optional[UserRole] = None
-    status: Optional[UserStatus] = None
-    avatar_url: Optional[str] = None
-
-class UserStats(BaseModel):
-    total_users: int
-    active_users: int
-    new_users_today: int
-    new_users_this_week: int
-    users_by_role: Dict[str, int]
-
-# Content Models
-class Content(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    title: str
-    slug: str
-    content: str
-    excerpt: Optional[str] = None
-    content_type: ContentType = ContentType.ARTICLE
-    status: ContentStatus = ContentStatus.DRAFT
-    author_id: str
-    author_name: str
-    tags: List[str] = []
-    featured_image: Optional[str] = None
-    views: int = 0
-    likes: int = 0
-    published_at: Optional[datetime] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-class ContentCreate(BaseModel):
-    title: str
-    slug: str
-    content: str
-    excerpt: Optional[str] = None
-    content_type: ContentType = ContentType.ARTICLE
-    status: ContentStatus = ContentStatus.DRAFT
-    author_id: str
-    author_name: str
-    tags: List[str] = []
-    featured_image: Optional[str] = None
-
-class ContentUpdate(BaseModel):
-    title: Optional[str] = None
-    slug: Optional[str] = None
-    content: Optional[str] = None
-    excerpt: Optional[str] = None
-    content_type: Optional[ContentType] = None
-    status: Optional[ContentStatus] = None
-    tags: Optional[List[str]] = None
-    featured_image: Optional[str] = None
-
-class ContentStats(BaseModel):
-    total_content: int
-    published_content: int
-    draft_content: int
-    total_views: int
-    content_by_type: Dict[str, int]
-
-# Analytics Models
-class AnalyticsOverview(BaseModel):
-    total_users: int
-    total_content: int
-    total_views: int
-    total_likes: int
-    users_growth: float
-    content_growth: float
-    popular_content: List[Dict[str, Any]]
-    recent_activity: List[Dict[str, Any]]
-
-class ActivityLog(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str
-    user_name: str
-    action: str
-    resource_type: str
-    resource_id: str
-    details: Dict[str, Any] = {}
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-# Settings Models
-class SystemSettings(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    site_name: str = "Wobera Dashboard"
-    site_description: str = "Admin Dashboard for Wobera"
-    site_logo: Optional[str] = None
-    maintenance_mode: bool = False
-    registration_enabled: bool = True
-    email_notifications: bool = True
-    max_upload_size: int = 10  # MB
-    allowed_file_types: List[str] = ["jpg", "jpeg", "png", "gif", "pdf"]
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-class SettingsUpdate(BaseModel):
-    site_name: Optional[str] = None
-    site_description: Optional[str] = None
-    site_logo: Optional[str] = None
-    maintenance_mode: Optional[bool] = None
-    registration_enabled: Optional[bool] = None
-    email_notifications: Optional[bool] = None
-    max_upload_size: Optional[int] = None
-    allowed_file_types: Optional[List[str]] = None
-
-# System Health Models
-class SystemHealth(BaseModel):
-    status: str
-    database_status: str
-    uptime: str
-    memory_usage: str
-    disk_usage: str
-    last_backup: Optional[datetime] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-# Helper Functions
-async def log_activity(user_id: str, user_name: str, action: str, resource_type: str, resource_id: str, details: Dict = {}):
-    """Log user activity for admin monitoring"""
-    activity = ActivityLog(
-        user_id=user_id,
-        user_name=user_name,
-        action=action,
-        resource_type=resource_type,
-        resource_id=resource_id,
-        details=details
-    )
-    await db.activity_logs.insert_one(activity.dict())
-
-# Original routes (keeping compatibility)
-@api_router.get("/")
-async def root():
-    return {"message": "Wobera Admin Dashboard API"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Admin User Management APIs
-@api_router.get("/admin/users", response_model=List[User])
-async def get_users(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=100),
-    role: Optional[UserRole] = None,
-    status: Optional[UserStatus] = None,
-    search: Optional[str] = None
-):
-    """Get all users with pagination and filtering"""
-    filter_query = {}
-    
-    if role:
-        filter_query["role"] = role
-    if status:
-        filter_query["status"] = status
-    if search:
-        filter_query["$or"] = [
-            {"username": {"$regex": search, "$options": "i"}},
-            {"email": {"$regex": search, "$options": "i"}},
-            {"full_name": {"$regex": search, "$options": "i"}}
-        ]
-    
-    users = await db.users.find(filter_query).skip(skip).limit(limit).sort("created_at", -1).to_list(limit)
-    return [User(**user) for user in users]
-
-@api_router.post("/admin/users", response_model=User)
-async def create_user(user_data: UserCreate):
-    """Create a new user"""
-    # Check if username or email already exists
-    existing_user = await db.users.find_one({
-        "$or": [
-            {"username": user_data.username},
-            {"email": user_data.email}
-        ]
-    })
-    
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username or email already exists")
-    
-    user = User(**user_data.dict())
-    await db.users.insert_one(user.dict())
-    
-    # Log activity
-    await log_activity("system", "System", "CREATE", "user", user.id, {"username": user.username})
-    
-    return user
-
-@api_router.put("/admin/users/{user_id}", response_model=User)
-async def update_user(user_id: str, user_update: UserUpdate):
-    """Update user information"""
-    user = await db.users.find_one({"id": user_id})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    update_data = {k: v for k, v in user_update.dict().items() if v is not None}
-    update_data["updated_at"] = datetime.utcnow()
-    
-    await db.users.update_one({"id": user_id}, {"$set": update_data})
-    
-    updated_user = await db.users.find_one({"id": user_id})
-    
-    # Log activity
-    await log_activity("admin", "Admin", "UPDATE", "user", user_id, update_data)
-    
-    return User(**updated_user)
-
-@api_router.delete("/admin/users/{user_id}")
-async def delete_user(user_id: str):
-    """Delete a user"""
-    user = await db.users.find_one({"id": user_id})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    await db.users.delete_one({"id": user_id})
-    
-    # Log activity
-    await log_activity("admin", "Admin", "DELETE", "user", user_id, {"username": user["username"]})
-    
-    return {"message": "User deleted successfully"}
-
-@api_router.get("/admin/users/stats", response_model=UserStats)
-async def get_user_stats():
-    """Get user statistics"""
-    total_users = await db.users.count_documents({})
-    active_users = await db.users.count_documents({"status": "active"})
-    
-    # Users created today
-    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-    new_users_today = await db.users.count_documents({"created_at": {"$gte": today}})
-    
-    # Users created this week
-    week_ago = datetime.utcnow() - timedelta(days=7)
-    new_users_this_week = await db.users.count_documents({"created_at": {"$gte": week_ago}})
-    
-    # Users by role
-    pipeline = [
-        {"$group": {"_id": "$role", "count": {"$sum": 1}}}
-    ]
-    role_stats = await db.users.aggregate(pipeline).to_list(None)
-    users_by_role = {item["_id"]: item["count"] for item in role_stats}
-    
-    return UserStats(
-        total_users=total_users,
-        active_users=active_users,
-        new_users_today=new_users_today,
-        new_users_this_week=new_users_this_week,
-        users_by_role=users_by_role
-    )
-
-# Admin Content Management APIs
-@api_router.get("/admin/content", response_model=List[Content])
-async def get_content(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=100),
-    status: Optional[ContentStatus] = None,
-    content_type: Optional[ContentType] = None,
-    author_id: Optional[str] = None,
-    search: Optional[str] = None
-):
-    """Get all content with pagination and filtering"""
-    filter_query = {}
-    
-    if status:
-        filter_query["status"] = status
-    if content_type:
-        filter_query["content_type"] = content_type
-    if author_id:
-        filter_query["author_id"] = author_id
-    if search:
-        filter_query["$or"] = [
-            {"title": {"$regex": search, "$options": "i"}},
-            {"content": {"$regex": search, "$options": "i"}},
-            {"tags": {"$in": [search]}}
-        ]
-    
-    content_list = await db.content.find(filter_query).skip(skip).limit(limit).sort("created_at", -1).to_list(limit)
-    return [Content(**content) for content in content_list]
-
-@api_router.post("/admin/content", response_model=Content)
-async def create_content(content_data: ContentCreate):
-    """Create new content"""
-    # Check if slug already exists
-    existing_content = await db.content.find_one({"slug": content_data.slug})
-    if existing_content:
-        raise HTTPException(status_code=400, detail="Slug already exists")
-    
-    content = Content(**content_data.dict())
-    if content.status == ContentStatus.PUBLISHED:
-        content.published_at = datetime.utcnow()
-    
-    await db.content.insert_one(content.dict())
-    
-    # Log activity
-    await log_activity(content.author_id, content.author_name, "CREATE", "content", content.id, {"title": content.title})
-    
-    return content
-
-@api_router.put("/admin/content/{content_id}", response_model=Content)
-async def update_content(content_id: str, content_update: ContentUpdate):
-    """Update content"""
-    content = await db.content.find_one({"id": content_id})
-    if not content:
-        raise HTTPException(status_code=404, detail="Content not found")
-    
-    update_data = {k: v for k, v in content_update.dict().items() if v is not None}
-    update_data["updated_at"] = datetime.utcnow()
-    
-    # Set published_at if status changes to published
-    if update_data.get("status") == ContentStatus.PUBLISHED and content["status"] != ContentStatus.PUBLISHED:
-        update_data["published_at"] = datetime.utcnow()
-    
-    await db.content.update_one({"id": content_id}, {"$set": update_data})
-    
-    updated_content = await db.content.find_one({"id": content_id})
-    
-    # Log activity
-    await log_activity("admin", "Admin", "UPDATE", "content", content_id, update_data)
-    
-    return Content(**updated_content)
-
-@api_router.delete("/admin/content/{content_id}")
-async def delete_content(content_id: str):
-    """Delete content"""
-    content = await db.content.find_one({"id": content_id})
-    if not content:
-        raise HTTPException(status_code=404, detail="Content not found")
-    
-    await db.content.delete_one({"id": content_id})
-    
-    # Log activity
-    await log_activity("admin", "Admin", "DELETE", "content", content_id, {"title": content["title"]})
-    
-    return {"message": "Content deleted successfully"}
-
-@api_router.get("/admin/content/stats", response_model=ContentStats)
-async def get_content_stats():
-    """Get content statistics"""
-    total_content = await db.content.count_documents({})
-    published_content = await db.content.count_documents({"status": "published"})
-    draft_content = await db.content.count_documents({"status": "draft"})
-    
-    # Total views
-    pipeline = [{"$group": {"_id": None, "total_views": {"$sum": "$views"}}}]
-    views_result = await db.content.aggregate(pipeline).to_list(None)
-    total_views = views_result[0]["total_views"] if views_result else 0
-    
-    # Content by type
-    pipeline = [{"$group": {"_id": "$content_type", "count": {"$sum": 1}}}]
-    type_stats = await db.content.aggregate(pipeline).to_list(None)
-    content_by_type = {item["_id"]: item["count"] for item in type_stats}
-    
-    return ContentStats(
-        total_content=total_content,
-        published_content=published_content,
-        draft_content=draft_content,
-        total_views=total_views,
-        content_by_type=content_by_type
-    )
-
-# Analytics APIs
-@api_router.get("/admin/analytics/overview", response_model=AnalyticsOverview)
-async def get_analytics_overview():
-    """Get dashboard analytics overview"""
-    # Get basic stats
-    total_users = await db.users.count_documents({})
-    total_content = await db.content.count_documents({})
-    
-    # Total views and likes
-    views_pipeline = [{"$group": {"_id": None, "total_views": {"$sum": "$views"}, "total_likes": {"$sum": "$likes"}}}]
-    stats_result = await db.content.aggregate(views_pipeline).to_list(None)
-    total_views = stats_result[0]["total_views"] if stats_result else 0
-    total_likes = stats_result[0]["total_likes"] if stats_result else 0
-    
-    # Growth calculations (simplified - you can enhance with actual time-based calculations)
-    users_growth = 15.5  # Mock data - implement actual calculation
-    content_growth = 8.2  # Mock data - implement actual calculation
-    
-    # Popular content
-    popular_content = await db.content.find({}).sort("views", -1).limit(5).to_list(5)
-    popular_content_list = [
-        {"id": content["id"], "title": content["title"], "views": content["views"]}
-        for content in popular_content
-    ]
-    
-    # Recent activity
-    recent_activity = await db.activity_logs.find({}).sort("timestamp", -1).limit(10).to_list(10)
-    recent_activity_list = [
-        {
-            "user_name": activity["user_name"],
-            "action": activity["action"],
-            "resource_type": activity["resource_type"],
-            "timestamp": activity["timestamp"]
-        }
-        for activity in recent_activity
-    ]
-    
-    return AnalyticsOverview(
-        total_users=total_users,
-        total_content=total_content,
-        total_views=total_views,
-        total_likes=total_likes,
-        users_growth=users_growth,
-        content_growth=content_growth,
-        popular_content=popular_content_list,
-        recent_activity=recent_activity_list
-    )
-
-@api_router.get("/admin/analytics/activity", response_model=List[ActivityLog])
-async def get_recent_activity(limit: int = Query(50, ge=1, le=100)):
-    """Get recent activity logs"""
-    activities = await db.activity_logs.find({}).sort("timestamp", -1).limit(limit).to_list(limit)
-    return [ActivityLog(**activity) for activity in activities]
-
-# Settings APIs
-@api_router.get("/admin/settings", response_model=SystemSettings)
-async def get_settings():
-    """Get system settings"""
-    settings = await db.settings.find_one({})
-    if not settings:
-        # Create default settings
-        default_settings = SystemSettings()
-        await db.settings.insert_one(default_settings.dict())
-        return default_settings
-    return SystemSettings(**settings)
-
-@api_router.put("/admin/settings", response_model=SystemSettings)
-async def update_settings(settings_update: SettingsUpdate):
-    """Update system settings"""
-    existing_settings = await db.settings.find_one({})
-    
-    if not existing_settings:
-        # Create new settings
-        new_settings = SystemSettings(**settings_update.dict(exclude_unset=True))
-        await db.settings.insert_one(new_settings.dict())
-        return new_settings
-    
-    update_data = {k: v for k, v in settings_update.dict().items() if v is not None}
-    update_data["updated_at"] = datetime.utcnow()
-    
-    await db.settings.update_one({"id": existing_settings["id"]}, {"$set": update_data})
-    
-    updated_settings = await db.settings.find_one({"id": existing_settings["id"]})
-    
-    # Log activity
-    await log_activity("admin", "Admin", "UPDATE", "settings", existing_settings["id"], update_data)
-    
-    return SystemSettings(**updated_settings)
-
-# System Health APIs
-@api_router.get("/admin/system/health", response_model=SystemHealth)
-async def get_system_health():
-    """Get system health status"""
-    # Check database connection
-    try:
-        await db.command("ping")
-        db_status = "healthy"
-    except Exception:
-        db_status = "unhealthy"
-    
-    # Mock system stats (in production, you'd get real system metrics)
-    return SystemHealth(
-        status="healthy" if db_status == "healthy" else "degraded",
-        database_status=db_status,
-        uptime="2 days, 5 hours",
-        memory_usage="45%",
-        disk_usage="23%",
-        last_backup=datetime.utcnow() - timedelta(hours=6)
-    )
-
-# Include the router in the main app
-app.include_router(api_router)
-
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Security
+security = HTTPBearer()
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+# Pydantic models
+class UserRegister(BaseModel):
+    username: str
+    email: str
+    password: str
+    country: str
+    full_name: str
+    avatar_url: Optional[str] = None
+    admin_role: Optional[AdminRole] = AdminRole.USER
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class User(BaseModel):
+    id: str
+    username: str
+    email: str
+    country: str
+    full_name: str
+    avatar_url: Optional[str] = None
+    admin_role: AdminRole = AdminRole.USER
+    is_blocked: bool = False
+    blocked_until: Optional[datetime] = None
+    blocked_reason: Optional[str] = None
+    created_at: datetime
+    total_bets: int = 0
+    won_bets: int = 0
+    lost_bets: int = 0
+    total_amount: float = 0.0
+    total_winnings: float = 0.0
+    avg_odds: float = 0.0
+    rank: int = 0
+    score: float = 0.0
+
+class RankingEntry(BaseModel):
+    user_id: str
+    username: str
+    country: str
+    full_name: str
+    avatar_url: Optional[str] = None
+    total_bets: int
+    won_bets: int
+    lost_bets: int
+    total_amount: float
+    total_winnings: float
+    avg_odds: float
+    score: float
+    rank: int
+
+class AdminAction(BaseModel):
+    action_type: str  # 'block_user', 'unblock_user', 'adjust_points', 'create_competition', etc.
+    target_user_id: Optional[str] = None
+    target_competition_id: Optional[str] = None
+    details: Optional[dict] = None
+    reason: Optional[str] = None
+
+class BlockUserRequest(BaseModel):
+    user_id: str
+    block_type: str  # 'temporary' or 'permanent'
+    duration_hours: Optional[int] = None
+    reason: str
+
+class AdjustPointsRequest(BaseModel):
+    user_id: str
+    points_change: int  # positive or negative
+    reason: str
+
+class Competition(BaseModel):
+    id: str
+    name: str
+    description: str
+    region: str
+    start_date: datetime
+    end_date: datetime
+    max_participants: int
+    current_participants: int
+    status: str  # active, upcoming, finished
+    prize_pool: float
+    created_by: Optional[str] = None
+
+class SiteMessage(BaseModel):
+    id: Optional[str] = None
+    message: str
+    message_type: str  # 'announcement', 'warning', 'info'
+    is_active: bool = True
+    created_by: str
+    created_at: Optional[datetime] = None
+    expires_at: Optional[datetime] = None
+    id: str
+    name: str
+    description: str
+    region: str
+    start_date: datetime
+    end_date: datetime
+    max_participants: int
+    current_participants: int
+    status: str  # active, upcoming, finished
+    prize_pool: float
+
+# Helper functions
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(password: str, hashed: str) -> bool:
+    return hash_password(password) == hashed
+
+def create_token(user_id: str) -> str:
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.utcnow() + timedelta(days=7)
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=["HS256"])
+        return payload["user_id"]
+    except:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+def verify_admin_token(min_role: AdminRole = AdminRole.ADMIN):
+    def admin_check(credentials: HTTPAuthorizationCredentials = Depends(security)):
+        try:
+            payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=["HS256"])
+            user_id = payload["user_id"]
+            
+            # Get user and check admin role
+            user = users_collection.find_one({"id": user_id})
+            if not user:
+                raise HTTPException(status_code=404, detail="User not found")
+            
+            user_role = AdminRole(user.get("admin_role", "user"))
+            
+            # Check role hierarchy: god > super_admin > admin > user
+            role_hierarchy = {
+                AdminRole.GOD: 4,
+                AdminRole.SUPER_ADMIN: 3,
+                AdminRole.ADMIN: 2,
+                AdminRole.USER: 1
+            }
+            
+            if role_hierarchy[user_role] < role_hierarchy[min_role]:
+                raise HTTPException(status_code=403, detail="Insufficient admin privileges")
+            
+            return user_id
+        except HTTPException:
+            raise
+        except:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    
+    return admin_check
+
+def calculate_user_score(user_data):
+    """Calculate user betting score based on various factors"""
+    if user_data["total_bets"] == 0:
+        return 0.0
+    
+    win_rate = user_data["won_bets"] / user_data["total_bets"]
+    profit = user_data["total_winnings"] - user_data["total_amount"]
+    roi = profit / user_data["total_amount"] if user_data["total_amount"] > 0 else 0
+    
+    # Score calculation (can be modified based on the formula you'll provide)
+    score = (win_rate * 100) + (roi * 50) + (user_data["avg_odds"] * 10)
+    return max(0, score)
+
+# Routes
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "message": "WoBeRa - World Betting Rank API is running"}
+
+@app.post("/api/register")
+async def register_user(user: UserRegister):
+    # Check if user already exists
+    if users_collection.find_one({"$or": [{"username": user.username}, {"email": user.email}]}):
+        raise HTTPException(status_code=400, detail="Username or email already exists")
+    
+    # Create new user
+    user_id = str(uuid.uuid4())
+    user_data = {
+        "id": user_id,
+        "username": user.username,
+        "email": user.email,
+        "password": hash_password(user.password),
+        "country": user.country,
+        "full_name": user.full_name,
+        "avatar_url": user.avatar_url,
+        "admin_role": user.admin_role.value,
+        "is_blocked": False,
+        "blocked_until": None,
+        "blocked_reason": None,
+        "created_at": datetime.utcnow(),
+        "total_bets": 0,
+        "won_bets": 0,
+        "lost_bets": 0,
+        "total_amount": 0.0,
+        "total_winnings": 0.0,
+        "avg_odds": 0.0,
+        "rank": 0,
+        "score": 0.0
+    }
+    
+    users_collection.insert_one(user_data)
+    token = create_token(user_id)
+    
+    return {"message": "User registered successfully", "token": token, "user_id": user_id}
+
+@app.post("/api/login")
+async def login_user(user: UserLogin):
+    # Find user
+    user_data = users_collection.find_one({"username": user.username})
+    if not user_data or not verify_password(user.password, user_data["password"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    token = create_token(user_data["id"])
+    return {"message": "Login successful", "token": token, "user_id": user_data["id"]}
+
+@app.get("/api/profile")
+async def get_profile(user_id: str = Depends(verify_token)):
+    user_data = users_collection.find_one({"id": user_id})
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_data.pop("password", None)
+    user_data.pop("_id", None)
+    return user_data
+
+@app.get("/api/rankings")
+async def get_rankings(limit: int = 50, skip: int = 0):
+    # Get all users and calculate their scores
+    users = list(users_collection.find({}, {"password": 0, "_id": 0}))
+    
+    # Calculate scores and sort
+    for user in users:
+        user["score"] = calculate_user_score(user)
+    
+    users.sort(key=lambda x: x["score"], reverse=True)
+    
+    # Assign ranks
+    for i, user in enumerate(users):
+        user["rank"] = i + 1
+    
+    # Return paginated results
+    return {
+        "rankings": users[skip:skip + limit],
+        "total": len(users)
+    }
+
+@app.get("/api/rankings/country/{country}")
+async def get_country_rankings(country: str, limit: int = 20):
+    # Get users from specific country
+    users = list(users_collection.find({"country": country}, {"password": 0, "_id": 0}))
+    
+    # Calculate scores and sort
+    for user in users:
+        user["score"] = calculate_user_score(user)
+    
+    users.sort(key=lambda x: x["score"], reverse=True)
+    
+    # Assign ranks
+    for i, user in enumerate(users):
+        user["rank"] = i + 1
+    
+    return {
+        "country": country,
+        "rankings": users[:limit],
+        "total": len(users)
+    }
+
+@app.get("/api/competitions")
+async def get_competitions(region: Optional[str] = None, status: Optional[str] = None):
+    query = {}
+    if region:
+        query["region"] = region
+    if status:
+        query["status"] = status
+    
+    competitions = list(competitions_collection.find(query, {"_id": 0}))
+    return {"competitions": competitions}
+
+@app.post("/api/competitions/{competition_id}/join")
+async def join_competition(competition_id: str, user_id: str = Depends(verify_token)):
+    # Check if competition exists
+    competition = competitions_collection.find_one({"id": competition_id})
+    if not competition:
+        raise HTTPException(status_code=404, detail="Competition not found")
+    
+    # Check if user exists
+    user = users_collection.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # TODO: Add logic to join competition
+    return {"message": "Successfully joined competition"}
+
+@app.get("/api/stats/countries")
+async def get_country_stats():
+    # Get stats by country
+    pipeline = [
+        {"$group": {
+            "_id": "$country",
+            "total_users": {"$sum": 1},
+            "total_bets": {"$sum": "$total_bets"},
+            "total_amount": {"$sum": "$total_amount"},
+            "total_winnings": {"$sum": "$total_winnings"}
+        }},
+        {"$sort": {"total_users": -1}}
+    ]
+    
+    stats = list(users_collection.aggregate(pipeline))
+    return {"country_stats": stats}
+
+# ADMIN ENDPOINTS
+@app.post("/api/admin/block-user")
+async def block_user(request: BlockUserRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Block a user temporarily or permanently"""
+    user = users_collection.find_one({"id": request.user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate block end time for temporary blocks
+    blocked_until = None
+    if request.block_type == "temporary" and request.duration_hours:
+        blocked_until = datetime.utcnow() + timedelta(hours=request.duration_hours)
+    
+    # Update user
+    users_collection.update_one(
+        {"id": request.user_id},
+        {
+            "$set": {
+                "is_blocked": True,
+                "blocked_until": blocked_until,
+                "blocked_reason": request.reason
+            }
+        }
+    )
+    
+    # Log admin action
+    admin_actions_collection.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin_id,
+        "action_type": "block_user",
+        "target_user_id": request.user_id,
+        "details": {
+            "block_type": request.block_type,
+            "duration_hours": request.duration_hours,
+            "reason": request.reason
+        },
+        "timestamp": datetime.utcnow()
+    })
+    
+    return {"message": f"User blocked {request.block_type}ly"}
+
+@app.post("/api/admin/unblock-user/{user_id}")
+async def unblock_user(user_id: str, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Unblock a user"""
+    users_collection.update_one(
+        {"id": user_id},
+        {
+            "$set": {
+                "is_blocked": False,
+                "blocked_until": None,
+                "blocked_reason": None
+            }
+        }
+    )
+    
+    # Log admin action
+    admin_actions_collection.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin_id,
+        "action_type": "unblock_user",
+        "target_user_id": user_id,
+        "timestamp": datetime.utcnow()
+    })
+    
+    return {"message": "User unblocked successfully"}
+
+@app.post("/api/admin/adjust-points")
+async def adjust_user_points(request: AdjustPointsRequest, admin_id: str = Depends(verify_admin_token(AdminRole.GOD))):
+    """Adjust user points (God level only)"""
+    user = users_collection.find_one({"id": request.user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Update user score
+    new_score = max(0, user["score"] + request.points_change)
+    users_collection.update_one(
+        {"id": request.user_id},
+        {"$set": {"score": new_score}}
+    )
+    
+    # Log admin action
+    admin_actions_collection.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin_id,
+        "action_type": "adjust_points",
+        "target_user_id": request.user_id,
+        "details": {
+            "points_change": request.points_change,
+            "old_score": user["score"],
+            "new_score": new_score,
+            "reason": request.reason
+        },
+        "timestamp": datetime.utcnow()
+    })
+    
+    return {"message": f"Points adjusted by {request.points_change}"}
+
+@app.post("/api/admin/create-competition")
+async def create_competition(competition: Competition, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Create a new competition"""
+    competition_data = competition.dict()
+    competition_data["id"] = str(uuid.uuid4())
+    competition_data["created_by"] = admin_id
+    competition_data["current_participants"] = 0
+    
+    competitions_collection.insert_one(competition_data)
+    
+    # Log admin action
+    admin_actions_collection.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin_id,
+        "action_type": "create_competition",
+        "target_competition_id": competition_data["id"],
+        "details": {"name": competition.name, "region": competition.region},
+        "timestamp": datetime.utcnow()
+    })
+    
+    return {"message": "Competition created successfully", "competition_id": competition_data["id"]}
+
+@app.post("/api/admin/site-message")
+async def create_site_message(message: SiteMessage, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Create a site-wide message"""
+    message_data = message.dict()
+    message_data["id"] = str(uuid.uuid4())
+    message_data["created_by"] = admin_id
+    message_data["created_at"] = datetime.utcnow()
+    
+    site_messages_collection.insert_one(message_data)
+    
+    return {"message": "Site message created successfully", "message_id": message_data["id"]}
+
+@app.get("/api/admin/users")
+async def get_all_users(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all users for admin management"""
+    users = list(users_collection.find({}, {"password": 0, "_id": 0}))
+    return {"users": users}
+
+@app.get("/api/admin/actions")
+async def get_admin_actions(admin_id: str = Depends(verify_admin_token(AdminRole.GOD))):
+    """Get all admin actions (God level only)"""
+    actions = list(admin_actions_collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(100))
+    return {"actions": actions}
+
+@app.get("/api/site-messages")
+async def get_active_site_messages():
+    """Get active site messages"""
+    messages = list(site_messages_collection.find({
+        "is_active": True,
+        "$or": [
+            {"expires_at": None},
+            {"expires_at": {"$gt": datetime.utcnow()}}
+        ]
+    }, {"_id": 0}))
+    return {"messages": messages}
+
+# Initialize some sample data
+@app.on_event("startup")
+async def startup_event():
+    # Create sample competitions
+    if competitions_collection.count_documents({}) == 0:
+        sample_competitions = [
+            {
+                "id": str(uuid.uuid4()),
+                "name": "European Championship 2024",
+                "description": "Premier European betting competition",
+                "region": "Europe",
+                "start_date": datetime(2024, 6, 1),
+                "end_date": datetime(2024, 6, 30),
+                "max_participants": 1000,
+                "current_participants": 0,
+                "status": "upcoming",
+                "prize_pool": 50000.0
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "name": "World Cup Betting Challenge",
+                "description": "Global betting competition for World Cup",
+                "region": "Global",
+                "start_date": datetime(2024, 11, 20),
+                "end_date": datetime(2024, 12, 18),
+                "max_participants": 5000,
+                "current_participants": 0,
+                "status": "upcoming",
+                "prize_pool": 100000.0
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Asian Masters",
+                "description": "Asian region betting championship",
+                "region": "Asia",
+                "start_date": datetime(2024, 8, 1),
+                "end_date": datetime(2024, 8, 31),
+                "max_participants": 2000,
+                "current_participants": 0,
+                "status": "upcoming",
+                "prize_pool": 30000.0
+            }
+        ]
+        competitions_collection.insert_many(sample_competitions)
+        print("Sample competitions created")
+    
+    # Create sample users for testing World Map
+    if users_collection.count_documents({}) < 50:
+        import random
+        
+        # Avatar URLs for realistic testing
+        avatar_urls = [
+            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
+            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400", 
+            "https://images.unsplash.com/photo-1494790108755-2616b612b829?w=400",
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400",
+            None, None  # Some users without avatars
+        ]
+        
+        countries_data = [
+            ('GR', ['Dimitris Papadopoulos', 'Maria Konstantinou', 'Yannis Stavros', 'Anna Georgiou', 'Kostas Petrou', 'Eleni Dimitriou', 'Nikos Christou', 'Sofia Andreou']),
+            ('US', ['John Smith', 'Emma Johnson', 'Michael Brown', 'Olivia Davis', 'William Wilson', 'Ava Garcia', 'James Martinez']),
+            ('UK', ['James Thompson', 'Emily White', 'Harry Taylor', 'Sophie Anderson', 'George Clark', 'Lily Evans', 'Charlie Robinson']),
+            ('DE', ['Hans Mueller', 'Anna Schmidt', 'Klaus Weber', 'Petra Fischer', 'Wolfgang Koch', 'Sabine Richter', 'Dieter Hoffman']),
+            ('FR', ['Pierre Dubois', 'Marie Martin', 'Jean Bernard', 'Claire Petit', 'Alain Durand', 'Isabelle Moreau', 'François Simon']),
+            ('IT', ['Marco Rossi', 'Giulia Bianchi', 'Andrea Ferrari', 'Francesca Romano', 'Alessandro Marino', 'Valentina Greco', 'Davide Conti']),
+            ('ES', ['Carlos Garcia', 'Ana Martinez', 'David Rodriguez', 'Laura Fernandez', 'Miguel Lopez', 'Isabel Gonzalez', 'Jose Perez']),
+            ('BR', ['João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Pereira', 'Lucia Almeida', 'Roberto Nascimento']),
+            ('AR', ['Diego Fernandez', 'Sofia Gonzalez', 'Mateo Rodriguez', 'Valentina Lopez', 'Santiago Martinez', 'Camila Perez']),
+            ('AU', ['Jack Wilson', 'Emma Thompson', 'Liam Johnson', 'Olivia Brown', 'Noah Davis', 'Ava Miller', 'William Garcia'])
+        ]
+        
+        sample_users = []
+        user_id_counter = 1
+        
+        for country_code, names in countries_data:
+            for i, full_name in enumerate(names):
+                username = f"{full_name.lower().replace(' ', '_')}_{country_code.lower()}"
+                
+                # Generate random betting stats
+                total_bets = random.randint(15, 100)
+                won_bets = random.randint(int(total_bets * 0.3), int(total_bets * 0.7))
+                lost_bets = total_bets - won_bets
+                total_amount = round(random.uniform(500, 5000))
+                total_winnings = round(total_amount * random.uniform(0.8, 1.4))
+                avg_odds = round(random.uniform(1.5, 3.5), 1)
+                
+                # Calculate score
+                win_rate = won_bets / total_bets if total_bets > 0 else 0
+                profit = total_winnings - total_amount
+                roi = profit / total_amount if total_amount > 0 else 0
+                score = max(0, (win_rate * 100) + (roi * 50) + (avg_odds * 10))
+                
+                # Random avatar
+                avatar_url = random.choice(avatar_urls)
+                
+                user_data = {
+                    "id": str(uuid.uuid4()),
+                    "username": username,
+                    "email": f"{username}@example.com",
+                    "password": hash_password("demo123"),
+                    "country": country_code,
+                    "full_name": full_name,
+                    "avatar_url": avatar_url,
+                    "admin_role": "user",
+                    "is_blocked": False,
+                    "blocked_until": None,
+                    "blocked_reason": None,
+                    "created_at": datetime.utcnow(),
+                    "total_bets": total_bets,
+                    "won_bets": won_bets,
+                    "lost_bets": lost_bets,
+                    "total_amount": total_amount,
+                    "total_winnings": total_winnings,
+                    "avg_odds": avg_odds,
+                    "rank": 0,
+                    "score": score
+                }
+                sample_users.append(user_data)
+                user_id_counter += 1
+        
+        # Insert all sample users
+        users_collection.insert_many(sample_users)
+        print(f"Created {len(sample_users)} sample users across {len(countries_data)} countries")
+        
+        # Create the demo user if it doesn't exist
+        if not users_collection.find_one({"username": "testuser"}):
+            demo_user = {
+                "id": str(uuid.uuid4()),
+                "username": "testuser",
+                "email": "testuser@example.com",
+                "password": hash_password("test123"),
+                "country": "GR",
+                "full_name": "Demo User",
+                "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
+                "admin_role": "user",
+                "is_blocked": False,
+                "blocked_until": None,
+                "blocked_reason": None,
+                "created_at": datetime.utcnow(),
+                "total_bets": 50,
+                "won_bets": 32,
+                "lost_bets": 18,
+                "total_amount": 2500,
+                "total_winnings": 3200,
+                "avg_odds": 2.1,
+                "rank": 0,
+                "score": 85.5
+            }
+            users_collection.insert_one(demo_user)
+            print("Demo user created")
+        
+        # Create admin accounts
+        admin_accounts = [
+            {
+                "username": "God",
+                "password": "Kiki1999@",
+                "admin_role": "god",
+                "full_name": "God Administrator",
+                "email": "god@wobera.com"
+            },
+            {
+                "username": "Superadmin", 
+                "password": "Kiki1999@",
+                "admin_role": "super_admin",
+                "full_name": "Super Administrator", 
+                "email": "superadmin@wobera.com"
+            },
+            {
+                "username": "admin",
+                "password": "Kiki1999@", 
+                "admin_role": "admin",
+                "full_name": "Administrator",
+                "email": "admin@wobera.com"
+            }
+        ]
+        
+        for admin_data in admin_accounts:
+            if not users_collection.find_one({"username": admin_data["username"]}):
+                admin_user = {
+                    "id": str(uuid.uuid4()),
+                    "username": admin_data["username"],
+                    "email": admin_data["email"],
+                    "password": hash_password(admin_data["password"]),
+                    "country": "GR",
+                    "full_name": admin_data["full_name"],
+                    "avatar_url": None,
+                    "admin_role": admin_data["admin_role"],
+                    "is_blocked": False,
+                    "blocked_until": None,
+                    "blocked_reason": None,
+                    "created_at": datetime.utcnow(),
+                    "total_bets": 0,
+                    "won_bets": 0,
+                    "lost_bets": 0,
+                    "total_amount": 0,
+                    "total_winnings": 0,
+                    "avg_odds": 0.0,
+                    "rank": 0,
+                    "score": 0.0
+                }
+                users_collection.insert_one(admin_user)
+                print(f"Admin user created: {admin_data['username']} ({admin_data['admin_role']})")
+
+@app.get("/api/reset-data")
+async def reset_data():
+    """Reset all sample data for testing"""
+    try:
+        # Clear existing data
+        users_collection.delete_many({})
+        competitions_collection.delete_many({})
+        
+        # Recreate sample data
+        await startup_event()
+        
+        return {"message": "Data reset successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
