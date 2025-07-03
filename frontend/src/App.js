@@ -1475,16 +1475,9 @@ function App() {
               <div className="admin-controls">
                 <button 
                   className="btn btn-primary"
-                  onClick={() => {
-                    const message = prompt('Enter message:');
-                    const messageType = prompt('Message type (info/announcement/warning):') || 'info';
-                    const expiresAt = prompt('Expires at (YYYY-MM-DD HH:MM or leave empty):');
-                    if (message) {
-                      createSiteMessage(message, messageType, expiresAt);
-                    }
-                  }}
+                  onClick={() => setShowMessageModal(true)}
                 >
-                  ➕ {t.createMessage}
+                  ➕ Create New Message
                 </button>
               </div>
 
@@ -1505,9 +1498,94 @@ function App() {
                     <div className="message-content">
                       {msg.message}
                     </div>
+                    {msg.expires_at && (
+                      <div className="message-expires">
+                        Expires: {new Date(msg.expires_at).toLocaleDateString()}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
+
+              {/* Message Creation Modal */}
+              {showMessageModal && (
+                <div className="modal-overlay" onClick={() => setShowMessageModal(false)}>
+                  <div className="modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-header">
+                      <h3>📢 Create Site Message</h3>
+                      <button 
+                        className="modal-close"
+                        onClick={() => setShowMessageModal(false)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      createSiteMessage(messageForm);
+                    }}>
+                      <div className="form-group">
+                        <label>Message Type</label>
+                        <select
+                          value={messageForm.message_type}
+                          onChange={(e) => setMessageForm({...messageForm, message_type: e.target.value})}
+                          className="form-control"
+                        >
+                          <option value="info">ℹ️ Information</option>
+                          <option value="announcement">📢 Announcement</option>
+                          <option value="warning">⚠️ Warning</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Message Content *</label>
+                        <textarea
+                          value={messageForm.message}
+                          onChange={(e) => setMessageForm({...messageForm, message: e.target.value})}
+                          placeholder="Enter your message that will appear in the scrolling banner..."
+                          className="form-control"
+                          rows="4"
+                          required
+                        />
+                        <small className="form-hint">
+                          This message will appear in the scrolling banner visible to all users
+                        </small>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Expiration Date (Optional)</label>
+                        <input
+                          type="datetime-local"
+                          value={messageForm.expires_at}
+                          onChange={(e) => setMessageForm({...messageForm, expires_at: e.target.value})}
+                          className="form-control"
+                        />
+                        <small className="form-hint">
+                          Leave empty for permanent message. Set date/time for automatic removal.
+                        </small>
+                      </div>
+
+                      <div className="modal-actions">
+                        <button 
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={() => setShowMessageModal(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          type="submit"
+                          className="btn btn-primary"
+                          disabled={!messageForm.message.trim()}
+                        >
+                          Create Message
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
