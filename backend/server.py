@@ -131,18 +131,9 @@ class Competition(BaseModel):
     created_by: Optional[str] = None
 
 class SiteMessage(BaseModel):
-    id: Optional[str] = None
     message: str
     message_type: str  # 'announcement', 'warning', 'info'
-    is_active: bool = True
-    created_by: str
-    created_at: Optional[datetime] = None
     expires_at: Optional[datetime] = None
-    id: str
-    name: str
-    description: str
-    region: str
-    start_date: datetime
     end_date: datetime
     max_participants: int
     current_participants: int
