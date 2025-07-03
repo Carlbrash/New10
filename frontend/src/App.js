@@ -294,9 +294,6 @@ function App() {
     expires_at: ''
   });
   
-  // Active Site Messages for Banner
-  const [activeSiteMessages, setActiveSiteMessages] = useState([]);
-
   // Get current translations
   const t = translations[language];
 
