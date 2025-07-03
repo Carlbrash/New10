@@ -650,7 +650,13 @@ function App() {
       if (response.ok) {
         alert('Site message created successfully! It will appear in the banner.');
         fetchAdminData(); // Refresh admin data
-        fetchActiveSiteMessages(); // Refresh banner messages
+        
+        // Force refresh banner messages with delay
+        setTimeout(() => {
+          console.log('🔄 Force refreshing banner messages after creation...');
+          fetchActiveSiteMessages();
+        }, 1000);
+        
         setShowMessageModal(false);
         setMessageForm({ message: '', message_type: 'info', expires_at: '' });
       } else {
