@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the WoBeRa backend site messages functionality: 1. Check the current state of site messages in the database 2. Test the GET /api/site-messages endpoint to verify it returns messages correctly 3. Test the POST /api/admin/site-message endpoint with proper authentication to create a new message 4. Verify that the created message appears in the GET endpoint response"
+user_problem_statement: "Test the WoBeRa frontend site messages banner functionality: 1. Check if the banner is visible and what it shows initially 2. Login as Admin to access admin panel 3. Navigate to Admin Panel and find the site messages section 4. Create a new site message with Message: 'Frontend Test Message from Testing Agent', Type: 'info', No expiration date 5. Verify if the new message appears in the banner immediately 6. Test manual refresh button in the banner to force update 7. Check browser console for any errors or debug messages 8. Create a second message and verify both messages appear"
 
 backend:
   - task: "Site Messages GET Endpoint"
@@ -142,33 +142,37 @@ backend:
         comment: "MongoDB integration for site messages is working correctly. Created messages are properly stored in the database and can be retrieved via the GET endpoint. The message appears immediately after creation."
 
 frontend:
-  - task: "Site Messages UI Display"
+  - task: "Site Messages Banner Display"
     implemented: true
-    working: "NA"
-    file: "/app/frontend/src/components/SiteMessages.js"
-    stuck_count: 0
-    priority: "medium"
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
     needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend testing was not part of this test scope. Only backend functionality was tested."
+      - working: false
+        agent: "testing"
+        comment: "The site messages banner is visible and displays existing messages correctly. However, newly created messages do not appear in the banner immediately after creation. When creating a new message through the admin panel, the message is saved to the backend (API returns 422 error), but it doesn't appear in the banner even after using the manual refresh button. The banner only shows the existing test message."
 
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 1
-  run_ui: false
+  test_sequence: 2
+  run_ui: true
 
 test_plan:
   current_focus:
-    - "Site Messages GET Endpoint"
-    - "Site Messages POST Endpoint"
-    - "Site Messages Database Integration"
-  stuck_tasks: []
+    - "Site Messages Banner Display"
+  stuck_tasks: 
+    - "Site Messages Banner Display"
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "testing"
     message: "I've completed testing of the site messages functionality in the backend. All tests are passing. The GET /api/site-messages endpoint correctly returns active messages, and the POST /api/admin/site-message endpoint successfully creates new messages with proper admin authentication. The database integration is working correctly, with messages being stored and retrieved properly."
+  - agent: "testing"
+    message: "I've tested the site messages banner functionality in the frontend. The banner is visible and displays existing messages correctly. However, there's an issue with newly created messages not appearing in the banner. When creating a new message through the admin panel, the API returns a 422 error, and the message doesn't appear in the banner even after using the manual refresh button. The banner only shows the existing test message. The console logs show 'Failed to fetch' errors when trying to fetch site messages, which might be related to the issue."
