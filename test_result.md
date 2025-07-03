@@ -144,9 +144,9 @@ backend:
 frontend:
   - task: "Site Messages Banner Display"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
@@ -156,6 +156,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "The site messages banner is visible and displays existing messages correctly. However, newly created messages do not appear in the banner immediately after creation. When creating a new message through the admin panel, the message is saved to the backend (API returns 422 error), but it doesn't appear in the banner even after using the manual refresh button. The banner only shows the existing test message."
+      - working: true
+        agent: "testing"
+        comment: "The fix for the site messages banner functionality is working correctly. Successfully created two new messages: one without an expiration date and one with a future expiration date. Both messages appeared in the banner immediately after creation. The API responses showed 200 status codes for all requests, confirming that the 422 validation error has been resolved. The fix to convert empty expiration date strings to null in the frontend before sending to the backend has successfully resolved the issue."
 
 metadata:
   created_by: "testing_agent"
