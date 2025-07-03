@@ -516,20 +516,27 @@ function App() {
 
   // Fetch Active Site Messages for Banner
   const fetchActiveSiteMessages = async () => {
+    console.log('🔄 Fetching active site messages...');
     try {
       const response = await fetch(`${API_BASE_URL}/api/site-messages`);
       if (response.ok) {
         const data = await response.json();
+        console.log('📥 Received site messages:', data);
+        
         // Filter only active messages (not expired)
         const now = new Date();
         const activeMessages = data.messages.filter(msg => {
           if (!msg.expires_at) return true; // No expiry = always active
           return new Date(msg.expires_at) > now;
         });
+        
+        console.log('✅ Active messages after filtering:', activeMessages);
         setActiveSiteMessages(activeMessages);
+      } else {
+        console.error('❌ Failed to fetch site messages:', response.status);
       }
     } catch (error) {
-      console.error('Error fetching active site messages:', error);
+      console.error('❌ Error fetching active site messages:', error);
     }
   };
 
