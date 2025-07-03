@@ -547,21 +547,14 @@ class GlobalRankingsTester(unittest.TestCase):
         print("✅ Enhanced search functionality test completed - UI testing required for full verification")
 
 class SiteMessagesTester(unittest.TestCase):
-    def __init__(self, *args, **kwargs):
-        super(SiteMessagesTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://4a8aa96b-af2f-46ea-b951-d2885237a55a.preview.emergentagent.com"
-        # Using the correct credentials from server.py
-        self.admin_credentials = {
-            "username": "God",
-            "password": "Kiki1999@"
-        }
-        self.admin_token = None
-        self.test_message = {
-            "message": "This is a test site message for testing purposes",
-            "message_type": "info",
-            "expires_at": None
-        }
-        self.created_message_id = None
+    base_url = "https://4a8aa96b-af2f-46ea-b951-d2885237a55a.preview.emergentagent.com"
+    # Using the correct credentials from server.py
+    admin_credentials = {
+        "username": "God",
+        "password": "Kiki1999@"
+    }
+    admin_token = None
+    created_message_id = None
     
     def test_01_admin_login(self):
         """Login as admin to get token for site message creation"""
@@ -573,7 +566,7 @@ class SiteMessagesTester(unittest.TestCase):
         self.assertEqual(response.status_code, 200, f"Admin login failed with status {response.status_code}: {response.text}")
         data = response.json()
         self.assertIn("token", data)
-        self.admin_token = data["token"]
+        SiteMessagesTester.admin_token = data["token"]
         print(f"✅ Admin login successful - Token obtained for site message testing")
     
     def test_02_get_current_site_messages(self):
@@ -600,30 +593,36 @@ class SiteMessagesTester(unittest.TestCase):
         print("\n🔍 Testing POST /api/admin/site-message endpoint...")
         
         # Skip if admin login failed
-        if not self.admin_token:
+        if not SiteMessagesTester.admin_token:
             self.skipTest("Admin token not available, skipping site message creation test")
         
-        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        test_message = {
+            "message": "This is a test site message for testing purposes",
+            "message_type": "info",
+            "expires_at": None
+        }
+        
+        headers = {"Authorization": f"Bearer {SiteMessagesTester.admin_token}"}
         response = requests.post(
             f"{self.base_url}/api/admin/site-message",
             headers=headers,
-            json=self.test_message
+            json=test_message
         )
         
         self.assertEqual(response.status_code, 200, f"Failed to create site message: {response.text}")
         data = response.json()
         self.assertIn("message", data)
         self.assertIn("message_id", data)
-        self.created_message_id = data["message_id"]
+        SiteMessagesTester.created_message_id = data["message_id"]
         
-        print(f"✅ Site message created successfully - Message ID: {self.created_message_id}")
+        print(f"✅ Site message created successfully - Message ID: {SiteMessagesTester.created_message_id}")
     
     def test_04_verify_created_message(self):
         """Verify that the created message appears in the GET response"""
         print("\n🔍 Verifying created site message appears in GET response...")
         
         # Skip if message creation failed
-        if not self.created_message_id:
+        if not SiteMessagesTester.created_message_id:
             self.skipTest("Message creation failed, skipping verification test")
         
         response = requests.get(f"{self.base_url}/api/site-messages")
@@ -634,10 +633,10 @@ class SiteMessagesTester(unittest.TestCase):
         messages = data["messages"]
         found = False
         for msg in messages:
-            if msg.get("id") == self.created_message_id:
+            if msg.get("id") == SiteMessagesTester.created_message_id:
                 found = True
-                self.assertEqual(msg["message"], self.test_message["message"])
-                self.assertEqual(msg["message_type"], self.test_message["message_type"])
+                self.assertEqual(msg["message"], "This is a test site message for testing purposes")
+                self.assertEqual(msg["message_type"], "info")
                 self.assertTrue(msg["is_active"])
                 print(f"✅ Created message found in GET response")
                 break
