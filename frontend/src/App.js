@@ -1442,6 +1442,38 @@ function App() {
           className="rankings-trophy"
         />
       </div>
+
+      {/* Search Section */}
+      <div className="rankings-search-section">
+        <h3>🔍 Search Player Position</h3>
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Enter name or username to find their ranking position..."
+            value={rankingSearch}
+            onChange={(e) => handleRankingSearch(e.target.value)}
+            className="ranking-search-input"
+          />
+          <span className="search-icon">🔍</span>
+        </div>
+        
+        {rankingSearchResult && (
+          <div className={`search-result ${rankingSearchResult.found ? 'found' : 'not-found'}`}>
+            {rankingSearchResult.found ? (
+              <div className="found-user">
+                <span className="result-icon">✅</span>
+                <span className="result-text">{rankingSearchResult.message}</span>
+              </div>
+            ) : (
+              <div className="not-found-user">
+                <span className="result-icon">❌</span>
+                <span className="result-text">{rankingSearchResult.message}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="rankings-table">
         <div className="table-header">
           <div className="rank-col">{t.position}</div>
@@ -1478,6 +1510,66 @@ function App() {
         )) : (
           <div className="no-players">
             <p>Loading rankings...</p>
+          </div>
+        )}
+      </div>
+
+      {/* Top 100 Players Section */}
+      <div className="top-players-section-rankings">
+        <div className="top-players-header">
+          <h3>🏆 Complete Top 100 Players by Score</h3>
+          <div className="top-players-controls">
+            <button 
+              className="btn btn-secondary btn-small"
+              onClick={() => {
+                setShowTop100Rankings(!showTop100Rankings);
+                if (!showTop100Rankings && top100Users.length === 0) {
+                  fetchTop100Users();
+                }
+              }}
+            >
+              {showTop100Rankings ? '👁️ Hide Top 100' : '👁️ Show Complete Top 100'}
+            </button>
+            {showTop100Rankings && (
+              <button 
+                className="btn btn-primary btn-small"
+                onClick={fetchTop100Users}
+              >
+                🔄 Refresh
+              </button>
+            )}
+          </div>
+        </div>
+
+        {showTop100Rankings && (
+          <div className="top-players-grid">
+            {/* Split into groups of 10 */}
+            {Array.from({ length: 10 }, (_, groupIndex) => {
+              const startIndex = groupIndex * 10;
+              const endIndex = startIndex + 10;
+              const groupUsers = top100Users.slice(startIndex, endIndex);
+              
+              if (groupUsers.length === 0) return null;
+              
+              return (
+                <div key={groupIndex} className="top-players-group">
+                  <h4>
+                    Positions {startIndex + 1}-{Math.min(endIndex, top100Users.length)}
+                  </h4>
+                  <div className="players-list">
+                    {groupUsers.map((player, index) => (
+                      <div key={player.username} className="top-player-item">
+                        <span className="player-rank">#{startIndex + index + 1}</span>
+                        <span className="player-flag">{countryFlags[player.country] || '🏳️'}</span>
+                        <span className="player-name">{player.full_name}</span>
+                        <span className="player-username">@{player.username}</span>
+                        <span className="player-score">{Math.round(player.score || 0)} pts</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
