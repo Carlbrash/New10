@@ -1273,6 +1273,60 @@ body {
   gap: 20px;
 }
 
+/* Search Container */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-search-input {
+  flex: 1;
+  min-width: 300px;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 25px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.admin-search-input:focus {
+  outline: none;
+  border-color: #ffd700;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.admin-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.search-results-count {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  white-space: nowrap;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+}
+
+.no-results p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Enhanced User Card */
 .admin-user-card {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 15px;
@@ -1347,6 +1401,10 @@ body {
   font-size: 0.9rem;
 }
 
+.stat-item strong {
+  color: #ffd700;
+}
+
 .status-badge {
   padding: 4px 8px;
   border-radius: 12px;
@@ -1364,6 +1422,13 @@ body {
   color: white;
 }
 
+.block-reason {
+  color: #ef4444;
+  font-style: italic;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
 .admin-actions {
   display: flex;
   gap: 10px;
@@ -1378,6 +1443,9 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   transition: all 0.3s ease;
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
 }
 
 .btn-success {
@@ -1398,6 +1466,18 @@ body {
 .admin-actions .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #4b5563, #6b7280);
 }
 
 /* Messages Grid */
