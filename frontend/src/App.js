@@ -547,6 +547,7 @@ function App() {
         
         console.log('✅ Active messages after filtering:', activeMessages);
         setActiveSiteMessages(activeMessages);
+        setBannerUpdateTrigger(prev => prev + 1); // Force re-render
       } else {
         console.error('❌ Failed to fetch site messages:', response.status);
       }
