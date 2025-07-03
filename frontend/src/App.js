@@ -404,6 +404,20 @@ function App() {
     }
   };
 
+  const fetchTop100Users = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/top100`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTop100Users(data.top_users);
+      }
+    } catch (error) {
+      console.error('Error fetching top 100 users:', error);
+    }
+  };
+
   // Form states
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
