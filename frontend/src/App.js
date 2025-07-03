@@ -611,8 +611,20 @@ function App() {
       fetchCompetitionAnalytics();
     } else if (adminView === 'content' && token && isAdmin) {
       fetchContentPages();
+      fetchMenuItems();
     }
   }, [adminView, token, isAdmin]);
+
+  // Fetch page content on app load
+  useEffect(() => {
+    const loadPageContent = async () => {
+      const pageIds = ['home_hero', 'about_us', 'terms_of_service'];
+      for (const pageId of pageIds) {
+        await fetchPageContent(pageId);
+      }
+    };
+    loadPageContent();
+  }, []);
 
   const fetchProfile = async () => {
     try {
