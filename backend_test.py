@@ -800,5 +800,355 @@ def run_tests():
     print("=" * 50)
     runner.run(site_messages_suite)
 
+class RankingsAndSearchTester(unittest.TestCase):
+    base_url = "https://d8447eb8-0bbb-4992-a0f4-51048a28a072.preview.emergentagent.com"
+    # Using the correct credentials from server.py
+    admin_credentials = {
+        "username": "admin",
+        "password": "Kiki1999@"
+    }
+    admin_token = None
+    
+    def test_01_admin_login(self):
+        """Login as admin to get token for admin endpoints"""
+        print("\n🔍 Testing admin login for rankings and search testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.admin_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        RankingsAndSearchTester.admin_token = data["token"]
+        print(f"✅ Admin login successful - Token obtained for admin endpoints testing")
+    
+    def test_02_rankings_api_data_structure(self):
+        """Test that rankings API returns proper data structure with scores"""
+        print("\n🔍 Testing rankings API data structure...")
+        response = requests.get(f"{self.base_url}/api/rankings")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("rankings", data)
+        self.assertIn("total", data)
+        
+        # Verify we have rankings data
+        rankings = data["rankings"]
+        self.assertGreater(len(rankings), 0, "Expected at least one player in rankings")
+        print(f"✅ Found {len(rankings)} players in rankings")
+        
+        # Check first few players for required fields
+        for i, player in enumerate(rankings[:5]):
+            # Check required fields for search functionality
+            self.assertIn("username", player)
+            self.assertIn("full_name", player)
+            self.assertIn("country", player)
+            self.assertIn("score", player)
+            
+            # Check score calculation fields
+            self.assertIn("total_bets", player)
+            self.assertIn("won_bets", player)
+            self.assertIn("lost_bets", player)
+            self.assertIn("total_amount", player)
+            self.assertIn("total_winnings", player)
+            self.assertIn("avg_odds", player)
+            self.assertIn("rank", player)
+            
+            # Verify score calculation logic
+            if player["total_bets"] > 0:
+                win_rate = player["won_bets"] / player["total_bets"]
+                profit = player["total_winnings"] - player["total_amount"]
+                roi = profit / player["total_amount"] if player["total_amount"] > 0 else 0
+                
+                # Base score calculation from betting performance
+                expected_base_score = (win_rate * 100) + (roi * 50) + (player["avg_odds"] * 10)
+                
+                # Allow for some floating point differences and manual score adjustments
+                self.assertGreaterEqual(player["score"], expected_base_score * 0.9, 
+                                      f"Score calculation seems off for player {player['username']}")
+                
+            print(f"  Player {i+1}: {player['full_name']} (Rank: {player['rank']}, Score: {player['score']})")
+            
+        print("✅ Rankings API returns proper data structure with scores")
+    
+    def test_03_top_100_users_api(self):
+        """Test the Top 100 Users API endpoint"""
+        print("\n🔍 Testing Top 100 Users API endpoint...")
+        
+        # Skip if admin login failed
+        if not RankingsAndSearchTester.admin_token:
+            self.skipTest("Admin token not available, skipping Top 100 Users API test")
+        
+        headers = {"Authorization": f"Bearer {RankingsAndSearchTester.admin_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/admin/users/top100",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get top 100 users: {response.text}")
+        data = response.json()
+        self.assertIn("top_users", data)
+        
+        top_users = data["top_users"]
+        self.assertLessEqual(len(top_users), 100, f"Expected at most 100 users, got {len(top_users)}")
+        print(f"✅ Found {len(top_users)} users in Top 100 API response")
+        
+        # Verify the users are sorted by score in descending order
+        if len(top_users) > 1:
+            is_sorted = all(top_users[i]["score"] >= top_users[i+1]["score"] for i in range(len(top_users)-1))
+            self.assertTrue(is_sorted, "Top users are not sorted by score in descending order")
+            print("✅ Users are correctly sorted by score in descending order")
+        
+        # Check first few users for required fields
+        for i, user in enumerate(top_users[:5]):
+            self.assertIn("full_name", user)
+            self.assertIn("username", user)
+            self.assertIn("score", user)
+            self.assertIn("country", user)
+            print(f"  User {i+1}: {user['full_name']} (Score: {user['score']})")
+        
+        print("✅ Top 100 Users API returns correctly sorted users with required fields")
+    
+    def test_04_site_messages_api(self):
+        """Quick test to verify site messages API is working"""
+        print("\n🔍 Testing site messages API...")
+        response = requests.get(f"{self.base_url}/api/site-messages")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("messages", data)
+        
+        messages = data["messages"]
+        print(f"✅ Site messages API returned {len(messages)} messages")
+        
+        # Print a few messages if available
+        for i, msg in enumerate(messages[:3]):
+            self.assertIn("message", msg)
+            self.assertIn("message_type", msg)
+            self.assertIn("is_active", msg)
+            print(f"  Message {i+1}: {msg['message'][:50]}...")
+        
+        print("✅ Site messages API is working correctly")
+    
+    def test_05_user_search_data_availability(self):
+        """Test that rankings data includes all fields needed for search functionality"""
+        print("\n🔍 Testing user search data availability in rankings...")
+        response = requests.get(f"{self.base_url}/api/rankings")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        rankings = data["rankings"]
+        self.assertGreater(len(rankings), 0, "Expected at least one player in rankings")
+        
+        # Check all users have the required search fields
+        search_fields = ["username", "full_name", "country", "score"]
+        missing_fields = {}
+        
+        for player in rankings:
+            for field in search_fields:
+                if field not in player:
+                    if field not in missing_fields:
+                        missing_fields[field] = 0
+                    missing_fields[field] += 1
+        
+        # Assert no missing fields
+        self.assertEqual(len(missing_fields), 0, f"Missing search fields in rankings data: {missing_fields}")
+        
+        # Check for empty values in critical fields
+        empty_fields = {}
+        for player in rankings:
+            for field in search_fields:
+                if field in player and not player[field] and player[field] != 0:
+                    if field not in empty_fields:
+                        empty_fields[field] = 0
+                    empty_fields[field] += 1
+        
+        # Warn about empty values but don't fail the test
+        if empty_fields:
+            print(f"⚠️ Warning: Some players have empty values in search fields: {empty_fields}")
+        
+        print("✅ Rankings data includes all fields needed for search functionality")
+
+def run_tests():
+    """Run all tests in order"""
+    # Allow running specific test groups via command line
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "world_map_only":
+            # Run only world map related tests
+            api_test_suite = unittest.TestSuite()
+            api_test_suite.addTest(BettingFederationAPITest('test_01_health_check'))
+            api_test_suite.addTest(BettingFederationAPITest('test_07_country_stats'))
+            api_test_suite.addTest(BettingFederationAPITest('test_08_country_rankings'))
+            api_test_suite.addTest(WorldMapSearchTester('test_01_country_stats_for_search'))
+            api_test_suite.addTest(WorldMapSearchTester('test_02_enhanced_search_functionality'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING WORLD MAP API ENDPOINTS")
+            print("=" * 50)
+            runner.run(api_test_suite)
+            return
+        elif sys.argv[1] == "decimal_removal":
+            # Run only decimal removal tests
+            decimal_test_suite = unittest.TestSuite()
+            decimal_test_suite.addTest(DecimalRemovalTester('test_01_ui_decimal_removal_verification'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING UI DECIMAL REMOVAL")
+            print("=" * 50)
+            runner.run(decimal_test_suite)
+            return
+        elif sys.argv[1] == "avatar_only":
+            # Run only avatar tests
+            avatar_test_suite = unittest.TestSuite()
+            avatar_test_suite.addTest(AvatarTester('test_01_register_with_avatar'))
+            avatar_test_suite.addTest(AvatarTester('test_02_verify_avatar_in_profile'))
+            avatar_test_suite.addTest(AvatarTester('test_03_verify_avatar_in_rankings'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING AVATAR FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(avatar_test_suite)
+            return
+        elif sys.argv[1] == "global_rankings":
+            # Run only global rankings tests
+            rankings_test_suite = unittest.TestSuite()
+            rankings_test_suite.addTest(GlobalRankingsTester('test_01_global_rankings_data'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING GLOBAL RANKINGS FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(rankings_test_suite)
+            return
+        elif sys.argv[1] == "enhanced_search":
+            # Run only enhanced search tests
+            search_test_suite = unittest.TestSuite()
+            search_test_suite.addTest(WorldMapSearchTester('test_01_country_stats_for_search'))
+            search_test_suite.addTest(WorldMapSearchTester('test_02_enhanced_search_functionality'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING ENHANCED SEARCH FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(search_test_suite)
+            return
+        elif sys.argv[1] == "site_messages":
+            # Run only site messages tests
+            site_messages_suite = unittest.TestSuite()
+            site_messages_suite.addTest(SiteMessagesTester('test_01_admin_login'))
+            site_messages_suite.addTest(SiteMessagesTester('test_02_get_current_site_messages'))
+            site_messages_suite.addTest(SiteMessagesTester('test_03_create_site_message'))
+            site_messages_suite.addTest(SiteMessagesTester('test_04_verify_created_message'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING SITE MESSAGES FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(site_messages_suite)
+            return
+        elif sys.argv[1] == "rankings_search":
+            # Run only rankings and search tests
+            rankings_search_suite = unittest.TestSuite()
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_01_admin_login'))
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_02_rankings_api_data_structure'))
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_03_top_100_users_api'))
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_04_site_messages_api'))
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_05_user_search_data_availability'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING RANKINGS AND SEARCH FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(rankings_search_suite)
+            return
+    
+    # Run all tests
+    api_test_suite = unittest.TestSuite()
+    api_test_suite.addTest(BettingFederationAPITest('test_01_health_check'))
+    api_test_suite.addTest(BettingFederationAPITest('test_02_user_registration'))
+    api_test_suite.addTest(BettingFederationAPITest('test_03_user_login'))
+    api_test_suite.addTest(BettingFederationAPITest('test_03b_demo_user_login'))
+    api_test_suite.addTest(BettingFederationAPITest('test_04_protected_profile_route'))
+    api_test_suite.addTest(BettingFederationAPITest('test_05_rankings'))
+    api_test_suite.addTest(BettingFederationAPITest('test_06_competitions'))
+    api_test_suite.addTest(BettingFederationAPITest('test_07_country_stats'))
+    api_test_suite.addTest(BettingFederationAPITest('test_08_country_rankings'))
+    api_test_suite.addTest(BettingFederationAPITest('test_09_join_competition'))
+    
+    decimal_test_suite = unittest.TestSuite()
+    decimal_test_suite.addTest(DecimalRemovalTester('test_01_ui_decimal_removal_verification'))
+    
+    backup_test_suite = unittest.TestSuite()
+    backup_test_suite.addTest(BackupTester('test_01_direct_targz_download'))
+    backup_test_suite.addTest(BackupTester('test_02_direct_zip_download'))
+    backup_test_suite.addTest(BackupTester('test_03_downloads_html_page'))
+    
+    avatar_test_suite = unittest.TestSuite()
+    avatar_test_suite.addTest(AvatarTester('test_01_register_with_avatar'))
+    avatar_test_suite.addTest(AvatarTester('test_02_verify_avatar_in_profile'))
+    avatar_test_suite.addTest(AvatarTester('test_03_verify_avatar_in_rankings'))
+    
+    world_map_search_suite = unittest.TestSuite()
+    world_map_search_suite.addTest(WorldMapSearchTester('test_01_country_stats_for_search'))
+    world_map_search_suite.addTest(WorldMapSearchTester('test_02_enhanced_search_functionality'))
+    
+    global_rankings_suite = unittest.TestSuite()
+    global_rankings_suite.addTest(GlobalRankingsTester('test_01_global_rankings_data'))
+    
+    site_messages_suite = unittest.TestSuite()
+    site_messages_suite.addTest(SiteMessagesTester('test_01_admin_login'))
+    site_messages_suite.addTest(SiteMessagesTester('test_02_get_current_site_messages'))
+    site_messages_suite.addTest(SiteMessagesTester('test_03_create_site_message'))
+    site_messages_suite.addTest(SiteMessagesTester('test_04_verify_created_message'))
+    
+    rankings_search_suite = unittest.TestSuite()
+    rankings_search_suite.addTest(RankingsAndSearchTester('test_01_admin_login'))
+    rankings_search_suite.addTest(RankingsAndSearchTester('test_02_rankings_api_data_structure'))
+    rankings_search_suite.addTest(RankingsAndSearchTester('test_03_top_100_users_api'))
+    rankings_search_suite.addTest(RankingsAndSearchTester('test_04_site_messages_api'))
+    rankings_search_suite.addTest(RankingsAndSearchTester('test_05_user_search_data_availability'))
+    
+    runner = unittest.TextTestRunner(verbosity=2)
+    print("\n" + "=" * 50)
+    print("TESTING API ENDPOINTS")
+    print("=" * 50)
+    runner.run(api_test_suite)
+    
+    print("\n" + "=" * 50)
+    print("TESTING DECIMAL REMOVAL")
+    print("=" * 50)
+    runner.run(decimal_test_suite)
+    
+    print("\n" + "=" * 50)
+    print("TESTING BACKUP FUNCTIONALITY")
+    print("=" * 50)
+    runner.run(backup_test_suite)
+    
+    print("\n" + "=" * 50)
+    print("TESTING AVATAR FUNCTIONALITY")
+    print("=" * 50)
+    runner.run(avatar_test_suite)
+    
+    print("\n" + "=" * 50)
+    print("TESTING WORLD MAP SEARCH FUNCTIONALITY")
+    print("=" * 50)
+    runner.run(world_map_search_suite)
+    
+    print("\n" + "=" * 50)
+    print("TESTING GLOBAL RANKINGS FUNCTIONALITY")
+    print("=" * 50)
+    runner.run(global_rankings_suite)
+    
+    print("\n" + "=" * 50)
+    print("TESTING SITE MESSAGES FUNCTIONALITY")
+    print("=" * 50)
+    runner.run(site_messages_suite)
+    
+    print("\n" + "=" * 50)
+    print("TESTING RANKINGS AND SEARCH FUNCTIONALITY")
+    print("=" * 50)
+    runner.run(rankings_search_suite)
+
 if __name__ == "__main__":
     run_tests()
