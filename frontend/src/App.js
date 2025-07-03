@@ -296,7 +296,8 @@ function App() {
     full_name: '',
     email: '',
     avatar_url: '',
-    country: ''
+    country: '',
+    phone: ''
   });
   const [passwordForm, setPasswordForm] = useState({
     current_password: '',
