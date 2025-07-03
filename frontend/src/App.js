@@ -276,6 +276,13 @@ function App() {
   const [countryRankings, setCountryRankings] = useState([]);
   const [countrySearch, setCountrySearch] = useState('');
 
+  // Admin Panel States
+  const [adminView, setAdminView] = useState('users');
+  const [allUsers, setAllUsers] = useState([]);
+  const [siteMessages, setSiteMessages] = useState([]);
+  const [adminActions, setAdminActions] = useState([]);
+  const [adminLoading, setAdminLoading] = useState(false);
+
   // Get current translations
   const t = translations[language];
 
