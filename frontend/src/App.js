@@ -570,6 +570,102 @@ function App() {
     setSettingsLoading(false);
   };
 
+  // Settings functions
+  const openSettings = () => {
+    if (user) {
+      setSettingsForm({
+        full_name: user.full_name || '',
+        email: user.email || '',
+        avatar_url: user.avatar_url || '',
+        country: user.country || ''
+      });
+      setPasswordForm({
+        current_password: '',
+        new_password: '',
+        confirm_password: ''
+      });
+      setShowSettings(true);
+    }
+  };
+
+  const updateProfile = async (e) => {
+    e.preventDefault();
+    setSettingsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(settingsForm)
+      });
+
+      if (response.ok) {
+        alert('Profile updated successfully!');
+        // Refresh user data
+        fetchUserProfile();
+        setShowSettings(false);
+      } else {
+        const errorData = await response.json();
+        alert(`Error updating profile: ${errorData.detail || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Error updating profile');
+    }
+    
+    setSettingsLoading(false);
+  };
+
+  const changePassword = async (e) => {
+    e.preventDefault();
+    
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      alert('New passwords do not match!');
+      return;
+    }
+    
+    if (passwordForm.new_password.length < 6) {
+      alert('New password must be at least 6 characters long!');
+      return;
+    }
+    
+    setSettingsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/profile/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          current_password: passwordForm.current_password,
+          new_password: passwordForm.new_password
+        })
+      });
+
+      if (response.ok) {
+        alert('Password changed successfully!');
+        setPasswordForm({
+          current_password: '',
+          new_password: '',
+          confirm_password: ''
+        });
+      } else {
+        const errorData = await response.json();
+        alert(`Error changing password: ${errorData.detail || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      alert('Error changing password');
+    }
+    
+    setSettingsLoading(false);
+  };
+
   const fetchMenuItems = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/menu/items`, {
