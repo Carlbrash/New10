@@ -284,6 +284,11 @@ function App() {
   const [countrySearch, setCountrySearch] = useState('');
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [mapView, setMapView] = useState('countries');
+  const [countryRankings, setCountryRankings] = useState([]);
+  // World Map states
+  const [countrySearch, setCountrySearch] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [mapView, setMapView] = useState('countries');
   const [bannerUpdateTrigger, setBannerUpdateTrigger] = useState(0);
 
   // Admin Panel States
