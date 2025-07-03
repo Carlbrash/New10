@@ -1677,6 +1677,9 @@ function App() {
         </div>
       </nav>
 
+      {/* Site Messages Banner - positioned below navbar */}
+      <SiteMessagesBanner />
+
       <main className="main-content">
         {currentView === 'home' && renderHome()}
         {currentView === 'login' && renderLogin()}
