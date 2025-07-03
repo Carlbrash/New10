@@ -2026,11 +2026,7 @@ function App() {
     );
   };
 
-  // Admin Panel Component
-  const renderAdminPanel = () => {
-    const [activeTab, setActiveTab] = useState('users');
-
-    return (
+  return (
     <div className="App">
       <nav className="navbar">
         <div className="navbar-brand">
