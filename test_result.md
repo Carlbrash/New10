@@ -105,6 +105,30 @@
 user_problem_statement: "Added search functionality to Rankings page and Top 100 players list in both Rankings page and Admin panel. User requested: 'stin selida Ranking thelo na prosthesoyme pano apo thn arxh ths lista kai kato apo tin epikefalida GLOBAL RANKING ena pedio sertche poy tha mporrei o kathenas na pliktrologi to onoma i to user name kai na vriksi ti thesi einai kapoios sto pagosmio ranking ( episis sto telos tis listas thelo me ton tropo poy eixame valei sto admin panel tin lista ton 100 ana dekades (prpei na tin diorthosoyme pali giati sto teleytaio update xalase ) na thn valoyme kai edw sto ranking'"
 
 backend:
+  - task: "Rankings API Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Rankings API (/api/rankings) is working correctly. Returns proper ranking data with scores, includes all required fields for search functionality (username, full_name, country, score). Score calculations are working as expected."
+
+  - task: "Top 100 Users API Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Top 100 Users API (/api/admin/users/top100) is working correctly. Returns sorted users by score in descending order, includes all required fields for the Top 100 display functionality."
+
   - task: "Site Messages GET Endpoint"
     implemented: true
     working: true
@@ -116,9 +140,6 @@ backend:
       - working: true
         agent: "testing"
         comment: "GET /api/site-messages endpoint is working correctly. It returns an array of messages with the expected structure."
-      - working: true
-        agent: "testing"
-        comment: "Retested the site messages API as part of the rankings and search functionality testing. The API is working correctly and returns the expected data structure."
 
   - task: "Site Messages POST Endpoint"
     implemented: true
