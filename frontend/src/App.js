@@ -381,6 +381,10 @@ function App() {
         setMapView('countries');
       }
     }
+    if (currentView === 'admin' && isAdmin) {
+      console.log('⚙️ Fetching admin data for Admin Panel view');
+      fetchAdminData();
+    }
   }, [currentView]);
 
   const fetchProfile = async () => {
