@@ -401,10 +401,17 @@ function App() {
   // Fetch active site messages for banner when user logs in
   useEffect(() => {
     if (token) {
+      console.log('🔑 Token detected, fetching active site messages...');
       fetchActiveSiteMessages();
       // Refresh banner messages every 30 seconds
-      const interval = setInterval(fetchActiveSiteMessages, 30000);
+      const interval = setInterval(() => {
+        console.log('⏰ Auto-refreshing site messages...');
+        fetchActiveSiteMessages();
+      }, 30000);
       return () => clearInterval(interval);
+    } else {
+      console.log('❌ No token, fetching site messages anyway for public display...');
+      fetchActiveSiteMessages(); // Fetch even without token for public messages
     }
   }, [token]);
 
