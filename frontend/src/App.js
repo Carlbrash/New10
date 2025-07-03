@@ -506,6 +506,17 @@ function App() {
     fetchActiveSiteMessages();
   }, []);
 
+  // Fetch analytics data when adminView changes to analytics
+  useEffect(() => {
+    if (adminView === 'analytics' && token && isAdmin) {
+      fetchAnalyticsOverview();
+      fetchUserAnalytics();
+      fetchCompetitionAnalytics();
+    } else if (adminView === 'content' && token && isAdmin) {
+      fetchContentPages();
+    }
+  }, [adminView, token, isAdmin]);
+
   const fetchProfile = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/profile`, {
