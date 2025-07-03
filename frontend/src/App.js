@@ -474,24 +474,6 @@ function App() {
     }
   };
 
-  // Settings functions
-  const openSettings = () => {
-    if (user) {
-      setSettingsForm({
-        full_name: user.full_name || '',
-        email: user.email || '',
-        avatar_url: user.avatar_url || '',
-        country: user.country || ''
-      });
-      setPasswordForm({
-        current_password: '',
-        new_password: '',
-        confirm_password: ''
-      });
-      setShowSettings(true);
-    }
-  };
-
   const updateProfile = async (e) => {
     e.preventDefault();
     setSettingsLoading(true);
