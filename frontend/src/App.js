@@ -922,6 +922,10 @@ function App() {
         const messageType = action.details?.message_type || 'info';
         return `Δημιουργία site message (${messageType}) από ${adminName}`;
       
+      case 'update_content_page':
+        const pageTitle = action.details?.page_title || 'Unknown Page';
+        return `Ενημέρωση περιεχομένου σελίδας "${pageTitle}" από ${adminName}`;
+      
       default:
         return `${action.action_type} από ${adminName}`;
     }
