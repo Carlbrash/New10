@@ -506,6 +506,25 @@ function App() {
     }
   };
 
+  // Fetch Active Site Messages for Banner
+  const fetchActiveSiteMessages = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/site-messages`);
+      if (response.ok) {
+        const data = await response.json();
+        // Filter only active messages (not expired)
+        const now = new Date();
+        const activeMessages = data.messages.filter(msg => {
+          if (!msg.expires_at) return true; // No expiry = always active
+          return new Date(msg.expires_at) > now;
+        });
+        setActiveSiteMessages(activeMessages);
+      }
+    } catch (error) {
+      console.error('Error fetching active site messages:', error);
+    }
+  };
+
   // Search Users Function
   const handleUserSearch = (searchTerm) => {
     setUserSearchTerm(searchTerm);
