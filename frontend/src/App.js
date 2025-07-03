@@ -1070,6 +1070,17 @@ function App() {
               >
                 {t.dashboard}
               </button>
+              
+              {/* Admin Panel - only for admin users */}
+              {isAdmin && (
+                <button 
+                  className={`nav-link admin-nav ${currentView === 'admin' ? 'active' : ''}`}
+                  onClick={() => setCurrentView('admin')}
+                >
+                  ⚙️ {t.adminPanel}
+                </button>
+              )}
+              
               <button className="btn btn-logout" onClick={handleLogout}>
                 {t.logout}
               </button>
