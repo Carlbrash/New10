@@ -2137,12 +2137,10 @@ function App() {
                 {adminActions.map(action => (
                   <div key={action.id} className="action-item">
                     <div className="action-header">
-                      <span className="action-type">{action.action_type}</span>
-                      <span className="action-admin">by {action.admin_id}</span>
                       <span className="action-date">{new Date(action.timestamp).toLocaleString()}</span>
                     </div>
-                    <div className="action-details">
-                      {JSON.stringify(action.details, null, 2)}
+                    <div className="action-description">
+                      {formatAdminAction(action)}
                     </div>
                   </div>
                 ))}
