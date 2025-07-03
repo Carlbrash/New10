@@ -284,6 +284,17 @@ function App() {
   const [siteMessages, setSiteMessages] = useState([]);
   const [adminActions, setAdminActions] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
+  
+  // Site Messages Modal States
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [messageForm, setMessageForm] = useState({
+    message: '',
+    message_type: 'info',
+    expires_at: ''
+  });
+  
+  // Active Site Messages for Banner
+  const [activeSiteMessages, setActiveSiteMessages] = useState([]);
 
   // Get current translations
   const t = translations[language];
