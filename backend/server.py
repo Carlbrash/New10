@@ -679,33 +679,197 @@ async def get_competition_analytics(admin_id: str = Depends(verify_admin_token(A
 async def get_content_pages(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
     """Get all content pages for management"""
     try:
-        # For now, return predefined pages that can be managed
-        pages = [
-            {
-                "id": "home_hero",
-                "title": "Home Page Hero Section",
-                "type": "hero",
-                "content": "Welcome to WoBeRa - World Betting Rank Platform",
-                "last_updated": datetime.utcnow().isoformat()
-            },
-            {
-                "id": "about_us",
-                "title": "About Us Page",
-                "type": "page",
-                "content": "WoBeRa is the premier luxury sports betting federation platform...",
-                "last_updated": datetime.utcnow().isoformat()
-            },
-            {
-                "id": "terms_of_service",
-                "title": "Terms of Service",
-                "type": "legal",
-                "content": "Terms and conditions for using the WoBeRa platform...",
-                "last_updated": datetime.utcnow().isoformat()
-            }
-        ]
+        # Get content pages from database
+        pages = list(content_pages_collection.find({}, {"_id": 0}))
+        
+        # If no pages exist, create default ones
+        if not pages:
+            default_pages = [
+                {
+                    "id": "home_hero",
+                    "title": "Home Page Hero Section",
+                    "page_type": "hero",
+                    "content": "Welcome to WoBeRa - World Betting Rank Platform",
+                    "is_active": True,
+                    "meta_title": "WoBeRa - Παγκόσμια Ομοσπονδία Αθλητικού Betting",
+                    "meta_description": "Η κορυφαία πλατφόρμα αθλητικών στοιχημάτων με παγκόσμια κατάταξη",
+                    "created_at": datetime.utcnow(),
+                    "last_updated": datetime.utcnow()
+                },
+                {
+                    "id": "about_us",
+                    "title": "About Us Page",
+                    "page_type": "page",
+                    "content": "WoBeRa is the premier luxury sports betting federation platform connecting betting enthusiasts worldwide.",
+                    "is_active": True,
+                    "meta_title": "About WoBeRa - World Betting Rank",
+                    "meta_description": "Learn about WoBeRa, the luxury sports betting federation platform",
+                    "created_at": datetime.utcnow(),
+                    "last_updated": datetime.utcnow()
+                },
+                {
+                    "id": "terms_of_service",
+                    "title": "Terms of Service",
+                    "page_type": "legal",
+                    "content": "Terms and conditions for using the WoBeRa platform...",
+                    "is_active": True,
+                    "meta_title": "Terms of Service - WoBeRa",
+                    "meta_description": "Terms and conditions for using WoBeRa platform",
+                    "created_at": datetime.utcnow(),
+                    "last_updated": datetime.utcnow()
+                }
+            ]
+            
+            # Insert default pages
+            content_pages_collection.insert_many(default_pages)
+            pages = default_pages
+            
         return {"pages": pages}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching content pages: {str(e)}")
+
+@app.get("/api/content/page/{page_id}")
+async def get_public_content_page(page_id: str):
+    """Get public content page by ID"""
+    try:
+        page = content_pages_collection.find_one({"id": page_id, "is_active": True}, {"_id": 0})
+        if not page:
+            raise HTTPException(status_code=404, detail="Page not found")
+        return page
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching page: {str(e)}")
+
+@app.put("/api/admin/content/page/{page_id}")
+async def update_content_page(page_id: str, page_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Update content page"""
+    try:
+        # Update the page
+        update_data = {
+            "title": page_data.get("title"),
+            "content": page_data.get("content"),
+            "meta_title": page_data.get("meta_title"),
+            "meta_description": page_data.get("meta_description"),
+            "is_active": page_data.get("is_active", True),
+            "last_updated": datetime.utcnow()
+        }
+        
+        result = content_pages_collection.update_one(
+            {"id": page_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Page not found")
+            
+        # Log admin action
+        admin_actions_collection.insert_one({
+            "id": str(uuid.uuid4()),
+            "admin_id": admin_id,
+            "action_type": "update_content_page",
+            "target_user_id": page_id,
+            "details": {
+                "page_id": page_id,
+                "page_title": page_data.get("title", "Unknown")
+            },
+            "timestamp": datetime.utcnow()
+        })
+        
+        return {"message": "Page updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating page: {str(e)}")
+
+@app.get("/api/admin/menu/items")
+async def get_menu_items(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all menu items for management"""
+    try:
+        # Get menu items from database
+        items = list(menu_items_collection.find({}, {"_id": 0}).sort("order", 1))
+        
+        # If no items exist, create default ones
+        if not items:
+            default_items = [
+                {
+                    "id": "home",
+                    "label": "Home",
+                    "url": "/",
+                    "order": 1,
+                    "is_active": True,
+                    "icon": "🏠"
+                },
+                {
+                    "id": "rankings",
+                    "label": "Rankings",
+                    "url": "/rankings",
+                    "order": 2,
+                    "is_active": True,
+                    "icon": "🏆"
+                },
+                {
+                    "id": "competitions",
+                    "label": "Competitions",
+                    "url": "/competitions",
+                    "order": 3,
+                    "is_active": True,
+                    "icon": "🥇"
+                },
+                {
+                    "id": "world_map",
+                    "label": "World Map",
+                    "url": "/world-map",
+                    "order": 4,
+                    "is_active": True,
+                    "icon": "🌍"
+                },
+                {
+                    "id": "about",
+                    "label": "About",
+                    "url": "/about",
+                    "order": 5,
+                    "is_active": True,
+                    "icon": "ℹ️"
+                }
+            ]
+            
+            # Insert default items
+            menu_items_collection.insert_many(default_items)
+            items = default_items
+            
+        return {"menu_items": items}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching menu items: {str(e)}")
+
+@app.get("/api/menu/items")
+async def get_public_menu_items():
+    """Get public menu items"""
+    try:
+        items = list(menu_items_collection.find({"is_active": True}, {"_id": 0}).sort("order", 1))
+        return {"menu_items": items}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching menu items: {str(e)}")
+
+@app.put("/api/admin/menu/item/{item_id}")
+async def update_menu_item(item_id: str, item_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Update menu item"""
+    try:
+        update_data = {
+            "label": item_data.get("label"),
+            "url": item_data.get("url"),
+            "order": item_data.get("order"),
+            "is_active": item_data.get("is_active", True),
+            "icon": item_data.get("icon")
+        }
+        
+        result = menu_items_collection.update_one(
+            {"id": item_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Menu item not found")
+            
+        return {"message": "Menu item updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating menu item: {str(e)}")
 
 # Initialize some sample data
 @app.on_event("startup")
