@@ -422,6 +422,83 @@ function App() {
     }
   };
 
+  const fetchMenuItems = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/menu/items`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMenuItems(data.menu_items);
+      }
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+    }
+  };
+
+  const updateContentPage = async (pageId, pageData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/content/page/${pageId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(pageData)
+      });
+      
+      if (response.ok) {
+        alert('Page updated successfully!');
+        fetchContentPages();
+        setShowContentModal(false);
+        
+        // Refresh the actual page content that's displayed
+        fetchPageContent(pageId);
+      } else {
+        alert('Error updating page');
+      }
+    } catch (error) {
+      console.error('Error updating page:', error);
+      alert('Error updating page');
+    }
+  };
+
+  const fetchPageContent = async (pageId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/content/page/${pageId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setPageContent(prev => ({...prev, [pageId]: data}));
+      }
+    } catch (error) {
+      console.error('Error fetching page content:', error);
+    }
+  };
+
+  const updateMenuItem = async (itemId, itemData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/menu/item/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(itemData)
+      });
+      
+      if (response.ok) {
+        alert('Menu item updated successfully!');
+        fetchMenuItems();
+        setShowMenuModal(false);
+      } else {
+        alert('Error updating menu item');
+      }
+    } catch (error) {
+      console.error('Error updating menu item:', error);
+      alert('Error updating menu item');
+    }
+  };
+
   // Form states
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
