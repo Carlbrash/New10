@@ -1588,7 +1588,7 @@ function App() {
                         <span className="user-rank">#{index + 1}</span>
                         <span className="user-name">{user.full_name}</span>
                         <span className="user-country">{countryFlags[user.country] || '🏳️'}</span>
-                        <span className="user-points">{user.points} pts</span>
+                        <span className="user-points">{user.score ? Math.round(user.score) : 0} pts</span>
                       </div>
                     ))}
                   </div>
