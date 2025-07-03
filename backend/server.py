@@ -420,6 +420,10 @@ async def adjust_user_points(request: AdjustPointsRequest, admin_id: str = Depen
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Get admin info for better logging
+    admin_user = users_collection.find_one({"id": admin_id})
+    admin_name = admin_user.get("username", "Unknown") if admin_user else "Unknown"
+    
     # Update user score
     new_score = max(0, user["score"] + request.points_change)
     users_collection.update_one(
@@ -427,17 +431,18 @@ async def adjust_user_points(request: AdjustPointsRequest, admin_id: str = Depen
         {"$set": {"score": new_score}}
     )
     
-    # Log admin action
+    # Log admin action with more details
     admin_actions_collection.insert_one({
         "id": str(uuid.uuid4()),
-        "admin_id": admin_id,
+        "admin_id": admin_name,
         "action_type": "adjust_points",
-        "target_user_id": request.user_id,
+        "target_user_id": user.get("username", "Unknown"),
         "details": {
             "points_change": request.points_change,
             "old_score": user["score"],
             "new_score": new_score,
-            "reason": request.reason
+            "reason": request.reason,
+            "target_user_name": user.get("full_name", "Unknown User")
         },
         "timestamp": datetime.utcnow()
     })
