@@ -134,11 +134,6 @@ class SiteMessage(BaseModel):
     message: str
     message_type: str  # 'announcement', 'warning', 'info'
     expires_at: Optional[datetime] = None
-    end_date: datetime
-    max_participants: int
-    current_participants: int
-    status: str  # active, upcoming, finished
-    prize_pool: float
 
 # Helper functions
 def hash_password(password: str) -> str:
