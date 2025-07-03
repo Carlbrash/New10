@@ -1770,6 +1770,262 @@ function App() {
     );
   };
 
+  // Admin Panel Component
+  const renderAdminPanel = () => {
+    const [activeTab, setActiveTab] = useState('users');
+
+    return (
+      <div className="admin-panel">
+        <div className="admin-header">
+          <div className="admin-title">
+            <h1>⚙️ {t.adminPanel}</h1>
+            <div className="admin-role-badge">
+              {user.admin_role === 'god' && (
+                <span className="role-god">👑 {t.godLevel}</span>
+              )}
+              {user.admin_role === 'super_admin' && (
+                <span className="role-super-admin">⭐ {t.superAdmin}</span>
+              )}
+              {user.admin_role === 'admin' && (
+                <span className="role-admin">🛡️ {t.adminLevel}</span>
+              )}
+            </div>
+          </div>
+          
+          <div className="admin-tabs">
+            <button 
+              className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`}
+              onClick={() => setActiveTab('users')}
+            >
+              👥 {t.userManagement}
+            </button>
+            
+            <button 
+              className={`admin-tab ${activeTab === 'messages' ? 'active' : ''}`}
+              onClick={() => setActiveTab('messages')}
+            >
+              📢 {t.siteMessages}
+            </button>
+            
+            <button 
+              className={`admin-tab ${activeTab === 'competitions' ? 'active' : ''}`}
+              onClick={() => setActiveTab('competitions')}
+            >
+              🏆 {t.competitions}
+            </button>
+            
+            {isGod && (
+              <button 
+                className={`admin-tab ${activeTab === 'actions' ? 'active' : ''}`}
+                onClick={() => setActiveTab('actions')}
+              >
+                📋 {t.adminActions}
+              </button>
+            )}
+          </div>
+        </div>
+        
+        <div className="admin-content">
+          {activeTab === 'users' && (
+            <div className="admin-tab-content">
+              <div className="admin-controls">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setShowBlockModal(true)}
+                >
+                  🚫 {t.blockUser}
+                </button>
+                
+                {isGod && (
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => setShowPointsModal(true)}
+                  >
+                    ⚡ {t.adjustPoints}
+                  </button>
+                )}
+              </div>
+
+              <div className="admin-table">
+                <div className="table-header">
+                  <div className="col-user">👤 {t.player}</div>
+                  <div className="col-role">🛡️ Role</div>
+                  <div className="col-status">📊 {t.status}</div>
+                  <div className="col-stats">📈 Stats</div>
+                  <div className="col-actions">⚙️ Actions</div>
+                </div>
+
+                {allUsers.map(userItem => (
+                  <div key={userItem.id} className="table-row">
+                    <div className="col-user">
+                      <div className="user-info">
+                        <div className="user-details">
+                          <span className="user-name">{userItem.full_name}</span>
+                          <span className="username">@{userItem.username}</span>
+                          <span className="user-email">{userItem.email}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="col-role">
+                      <span className={`role-badge role-${userItem.admin_role}`}>
+                        {userItem.admin_role === 'god' && '👑'}
+                        {userItem.admin_role === 'super_admin' && '⭐'}
+                        {userItem.admin_role === 'admin' && '🛡️'}
+                        {userItem.admin_role === 'user' && '👤'}
+                        {userItem.admin_role}
+                      </span>
+                    </div>
+                    
+                    <div className="col-status">
+                      <span className={`status-badge ${userItem.is_blocked ? 'blocked' : 'active'}`}>
+                        {userItem.is_blocked ? t.blocked : t.active}
+                      </span>
+                    </div>
+                    
+                    <div className="col-stats">
+                      <div className="mini-stats">
+                        <span>Bets: {userItem.total_bets}</span>
+                        <span>Score: {Math.round(userItem.score)}</span>
+                        <span>Rank: #{userItem.rank || 'N/A'}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="col-actions">
+                      <div className="action-buttons">
+                        {userItem.is_blocked ? (
+                          <button 
+                            className="btn-action unblock"
+                            onClick={() => unblockUser(userItem.id)}
+                            title={t.unblockUser}
+                          >
+                            ✅
+                          </button>
+                        ) : (
+                          <button 
+                            className="btn-action block"
+                            onClick={() => {
+                              setSelectedUser(userItem);
+                              setBlockForm({...blockForm, user_id: userItem.id});
+                              setShowBlockModal(true);
+                            }}
+                            title={t.blockUser}
+                          >
+                            🚫
+                          </button>
+                        )}
+                        
+                        {isGod && (
+                          <button 
+                            className="btn-action points"
+                            onClick={() => {
+                              setSelectedUser(userItem);
+                              setPointsForm({...pointsForm, user_id: userItem.id});
+                              setShowPointsModal(true);
+                            }}
+                            title={t.adjustPoints}
+                          >
+                            ⚡
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'messages' && (
+            <div className="admin-tab-content">
+              <div className="admin-controls">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setShowMessageModal(true)}
+                >
+                  ➕ {t.createMessage}
+                </button>
+              </div>
+
+              <div className="messages-grid">
+                {siteMessages.map(msg => (
+                  <div key={msg.id} className={`message-card ${msg.message_type}`}>
+                    <div className="message-header">
+                      <span className={`message-type ${msg.message_type}`}>
+                        {msg.message_type === 'announcement' && '📢'}
+                        {msg.message_type === 'warning' && '⚠️'}
+                        {msg.message_type === 'info' && 'ℹ️'}
+                        {t[msg.message_type]}
+                      </span>
+                      <span className="message-date">
+                        {new Date(msg.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="message-content">
+                      {msg.message}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'competitions' && (
+            <div className="admin-tab-content">
+              <div className="admin-controls">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setShowCompetitionModal(true)}
+                >
+                  ➕ {t.createCompetition}
+                </button>
+              </div>
+
+              <div className="competitions-admin-grid">
+                {competitions.map(comp => (
+                  <div key={comp.id} className="competition-admin-card">
+                    <h4>{comp.name}</h4>
+                    <p>{comp.description}</p>
+                    <div className="competition-details">
+                      <span className="region">🌍 {comp.region}</span>
+                      <span className="participants">👥 {comp.current_participants}/{comp.max_participants}</span>
+                      <span className="prize">💰 €{comp.prize_pool.toLocaleString()}</span>
+                      <span className={`status ${comp.status}`}>📊 {comp.status}</span>
+                    </div>
+                    <div className="competition-dates">
+                      <span>📅 {new Date(comp.start_date).toLocaleDateString()}</span>
+                      <span>📅 {new Date(comp.end_date).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'actions' && isGod && (
+            <div className="admin-tab-content">
+              <h3>📋 Recent Admin Actions</h3>
+              <div className="actions-table">
+                {adminActions.map(action => (
+                  <div key={action.id} className="action-row">
+                    <div className="action-info">
+                      <span className="action-type">{action.action_type}</span>
+                      <span className="action-admin">by {action.admin_id}</span>
+                      <span className="action-date">{new Date(action.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div className="action-details">
+                      {JSON.stringify(action.details)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="App">
       <nav className="navbar">
