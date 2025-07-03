@@ -1770,11 +1770,7 @@ function App() {
     );
   };
 
-  // Admin Panel Component
-  const renderAdminPanel = () => {
-    const [activeTab, setActiveTab] = useState('users');
-
-    return (
+  return (
       <div className="admin-panel">
         <div className="admin-header">
           <div className="admin-title">
