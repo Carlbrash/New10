@@ -1281,6 +1281,7 @@ function App() {
   // Site Messages Banner Component
   const SiteMessagesBanner = () => {
     console.log('🎬 SiteMessagesBanner rendered, activeSiteMessages:', activeSiteMessages);
+    console.log('🎬 Banner update trigger:', bannerUpdateTrigger);
     
     if (!activeSiteMessages || activeSiteMessages.length === 0) {
       console.log('⚠️ No active site messages to display');
@@ -1289,7 +1290,10 @@ function App() {
           <span style={{color: 'white', fontSize: '0.9rem'}}>
             No active messages • 
             <button 
-              onClick={fetchActiveSiteMessages}
+              onClick={() => {
+                console.log('🔄 Manual refresh clicked');
+                fetchActiveSiteMessages();
+              }}
               style={{background: 'none', border: '1px solid #ffd700', color: '#ffd700', padding: '4px 8px', marginLeft: '10px', borderRadius: '4px', cursor: 'pointer'}}
             >
               Refresh Messages
@@ -1317,7 +1321,10 @@ function App() {
           ))}
         </div>
         <button 
-          onClick={fetchActiveSiteMessages}
+          onClick={() => {
+            console.log('🔄 Manual refresh clicked from banner');
+            fetchActiveSiteMessages();
+          }}
           style={{
             position: 'absolute', 
             right: '10px', 
