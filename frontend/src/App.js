@@ -1342,3 +1342,535 @@ function App() {
 }
 
 export default App;
+
+  // Admin Panel Component
+  const renderAdminPanel = () => {
+    const [activeTab, setActiveTab] = useState('users');
+
+    const AdminHeader = () => (
+      <div className="admin-header">
+        <div className="admin-title">
+          <h1>⚙️ {t.adminPanel}</h1>
+          <div className="admin-role-badge">
+            {user.admin_role === 'god' && (
+              <span className="role-god">👑 {t.godLevel}</span>
+            )}
+            {user.admin_role === 'super_admin' && (
+              <span className="role-super-admin">⭐ {t.superAdmin}</span>
+            )}
+            {user.admin_role === 'admin' && (
+              <span className="role-admin">🛡️ {t.adminLevel}</span>
+            )}
+          </div>
+        </div>
+        
+        <div className="admin-tabs">
+          <button 
+            className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`}
+            onClick={() => setActiveTab('users')}
+          >
+            👥 {t.userManagement}
+          </button>
+          
+          <button 
+            className={`admin-tab ${activeTab === 'messages' ? 'active' : ''}`}
+            onClick={() => setActiveTab('messages')}
+          >
+            📢 {t.siteMessages}
+          </button>
+          
+          <button 
+            className={`admin-tab ${activeTab === 'competitions' ? 'active' : ''}`}
+            onClick={() => setActiveTab('competitions')}
+          >
+            🏆 {t.competitions}
+          </button>
+          
+          {isGod && (
+            <button 
+              className={`admin-tab ${activeTab === 'actions' ? 'active' : ''}`}
+              onClick={() => setActiveTab('actions')}
+            >
+              📋 {t.adminActions}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+
+    const UsersTab = () => (
+      <div className="admin-tab-content">
+        <div className="admin-controls">
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowBlockModal(true)}
+          >
+            🚫 {t.blockUser}
+          </button>
+          
+          {isGod && (
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowPointsModal(true)}
+            >
+              ⚡ {t.adjustPoints}
+            </button>
+          )}
+        </div>
+
+        <div className="admin-table">
+          <div className="table-header">
+            <div className="col-user">👤 {t.player}</div>
+            <div className="col-role">🛡️ Role</div>
+            <div className="col-status">📊 {t.status}</div>
+            <div className="col-stats">📈 Stats</div>
+            <div className="col-actions">⚙️ Actions</div>
+          </div>
+
+          {allUsers.map(user => (
+            <div key={user.id} className="table-row">
+              <div className="col-user">
+                <div className="user-info">
+                  <Avatar src={user.avatar_url} name={user.full_name} size="small" />
+                  <div className="user-details">
+                    <span className="user-name">{user.full_name}</span>
+                    <span className="username">@{user.username}</span>
+                    <span className="user-email">{user.email}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="col-role">
+                <span className={`role-badge role-${user.admin_role}`}>
+                  {user.admin_role === 'god' && '👑'}
+                  {user.admin_role === 'super_admin' && '⭐'}
+                  {user.admin_role === 'admin' && '🛡️'}
+                  {user.admin_role === 'user' && '👤'}
+                  {user.admin_role}
+                </span>
+              </div>
+              
+              <div className="col-status">
+                <span className={`status-badge ${user.is_blocked ? 'blocked' : 'active'}`}>
+                  {user.is_blocked ? t.blocked : t.active}
+                </span>
+              </div>
+              
+              <div className="col-stats">
+                <div className="mini-stats">
+                  <span>Bets: {user.total_bets}</span>
+                  <span>Score: {Math.round(user.score)}</span>
+                  <span>Rank: #{user.rank || 'N/A'}</span>
+                </div>
+              </div>
+              
+              <div className="col-actions">
+                <div className="action-buttons">
+                  {user.is_blocked ? (
+                    <button 
+                      className="btn-action unblock"
+                      onClick={() => unblockUser(user.id)}
+                      title={t.unblockUser}
+                    >
+                      ✅
+                    </button>
+                  ) : (
+                    <button 
+                      className="btn-action block"
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setBlockForm({...blockForm, user_id: user.id});
+                        setShowBlockModal(true);
+                      }}
+                      title={t.blockUser}
+                    >
+                      🚫
+                    </button>
+                  )}
+                  
+                  {isGod && (
+                    <button 
+                      className="btn-action points"
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setPointsForm({...pointsForm, user_id: user.id});
+                        setShowPointsModal(true);
+                      }}
+                      title={t.adjustPoints}
+                    >
+                      ⚡
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+    const MessagesTab = () => (
+      <div className="admin-tab-content">
+        <div className="admin-controls">
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowMessageModal(true)}
+          >
+            ➕ {t.createMessage}
+          </button>
+        </div>
+
+        <div className="messages-grid">
+          {siteMessages.map(msg => (
+            <div key={msg.id} className={`message-card ${msg.message_type}`}>
+              <div className="message-header">
+                <span className={`message-type ${msg.message_type}`}>
+                  {msg.message_type === 'announcement' && '📢'}
+                  {msg.message_type === 'warning' && '⚠️'}
+                  {msg.message_type === 'info' && 'ℹ️'}
+                  {t[msg.message_type]}
+                </span>
+                <span className="message-date">
+                  {new Date(msg.created_at).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="message-content">
+                {msg.message}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+    const CompetitionsTab = () => (
+      <div className="admin-tab-content">
+        <div className="admin-controls">
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowCompetitionModal(true)}
+          >
+            ➕ {t.createCompetition}
+          </button>
+        </div>
+
+        <div className="competitions-admin-grid">
+          {competitions.map(comp => (
+            <div key={comp.id} className="competition-admin-card">
+              <h4>{comp.name}</h4>
+              <p>{comp.description}</p>
+              <div className="competition-details">
+                <span className="region">🌍 {comp.region}</span>
+                <span className="participants">👥 {comp.current_participants}/{comp.max_participants}</span>
+                <span className="prize">💰 €{comp.prize_pool.toLocaleString()}</span>
+                <span className={`status ${comp.status}`}>📊 {comp.status}</span>
+              </div>
+              <div className="competition-dates">
+                <span>📅 {new Date(comp.start_date).toLocaleDateString()}</span>
+                <span>📅 {new Date(comp.end_date).toLocaleDateString()}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+    const ActionsTab = () => (
+      <div className="admin-tab-content">
+        <h3>📋 Recent Admin Actions</h3>
+        <div className="actions-table">
+          {adminActions.map(action => (
+            <div key={action.id} className="action-row">
+              <div className="action-info">
+                <span className="action-type">{action.action_type}</span>
+                <span className="action-admin">by {action.admin_id}</span>
+                <span className="action-date">{new Date(action.timestamp).toLocaleString()}</span>
+              </div>
+              <div className="action-details">
+                {JSON.stringify(action.details)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="admin-panel">
+        <AdminHeader />
+        
+        <div className="admin-content">
+          {activeTab === 'users' && <UsersTab />}
+          {activeTab === 'messages' && <MessagesTab />}
+          {activeTab === 'competitions' && <CompetitionsTab />}
+          {activeTab === 'actions' && isGod && <ActionsTab />}
+        </div>
+
+        {/* Block User Modal */}
+        {showBlockModal && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h3>🚫 {t.blockUser}</h3>
+              {selectedUser && (
+                <p>Blocking: <strong>{selectedUser.full_name}</strong></p>
+              )}
+              
+              <div className="form-group">
+                <label>{t.blockType}</label>
+                <select
+                  value={blockForm.block_type}
+                  onChange={(e) => setBlockForm({...blockForm, block_type: e.target.value})}
+                >
+                  <option value="temporary">{t.temporary}</option>
+                  <option value="permanent">{t.permanent}</option>
+                </select>
+              </div>
+
+              {blockForm.block_type === 'temporary' && (
+                <div className="form-group">
+                  <label>{t.duration}</label>
+                  <input
+                    type="number"
+                    value={blockForm.duration_hours}
+                    onChange={(e) => setBlockForm({...blockForm, duration_hours: parseInt(e.target.value)})}
+                    min="1"
+                  />
+                </div>
+              )}
+
+              <div className="form-group">
+                <label>{t.reason}</label>
+                <textarea
+                  value={blockForm.reason}
+                  onChange={(e) => setBlockForm({...blockForm, reason: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowBlockModal(false)}
+                >
+                  {t.cancel}
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => blockUser(blockForm)}
+                >
+                  {t.submit}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Points Adjustment Modal */}
+        {showPointsModal && isGod && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h3>⚡ {t.adjustPoints}</h3>
+              {selectedUser && (
+                <p>User: <strong>{selectedUser.full_name}</strong></p>
+              )}
+              
+              <div className="form-group">
+                <label>{t.pointsChange}</label>
+                <input
+                  type="number"
+                  value={pointsForm.points_change}
+                  onChange={(e) => setPointsForm({...pointsForm, points_change: parseInt(e.target.value)})}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>{t.reason}</label>
+                <textarea
+                  value={pointsForm.reason}
+                  onChange={(e) => setPointsForm({...pointsForm, reason: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowPointsModal(false)}
+                >
+                  {t.cancel}
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => adjustPoints(pointsForm)}
+                >
+                  {t.submit}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Site Message Modal */}
+        {showMessageModal && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h3>📢 {t.createMessage}</h3>
+              
+              <div className="form-group">
+                <label>{t.messageType}</label>
+                <select
+                  value={messageForm.message_type}
+                  onChange={(e) => setMessageForm({...messageForm, message_type: e.target.value})}
+                >
+                  <option value="info">{t.info}</option>
+                  <option value="announcement">{t.announcement}</option>
+                  <option value="warning">{t.warning}</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>{t.message}</label>
+                <textarea
+                  value={messageForm.message}
+                  onChange={(e) => setMessageForm({...messageForm, message: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>{t.expiresAt}</label>
+                <input
+                  type="datetime-local"
+                  value={messageForm.expires_at}
+                  onChange={(e) => setMessageForm({...messageForm, expires_at: e.target.value})}
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowMessageModal(false)}
+                >
+                  {t.cancel}
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => createSiteMessage(messageForm)}
+                >
+                  {t.submit}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Competition Modal */}
+        {showCompetitionModal && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h3>🏆 {t.createCompetition}</h3>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Competition Name</label>
+                  <input
+                    type="text"
+                    value={competitionForm.name}
+                    onChange={(e) => setCompetitionForm({...competitionForm, name: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Region</label>
+                  <select
+                    value={competitionForm.region}
+                    onChange={(e) => setCompetitionForm({...competitionForm, region: e.target.value})}
+                    required
+                  >
+                    <option value="">Select Region</option>
+                    <option value="Global">Global</option>
+                    <option value="Europe">Europe</option>
+                    <option value="Americas">Americas</option>
+                    <option value="Asia">Asia</option>
+                    <option value="Africa">Africa</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  value={competitionForm.description}
+                  onChange={(e) => setCompetitionForm({...competitionForm, description: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Start Date</label>
+                  <input
+                    type="datetime-local"
+                    value={competitionForm.start_date}
+                    onChange={(e) => setCompetitionForm({...competitionForm, start_date: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>End Date</label>
+                  <input
+                    type="datetime-local"
+                    value={competitionForm.end_date}
+                    onChange={(e) => setCompetitionForm({...competitionForm, end_date: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Max Participants</label>
+                  <input
+                    type="number"
+                    value={competitionForm.max_participants}
+                    onChange={(e) => setCompetitionForm({...competitionForm, max_participants: parseInt(e.target.value)})}
+                    min="1"
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Prize Pool (€)</label>
+                  <input
+                    type="number"
+                    value={competitionForm.prize_pool}
+                    onChange={(e) => setCompetitionForm({...competitionForm, prize_pool: parseFloat(e.target.value)})}
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowCompetitionModal(false)}
+                >
+                  {t.cancel}
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => createCompetition(competitionForm)}
+                >
+                  {t.submit}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
