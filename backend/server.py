@@ -34,6 +34,8 @@ rankings_collection = db.rankings
 competitions_collection = db.competitions
 admin_actions_collection = db.admin_actions
 site_messages_collection = db.site_messages
+content_pages_collection = db.content_pages
+menu_items_collection = db.menu_items
 
 app = FastAPI(title="WoBeRa - World Betting Rank API")
 
