@@ -1168,65 +1168,6 @@ function App() {
             ))}
           </div>
         </div>
-
-              {/* Top 100 Players Section */}
-              <div className="top-players-section">
-                <div className="top-players-header">
-                  <h4>🏆 Top 100 Players by Score</h4>
-                  <div className="top-players-controls">
-                    <button 
-                      className="btn btn-secondary btn-small"
-                      onClick={() => {
-                        setShowTop100(!showTop100);
-                        if (!showTop100 && top100Users.length === 0) {
-                          fetchTop100Users();
-                        }
-                      }}
-                    >
-                      {showTop100 ? '👁️ Hide Top 100' : '👁️ Show Top 100'}
-                    </button>
-                    {showTop100 && (
-                      <button 
-                        className="btn btn-primary btn-small"
-                        onClick={fetchTop100Users}
-                      >
-                        🔄 Refresh
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {showTop100 && (
-                  <div className="top-players-grid">
-                    {/* Split into groups of 10 */}
-                    {Array.from({ length: 10 }, (_, groupIndex) => {
-                      const startIndex = groupIndex * 10;
-                      const endIndex = startIndex + 10;
-                      const groupUsers = top100Users.slice(startIndex, endIndex);
-                      
-                      if (groupUsers.length === 0) return null;
-                      
-                      return (
-                        <div key={groupIndex} className="top-players-group">
-                          <h5>
-                            Positions {startIndex + 1}-{Math.min(endIndex, top100Users.length)}
-                          </h5>
-                          <div className="players-list">
-                            {groupUsers.map((player, index) => (
-                              <div key={player.username} className="top-player-item">
-                                <span className="player-rank">#{startIndex + index + 1}</span>
-                                <span className="player-flag">{countryFlags[player.country] || '🏳️'}</span>
-                                <span className="player-name">{player.full_name}</span>
-                                <span className="player-score">{Math.round(player.score || 0)} pts</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
       </div>
     </div>
   );
