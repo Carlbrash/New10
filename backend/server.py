@@ -794,7 +794,8 @@ async def get_menu_items(admin_id: str = Depends(verify_admin_token(AdminRole.AD
                     "url": "/",
                     "order": 1,
                     "is_active": True,
-                    "icon": "🏠"
+                    "icon": "🏠",
+                    "created_at": datetime.utcnow()
                 },
                 {
                     "id": "rankings",
@@ -802,7 +803,8 @@ async def get_menu_items(admin_id: str = Depends(verify_admin_token(AdminRole.AD
                     "url": "/rankings",
                     "order": 2,
                     "is_active": True,
-                    "icon": "🏆"
+                    "icon": "🏆",
+                    "created_at": datetime.utcnow()
                 },
                 {
                     "id": "competitions",
@@ -810,7 +812,8 @@ async def get_menu_items(admin_id: str = Depends(verify_admin_token(AdminRole.AD
                     "url": "/competitions",
                     "order": 3,
                     "is_active": True,
-                    "icon": "🥇"
+                    "icon": "🥇",
+                    "created_at": datetime.utcnow()
                 },
                 {
                     "id": "world_map",
@@ -818,7 +821,8 @@ async def get_menu_items(admin_id: str = Depends(verify_admin_token(AdminRole.AD
                     "url": "/world-map",
                     "order": 4,
                     "is_active": True,
-                    "icon": "🌍"
+                    "icon": "🌍",
+                    "created_at": datetime.utcnow()
                 },
                 {
                     "id": "about",
@@ -826,7 +830,8 @@ async def get_menu_items(admin_id: str = Depends(verify_admin_token(AdminRole.AD
                     "url": "/about",
                     "order": 5,
                     "is_active": True,
-                    "icon": "ℹ️"
+                    "icon": "ℹ️",
+                    "created_at": datetime.utcnow()
                 }
             ]
             
