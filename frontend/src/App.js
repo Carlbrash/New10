@@ -275,6 +275,46 @@ function App() {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [countryRankings, setCountryRankings] = useState([]);
   const [countrySearch, setCountrySearch] = useState('');
+  
+  // Admin Panel States
+  const [allUsers, setAllUsers] = useState([]);
+  const [adminActions, setAdminActions] = useState([]);
+  const [siteMessages, setSiteMessages] = useState([]);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showPointsModal, setShowPointsModal] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [showCompetitionModal, setShowCompetitionModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  
+  // Admin Form States
+  const [blockForm, setBlockForm] = useState({
+    user_id: '',
+    block_type: 'temporary',
+    duration_hours: 24,
+    reason: ''
+  });
+  
+  const [pointsForm, setPointsForm] = useState({
+    user_id: '',
+    points_change: 0,
+    reason: ''
+  });
+  
+  const [messageForm, setMessageForm] = useState({
+    message: '',
+    message_type: 'info',
+    expires_at: ''
+  });
+  
+  const [competitionForm, setCompetitionForm] = useState({
+    name: '',
+    description: '',
+    region: '',
+    start_date: '',
+    end_date: '',
+    max_participants: 100,
+    prize_pool: 1000
+  });
 
   // Get current translations
   const t = translations[language];
