@@ -1427,6 +1427,20 @@ function App() {
                 📋 {t.adminActions}
               </button>
             )}
+            
+            <button 
+              className={`admin-tab ${adminView === 'analytics' ? 'active' : ''}`}
+              onClick={() => setAdminView('analytics')}
+            >
+              📊 {t.analytics}
+            </button>
+            
+            <button 
+              className={`admin-tab ${adminView === 'content' ? 'active' : ''}`}
+              onClick={() => setAdminView('content')}
+            >
+              📝 {t.contentManagement}
+            </button>
           </div>
         </div>
 
