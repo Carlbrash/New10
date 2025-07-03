@@ -291,6 +291,28 @@ function App() {
   const [adminActions, setAdminActions] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
   
+  // Analytics States
+  const [analyticsData, setAnalyticsData] = useState({
+    overview: {},
+    user_countries: [],
+    points_stats: {}
+  });
+  const [userAnalytics, setUserAnalytics] = useState({
+    registration_timeline: [],
+    top_users: [],
+    admin_role_distribution: []
+  });
+  const [competitionAnalytics, setCompetitionAnalytics] = useState({
+    competition_status: [],
+    competition_regions: [],
+    prize_stats: {}
+  });
+  
+  // Content Management States
+  const [contentPages, setContentPages] = useState([]);
+  const [selectedPage, setSelectedPage] = useState(null);
+  const [showContentModal, setShowContentModal] = useState(false);
+  
   // Site Messages Modal States
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageForm, setMessageForm] = useState({
