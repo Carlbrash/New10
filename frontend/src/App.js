@@ -451,6 +451,167 @@ function App() {
     }
   };
 
+  // Admin Functions
+  const fetchAdminData = async () => {
+    setAdminLoading(true);
+    try {
+      // Fetch users
+      const usersResponse = await fetch(`${API_BASE_URL}/api/admin/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json();
+        setAllUsers(usersData.users);
+      }
+
+      // Fetch site messages
+      const messagesResponse = await fetch(`${API_BASE_URL}/api/site-messages`);
+      if (messagesResponse.ok) {
+        const messagesData = await messagesResponse.json();
+        setSiteMessages(messagesData.messages);
+      }
+
+      // Fetch admin actions (God only)
+      if (isGod) {
+        const actionsResponse = await fetch(`${API_BASE_URL}/api/admin/actions`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (actionsResponse.ok) {
+          const actionsData = await actionsResponse.json();
+          setAdminActions(actionsData.actions);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  const blockUser = async (userId, blockType, duration, reason) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/block-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          block_type: blockType,
+          duration_hours: duration,
+          reason: reason
+        })
+      });
+
+      if (response.ok) {
+        alert('User blocked successfully');
+        fetchAdminData();
+      } else {
+        alert('Error blocking user');
+      }
+    } catch (error) {
+      console.error('Error blocking user:', error);
+      alert('Error blocking user');
+    }
+  };
+
+  const unblockUser = async (userId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/unblock-user/${userId}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        alert('User unblocked successfully');
+        fetchAdminData();
+      } else {
+        alert('Error unblocking user');
+      }
+    } catch (error) {
+      console.error('Error unblocking user:', error);
+      alert('Error unblocking user');
+    }
+  };
+
+  const adjustPoints = async (userId, pointsChange, reason) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/adjust-points`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          points_change: parseInt(pointsChange),
+          reason: reason
+        })
+      });
+
+      if (response.ok) {
+        alert('Points adjusted successfully');
+        fetchAdminData();
+      } else {
+        alert('Error adjusting points');
+      }
+    } catch (error) {
+      console.error('Error adjusting points:', error);
+      alert('Error adjusting points');
+    }
+  };
+
+  const createSiteMessage = async (message, messageType, expiresAt) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/site-message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          message: message,
+          message_type: messageType,
+          expires_at: expiresAt || null
+        })
+      });
+
+      if (response.ok) {
+        alert('Message created successfully');
+        fetchAdminData();
+      } else {
+        alert('Error creating message');
+      }
+    } catch (error) {
+      console.error('Error creating message:', error);
+      alert('Error creating message');
+    }
+  };
+
+  const createCompetition = async (competitionData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/create-competition`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(competitionData)
+      });
+
+      if (response.ok) {
+        alert('Competition created successfully');
+        fetchCompetitions();
+      } else {
+        alert('Error creating competition');
+      }
+    } catch (error) {
+      console.error('Error creating competition:', error);
+      alert('Error creating competition');
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
