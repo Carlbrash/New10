@@ -1269,7 +1269,19 @@ function App() {
     
     if (!activeSiteMessages || activeSiteMessages.length === 0) {
       console.log('⚠️ No active site messages to display');
-      return null;
+      return (
+        <div className="site-messages-banner" style={{backgroundColor: 'rgba(255, 0, 0, 0.1)', textAlign: 'center', padding: '10px'}}>
+          <span style={{color: 'white', fontSize: '0.9rem'}}>
+            No active messages • 
+            <button 
+              onClick={fetchActiveSiteMessages}
+              style={{background: 'none', border: '1px solid #ffd700', color: '#ffd700', padding: '4px 8px', marginLeft: '10px', borderRadius: '4px', cursor: 'pointer'}}
+            >
+              Refresh Messages
+            </button>
+          </span>
+        </div>
+      );
     }
 
     console.log('✅ Displaying', activeSiteMessages.length, 'messages in banner');
@@ -1289,6 +1301,25 @@ function App() {
             </div>
           ))}
         </div>
+        <button 
+          onClick={fetchActiveSiteMessages}
+          style={{
+            position: 'absolute', 
+            right: '10px', 
+            top: '50%', 
+            transform: 'translateY(-50%)',
+            background: 'rgba(255, 215, 0, 0.2)', 
+            border: '1px solid #ffd700', 
+            color: '#ffd700', 
+            padding: '4px 8px', 
+            borderRadius: '4px', 
+            cursor: 'pointer',
+            fontSize: '0.7rem'
+          }}
+          title="Refresh messages"
+        >
+          🔄
+        </button>
       </div>
     );
   };
