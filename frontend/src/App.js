@@ -279,6 +279,8 @@ function App() {
   // Admin Panel States
   const [adminView, setAdminView] = useState('users');
   const [allUsers, setAllUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
   const [siteMessages, setSiteMessages] = useState([]);
   const [adminActions, setAdminActions] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
