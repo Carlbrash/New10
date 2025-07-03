@@ -314,6 +314,10 @@ function App() {
   const [contentPages, setContentPages] = useState([]);
   const [selectedPage, setSelectedPage] = useState(null);
   const [showContentModal, setShowContentModal] = useState(false);
+  const [menuItems, setMenuItems] = useState([]);
+  const [showMenuModal, setShowMenuModal] = useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = useState(null);
+  const [pageContent, setPageContent] = useState({});  // Store actual page content
   
   // Site Messages Modal States
   const [showMessageModal, setShowMessageModal] = useState(false);
