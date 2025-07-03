@@ -532,22 +532,37 @@ function App() {
   // Fetch Active Site Messages for Banner
   const fetchActiveSiteMessages = async () => {
     console.log('🔄 Fetching active site messages...');
+    console.log('🌐 Using API_BASE_URL:', API_BASE_URL);
     try {
       const response = await fetch(`${API_BASE_URL}/api/site-messages`);
+      console.log('📡 Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
         console.log('📥 Received site messages:', data);
+        console.log('📊 Raw messages count:', data.messages?.length || 0);
         
         // Filter only active messages (not expired)
         const now = new Date();
+        console.log('⏰ Current time:', now.toISOString());
+        
         const activeMessages = data.messages.filter(msg => {
-          if (!msg.expires_at) return true; // No expiry = always active
-          return new Date(msg.expires_at) > now;
+          console.log('🔍 Checking message:', msg.message, 'expires_at:', msg.expires_at);
+          if (!msg.expires_at) {
+            console.log('✅ Message has no expiry - keeping');
+            return true; // No expiry = always active
+          }
+          const expiryDate = new Date(msg.expires_at);
+          console.log('📅 Expiry date:', expiryDate.toISOString(), 'vs now:', now.toISOString());
+          const isActive = expiryDate > now;
+          console.log('🔄 Message active?', isActive);
+          return isActive;
         });
         
         console.log('✅ Active messages after filtering:', activeMessages);
+        console.log('📊 Final active messages count:', activeMessages.length);
         setActiveSiteMessages(activeMessages);
         setBannerUpdateTrigger(prev => prev + 1); // Force re-render
+        console.log('🎬 Banner update trigger incremented');
       } else {
         console.error('❌ Failed to fetch site messages:', response.status);
       }
