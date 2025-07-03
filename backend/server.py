@@ -291,6 +291,60 @@ async def get_profile(user_id: str = Depends(verify_token)):
     user_data.pop("_id", None)
     return user_data
 
+@app.put("/api/profile")
+async def update_profile(profile_data: dict, user_id: str = Depends(verify_token)):
+    """Update user profile"""
+    user = users_collection.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Allowed fields to update
+    allowed_fields = ['full_name', 'email', 'avatar_url', 'country']
+    update_data = {}
+    
+    for field in allowed_fields:
+        if field in profile_data:
+            # Check if email already exists (if updating email)
+            if field == 'email' and profile_data[field] != user['email']:
+                existing_user = users_collection.find_one({"email": profile_data[field]})
+                if existing_user and existing_user['id'] != user_id:
+                    raise HTTPException(status_code=400, detail="Email already exists")
+            update_data[field] = profile_data[field]
+    
+    if update_data:
+        users_collection.update_one(
+            {"id": user_id},
+            {"$set": update_data}
+        )
+    
+    return {"message": "Profile updated successfully"}
+
+@app.put("/api/profile/password")
+async def change_password(password_data: dict, user_id: str = Depends(verify_token)):
+    """Change user password"""
+    current_password = password_data.get('current_password')
+    new_password = password_data.get('new_password')
+    
+    if not current_password or not new_password:
+        raise HTTPException(status_code=400, detail="Current and new password required")
+    
+    user = users_collection.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify current password
+    if not verify_password(current_password, user['password']):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Update password
+    hashed_new_password = hash_password(new_password)
+    users_collection.update_one(
+        {"id": user_id},
+        {"$set": {"password": hashed_new_password}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
 @app.get("/api/rankings")
 async def get_rankings(limit: int = 50, skip: int = 0):
     # Get all users and calculate their scores
