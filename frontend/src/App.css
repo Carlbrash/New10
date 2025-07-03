@@ -2214,3 +2214,146 @@ body {
     gap: 10px;
   }
 }
+
+/* Top 100 Players Section */
+.top-players-section {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 25px 0;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.top-players-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.top-players-header h4 {
+  color: #ffd700;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.top-players-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.top-players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.top-players-group {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.top-players-group h5 {
+  color: #ffd700;
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.top-player-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.top-player-item:hover {
+  background: rgba(255, 215, 0, 0.1);
+  transform: translateX(3px);
+}
+
+.player-rank {
+  color: #ffd700;
+  font-weight: bold;
+  min-width: 30px;
+  font-size: 0.9rem;
+}
+
+.player-flag {
+  font-size: 1.1rem;
+}
+
+.player-name {
+  color: #ffffff;
+  flex: 1;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-score {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* Responsive adjustments for Top 100 */
+@media (max-width: 768px) {
+  .top-players-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .top-players-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .top-players-controls {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-players-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .top-player-item {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+  
+  .player-rank {
+    min-width: 25px;
+    font-size: 0.8rem;
+  }
+  
+  .player-score {
+    min-width: 50px;
+    font-size: 0.8rem;
+  }
+}
