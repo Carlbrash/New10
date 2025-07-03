@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the WoBeRa frontend site messages banner functionality: 1. Check if the banner is visible and what it shows initially 2. Login as Admin to access admin panel 3. Navigate to Admin Panel and find the site messages section 4. Create a new site message with Message: 'Frontend Test Message from Testing Agent', Type: 'info', No expiration date 5. Verify if the new message appears in the banner immediately 6. Test manual refresh button in the banner to force update 7. Check browser console for any errors or debug messages 8. Create a second message and verify both messages appear"
+user_problem_statement: "Fix the WoBeRa site messages banner issue where newly created messages don't appear in the banner. The user reported: 'dokimasa neo mynima ..graftike kanonika ..pote den perase apo to baner' (I tried a new message... it was written correctly... it never appeared in the banner)"
 
 backend:
   - task: "Site Messages GET Endpoint"
@@ -159,6 +159,31 @@ frontend:
       - working: true
         agent: "testing"
         comment: "The fix for the site messages banner functionality is working correctly. Successfully created two new messages: one without an expiration date and one with a future expiration date. Both messages appeared in the banner immediately after creation. The API responses showed 200 status codes for all requests, confirming that the 422 validation error has been resolved. The fix to convert empty expiration date strings to null in the frontend before sending to the backend has successfully resolved the issue."
+      - working: true
+        agent: "main"
+        comment: "✅ ISSUE RESOLVED: Fixed the data validation issue where frontend was sending empty string for expires_at instead of null. Modified createSiteMessage function in App.js to properly handle optional expiration dates. All tests now pass and banner updates work correctly."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.1"
+  test_sequence: 3
+  run_ui: true
+
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  test_priority: "completed"
+
+agent_communication:
+  - agent: "testing"
+    message: "I've completed testing of the site messages functionality in the backend. All tests are passing. The GET /api/site-messages endpoint correctly returns active messages, and the POST /api/admin/site-message endpoint successfully creates new messages with proper admin authentication. The database integration is working correctly, with messages being stored and retrieved properly."
+  - agent: "testing"
+    message: "I've tested the site messages banner functionality in the frontend. The banner is visible and displays existing messages correctly. However, there's an issue with newly created messages not appearing in the banner. When creating a new message through the admin panel, the API returns a 422 error, and the message doesn't appear in the banner even after using the manual refresh button. The banner only shows the existing test message."
+  - agent: "testing"
+    message: "After the fix was implemented, I successfully tested the site messages banner functionality. The 422 validation error has been resolved, and new messages now appear in the banner immediately after creation. Created two test messages with different configurations and both appeared correctly in the scrolling banner."
+  - agent: "main"
+    message: "✅ SUCCESSFULLY FIXED: The site messages banner issue has been completely resolved. The problem was a data validation error where the frontend was sending an empty string for expires_at instead of null when no expiration date was selected. This caused a 422 error on the backend. The fix involved modifying the createSiteMessage function to properly convert empty expiration date strings to null before sending to the backend. All functionality now works as expected."
 
 metadata:
   created_by: "testing_agent"
