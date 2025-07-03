@@ -760,21 +760,37 @@ function App() {
 
       if (response.ok) {
         alert('Points adjusted successfully');
-        // Refresh all relevant data after points adjustment
-        fetchAdminData(); // Admin panel data
-        fetchRankings(); // Update rankings
-        fetchCountryStats(); // Update world map
         
-        // If analytics tab is active, refresh analytics too
-        if (adminView === 'analytics') {
-          fetchAnalyticsOverview();
-          fetchUserAnalytics();
-        }
+        // Refresh admin panel data immediately
+        fetchAdminData();
         
-        // If top 100 is visible, refresh it too
-        if (showTop100) {
-          fetchTop100Users();
-        }
+        // Wait a bit longer for database consistency, then refresh all other data
+        setTimeout(async () => {
+          console.log('🔄 Refreshing all data after points adjustment...');
+          
+          // Refresh rankings and country stats with a bit more delay between calls
+          await fetchRankings();
+          
+          setTimeout(async () => {
+            await fetchCountryStats();
+          }, 500);
+          
+          // If analytics tab is active, refresh analytics too
+          if (adminView === 'analytics') {
+            setTimeout(async () => {
+              await fetchAnalyticsOverview();
+              await fetchUserAnalytics();
+            }, 1000);
+          }
+          
+          // If top 100 is visible, refresh it too
+          if (showTop100) {
+            setTimeout(async () => {
+              await fetchTop100Users();
+            }, 1500);
+          }
+        }, 1000);
+        
       } else {
         alert('Error adjusting points');
       }
