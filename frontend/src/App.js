@@ -430,6 +430,35 @@ function App() {
     }
   };
 
+  // Search for user in rankings
+  const handleRankingSearch = (searchTerm) => {
+    setRankingSearch(searchTerm);
+    if (!searchTerm.trim()) {
+      setRankingSearchResult(null);
+      return;
+    }
+
+    // Search in current rankings list
+    const searchLower = searchTerm.toLowerCase();
+    const foundUser = rankings.find(user => 
+      user.full_name.toLowerCase().includes(searchLower) ||
+      user.username.toLowerCase().includes(searchLower)
+    );
+
+    if (foundUser) {
+      setRankingSearchResult({
+        found: true,
+        user: foundUser,
+        message: `Found: ${foundUser.full_name} (@${foundUser.username}) is ranked #${foundUser.rank} with ${Math.round(foundUser.score)} points`
+      });
+    } else {
+      setRankingSearchResult({
+        found: false,
+        message: `No user found with name or username containing "${searchTerm}"`
+      });
+    }
+  };
+
   const fetchMenuItems = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/menu/items`, {
