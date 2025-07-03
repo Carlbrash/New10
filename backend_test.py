@@ -550,9 +550,10 @@ class SiteMessagesTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(SiteMessagesTester, self).__init__(*args, **kwargs)
         self.base_url = "https://4a8aa96b-af2f-46ea-b951-d2885237a55a.preview.emergentagent.com"
+        # Using the correct credentials from server.py
         self.admin_credentials = {
-            "username": "god",
-            "password": "password"
+            "username": "God",
+            "password": "Kiki1999@"
         }
         self.admin_token = None
         self.test_message = {
