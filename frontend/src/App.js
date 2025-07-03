@@ -1249,6 +1249,31 @@ function App() {
     );
   };
 
+  // Site Messages Banner Component
+  const SiteMessagesBanner = () => {
+    if (!activeSiteMessages || activeSiteMessages.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="site-messages-banner">
+        <div className="banner-content">
+          {activeSiteMessages.map((message, index) => (
+            <div key={message.id} className={`banner-message ${message.message_type}`}>
+              <span className="banner-icon">
+                {message.message_type === 'announcement' && '📢'}
+                {message.message_type === 'warning' && '⚠️'}
+                {message.message_type === 'info' && 'ℹ️'}
+              </span>
+              <span className="banner-text">{message.message}</span>
+              {index < activeSiteMessages.length - 1 && <span className="banner-separator">•••</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // Admin Panel Render Function
   const renderAdminPanel = () => {
     return (
