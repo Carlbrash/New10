@@ -107,6 +107,8 @@ const translations = {
     siteMessages: 'Μηνύματα Site',
     competitions: 'Διαγωνισμοί',
     adminActions: 'Admin Actions',
+    analytics: 'Αναλυτικά Στοιχεία',
+    contentManagement: 'Διαχείριση Περιεχομένου',
     blockUser: 'Μπλοκάρισμα Χρήστη',
     unblockUser: 'Ξεμπλοκάρισμα',
     adjustPoints: 'Διόρθωση Πόντων',
