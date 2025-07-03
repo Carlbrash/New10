@@ -468,6 +468,7 @@ function App() {
       if (usersResponse.ok) {
         const usersData = await usersResponse.json();
         setAllUsers(usersData.users);
+        setFilteredUsers(usersData.users); // Initialize filtered users
       }
 
       // Fetch site messages
@@ -491,6 +492,21 @@ function App() {
       console.error('Error fetching admin data:', error);
     } finally {
       setAdminLoading(false);
+    }
+  };
+
+  // Search Users Function
+  const handleUserSearch = (searchTerm) => {
+    setUserSearchTerm(searchTerm);
+    if (!searchTerm.trim()) {
+      setFilteredUsers(allUsers);
+    } else {
+      const filtered = allUsers.filter(user => 
+        user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUsers(filtered);
     }
   };
 
