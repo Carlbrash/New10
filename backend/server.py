@@ -135,6 +135,24 @@ class SiteMessage(BaseModel):
     message_type: str  # 'announcement', 'warning', 'info'
     expires_at: Optional[datetime] = None
 
+class ContentPage(BaseModel):
+    id: str
+    title: str
+    content: str
+    page_type: str  # 'hero', 'page', 'legal'
+    is_active: bool = True
+    meta_title: Optional[str] = None
+    meta_description: Optional[str] = None
+
+class MenuItem(BaseModel):
+    id: str
+    label: str
+    url: str
+    order: int
+    is_active: bool = True
+    parent_id: Optional[str] = None  # For submenus
+    icon: Optional[str] = None
+
 # Helper functions
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
