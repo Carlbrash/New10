@@ -276,6 +276,7 @@ function App() {
   const [countryRankings, setCountryRankings] = useState([]);
   const [countrySearch, setCountrySearch] = useState('');
   const [activeSiteMessages, setActiveSiteMessages] = useState([]);
+  const [bannerUpdateTrigger, setBannerUpdateTrigger] = useState(0);
 
   // Admin Panel States
   const [adminView, setAdminView] = useState('users');
