@@ -485,6 +485,19 @@ async def get_all_users(admin_id: str = Depends(verify_admin_token(AdminRole.ADM
     users = list(users_collection.find({}, {"password": 0, "_id": 0}))
     return {"users": users}
 
+@app.get("/api/admin/users/top100")
+async def get_top_100_users(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get top 100 users by score for ranking display"""
+    try:
+        top_users = list(users_collection.find(
+            {}, 
+            {"_id": 0, "full_name": 1, "username": 1, "score": 1, "country": 1, "avatar_url": 1}
+        ).sort("score", -1).limit(100))
+        
+        return {"top_users": top_users}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching top 100 users: {str(e)}")
+
 @app.get("/api/admin/actions")
 async def get_admin_actions(admin_id: str = Depends(verify_admin_token(AdminRole.GOD))):
     """Get all admin actions (God level only)"""
