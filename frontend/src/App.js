@@ -400,6 +400,16 @@ function App() {
     }
   }, [currentView]);
 
+  // Fetch active site messages for banner when user logs in
+  useEffect(() => {
+    if (token) {
+      fetchActiveSiteMessages();
+      // Refresh banner messages every 30 seconds
+      const interval = setInterval(fetchActiveSiteMessages, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [token]);
+
   const fetchProfile = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/profile`, {
