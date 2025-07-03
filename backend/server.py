@@ -503,6 +503,163 @@ async def get_active_site_messages():
     }, {"_id": 0}))
     return {"messages": messages}
 
+@app.get("/api/admin/analytics/overview")
+async def get_analytics_overview(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get analytics overview data"""
+    try:
+        # User statistics
+        total_users = users_collection.count_documents({})
+        active_users = users_collection.count_documents({"is_blocked": {"$ne": True}})
+        blocked_users = users_collection.count_documents({"is_blocked": True})
+        
+        # Competition statistics
+        total_competitions = competitions_collection.count_documents({})
+        active_competitions = competitions_collection.count_documents({"status": "active"})
+        
+        # Rankings statistics
+        total_rankings = rankings_collection.count_documents({})
+        
+        # User distribution by country
+        user_countries = list(users_collection.aggregate([
+            {"$group": {"_id": "$country", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]))
+        
+        # Recent user registrations (last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        recent_registrations = users_collection.count_documents({
+            "created_at": {"$gte": thirty_days_ago}
+        })
+        
+        # Points distribution
+        points_stats = list(users_collection.aggregate([
+            {"$group": {
+                "_id": None,
+                "avg_points": {"$avg": "$points"},
+                "max_points": {"$max": "$points"},
+                "min_points": {"$min": "$points"},
+                "total_points": {"$sum": "$points"}
+            }}
+        ]))
+        
+        return {
+            "overview": {
+                "total_users": total_users,
+                "active_users": active_users,
+                "blocked_users": blocked_users,
+                "total_competitions": total_competitions,
+                "active_competitions": active_competitions,
+                "total_rankings": total_rankings,
+                "recent_registrations": recent_registrations
+            },
+            "user_countries": user_countries,
+            "points_stats": points_stats[0] if points_stats else {}
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching analytics: {str(e)}")
+
+@app.get("/api/admin/analytics/users")
+async def get_user_analytics(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get detailed user analytics"""
+    try:
+        # User registration timeline (last 6 months)
+        six_months_ago = datetime.utcnow() - timedelta(days=180)
+        registration_timeline = list(users_collection.aggregate([
+            {"$match": {"created_at": {"$gte": six_months_ago}}},
+            {"$group": {
+                "_id": {
+                    "year": {"$year": "$created_at"},
+                    "month": {"$month": "$created_at"}
+                },
+                "count": {"$sum": 1}
+            }},
+            {"$sort": {"_id.year": 1, "_id.month": 1}}
+        ]))
+        
+        # Top users by points
+        top_users = list(users_collection.find(
+            {}, 
+            {"_id": 0, "full_name": 1, "username": 1, "points": 1, "country": 1}
+        ).sort("points", -1).limit(10))
+        
+        # User activity by admin role
+        admin_role_distribution = list(users_collection.aggregate([
+            {"$group": {"_id": "$admin_role", "count": {"$sum": 1}}}
+        ]))
+        
+        return {
+            "registration_timeline": registration_timeline,
+            "top_users": top_users,
+            "admin_role_distribution": admin_role_distribution
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching user analytics: {str(e)}")
+
+@app.get("/api/admin/analytics/competitions")
+async def get_competition_analytics(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get competition analytics"""
+    try:
+        # Competition by status
+        competition_status = list(competitions_collection.aggregate([
+            {"$group": {"_id": "$status", "count": {"$sum": 1}}}
+        ]))
+        
+        # Competition by region
+        competition_regions = list(competitions_collection.aggregate([
+            {"$group": {"_id": "$region", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]))
+        
+        # Prize pool statistics
+        prize_stats = list(competitions_collection.aggregate([
+            {"$group": {
+                "_id": None,
+                "total_prize_pool": {"$sum": "$prize_pool"},
+                "avg_prize_pool": {"$avg": "$prize_pool"},
+                "max_prize_pool": {"$max": "$prize_pool"}
+            }}
+        ]))
+        
+        return {
+            "competition_status": competition_status,
+            "competition_regions": competition_regions,
+            "prize_stats": prize_stats[0] if prize_stats else {}
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching competition analytics: {str(e)}")
+
+@app.get("/api/admin/content/pages")
+async def get_content_pages(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all content pages for management"""
+    try:
+        # For now, return predefined pages that can be managed
+        pages = [
+            {
+                "id": "home_hero",
+                "title": "Home Page Hero Section",
+                "type": "hero",
+                "content": "Welcome to WoBeRa - World Betting Rank Platform",
+                "last_updated": datetime.utcnow().isoformat()
+            },
+            {
+                "id": "about_us",
+                "title": "About Us Page",
+                "type": "page",
+                "content": "WoBeRa is the premier luxury sports betting federation platform...",
+                "last_updated": datetime.utcnow().isoformat()
+            },
+            {
+                "id": "terms_of_service",
+                "title": "Terms of Service",
+                "type": "legal",
+                "content": "Terms and conditions for using the WoBeRa platform...",
+                "last_updated": datetime.utcnow().isoformat()
+            }
+        ]
+        return {"pages": pages}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching content pages: {str(e)}")
+
 # Initialize some sample data
 @app.on_event("startup")
 async def startup_event():
