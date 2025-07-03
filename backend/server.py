@@ -579,8 +579,8 @@ async def get_user_analytics(admin_id: str = Depends(verify_admin_token(AdminRol
         # Top users by points
         top_users = list(users_collection.find(
             {}, 
-            {"_id": 0, "full_name": 1, "username": 1, "points": 1, "country": 1}
-        ).sort("points", -1).limit(10))
+            {"_id": 0, "full_name": 1, "username": 1, "score": 1, "country": 1}
+        ).sort("score", -1).limit(10))
         
         # User activity by admin role
         admin_role_distribution = list(users_collection.aggregate([
