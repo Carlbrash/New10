@@ -116,6 +116,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "GET /api/site-messages endpoint is working correctly. It returns an array of messages with the expected structure."
+      - working: true
+        agent: "testing"
+        comment: "Retested the site messages API as part of the rankings and search functionality testing. The API is working correctly and returns the expected data structure."
 
   - task: "Site Messages POST Endpoint"
     implemented: true
@@ -140,6 +143,30 @@ backend:
       - working: true
         agent: "testing"
         comment: "MongoDB integration for site messages is working correctly. Created messages are properly stored in the database and can be retrieved via the GET endpoint."
+
+  - task: "Rankings API Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/rankings endpoint is working correctly. It returns an array of users with proper score calculations. The data includes all required fields for search functionality: username, full_name, country, and score. The score calculation logic is working as expected."
+
+  - task: "Top 100 Users API Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/admin/users/top100 endpoint is working correctly. It returns up to 100 users sorted by score in descending order. The data includes all required fields for the Top 100 functionality: full_name, username, score, and country. Authentication is working properly for this admin endpoint."
 
 frontend:
   - task: "Site Messages Banner Display"
@@ -169,7 +196,7 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.2"
-  test_sequence: 4
+  test_sequence: 5
   run_ui: true
   final_status: "RESOLVED"
 
@@ -191,6 +218,8 @@ agent_communication:
     message: "✅ SUCCESSFULLY FIXED: The site messages banner issue has been completely resolved. The problem was a data validation error where the frontend was sending an empty string for expires_at instead of null when no expiration date was selected. This caused a 422 error on the backend. The fix involved modifying the createSiteMessage function to properly convert empty expiration date strings to null before sending to the backend."
   - agent: "main"
     message: "✅ USER CONFIRMATION: User tested the live application and confirmed the fix is working correctly. The site messages banner now displays new messages immediately after creation as expected. Ready to proceed with additional enhancements."
+  - agent: "testing"
+    message: "I've completed testing of the rankings and search functionality in the backend. All tests are passing. The GET /api/rankings endpoint correctly returns users with proper score calculations. The GET /api/admin/users/top100 endpoint returns sorted users by score. The user data includes all required fields for search functionality: full_name, username, score, and country. Authentication is working properly for admin endpoints."
 
 metadata:
   created_by: "main_agent"
