@@ -1022,6 +1022,443 @@ function App() {
     );
   };
 
+  // Admin Panel Render Function
+  const renderAdminPanel = () => {
+    const [adminView, setAdminView] = useState('users');
+    const [allUsers, setAllUsers] = useState([]);
+    const [siteMessages, setSiteMessages] = useState([]);
+    const [adminActions, setAdminActions] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    // Fetch admin data on component mount
+    React.useEffect(() => {
+      fetchAdminData();
+    }, []);
+
+    const fetchAdminData = async () => {
+      setLoading(true);
+      try {
+        // Fetch users
+        const usersResponse = await fetch(`${API_BASE_URL}/api/admin/users`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (usersResponse.ok) {
+          const usersData = await usersResponse.json();
+          setAllUsers(usersData.users);
+        }
+
+        // Fetch site messages
+        const messagesResponse = await fetch(`${API_BASE_URL}/api/site-messages`);
+        if (messagesResponse.ok) {
+          const messagesData = await messagesResponse.json();
+          setSiteMessages(messagesData.messages);
+        }
+
+        // Fetch admin actions (God only)
+        if (isGod) {
+          const actionsResponse = await fetch(`${API_BASE_URL}/api/admin/actions`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (actionsResponse.ok) {
+            const actionsData = await actionsResponse.json();
+            setAdminActions(actionsData.actions);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching admin data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const blockUser = async (userId, blockType, duration, reason) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/block-user`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            block_type: blockType,
+            duration_hours: duration,
+            reason: reason
+          })
+        });
+
+        if (response.ok) {
+          alert('User blocked successfully');
+          fetchAdminData();
+        } else {
+          alert('Error blocking user');
+        }
+      } catch (error) {
+        console.error('Error blocking user:', error);
+        alert('Error blocking user');
+      }
+    };
+
+    const unblockUser = async (userId) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/unblock-user/${userId}`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          alert('User unblocked successfully');
+          fetchAdminData();
+        } else {
+          alert('Error unblocking user');
+        }
+      } catch (error) {
+        console.error('Error unblocking user:', error);
+        alert('Error unblocking user');
+      }
+    };
+
+    const adjustPoints = async (userId, pointsChange, reason) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/adjust-points`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            points_change: parseInt(pointsChange),
+            reason: reason
+          })
+        });
+
+        if (response.ok) {
+          alert('Points adjusted successfully');
+          fetchAdminData();
+        } else {
+          alert('Error adjusting points');
+        }
+      } catch (error) {
+        console.error('Error adjusting points:', error);
+        alert('Error adjusting points');
+      }
+    };
+
+    const createSiteMessage = async (message, messageType, expiresAt) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/site-message`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            message: message,
+            message_type: messageType,
+            expires_at: expiresAt || null
+          })
+        });
+
+        if (response.ok) {
+          alert('Message created successfully');
+          fetchAdminData();
+        } else {
+          alert('Error creating message');
+        }
+      } catch (error) {
+        console.error('Error creating message:', error);
+        alert('Error creating message');
+      }
+    };
+
+    const createCompetition = async (competitionData) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/create-competition`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(competitionData)
+        });
+
+        if (response.ok) {
+          alert('Competition created successfully');
+          fetchCompetitions();
+        } else {
+          alert('Error creating competition');
+        }
+      } catch (error) {
+        console.error('Error creating competition:', error);
+        alert('Error creating competition');
+      }
+    };
+
+    return (
+      <div className="admin-panel">
+        <div className="admin-header">
+          <div className="admin-title">
+            <h1>⚙️ {t.adminPanel}</h1>
+            <div className="admin-role-badge">
+              {user.admin_role === 'god' && (
+                <span className="role-god">👑 {t.godLevel}</span>
+              )}
+              {user.admin_role === 'super_admin' && (
+                <span className="role-super-admin">⭐ {t.superAdmin}</span>
+              )}
+              {user.admin_role === 'admin' && (
+                <span className="role-admin">🛡️ {t.adminLevel}</span>
+              )}
+            </div>
+          </div>
+          
+          <div className="admin-tabs">
+            <button 
+              className={`admin-tab ${adminView === 'users' ? 'active' : ''}`}
+              onClick={() => setAdminView('users')}
+            >
+              👥 {t.userManagement}
+            </button>
+            
+            <button 
+              className={`admin-tab ${adminView === 'messages' ? 'active' : ''}`}
+              onClick={() => setAdminView('messages')}
+            >
+              📢 {t.siteMessages}
+            </button>
+            
+            <button 
+              className={`admin-tab ${adminView === 'competitions' ? 'active' : ''}`}
+              onClick={() => setAdminView('competitions')}
+            >
+              🏆 {t.competitions}
+            </button>
+            
+            {isGod && (
+              <button 
+                className={`admin-tab ${adminView === 'actions' ? 'active' : ''}`}
+                onClick={() => setAdminView('actions')}
+              >
+                📋 {t.adminActions}
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="admin-content">
+          {loading && <div className="loading">Loading admin data...</div>}
+          
+          {/* Users Management Tab */}
+          {adminView === 'users' && (
+            <div className="admin-section">
+              <h3>👥 {t.userManagement}</h3>
+              <div className="admin-users-grid">
+                {allUsers.map(userItem => (
+                  <div key={userItem.id} className="admin-user-card">
+                    <div className="user-info">
+                      <Avatar src={userItem.avatar_url} name={userItem.full_name} size="medium" />
+                      <div className="user-details">
+                        <h4>{userItem.full_name}</h4>
+                        <p>@{userItem.username}</p>
+                        <p>{userItem.email}</p>
+                        <span className={`role-badge role-${userItem.admin_role}`}>
+                          {userItem.admin_role === 'god' && '👑'}
+                          {userItem.admin_role === 'super_admin' && '⭐'}
+                          {userItem.admin_role === 'admin' && '🛡️'}
+                          {userItem.admin_role === 'user' && '👤'}
+                          {userItem.admin_role}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="user-stats">
+                      <div className="stat-item">
+                        <strong>Bets:</strong> {userItem.total_bets}
+                      </div>
+                      <div className="stat-item">
+                        <strong>Score:</strong> {Math.round(userItem.score)}
+                      </div>
+                      <div className="stat-item">
+                        <strong>Status:</strong>
+                        <span className={`status-badge ${userItem.is_blocked ? 'blocked' : 'active'}`}>
+                          {userItem.is_blocked ? t.blocked : t.active}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="admin-actions">
+                      {userItem.is_blocked ? (
+                        <button 
+                          className="btn btn-success"
+                          onClick={() => unblockUser(userItem.id)}
+                        >
+                          ✅ {t.unblockUser}
+                        </button>
+                      ) : (
+                        <button 
+                          className="btn btn-warning"
+                          onClick={() => {
+                            const reason = prompt('Reason for blocking:');
+                            if (reason) {
+                              const duration = prompt('Duration in hours (or leave empty for permanent):');
+                              blockUser(userItem.id, duration ? 'temporary' : 'permanent', duration ? parseInt(duration) : null, reason);
+                            }
+                          }}
+                        >
+                          🚫 {t.blockUser}
+                        </button>
+                      )}
+                      
+                      {isGod && (
+                        <button 
+                          className="btn btn-secondary"
+                          onClick={() => {
+                            const points = prompt('Points to add/remove (use negative for removal):');
+                            const reason = prompt('Reason for adjustment:');
+                            if (points && reason) {
+                              adjustPoints(userItem.id, points, reason);
+                            }
+                          }}
+                        >
+                          ⚡ {t.adjustPoints}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Site Messages Tab */}
+          {adminView === 'messages' && (
+            <div className="admin-section">
+              <h3>📢 {t.siteMessages}</h3>
+              
+              <div className="admin-controls">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    const message = prompt('Enter message:');
+                    const messageType = prompt('Message type (info/announcement/warning):') || 'info';
+                    const expiresAt = prompt('Expires at (YYYY-MM-DD HH:MM or leave empty):');
+                    if (message) {
+                      createSiteMessage(message, messageType, expiresAt);
+                    }
+                  }}
+                >
+                  ➕ {t.createMessage}
+                </button>
+              </div>
+
+              <div className="messages-grid">
+                {siteMessages.map(msg => (
+                  <div key={msg.id} className={`message-card ${msg.message_type}`}>
+                    <div className="message-header">
+                      <span className={`message-type ${msg.message_type}`}>
+                        {msg.message_type === 'announcement' && '📢'}
+                        {msg.message_type === 'warning' && '⚠️'}
+                        {msg.message_type === 'info' && 'ℹ️'}
+                        {t[msg.message_type]}
+                      </span>
+                      <span className="message-date">
+                        {new Date(msg.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="message-content">
+                      {msg.message}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Competitions Tab */}
+          {adminView === 'competitions' && (
+            <div className="admin-section">
+              <h3>🏆 {t.competitions}</h3>
+              
+              <div className="admin-controls">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    const name = prompt('Competition name:');
+                    const description = prompt('Description:');
+                    const region = prompt('Region (Global/Europe/Americas/Asia/Africa):') || 'Global';
+                    const maxParticipants = prompt('Max participants:') || '100';
+                    const prizePool = prompt('Prize pool (€):') || '1000';
+                    
+                    if (name && description) {
+                      const startDate = new Date();
+                      startDate.setDate(startDate.getDate() + 7); // Start in 7 days
+                      const endDate = new Date();
+                      endDate.setDate(endDate.getDate() + 37); // End in 37 days
+                      
+                      createCompetition({
+                        name,
+                        description,
+                        region,
+                        start_date: startDate.toISOString(),
+                        end_date: endDate.toISOString(),
+                        max_participants: parseInt(maxParticipants),
+                        prize_pool: parseFloat(prizePool),
+                        status: 'upcoming'
+                      });
+                    }
+                  }}
+                >
+                  ➕ {t.createCompetition}
+                </button>
+              </div>
+
+              <div className="competitions-admin-grid">
+                {competitions.map(comp => (
+                  <div key={comp.id} className="competition-admin-card">
+                    <h4>{comp.name}</h4>
+                    <p>{comp.description}</p>
+                    <div className="competition-details">
+                      <span className="region">🌍 {comp.region}</span>
+                      <span className="participants">👥 {comp.current_participants}/{comp.max_participants}</span>
+                      <span className="prize">💰 €{comp.prize_pool.toLocaleString()}</span>
+                      <span className={`status ${comp.status}`}>📊 {comp.status}</span>
+                    </div>
+                    <div className="competition-dates">
+                      <span>📅 {new Date(comp.start_date).toLocaleDateString()}</span>
+                      <span>📅 {new Date(comp.end_date).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Admin Actions Tab (God only) */}
+          {adminView === 'actions' && isGod && (
+            <div className="admin-section">
+              <h3>📋 {t.adminActions}</h3>
+              <div className="admin-actions-list">
+                {adminActions.map(action => (
+                  <div key={action.id} className="action-item">
+                    <div className="action-header">
+                      <span className="action-type">{action.action_type}</span>
+                      <span className="action-admin">by {action.admin_id}</span>
+                      <span className="action-date">{new Date(action.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div className="action-details">
+                      {JSON.stringify(action.details, null, 2)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="App">
       <nav className="navbar">
