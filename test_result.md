@@ -252,10 +252,10 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.2"
+  version: "2.0"
   test_sequence: 5
-  run_ui: true
-  final_status: "RESOLVED"
+  run_ui: false
+  final_status: "COMPLETED"
 
 test_plan:
   current_focus: []
