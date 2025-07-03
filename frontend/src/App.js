@@ -784,6 +784,40 @@ function App() {
     }
   };
 
+  // Helper function to format admin actions
+  const formatAdminAction = (action) => {
+    const adminName = action.admin_id || 'Unknown Admin';
+    const targetUser = action.details?.target_user_name || action.target_user_id || 'Unknown User';
+    
+    switch (action.action_type) {
+      case 'adjust_points':
+        const pointsChange = action.details?.points_change || 0;
+        const oldScore = action.details?.old_score || 0;
+        const newScore = action.details?.new_score || 0;
+        const reason = action.details?.reason || 'No reason provided';
+        return `Αλλαγή ${pointsChange > 0 ? '+' : ''}${pointsChange} πόντων από ${adminName} στον χρήστη ${targetUser} (${oldScore} → ${newScore}). Αιτιολογία: ${reason}`;
+      
+      case 'block_user':
+        const blockType = action.details?.block_type || 'permanent';
+        const blockReason = action.details?.reason || 'No reason provided';
+        return `Μπλοκάρισμα χρήστη ${targetUser} από ${adminName} (${blockType}). Αιτιολογία: ${blockReason}`;
+      
+      case 'unblock_user':
+        return `Ξεμπλοκάρισμα χρήστη ${targetUser} από ${adminName}`;
+      
+      case 'create_competition':
+        const compName = action.details?.competition_name || 'Unknown Competition';
+        return `Δημιουργία διαγωνισμού "${compName}" από ${adminName}`;
+      
+      case 'create_site_message':
+        const messageType = action.details?.message_type || 'info';
+        return `Δημιουργία site message (${messageType}) από ${adminName}`;
+      
+      default:
+        return `${action.action_type} από ${adminName}`;
+    }
+  };
+
   const createSiteMessage = async (messageData) => {
     try {
       // Prepare data for backend - convert empty expires_at to null
