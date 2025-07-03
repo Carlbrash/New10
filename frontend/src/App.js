@@ -482,7 +482,8 @@ function App() {
         full_name: user.full_name || '',
         email: user.email || '',
         avatar_url: user.avatar_url || '',
-        country: user.country || ''
+        country: user.country || '',
+        phone: user.phone || ''
       });
       setPasswordForm({
         current_password: '',
