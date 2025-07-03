@@ -262,7 +262,7 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "completed"
-  next_phase: "ready_for_enhancements"
+  next_phase: "ready_for_frontend_testing_or_user_validation"
 
 agent_communication:
   - agent: "testing"
