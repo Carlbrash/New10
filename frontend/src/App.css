@@ -2757,3 +2757,125 @@ body {
     font-size: 0.75rem;
   }
 }
+
+/* Settings Modal Styles */
+.settings-modal {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.settings-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.settings-tab {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 215, 0, 0.1);
+  border-radius: 12px;
+  padding: 25px;
+  transition: all 0.3s ease;
+}
+
+.settings-tab:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 215, 0, 0.2);
+}
+
+.settings-tab h4 {
+  color: #ffd700;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  padding-bottom: 10px;
+}
+
+.settings-tab .form-group {
+  margin-bottom: 20px;
+}
+
+.settings-tab .form-group label {
+  display: block;
+  color: #ffffff;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.settings-tab .form-input {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.settings-tab .form-input:focus {
+  outline: none;
+  border-color: #ffd700;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.settings-tab .form-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.settings-tab .btn {
+  margin-top: 15px;
+  min-width: 160px;
+}
+
+.settings-tab .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255, 215, 0, 0.3);
+}
+
+/* Responsive for Settings Modal */
+@media (max-width: 768px) {
+  .settings-modal {
+    max-width: 90%;
+    padding: 15px;
+  }
+  
+  .settings-tab {
+    padding: 20px 15px;
+  }
+  
+  .settings-tab h4 {
+    font-size: 1.1rem;
+  }
+  
+  .settings-tab .form-input {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-tab {
+    padding: 15px 10px;
+  }
+  
+  .settings-tab h4 {
+    font-size: 1rem;
+  }
+  
+  .settings-tab .form-input {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .settings-tab .btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
