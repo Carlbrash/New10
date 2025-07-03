@@ -484,6 +484,182 @@ function App() {
     }
   };
 
+  // Admin API Functions
+  const fetchAllUsers = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAllUsers(data.users);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchAdminActions = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/actions`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAdminActions(data.actions);
+      }
+    } catch (error) {
+      console.error('Error fetching admin actions:', error);
+    }
+  };
+
+  const fetchSiteMessages = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/site-messages`);
+      if (response.ok) {
+        const data = await response.json();
+        setSiteMessages(data.messages);
+      }
+    } catch (error) {
+      console.error('Error fetching site messages:', error);
+    }
+  };
+
+  const blockUser = async (blockData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/block-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(blockData)
+      });
+      
+      if (response.ok) {
+        alert('User blocked successfully');
+        fetchAllUsers();
+        setShowBlockModal(false);
+        setBlockForm({ user_id: '', block_type: 'temporary', duration_hours: 24, reason: '' });
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.detail}`);
+      }
+    } catch (error) {
+      console.error('Error blocking user:', error);
+      alert('Error blocking user');
+    }
+  };
+
+  const unblockUser = async (userId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/unblock-user/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        alert('User unblocked successfully');
+        fetchAllUsers();
+      } else {
+        alert('Error unblocking user');
+      }
+    } catch (error) {
+      console.error('Error unblocking user:', error);
+      alert('Error unblocking user');
+    }
+  };
+
+  const adjustPoints = async (pointsData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/adjust-points`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(pointsData)
+      });
+      
+      if (response.ok) {
+        alert('Points adjusted successfully');
+        fetchAllUsers();
+        setShowPointsModal(false);
+        setPointsForm({ user_id: '', points_change: 0, reason: '' });
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.detail}`);
+      }
+    } catch (error) {
+      console.error('Error adjusting points:', error);
+      alert('Error adjusting points');
+    }
+  };
+
+  const createSiteMessage = async (messageData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/site-message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(messageData)
+      });
+      
+      if (response.ok) {
+        alert('Site message created successfully');
+        fetchSiteMessages();
+        setShowMessageModal(false);
+        setMessageForm({ message: '', message_type: 'info', expires_at: '' });
+      } else {
+        alert('Error creating message');
+      }
+    } catch (error) {
+      console.error('Error creating message:', error);
+      alert('Error creating message');
+    }
+  };
+
+  const createCompetition = async (competitionData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/create-competition`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(competitionData)
+      });
+      
+      if (response.ok) {
+        alert('Competition created successfully');
+        fetchCompetitions();
+        setShowCompetitionModal(false);
+        setCompetitionForm({
+          name: '',
+          description: '',
+          region: '',
+          start_date: '',
+          end_date: '',
+          max_participants: 100,
+          prize_pool: 1000
+        });
+      } else {
+        alert('Error creating competition');
+      }
+    } catch (error) {
+      console.error('Error creating competition:', error);
+      alert('Error creating competition');
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
