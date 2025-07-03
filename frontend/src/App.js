@@ -760,7 +760,21 @@ function App() {
 
       if (response.ok) {
         alert('Points adjusted successfully');
-        fetchAdminData();
+        // Refresh all relevant data after points adjustment
+        fetchAdminData(); // Admin panel data
+        fetchRankings(); // Update rankings
+        fetchCountryStats(); // Update world map
+        
+        // If analytics tab is active, refresh analytics too
+        if (adminView === 'analytics') {
+          fetchAnalyticsOverview();
+          fetchUserAnalytics();
+        }
+        
+        // If top 100 is visible, refresh it too
+        if (showTop100) {
+          fetchTop100Users();
+        }
       } else {
         alert('Error adjusting points');
       }
