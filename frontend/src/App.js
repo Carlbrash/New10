@@ -290,6 +290,8 @@ function App() {
   const [siteMessages, setSiteMessages] = useState([]);
   const [adminActions, setAdminActions] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
+  const [top100Users, setTop100Users] = useState([]);
+  const [showTop100, setShowTop100] = useState(false);
   
   // Analytics States
   const [analyticsData, setAnalyticsData] = useState({
