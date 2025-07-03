@@ -400,6 +400,7 @@ function App() {
 
   // Fetch active site messages for banner when user logs in
   useEffect(() => {
+    console.log('🔄 UseEffect triggered for site messages, token:', !!token);
     if (token) {
       console.log('🔑 Token detected, fetching active site messages...');
       fetchActiveSiteMessages();
@@ -413,7 +414,13 @@ function App() {
       console.log('❌ No token, fetching site messages anyway for public display...');
       fetchActiveSiteMessages(); // Fetch even without token for public messages
     }
-  }, [token]);
+  }, [token, API_BASE_URL]);
+
+  // Also fetch messages on component mount
+  useEffect(() => {
+    console.log('🔄 Component mounted, fetching initial site messages...');
+    fetchActiveSiteMessages();
+  }, []);
 
   const fetchProfile = async () => {
     try {
