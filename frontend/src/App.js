@@ -614,7 +614,7 @@ function App() {
     }
   };
 
-  const createSiteMessage = async (message, messageType, expiresAt) => {
+  const createSiteMessage = async (messageData) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/site-message`, {
         method: 'POST',
@@ -622,16 +622,15 @@ function App() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          message: message,
-          message_type: messageType,
-          expires_at: expiresAt || null
-        })
+        body: JSON.stringify(messageData)
       });
 
       if (response.ok) {
-        alert('Message created successfully');
-        fetchAdminData();
+        alert('Site message created successfully! It will appear in the banner.');
+        fetchAdminData(); // Refresh admin data
+        fetchActiveSiteMessages(); // Refresh banner messages
+        setShowMessageModal(false);
+        setMessageForm({ message: '', message_type: 'info', expires_at: '' });
       } else {
         alert('Error creating message');
       }
