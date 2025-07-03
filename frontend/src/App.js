@@ -1111,6 +1111,7 @@ function App() {
         {currentView === 'dashboard' && renderDashboard()}
         {currentView === 'rankings' && renderRankings()}
         {currentView === 'worldmap' && renderWorldMap()}
+        {currentView === 'admin' && isAdmin && renderAdminPanel()}
         {currentView === 'download' && <DownloadBackup />}
       </main>
     </div>
