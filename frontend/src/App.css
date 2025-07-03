@@ -1947,6 +1947,16 @@ body {
   white-space: pre-wrap;
 }
 
+.action-description {
+  background: rgba(255, 215, 0, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border-left: 3px solid #ffd700;
+}
+
 .loading {
   text-align: center;
   color: #ffd700;
