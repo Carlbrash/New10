@@ -1,7 +1,7 @@
 import React from 'react';
 
 const DownloadBackup = () => {
-  const BASE_URL = "https://5fbf7006-ac0f-4985-a813-a01f269d3d14.preview.emergentagent.com";
+  const BASE_URL = "https://4a8aa96b-af2f-46ea-b951-d2885237a55a.preview.emergentagent.com";
   const BACKUP_URL = `${BASE_URL}/WoBeRa_backup.tar.gz`;
   const NETLIFY_URL = `${BASE_URL}/WoBeRa_Netlify_Ready.zip`;
 
