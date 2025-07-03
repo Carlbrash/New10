@@ -2924,6 +2924,17 @@ function App() {
                     </div>
                     
                     <div className="form-group">
+                      <label>Phone:</label>
+                      <input
+                        type="tel"
+                        value={settingsForm.phone}
+                        onChange={(e) => setSettingsForm({...settingsForm, phone: e.target.value})}
+                        className="form-input"
+                        placeholder="+30 123 456 7890"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
                       <label>Avatar URL:</label>
                       <input
                         type="url"
