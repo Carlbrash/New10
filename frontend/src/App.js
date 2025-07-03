@@ -678,7 +678,10 @@ function App() {
         setShowMessageModal(false);
         setMessageForm({ message: '', message_type: 'info', expires_at: '' });
       } else {
-        alert('Error creating message');
+        // Get error details
+        const errorData = await response.text();
+        console.error('❌ Error creating message:', response.status, errorData);
+        alert(`Error creating message: ${response.status} - ${errorData}`);
       }
     } catch (error) {
       console.error('Error creating message:', error);
