@@ -299,7 +299,7 @@ async def update_profile(profile_data: dict, user_id: str = Depends(verify_token
         raise HTTPException(status_code=404, detail="User not found")
     
     # Allowed fields to update
-    allowed_fields = ['full_name', 'email', 'avatar_url', 'country']
+    allowed_fields = ['full_name', 'email', 'avatar_url', 'country', 'phone']
     update_data = {}
     
     for field in allowed_fields:
