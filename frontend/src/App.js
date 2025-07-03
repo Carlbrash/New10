@@ -1526,6 +1526,157 @@ function App() {
         <div className="admin-content">
           {adminLoading && <div className="loading">Loading admin data...</div>}
           
+          {/* Analytics Tab */}
+          {adminView === 'analytics' && (
+            <div className="admin-section">
+              <h3>📊 {t.analytics}</h3>
+              
+              <div className="analytics-dashboard">
+                {/* Overview Cards */}
+                <div className="analytics-overview">
+                  <div className="stats-grid">
+                    <div className="stat-card">
+                      <h4>👥 Total Users</h4>
+                      <div className="stat-number">{analyticsData.overview?.total_users || 0}</div>
+                    </div>
+                    <div className="stat-card">
+                      <h4>✅ Active Users</h4>
+                      <div className="stat-number">{analyticsData.overview?.active_users || 0}</div>
+                    </div>
+                    <div className="stat-card">
+                      <h4>🚫 Blocked Users</h4>
+                      <div className="stat-number">{analyticsData.overview?.blocked_users || 0}</div>
+                    </div>
+                    <div className="stat-card">
+                      <h4>🏆 Competitions</h4>
+                      <div className="stat-number">{analyticsData.overview?.total_competitions || 0}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* User Countries Distribution */}
+                <div className="analytics-section">
+                  <h4>🌍 Users by Country</h4>
+                  <div className="country-stats">
+                    {analyticsData.user_countries?.slice(0, 10).map((country, index) => (
+                      <div key={country._id} className="country-stat">
+                        <span className="country-flag">{countryFlags[country._id] || '🏳️'}</span>
+                        <span className="country-name">{country._id}</span>
+                        <span className="country-count">{country.count} users</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top Users */}
+                <div className="analytics-section">
+                  <h4>🏅 Top Users by Points</h4>
+                  <div className="top-users-list">
+                    {userAnalytics.top_users?.slice(0, 5).map((user, index) => (
+                      <div key={user.username} className="top-user-item">
+                        <span className="user-rank">#{index + 1}</span>
+                        <span className="user-name">{user.full_name}</span>
+                        <span className="user-country">{countryFlags[user.country] || '🏳️'}</span>
+                        <span className="user-points">{user.points} pts</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="analytics-actions">
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => {
+                      fetchAnalyticsOverview();
+                      fetchUserAnalytics();
+                      fetchCompetitionAnalytics();
+                    }}
+                  >
+                    🔄 Refresh Analytics
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Content Management Tab */}
+          {adminView === 'content' && (
+            <div className="admin-section">
+              <h3>📝 {t.contentManagement}</h3>
+              
+              <div className="content-management">
+                <div className="content-actions">
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => {
+                      fetchContentPages();
+                    }}
+                  >
+                    🔄 Refresh Content
+                  </button>
+                </div>
+
+                <div className="content-pages-list">
+                  {contentPages.map(page => (
+                    <div key={page.id} className="content-page-item">
+                      <div className="page-header">
+                        <h4>{page.title}</h4>
+                        <span className="page-type">{page.type}</span>
+                      </div>
+                      <div className="page-preview">
+                        {page.content.substring(0, 150)}...
+                      </div>
+                      <div className="page-actions">
+                        <button 
+                          className="btn btn-small btn-secondary"
+                          onClick={() => {
+                            setSelectedPage(page);
+                            setShowContentModal(true);
+                          }}
+                        >
+                          ✏️ Edit
+                        </button>
+                        <small className="page-updated">
+                          Last updated: {new Date(page.last_updated).toLocaleDateString()}
+                        </small>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Content Edit Modal (placeholder) */}
+                {showContentModal && (
+                  <div className="modal-overlay">
+                    <div className="modal">
+                      <div className="modal-header">
+                        <h3>Edit Content: {selectedPage?.title}</h3>
+                        <button 
+                          className="modal-close"
+                          onClick={() => setShowContentModal(false)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <div className="modal-content">
+                        <p>Content editing functionality coming soon...</p>
+                        <p>Page ID: {selectedPage?.id}</p>
+                        <p>Type: {selectedPage?.type}</p>
+                      </div>
+                      <div className="modal-actions">
+                        <button 
+                          className="btn btn-secondary"
+                          onClick={() => setShowContentModal(false)}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Users Management Tab */}
           {adminView === 'users' && (
             <div className="admin-section">
