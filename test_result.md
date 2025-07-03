@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix the WoBeRa site messages banner issue where newly created messages don't appear in the banner. The user reported: 'dokimasa neo mynima ..graftike kanonika ..pote den perase apo to baner' (I tried a new message... it was written correctly... it never appeared in the banner). RESOLVED: User confirmed the fix is working - 'ναι τςρα δουλεθει' (yes now it works)"
+user_problem_statement: "Added search functionality to Rankings page and Top 100 players list in both Rankings page and Admin panel. User requested: 'stin selida Ranking thelo na prosthesoyme pano apo thn arxh ths lista kai kato apo tin epikefalida GLOBAL RANKING ena pedio sertche poy tha mporrei o kathenas na pliktrologi to onoma i to user name kai na vriksi ti thesi einai kapoios sto pagosmio ranking ( episis sto telos tis listas thelo me ton tropo poy eixame valei sto admin panel tin lista ton 100 ana dekades (prpei na tin diorthosoyme pali giati sto teleytaio update xalase ) na thn valoyme kai edw sto ranking'"
 
 backend:
   - task: "Site Messages GET Endpoint"
