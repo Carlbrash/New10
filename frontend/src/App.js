@@ -1848,51 +1848,95 @@ function App() {
               <h3>📝 {t.contentManagement}</h3>
               
               <div className="content-management">
-                <div className="content-actions">
-                  <button 
-                    className="btn btn-primary"
-                    onClick={() => {
-                      fetchContentPages();
-                    }}
-                  >
-                    🔄 Refresh Content
-                  </button>
-                </div>
-
-                <div className="content-pages-list">
-                  {contentPages.map(page => (
-                    <div key={page.id} className="content-page-item">
-                      <div className="page-header">
-                        <h4>{page.title}</h4>
-                        <span className="page-type">{page.type}</span>
-                      </div>
-                      <div className="page-preview">
-                        {page.content.substring(0, 150)}...
-                      </div>
-                      <div className="page-actions">
-                        <button 
-                          className="btn btn-small btn-secondary"
-                          onClick={() => {
-                            setSelectedPage(page);
-                            setShowContentModal(true);
-                          }}
-                        >
-                          ✏️ Edit
-                        </button>
-                        <small className="page-updated">
-                          Last updated: {new Date(page.last_updated).toLocaleDateString()}
-                        </small>
-                      </div>
+                <div className="content-tabs">
+                  <div className="tab-section">
+                    <h4>📄 Page Content Management</h4>
+                    <div className="content-actions">
+                      <button 
+                        className="btn btn-primary"
+                        onClick={() => {
+                          fetchContentPages();
+                        }}
+                      >
+                        🔄 Refresh Content
+                      </button>
                     </div>
-                  ))}
+
+                    <div className="content-pages-list">
+                      {contentPages.map(page => (
+                        <div key={page.id} className="content-page-item">
+                          <div className="page-header">
+                            <h5>{page.title}</h5>
+                            <span className="page-type">{page.page_type}</span>
+                          </div>
+                          <div className="page-preview">
+                            {page.content.substring(0, 150)}...
+                          </div>
+                          <div className="page-actions">
+                            <button 
+                              className="btn btn-small btn-secondary"
+                              onClick={() => {
+                                setSelectedPage(page);
+                                setShowContentModal(true);
+                              }}
+                            >
+                              ✏️ Edit Content
+                            </button>
+                            <small className="page-updated">
+                              Last updated: {new Date(page.last_updated).toLocaleDateString()}
+                            </small>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="tab-section">
+                    <h4>🧭 Menu Management</h4>
+                    <div className="content-actions">
+                      <button 
+                        className="btn btn-primary"
+                        onClick={fetchMenuItems}
+                      >
+                        🔄 Refresh Menu
+                      </button>
+                    </div>
+
+                    <div className="menu-items-list">
+                      {menuItems.map(item => (
+                        <div key={item.id} className="menu-item-card">
+                          <div className="menu-item-header">
+                            <span className="menu-icon">{item.icon}</span>
+                            <span className="menu-label">{item.label}</span>
+                            <span className="menu-order">Order: {item.order}</span>
+                          </div>
+                          <div className="menu-item-details">
+                            <span className="menu-url">{item.url}</span>
+                            <span className={`menu-status ${item.is_active ? 'active' : 'inactive'}`}>
+                              {item.is_active ? '✅ Active' : '❌ Inactive'}
+                            </span>
+                          </div>
+                          <button 
+                            className="btn btn-small btn-secondary"
+                            onClick={() => {
+                              setSelectedMenuItem(item);
+                              setShowMenuModal(true);
+                            }}
+                          >
+                            ✏️ Edit Menu Item
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Content Edit Modal (placeholder) */}
-                {showContentModal && (
+                {/* Content Edit Modal */}
+                {showContentModal && selectedPage && (
                   <div className="modal-overlay">
-                    <div className="modal">
+                    <div className="modal modal-large">
                       <div className="modal-header">
-                        <h3>Edit Content: {selectedPage?.title}</h3>
+                        <h3>Edit Content: {selectedPage.title}</h3>
                         <button 
                           className="modal-close"
                           onClick={() => setShowContentModal(false)}
@@ -1901,17 +1945,181 @@ function App() {
                         </button>
                       </div>
                       <div className="modal-content">
-                        <p>Content editing functionality coming soon...</p>
-                        <p>Page ID: {selectedPage?.id}</p>
-                        <p>Type: {selectedPage?.type}</p>
+                        <form onSubmit={(e) => {
+                          e.preventDefault();
+                          const formData = new FormData(e.target);
+                          updateContentPage(selectedPage.id, {
+                            title: formData.get('title'),
+                            content: formData.get('content'),
+                            meta_title: formData.get('meta_title'),
+                            meta_description: formData.get('meta_description'),
+                            is_active: formData.get('is_active') === 'on'
+                          });
+                        }}>
+                          <div className="form-group">
+                            <label>Page Title:</label>
+                            <input 
+                              type="text" 
+                              name="title" 
+                              defaultValue={selectedPage.title}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Meta Title (SEO):</label>
+                            <input 
+                              type="text" 
+                              name="meta_title" 
+                              defaultValue={selectedPage.meta_title || ''}
+                              className="form-input"
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Meta Description (SEO):</label>
+                            <input 
+                              type="text" 
+                              name="meta_description" 
+                              defaultValue={selectedPage.meta_description || ''}
+                              className="form-input"
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Content:</label>
+                            <textarea 
+                              name="content" 
+                              defaultValue={selectedPage.content}
+                              className="form-textarea"
+                              rows="10"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group checkbox-group">
+                            <label>
+                              <input 
+                                type="checkbox" 
+                                name="is_active" 
+                                defaultChecked={selectedPage.is_active}
+                              />
+                              Page is Active
+                            </label>
+                          </div>
+                          
+                          <div className="modal-actions">
+                            <button type="submit" className="btn btn-primary">
+                              💾 Save Changes
+                            </button>
+                            <button 
+                              type="button"
+                              className="btn btn-secondary"
+                              onClick={() => setShowContentModal(false)}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
                       </div>
-                      <div className="modal-actions">
+                    </div>
+                  </div>
+                )}
+
+                {/* Menu Edit Modal */}
+                {showMenuModal && selectedMenuItem && (
+                  <div className="modal-overlay">
+                    <div className="modal">
+                      <div className="modal-header">
+                        <h3>Edit Menu Item: {selectedMenuItem.label}</h3>
                         <button 
-                          className="btn btn-secondary"
-                          onClick={() => setShowContentModal(false)}
+                          className="modal-close"
+                          onClick={() => setShowMenuModal(false)}
                         >
-                          Close
+                          ✕
                         </button>
+                      </div>
+                      <div className="modal-content">
+                        <form onSubmit={(e) => {
+                          e.preventDefault();
+                          const formData = new FormData(e.target);
+                          updateMenuItem(selectedMenuItem.id, {
+                            label: formData.get('label'),
+                            url: formData.get('url'),
+                            order: parseInt(formData.get('order')),
+                            icon: formData.get('icon'),
+                            is_active: formData.get('is_active') === 'on'
+                          });
+                        }}>
+                          <div className="form-group">
+                            <label>Label:</label>
+                            <input 
+                              type="text" 
+                              name="label" 
+                              defaultValue={selectedMenuItem.label}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>URL:</label>
+                            <input 
+                              type="text" 
+                              name="url" 
+                              defaultValue={selectedMenuItem.url}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Icon (Emoji):</label>
+                            <input 
+                              type="text" 
+                              name="icon" 
+                              defaultValue={selectedMenuItem.icon || ''}
+                              className="form-input"
+                              placeholder="🏠"
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Order:</label>
+                            <input 
+                              type="number" 
+                              name="order" 
+                              defaultValue={selectedMenuItem.order}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group checkbox-group">
+                            <label>
+                              <input 
+                                type="checkbox" 
+                                name="is_active" 
+                                defaultChecked={selectedMenuItem.is_active}
+                              />
+                              Menu Item is Active
+                            </label>
+                          </div>
+                          
+                          <div className="modal-actions">
+                            <button type="submit" className="btn btn-primary">
+                              💾 Save Changes
+                            </button>
+                            <button 
+                              type="button"
+                              className="btn btn-secondary"
+                              onClick={() => setShowMenuModal(false)}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
                       </div>
                     </div>
                   </div>
