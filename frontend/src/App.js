@@ -345,6 +345,63 @@ function App() {
     'AU': '🇦🇺'
   };
 
+  // Analytics Functions
+  const fetchAnalyticsOverview = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/analytics/overview`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAnalyticsData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics overview:', error);
+    }
+  };
+
+  const fetchUserAnalytics = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/analytics/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUserAnalytics(data);
+      }
+    } catch (error) {
+      console.error('Error fetching user analytics:', error);
+    }
+  };
+
+  const fetchCompetitionAnalytics = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/analytics/competitions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCompetitionAnalytics(data);
+      }
+    } catch (error) {
+      console.error('Error fetching competition analytics:', error);
+    }
+  };
+
+  const fetchContentPages = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/content/pages`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setContentPages(data.pages);
+      }
+    } catch (error) {
+      console.error('Error fetching content pages:', error);
+    }
+  };
+
   // Form states
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
