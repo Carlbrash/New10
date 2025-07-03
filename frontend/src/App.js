@@ -290,6 +290,21 @@ function App() {
   const [activeSiteMessages, setActiveSiteMessages] = useState([]);
   const [bannerUpdateTrigger, setBannerUpdateTrigger] = useState(0);
 
+  // Settings states
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsForm, setSettingsForm] = useState({
+    full_name: '',
+    email: '',
+    avatar_url: '',
+    country: ''
+  });
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  });
+  const [settingsLoading, setSettingsLoading] = useState(false);
+
   // Admin Panel States
   const [adminView, setAdminView] = useState('users');
   const [allUsers, setAllUsers] = useState([]);
