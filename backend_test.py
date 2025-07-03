@@ -710,6 +710,20 @@ def run_tests():
             print("=" * 50)
             runner.run(search_test_suite)
             return
+        elif sys.argv[1] == "site_messages":
+            # Run only site messages tests
+            site_messages_suite = unittest.TestSuite()
+            site_messages_suite.addTest(SiteMessagesTester('test_01_admin_login'))
+            site_messages_suite.addTest(SiteMessagesTester('test_02_get_current_site_messages'))
+            site_messages_suite.addTest(SiteMessagesTester('test_03_create_site_message'))
+            site_messages_suite.addTest(SiteMessagesTester('test_04_verify_created_message'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING SITE MESSAGES FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(site_messages_suite)
+            return
     
     # Run all tests
     api_test_suite = unittest.TestSuite()
@@ -744,6 +758,12 @@ def run_tests():
     global_rankings_suite = unittest.TestSuite()
     global_rankings_suite.addTest(GlobalRankingsTester('test_01_global_rankings_data'))
     
+    site_messages_suite = unittest.TestSuite()
+    site_messages_suite.addTest(SiteMessagesTester('test_01_admin_login'))
+    site_messages_suite.addTest(SiteMessagesTester('test_02_get_current_site_messages'))
+    site_messages_suite.addTest(SiteMessagesTester('test_03_create_site_message'))
+    site_messages_suite.addTest(SiteMessagesTester('test_04_verify_created_message'))
+    
     runner = unittest.TextTestRunner(verbosity=2)
     print("\n" + "=" * 50)
     print("TESTING API ENDPOINTS")
@@ -774,6 +794,11 @@ def run_tests():
     print("TESTING GLOBAL RANKINGS FUNCTIONALITY")
     print("=" * 50)
     runner.run(global_rankings_suite)
+    
+    print("\n" + "=" * 50)
+    print("TESTING SITE MESSAGES FUNCTIONALITY")
+    print("=" * 50)
+    runner.run(site_messages_suite)
 
 if __name__ == "__main__":
     run_tests()
