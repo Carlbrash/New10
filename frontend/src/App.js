@@ -236,6 +236,8 @@ const translations = {
     siteMessages: 'Site Messages',
     competitions: 'Competitions',
     adminActions: 'Admin Actions',
+    analytics: 'Analytics',
+    contentManagement: 'Content Management',
     blockUser: 'Block User',
     unblockUser: 'Unblock',
     adjustPoints: 'Adjust Points',
