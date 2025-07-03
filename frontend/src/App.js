@@ -2928,6 +2928,13 @@ function App() {
                 </button>
               )}
               
+              <button 
+                className="nav-link"
+                onClick={openSettings}
+              >
+                ⚙️ Settings
+              </button>
+              
               <button className="btn btn-logout" onClick={handleLogout}>
                 {t.logout}
               </button>
