@@ -1272,8 +1272,25 @@ function App() {
           {adminView === 'users' && (
             <div className="admin-section">
               <h3>👥 {t.userManagement}</h3>
+              
+              {/* Search Bar */}
+              <div className="admin-controls">
+                <div className="search-container">
+                  <input
+                    type="text"
+                    placeholder="🔍 Search by name, username, or email..."
+                    value={userSearchTerm}
+                    onChange={(e) => handleUserSearch(e.target.value)}
+                    className="admin-search-input"
+                  />
+                  <span className="search-results-count">
+                    {filteredUsers.length} of {allUsers.length} users
+                  </span>
+                </div>
+              </div>
+
               <div className="admin-users-grid">
-                {allUsers.map(userItem => (
+                {filteredUsers.map(userItem => (
                   <div key={userItem.id} className="admin-user-card">
                     <div className="user-info">
                       <Avatar src={userItem.avatar_url} name={userItem.full_name} size="medium" />
@@ -1296,14 +1313,23 @@ function App() {
                         <strong>Bets:</strong> {userItem.total_bets}
                       </div>
                       <div className="stat-item">
-                        <strong>Score:</strong> {Math.round(userItem.score)}
+                        <strong>Current Score:</strong> {Math.round(userItem.score)}
+                      </div>
+                      <div className="stat-item">
+                        <strong>Win Rate:</strong> {userItem.total_bets > 0 ? Math.round((userItem.won_bets / userItem.total_bets) * 100) : 0}%
                       </div>
                       <div className="stat-item">
                         <strong>Status:</strong>
                         <span className={`status-badge ${userItem.is_blocked ? 'blocked' : 'active'}`}>
-                          {userItem.is_blocked ? t.blocked : t.active}
+                          {userItem.is_blocked ? '🚫 Blocked' : '✅ Active'}
                         </span>
                       </div>
+                      {userItem.is_blocked && userItem.blocked_reason && (
+                        <div className="stat-item">
+                          <strong>Block Reason:</strong> 
+                          <span className="block-reason">{userItem.blocked_reason}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="admin-actions">
@@ -1311,21 +1337,28 @@ function App() {
                         <button 
                           className="btn btn-success"
                           onClick={() => unblockUser(userItem.id)}
+                          title="Unblock this user"
                         >
-                          ✅ {t.unblockUser}
+                          ✅ Unblock User
                         </button>
                       ) : (
                         <button 
                           className="btn btn-warning"
                           onClick={() => {
-                            const reason = prompt('Reason for blocking:');
-                            if (reason) {
-                              const duration = prompt('Duration in hours (or leave empty for permanent):');
-                              blockUser(userItem.id, duration ? 'temporary' : 'permanent', duration ? parseInt(duration) : null, reason);
+                            const reason = prompt(`Block user "${userItem.full_name}"?\n\nEnter reason for blocking:`);
+                            if (reason && reason.trim()) {
+                              const durationStr = prompt('Block duration:\n• Leave empty for PERMANENT block\n• Enter hours for temporary block (e.g., 24)');
+                              const duration = durationStr && !isNaN(durationStr) ? parseInt(durationStr) : null;
+                              const blockType = duration ? 'temporary' : 'permanent';
+                              
+                              if (confirm(`Confirm ${blockType} block for "${userItem.full_name}"?\nReason: ${reason}${duration ? `\nDuration: ${duration} hours` : ''}`)) {
+                                blockUser(userItem.id, blockType, duration, reason);
+                              }
                             }
                           }}
+                          title="Block this user"
                         >
-                          🚫 {t.blockUser}
+                          🚫 Block User
                         </button>
                       )}
                       
@@ -1333,20 +1366,42 @@ function App() {
                         <button 
                           className="btn btn-secondary"
                           onClick={() => {
-                            const points = prompt('Points to add/remove (use negative for removal):');
-                            const reason = prompt('Reason for adjustment:');
-                            if (points && reason) {
-                              adjustPoints(userItem.id, points, reason);
+                            const currentPoints = Math.round(userItem.score);
+                            const pointsStr = prompt(`Current Score: ${currentPoints} points\n\nAdjust points for "${userItem.full_name}":\n• Enter positive number to ADD points\n• Enter negative number to REMOVE points\n• Example: +50 or -25`);
+                            
+                            if (pointsStr && !isNaN(pointsStr)) {
+                              const pointsChange = parseInt(pointsStr);
+                              const newTotal = currentPoints + pointsChange;
+                              const reason = prompt(`Points Change: ${pointsChange > 0 ? '+' : ''}${pointsChange}\nCurrent: ${currentPoints} → New: ${newTotal}\n\nEnter reason for this adjustment:`);
+                              
+                              if (reason && reason.trim()) {
+                                if (confirm(`Confirm points adjustment for "${userItem.full_name}":\n\nChange: ${pointsChange > 0 ? '+' : ''}${pointsChange} points\nCurrent: ${currentPoints} → New: ${newTotal}\nReason: ${reason}`)) {
+                                  adjustPoints(userItem.id, pointsChange, reason);
+                                }
+                              }
                             }
                           }}
+                          title="Adjust user points"
                         >
-                          ⚡ {t.adjustPoints}
+                          ⚡ Adjust Points
                         </button>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
+              
+              {filteredUsers.length === 0 && userSearchTerm && (
+                <div className="no-results">
+                  <p>No users found matching "{userSearchTerm}"</p>
+                  <button 
+                    onClick={() => handleUserSearch('')}
+                    className="btn btn-secondary"
+                  >
+                    Clear Search
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
