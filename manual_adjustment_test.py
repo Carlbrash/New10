@@ -218,4 +218,22 @@ if __name__ == "__main__":
     
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
-    runner.run(test_suite)
+    result = runner.run(test_suite)
+    
+    # Print test results
+    print("\n=== TEST RESULTS ===")
+    print(f"Tests run: {result.testsRun}")
+    print(f"Errors: {len(result.errors)}")
+    print(f"Failures: {len(result.failures)}")
+    
+    if result.errors:
+        print("\n=== ERRORS ===")
+        for test, error in result.errors:
+            print(f"\nTest: {test}")
+            print(f"Error: {error}")
+    
+    if result.failures:
+        print("\n=== FAILURES ===")
+        for test, failure in result.failures:
+            print(f"\nTest: {test}")
+            print(f"Failure: {failure}")
