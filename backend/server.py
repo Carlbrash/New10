@@ -1752,6 +1752,33 @@ async def startup_event():
         tournaments_collection.insert_many(sample_tournaments)
         print("Sample tournaments created")
 
+    # Create test user if not exists
+    if not users_collection.find_one({"username": "testuser"}):
+        test_user = {
+            "id": str(uuid.uuid4()),
+            "username": "testuser",
+            "email": "testuser@example.com",
+            "password": hash_password("testpass123"),
+            "country": "GR",
+            "full_name": "Test User",
+            "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
+            "admin_role": "user",
+            "is_blocked": False,
+            "blocked_until": None,
+            "blocked_reason": None,
+            "created_at": datetime.utcnow(),
+            "total_bets": 25,
+            "won_bets": 18,
+            "lost_bets": 7,
+            "total_amount": 1200.0,
+            "total_winnings": 1850.0,
+            "avg_odds": 2.8,
+            "rank": 0,
+            "score": 85.5
+        }
+        users_collection.insert_one(test_user)
+        print("Test user created: testuser")
+
 @app.get("/api/reset-data")
 async def reset_data():
     """Reset all sample data for testing"""
