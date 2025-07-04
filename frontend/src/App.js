@@ -1749,6 +1749,219 @@ function App() {
     }
   };
 
+  // =============================================================================
+  // AFFILIATE SYSTEM FUNCTIONS
+  // =============================================================================
+  
+  // Check if user is an affiliate
+  const checkAffiliateStatus = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/affiliate/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAffiliateData(data);
+        setIsAffiliate(true);
+        fetchAffiliateStats();
+      } else {
+        setIsAffiliate(false);
+        setAffiliateData(null);
+      }
+    } catch (error) {
+      console.error('Error checking affiliate status:', error);
+      setIsAffiliate(false);
+    }
+  };
+
+  // Fetch affiliate statistics
+  const fetchAffiliateStats = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/affiliate/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAffiliateStats(data);
+      }
+    } catch (error) {
+      console.error('Error fetching affiliate stats:', error);
+    }
+  };
+
+  // Fetch affiliate commissions
+  const fetchAffiliateCommissions = async () => {
+    if (!token) return;
+    
+    setAffiliateLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/affiliate/commissions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAffiliateCommissions(data.commissions);
+      }
+    } catch (error) {
+      console.error('Error fetching affiliate commissions:', error);
+    }
+    setAffiliateLoading(false);
+  };
+
+  // Fetch affiliate referrals
+  const fetchAffiliateReferrals = async () => {
+    if (!token) return;
+    
+    setAffiliateLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/affiliate/referrals`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAffiliateReferrals(data.referrals);
+      }
+    } catch (error) {
+      console.error('Error fetching affiliate referrals:', error);
+    }
+    setAffiliateLoading(false);
+  };
+
+  // Apply for affiliate program
+  const applyForAffiliate = async () => {
+    if (!token) {
+      alert('Please login first');
+      return;
+    }
+    
+    setAffiliateLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/affiliate/apply`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          motivation: 'I want to promote WoBeRa to my network'
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Affiliate application approved! Your referral code is: ${data.referral_code}`);
+        checkAffiliateStatus(); // Refresh affiliate status
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to apply for affiliate program');
+      }
+    } catch (error) {
+      console.error('Error applying for affiliate:', error);
+      alert('Error applying for affiliate program');
+    }
+    setAffiliateLoading(false);
+  };
+
+  // Copy referral link to clipboard
+  const copyReferralLink = async () => {
+    if (affiliateData && affiliateData.referral_link) {
+      try {
+        await navigator.clipboard.writeText(affiliateData.referral_link);
+        alert('Referral link copied to clipboard!');
+      } catch (error) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = affiliateData.referral_link;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Referral link copied to clipboard!');
+      }
+    }
+  };
+
+  // Request payout
+  const requestPayout = async () => {
+    if (!token || !affiliateStats) return;
+    
+    const amount = parseFloat(payoutForm.amount);
+    if (amount < 50) {
+      alert('Minimum payout amount is €50');
+      return;
+    }
+    
+    if (amount > affiliateStats.pending_earnings) {
+      alert('Insufficient pending earnings');
+      return;
+    }
+    
+    setAffiliateLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/affiliate/payout/request`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          affiliate_user_id: user.id,
+          amount: amount,
+          payment_method: payoutForm.payment_method,
+          payment_details: payoutForm.payment_details,
+          notes: payoutForm.notes
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Payout request submitted successfully! Amount: €${data.amount}`);
+        setShowPayoutModal(false);
+        setPayoutForm({
+          amount: '',
+          payment_method: 'bank_transfer',
+          payment_details: {},
+          notes: ''
+        });
+        fetchAffiliateStats(); // Refresh stats
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to request payout');
+      }
+    } catch (error) {
+      console.error('Error requesting payout:', error);
+      alert('Error requesting payout');
+    }
+    setAffiliateLoading(false);
+  };
+
+  // Load affiliate data when user logs in
+  useEffect(() => {
+    if (user && token) {
+      checkAffiliateStatus();
+    }
+  }, [user, token]);
+
+  // Fetch affiliate data when view changes
+  useEffect(() => {
+    if (currentView === 'affiliate' && isAffiliate) {
+      if (affiliateView === 'commissions') {
+        fetchAffiliateCommissions();
+      } else if (affiliateView === 'referrals') {
+        fetchAffiliateReferrals();
+      }
+    }
+  }, [currentView, affiliateView, isAffiliate]);
+
   // Search Users Function
   const handleUserSearch = (searchTerm) => {
     setUserSearchTerm(searchTerm);
