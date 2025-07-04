@@ -237,6 +237,30 @@ backend:
         agent: "testing"
         comment: "User registration with referral code is working correctly. Successfully registers new user and processes the referral, returning appropriate confirmation messages."
 
+  - task: "Team System API - GET /api/teams"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/teams endpoint is working correctly. Returns a list of teams with proper details including team name, logo URL, colors, city, country, phone, email, captain name, and player count."
+
+  - task: "Team System API - POST /api/teams"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/teams endpoint is working correctly. When attempting to create a team with testuser, the API correctly returns a 400 error with 'You are already a member of another team' message, which is the expected behavior since testuser is already a captain of 'Test Warriors' team."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
