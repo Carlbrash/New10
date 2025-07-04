@@ -3344,7 +3344,10 @@ function App() {
               <div className="tournament-admin-header">
                 <button 
                   className="btn btn-primary"
-                  onClick={() => setShowTournamentModal(true)}
+                  onClick={() => {
+                    console.log('🏆 Create Tournament button clicked!');
+                    setShowTournamentModal(true);
+                  }}
                 >
                   ➕ Create New Tournament
                 </button>
