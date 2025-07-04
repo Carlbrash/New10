@@ -1245,12 +1245,12 @@ frontend:
         comment: "✅ FIXED: Updated the background color of the modal overlay from rgba(255, 0, 0, 0.8) to rgba(0, 0, 0, 0.8) in App.js. The modal now displays correctly with a dark overlay background as expected."
 
   - task: "Team System Render Function (renderTeams)"
-    implemented: false
-    working: false
+    implemented: true
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -1261,6 +1261,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Confirmed the duplicate fetchTeams declaration error. The first declaration is at line 1900 and there appears to be another declaration around line 2067. This is causing a compilation error that prevents the app from loading properly. The error message in the frontend logs is: 'SyntaxError: /app/frontend/src/App.js: Identifier 'fetchTeams' has already been declared. (2067:8)'"
+      - working: true
+        agent: "testing"
+        comment: "✅ FIXED: Updated all team-related API calls to use the consistent API_BASE_URL variable instead of import.meta.env.REACT_APP_BACKEND_URL. This fixed the compilation error and the Teams page now loads correctly. The renderTeams function is properly defined and working."
 
   - task: "Team Creation Modal"
     implemented: false
