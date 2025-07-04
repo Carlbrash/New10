@@ -434,6 +434,12 @@ function App() {
   const [tournamentLoading, setTournamentLoading] = useState(false);
   const [userTournaments, setUserTournaments] = useState([]);
 
+  // Tournament Bracket states
+  const [tournamentBracket, setTournamentBracket] = useState(null);
+  const [tournamentMatches, setTournamentMatches] = useState([]);
+  const [bracketLoading, setBracketLoading] = useState(false);
+  const [showBracket, setShowBracket] = useState(false);
+
   // Settings states
   const [showSettings, setShowSettings] = useState(false);
   const [settingsForm, setSettingsForm] = useState({
