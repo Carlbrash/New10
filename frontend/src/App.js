@@ -5529,17 +5529,6 @@ function App() {
                   <div className="manual-adjustment">
                     <div className="section-header">
                       <h4>⚙️ {t.manualAdjustment}</h4>
-                      <button 
-                        className="btn btn-secondary"
-                        onClick={() => {
-                          console.log('CREATE ADJUSTMENT BUTTON CLICKED!');
-                          console.log('Current modal state:', showManualAdjustmentModal);
-                          setShowManualAdjustmentModal(true);
-                          console.log('Modal state should now be true');
-                        }}
-                      >
-                        ➕ Create Adjustment
-                      </button>
                     </div>
                     <p>Manually adjust user wallet balances for corrections, bonuses, or penalties.</p>
                   </div>
