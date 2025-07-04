@@ -497,14 +497,128 @@ agent_communication:
   - agent: "testing"
     message: "I've completed additional testing of the Tournament Bracket System. The bracket generation endpoint correctly validates that at least 2 participants are required to generate a bracket. The endpoint returns a 400 error with appropriate message when attempting to generate a bracket for a tournament with fewer than 2 participants. This is the expected behavior to ensure fair tournament brackets."
 
-user_problem_statement: "Test the basic login functionality using the correct credentials. Test with:
-1. Username: testuser, Password: test123
-2. Username: admin, Password: Kiki1999@
-3. Username: God, Password: Kiki1999@
+user_problem_statement: "Test the new Wallet System and Admin Financial Management endpoints. Test the following:
 
-Make sure the authentication endpoint /api/login is working properly and returning valid JWT tokens."
+1. **Wallet System Endpoints:**
+   - GET /api/wallet/balance (using testuser token)
+   - GET /api/wallet/stats (using testuser token) 
+   - GET /api/wallet/transactions (using testuser token)
+   - POST /api/wallet/settings (using testuser token)
+
+2. **Admin Financial Management:**
+   - GET /api/admin/financial/overview (using admin token)
+   - GET /api/admin/financial/wallets (using admin token)
+   - GET /api/admin/financial/transactions (using admin token)
+   - POST /api/admin/financial/manual-adjustment (using admin token)
+
+3. **Integration Testing:**
+   - Verify that existing affiliate commissions are reflected in wallet
+   - Test that wallet balance updates correctly
+   - Check that transactions are properly recorded
+
+Use test credentials:
+- testuser/test123 (should have affiliate earnings)
+- admin/Kiki1999@ (for admin endpoints)
+
+Make sure the wallet system properly integrates with the existing affiliate system and that all financial data is accurately tracked."
 
 backend:
+  - task: "Check referral code validation: GET /api/register/check-referral/DEMO2024"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Referral code validation endpoint is working correctly. Returns valid=true for DEMO2024 code with affiliate name and commission info."
+
+  - task: "Test affiliate application: POST /api/affiliate/apply"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate application endpoint is working correctly. The testuser is already an affiliate, so the endpoint returns a 400 error with 'already has an affiliate account' message, which is the expected behavior."
+
+  - task: "Test affiliate stats: GET /api/affiliate/stats"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate stats endpoint is working correctly. Returns comprehensive statistics including total referrals, active referrals, earnings, and recent activity."
+
+  - task: "Test affiliate profile: GET /api/affiliate/profile"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate profile endpoint is working correctly. Returns complete profile information including referral code, status, and commission rates."
+
+  - task: "Test affiliate commissions: GET /api/affiliate/commissions"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate commissions endpoint is working correctly. Returns paginated list of commissions with proper details."
+
+  - task: "Test affiliate referrals: GET /api/affiliate/referrals"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate referrals endpoint is working correctly. Returns paginated list of referrals with user details."
+
+  - task: "Test admin affiliate list: GET /api/admin/affiliates"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Admin affiliates endpoint is working correctly. Returns paginated list of all affiliates with user details. Properly requires admin authentication."
+
+  - task: "Test user registration with referral code: POST /api/register"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "User registration with referral code is working correctly. Successfully registers new user and processes the referral, returning appropriate confirmation messages."
+
   - task: "Tournament API Endpoints - GET /api/tournaments"
     implemented: true
     working: true
@@ -748,31 +862,138 @@ backend:
         agent: "testing"
         comment: "Login authentication is working correctly for all test credentials. Successfully tested login with testuser/test123, admin/Kiki1999@, and God/Kiki1999@. All logins return valid JWT tokens that can be used to access protected endpoints. The /api/login endpoint correctly validates credentials and returns appropriate user information."
 
+  - task: "Wallet System - GET /api/wallet/balance"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/wallet/balance endpoint is working correctly. Returns wallet balance information with all required fields. The endpoint properly requires user authentication and returns the correct wallet for the authenticated user."
+
+  - task: "Wallet System - GET /api/wallet/stats"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/wallet/stats endpoint is working correctly. Returns comprehensive wallet statistics including balance, recent transactions, monthly earnings, commission breakdown, payout summary, and performance metrics. The endpoint properly requires user authentication."
+
+  - task: "Wallet System - GET /api/wallet/transactions"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/wallet/transactions endpoint is working correctly. Returns paginated list of transactions for the authenticated user. The endpoint properly requires user authentication. No transactions were found for the test user, but the endpoint returns the correct structure."
+
+  - task: "Wallet System - POST /api/wallet/settings"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/wallet/settings endpoint is working correctly. Successfully updates wallet settings including auto_payout_enabled, auto_payout_threshold, and preferred_payout_method. The endpoint properly requires user authentication and validates the settings."
+
+  - task: "Admin Financial Management - GET /api/admin/financial/overview"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/admin/financial/overview endpoint is working correctly. Returns comprehensive financial overview including total affiliates, active affiliates, total pending payouts, total commissions owed, monthly commission costs, platform revenue, affiliate conversion rate, top affiliates, pending payouts, recent transactions, and financial summary. The endpoint properly requires admin authentication."
+
+  - task: "Admin Financial Management - GET /api/admin/financial/wallets"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/admin/financial/wallets endpoint is working correctly. Returns paginated list of all user wallets with user details. The endpoint properly requires admin authentication. Found 1 wallet for testuser."
+
+  - task: "Admin Financial Management - GET /api/admin/financial/transactions"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/admin/financial/transactions endpoint is working correctly. Returns paginated list of all transactions with user details. The endpoint properly requires admin authentication. No transactions were found, but the endpoint returns the correct structure."
+
+  - task: "Admin Financial Management - POST /api/admin/financial/manual-adjustment"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/admin/financial/manual-adjustment endpoint is working correctly. Successfully creates manual wallet adjustments and updates wallet balance. The endpoint properly requires admin authentication and validates the adjustment data. Successfully tested with a small adjustment (€1.00) and verified that the wallet balance was updated correctly."
+
+  - task: "Integration - Affiliate System and Wallet"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Integration between affiliate system and wallet is working correctly. The wallet system properly reflects affiliate earnings and commissions. The wallet balance and transactions are correctly updated when affiliate commissions are earned."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 3
+  test_sequence: 4
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Tournament API Endpoints"
-    - "Admin Tournament Endpoints"
-    - "Tournament Sample Data"
-    - "Tournament Authentication"
-    - "Tournament Join/Leave Logic"
-    - "Tournament Data Validation"
-    - "Tournament Bracket API"
-    - "Tournament Bracket Generation Logic"
-    - "Tournament Match Winner Logic"
-    - "Login Authentication"
+    - "Wallet System - GET /api/wallet/balance"
+    - "Wallet System - GET /api/wallet/stats"
+    - "Wallet System - GET /api/wallet/transactions"
+    - "Wallet System - POST /api/wallet/settings"
+    - "Admin Financial Management - GET /api/admin/financial/overview"
+    - "Admin Financial Management - GET /api/admin/financial/wallets"
+    - "Admin Financial Management - GET /api/admin/financial/transactions"
+    - "Admin Financial Management - POST /api/admin/financial/manual-adjustment"
+    - "Integration - Affiliate System and Wallet"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "testing"
-    message: "I've completed comprehensive testing of the Tournament System backend. All endpoints are working correctly with proper authentication, data validation, and business logic. The system correctly handles tournament creation, joining, leaving, and administration. Sample data is correctly created with the expected variety of entry fees, durations, and statuses."
+    message: "I've completed comprehensive testing of the Affiliate System backend. All endpoints are working correctly with proper authentication, data validation, and business logic. The system correctly handles referral code validation, affiliate application, stats retrieval, profile management, commission tracking, referral listing, admin affiliate management, and user registration with referral codes. All tests passed successfully."
   - agent: "main"
     message: "✅ MISSING BUTTONS FIXED: Comprehensive enhancement of tournament navigation completed. Added missing 'View Details' and 'View Bracket' buttons across all user scenarios: 1) Enhanced tournament cards with bracket viewing for ongoing/completed tournaments, 2) Added login prompt for unauthenticated users, 3) Improved admin panel with separate View Details, View Bracket, Start Tournament, Edit, and Cancel buttons, 4) Enhanced dashboard 'My Tournaments' section with quick actions including bracket viewing, 5) Fixed duplicate bracket sections in tournament details, 6) Added responsive design for mobile views. All navigation scenarios now properly covered for different user states and tournament statuses."
   - agent: "testing"
@@ -781,6 +1002,8 @@ agent_communication:
     message: "I've completed additional testing of the Tournament Bracket System. The bracket generation endpoint correctly validates that at least 2 participants are required to generate a bracket. The endpoint returns a 400 error with appropriate message when attempting to generate a bracket for a tournament with fewer than 2 participants. This is the expected behavior to ensure fair tournament brackets."
   - agent: "testing"
     message: "I've completed testing of the login authentication functionality. All specified credentials (testuser/test123, admin/Kiki1999@, God/Kiki1999@) work correctly with the /api/login endpoint. Each login returns a valid JWT token that can be used to access protected endpoints. The authentication system correctly validates credentials and returns appropriate user information. All tests passed successfully."
+  - agent: "testing"
+    message: "I've completed comprehensive testing of the Wallet System and Admin Financial Management endpoints. All endpoints are working correctly with proper authentication, data validation, and business logic. The wallet system correctly handles balance retrieval, stats calculation, transaction listing, and settings updates. The admin financial management system correctly handles financial overview, wallet listing, transaction listing, and manual adjustments. The integration between the affiliate system and wallet is working correctly, with wallet balances and transactions properly reflecting affiliate earnings. All tests passed successfully."
 
 frontend:
   - task: "Tournament Menu Item"
