@@ -2369,15 +2369,51 @@ function App() {
                           </div>
                         )}
                       </div>
-                      <button 
-                        className="btn btn-secondary btn-small"
-                        onClick={() => {
-                          setCurrentView('tournament');
-                          fetchTournamentDetails(tournament.id);
-                        }}
-                      >
-                        View Details
-                      </button>
+                      <div className="tournament-quick-actions">
+                        <button 
+                          className="btn btn-secondary btn-small"
+                          onClick={() => {
+                            setCurrentView('tournament');
+                            fetchTournamentDetails(tournament.id);
+                          }}
+                        >
+                          📝 View Details
+                        </button>
+                        
+                        {/* Bracket button if tournament has started or has bracket */}
+                        {(tournament.status === 'ongoing' || tournament.status === 'completed') && (
+                          <button 
+                            className="btn btn-outline btn-small"
+                            onClick={() => {
+                              setCurrentView('tournament');
+                              fetchTournamentDetails(tournament.id);
+                              // Auto-show bracket after details load
+                              setTimeout(() => setShowBracket(true), 500);
+                            }}
+                          >
+                            🏆 View Bracket
+                          </button>
+                        )}
+                        
+                        {/* Quick action based on tournament status */}
+                        {tournament.status === 'open' && !tournament.user_registered && (
+                          <button 
+                            className="btn btn-primary btn-small"
+                            onClick={() => joinTournament(tournament.id)}
+                          >
+                            🚀 Join Now
+                          </button>
+                        )}
+                        
+                        {tournament.user_registered && tournament.status === 'open' && (
+                          <button 
+                            className="btn btn-warning btn-small"
+                            onClick={() => leaveTournament(tournament.id)}
+                          >
+                            ❌ Leave
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
