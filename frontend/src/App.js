@@ -7238,7 +7238,12 @@ function App() {
       
       {/* Team Creation Modal */}
       {showCreateTeamModal && (
-        <div className="modal-overlay" onClick={() => setShowCreateTeamModal(false)}>
+        <div className="modal-overlay" onClick={(e) => {
+          // Only close if clicking the overlay itself, not its children
+          if (e.target === e.currentTarget) {
+            setShowCreateTeamModal(false);
+          }
+        }}>
           <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>🏆 Create New Team</h3>
@@ -7251,7 +7256,11 @@ function App() {
             </div>
             
             <div className="modal-content">
-              <form onSubmit={(e) => { e.preventDefault(); createTeam(); }}>
+              <form onSubmit={(e) => { 
+                e.preventDefault(); 
+                console.log('FORM SUBMITTED - calling createTeam');
+                createTeam(); 
+              }}>
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Team Name *</label>
@@ -7354,7 +7363,10 @@ function App() {
                   <button 
                     type="button"
                     className="btn btn-secondary"
-                    onClick={() => setShowCreateTeamModal(false)}
+                    onClick={() => {
+                      console.log('CANCEL CLICKED');
+                      setShowCreateTeamModal(false);
+                    }}
                   >
                     Cancel
                   </button>
@@ -7362,6 +7374,10 @@ function App() {
                     type="submit"
                     className="btn btn-primary"
                     disabled={teamLoading}
+                    onClick={(e) => {
+                      console.log('CREATE TEAM BUTTON CLICKED');
+                      // Let the form submit handle this
+                    }}
                   >
                     {teamLoading ? '⏳ Creating...' : '🏆 Create Team'}
                   </button>
