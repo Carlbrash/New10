@@ -3007,6 +3007,267 @@ async def check_referral_code(referral_code: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error checking referral code: {str(e)}")
 
+# =============================================================================
+# WALLET SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.get("/api/wallet/balance")
+async def get_wallet_balance(user_id: str = Depends(verify_token)):
+    """Get user's wallet balance"""
+    try:
+        wallet = get_or_create_wallet(user_id)
+        return wallet
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching wallet balance: {str(e)}")
+
+@app.get("/api/wallet/stats")
+async def get_wallet_stats(user_id: str = Depends(verify_token)):
+    """Get comprehensive wallet statistics"""
+    try:
+        stats = calculate_wallet_stats(user_id)
+        return stats
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching wallet stats: {str(e)}")
+
+@app.get("/api/wallet/transactions")
+async def get_wallet_transactions(user_id: str = Depends(verify_token), limit: int = 50, skip: int = 0):
+    """Get user's transaction history"""
+    try:
+        transactions = list(transactions_collection.find(
+            {"user_id": user_id},
+            {"_id": 0}
+        ).sort("created_at", -1).skip(skip).limit(limit))
+        
+        total_transactions = transactions_collection.count_documents({"user_id": user_id})
+        
+        return {
+            "transactions": transactions,
+            "total": total_transactions,
+            "page": skip // limit + 1,
+            "pages": (total_transactions + limit - 1) // limit
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching transactions: {str(e)}")
+
+@app.post("/api/wallet/settings")
+async def update_wallet_settings(settings: dict, user_id: str = Depends(verify_token)):
+    """Update wallet settings"""
+    try:
+        wallet = get_or_create_wallet(user_id)
+        
+        # Validate settings
+        allowed_settings = [
+            "auto_payout_enabled", "auto_payout_threshold", "preferred_payout_method"
+        ]
+        
+        update_data = {"updated_at": datetime.utcnow()}
+        for key, value in settings.items():
+            if key in allowed_settings:
+                update_data[key] = value
+        
+        wallet_balances_collection.update_one(
+            {"user_id": user_id},
+            {"$set": update_data}
+        )
+        
+        return {"message": "Wallet settings updated successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating wallet settings: {str(e)}")
+
+# =============================================================================
+# ADMIN FINANCIAL MANAGEMENT ENDPOINTS
+# =============================================================================
+
+@app.get("/api/admin/financial/overview")
+async def get_admin_financial_overview(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get comprehensive financial overview for admins"""
+    try:
+        overview = calculate_admin_financial_overview()
+        return overview
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching financial overview: {str(e)}")
+
+@app.get("/api/admin/financial/wallets")
+async def get_all_wallets(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN)), limit: int = 50, skip: int = 0):
+    """Get all user wallets for admin management"""
+    try:
+        wallets = list(wallet_balances_collection.find({}, {"_id": 0}).sort("total_earned", -1).skip(skip).limit(limit))
+        
+        # Enrich with user details
+        for wallet in wallets:
+            user = users_collection.find_one(
+                {"id": wallet["user_id"]},
+                {"username": 1, "full_name": 1, "email": 1, "_id": 0}
+            )
+            if user:
+                wallet["user_details"] = user
+        
+        total_wallets = wallet_balances_collection.count_documents({})
+        
+        return {
+            "wallets": wallets,
+            "total": total_wallets,
+            "page": skip // limit + 1,
+            "pages": (total_wallets + limit - 1) // limit
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching wallets: {str(e)}")
+
+@app.get("/api/admin/financial/transactions")
+async def get_all_transactions(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN)), 
+                              transaction_type: Optional[str] = None, limit: int = 100, skip: int = 0):
+    """Get all transactions for admin overview"""
+    try:
+        query = {}
+        if transaction_type:
+            query["transaction_type"] = transaction_type
+        
+        transactions = list(transactions_collection.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit))
+        
+        # Enrich with user details
+        for transaction in transactions:
+            user = users_collection.find_one(
+                {"id": transaction["user_id"]},
+                {"username": 1, "full_name": 1, "_id": 0}
+            )
+            if user:
+                transaction["user_details"] = user
+        
+        total_transactions = transactions_collection.count_documents(query)
+        
+        return {
+            "transactions": transactions,
+            "total": total_transactions,
+            "page": skip // limit + 1,
+            "pages": (total_transactions + limit - 1) // limit
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching transactions: {str(e)}")
+
+@app.post("/api/admin/financial/manual-adjustment")
+async def create_manual_adjustment(request: ManualAdjustmentRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Create a manual wallet adjustment"""
+    try:
+        # Verify user exists
+        user = users_collection.find_one({"id": request.user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Add transaction
+        transaction_type = "manual_adjustment"
+        description = f"Manual adjustment: {request.reason}"
+        
+        success = add_transaction(
+            user_id=request.user_id,
+            transaction_type=transaction_type,
+            amount=request.amount,
+            description=description,
+            processed_by=admin_id,
+            admin_notes=request.admin_notes,
+            metadata={"reason": request.reason, "admin_id": admin_id}
+        )
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to process manual adjustment")
+        
+        # Log admin action
+        log_admin_action(
+            admin_id=admin_id,
+            action="manual_wallet_adjustment",
+            target_id=request.user_id,
+            details=f"Adjusted wallet balance by €{request.amount}. Reason: {request.reason}"
+        )
+        
+        return {
+            "message": "Manual adjustment processed successfully",
+            "amount": request.amount,
+            "user_id": request.user_id,
+            "reason": request.reason
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing manual adjustment: {str(e)}")
+
+@app.post("/api/admin/financial/bulk-payout")
+async def process_bulk_payout(payout_ids: List[str], admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Process multiple payouts in bulk"""
+    try:
+        processed_payouts = []
+        failed_payouts = []
+        
+        for payout_id in payout_ids:
+            try:
+                # Get payout
+                payout = payouts_collection.find_one({"id": payout_id})
+                if not payout or payout["status"] != "pending":
+                    failed_payouts.append({"id": payout_id, "reason": "Invalid or non-pending payout"})
+                    continue
+                
+                # Mark as completed
+                payouts_collection.update_one(
+                    {"id": payout_id},
+                    {"$set": {
+                        "status": "completed",
+                        "processed_by": admin_id,
+                        "processed_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
+                    }}
+                )
+                
+                # Mark commissions as paid
+                commission_ids = payout["commission_ids"]
+                commissions_collection.update_many(
+                    {"id": {"$in": commission_ids}},
+                    {"$set": {"is_paid": True, "paid_at": datetime.utcnow()}}
+                )
+                
+                # Add payout completed transaction
+                add_transaction(
+                    user_id=payout["affiliate_user_id"],
+                    transaction_type="payout_completed",
+                    amount=payout["amount"],
+                    description=f"Payout completed via {payout['payment_method']}",
+                    payout_id=payout_id,
+                    processed_by=admin_id
+                )
+                
+                # Update affiliate earnings
+                affiliates_collection.update_one(
+                    {"user_id": payout["affiliate_user_id"]},
+                    {
+                        "$inc": {
+                            "pending_earnings": -payout["amount"],
+                            "paid_earnings": payout["amount"]
+                        },
+                        "$set": {"updated_at": datetime.utcnow()}
+                    }
+                )
+                
+                processed_payouts.append(payout_id)
+                
+            except Exception as e:
+                failed_payouts.append({"id": payout_id, "reason": str(e)})
+        
+        return {
+            "message": f"Processed {len(processed_payouts)} payouts successfully",
+            "processed": processed_payouts,
+            "failed": failed_payouts,
+            "total_processed": len(processed_payouts),
+            "total_failed": len(failed_payouts)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing bulk payout: {str(e)}")
+
 # Initialize some sample data
 @app.on_event("startup")
 async def startup_event():
