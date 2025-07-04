@@ -5572,16 +5572,59 @@ body {
 }
 
 .user-tournament-card {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 215, 0, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 215, 0, 0.2);
   border-radius: 10px;
-  padding: 1rem;
+  padding: 15px;
   transition: all 0.3s ease;
 }
 
 .user-tournament-card:hover {
-  border-color: rgba(255, 215, 0, 0.3);
-  background: rgba(255, 215, 0, 0.05);
+  transform: translateY(-2px);
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.1);
+}
+
+.tournament-quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.tournament-quick-actions .btn-small {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  border-radius: 5px;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+
+.tournament-quick-actions .btn-outline {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+}
+
+.tournament-quick-actions .btn-outline:hover {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+/* Responsive dashboard tournament actions */
+@media (max-width: 768px) {
+  .tournament-quick-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .tournament-quick-actions .btn-small {
+    width: 100%;
+    min-width: auto;
+  }
 }
 
 .user-tournament-card h4 {
