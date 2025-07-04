@@ -274,7 +274,7 @@ function App() {
   const [competitions, setCompetitions] = useState([]);
   const [countryStats, setCountryStats] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [language, setLanguage] = useState(localStorage.getItem('language') || 'gr');
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   // Rankings search states
   const [rankingSearch, setRankingSearch] = useState('');
   const [rankingSearchResult, setRankingSearchResult] = useState(null);
