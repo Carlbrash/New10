@@ -7129,6 +7129,7 @@ function App() {
         {currentView === 'rankings' && renderRankings()}
         {currentView === 'worldmap' && renderWorldMap()}
         {currentView === 'tournament' && renderTournament()}
+        {currentView === 'teams' && renderTeams()}
         {currentView === 'affiliate' && user && renderAffiliate()}
         {currentView === 'wallet' && user && renderWallet()}
         {currentView === 'admin' && isAdmin && renderAdminPanel()}
