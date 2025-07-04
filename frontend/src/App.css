@@ -1190,6 +1190,11 @@ body {
   font-style: italic;
 }
 
+.modal-content {
+  padding: 30px !important;
+  color: #ffffff !important;
+}
+
 .modal-actions {
   display: flex;
   gap: 15px;
