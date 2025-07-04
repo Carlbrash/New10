@@ -6099,7 +6099,7 @@ function App() {
         {/* Mobile Navigation Indicator */}
         <div className="mobile-nav-indicator">
           <div className="nav-dots">
-            {['home', 'dashboard', 'rankings', 'worldmap', 'tournament', ...(user ? ['affiliate'] : [])].map((view, index) => (
+            {['home', 'dashboard', 'rankings', 'worldmap', 'tournament', ...(user ? ['affiliate', 'wallet'] : [])].map((view, index) => (
               <div 
                 key={view}
                 className={`nav-dot ${currentView === view ? 'active' : ''}`}
