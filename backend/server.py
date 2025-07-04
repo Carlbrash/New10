@@ -785,7 +785,29 @@ async def register_user(user: UserRegister):
     users_collection.insert_one(user_data)
     token = create_token(user_id)
     
-    return {"message": "User registered successfully", "token": token, "user_id": user_id}
+    # Process referral if provided
+    referral_success = False
+    if user.referral_code:
+        referral_success = process_referral_registration(
+            referred_user_id=user_id,
+            referral_code=user.referral_code,
+            registration_ip=None  # Could extract from request in the future
+        )
+    
+    response_data = {
+        "message": "User registered successfully",
+        "token": token,
+        "user_id": user_id
+    }
+    
+    if user.referral_code:
+        response_data["referral_processed"] = referral_success
+        if referral_success:
+            response_data["referral_message"] = "Referral bonus applied successfully!"
+        else:
+            response_data["referral_message"] = "Invalid referral code"
+    
+    return response_data
 
 @app.post("/api/login")
 async def login_user(user: UserLogin):
