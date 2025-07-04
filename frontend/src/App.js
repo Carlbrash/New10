@@ -4334,7 +4334,7 @@ function App() {
           {/* Competitions Tab */}
           {adminView === 'competitions' && (
             <div className="admin-section">
-              <h3>🏆 {t.competitions}</h3>
+              <h3>🏆 Tournament Management</h3>
               
               <div className="admin-controls">
                 <button 
