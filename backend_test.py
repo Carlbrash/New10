@@ -3225,6 +3225,8 @@ if __name__ == "__main__":
             run_tournament_bracket_tests()
         elif sys.argv[1] == "wallet":
             run_wallet_tests()
+        elif sys.argv[1] == "admin_users":
+            run_admin_users_tests()
         elif sys.argv[1] == "world_map_only":
             # Run only world map related tests
             api_test_suite = unittest.TestSuite()
