@@ -796,17 +796,19 @@ function App() {
 
   const fetchRankings = async () => {
     try {
-      console.log('🔍 Fetching global rankings...');
       const response = await fetch(`${API_BASE_URL}/api/rankings`);
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Global rankings fetched:', data.rankings.length, 'players');
         setRankings(data.rankings);
-      } else {
-        console.error('❌ Rankings fetch failed:', response.status);
+        
+        // Find current user's position if logged in
+        if (user && data.rankings) {
+          const userPosition = data.rankings.find(player => player.id === user.id);
+          setMyPosition(userPosition);
+        }
       }
     } catch (error) {
-      console.error('❌ Error fetching rankings:', error);
+      console.error('Error fetching rankings:', error);
     }
   };
 
