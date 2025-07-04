@@ -1832,6 +1832,14 @@ async def join_tournament(tournament_id: str, user_id: str = Depends(verify_toke
             {"$set": {"current_participants": new_participant_count}}
         )
         
+        # Process affiliate commission for tournament entry
+        if tournament["entry_fee"] > 0:
+            commission_processed = process_tournament_commission(
+                user_id=user_id,
+                tournament_id=tournament_id,
+                entry_fee=tournament["entry_fee"]
+            )
+        
         return {"message": "Successfully joined tournament", "participant_id": participant_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error joining tournament: {str(e)}")
