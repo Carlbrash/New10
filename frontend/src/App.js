@@ -5289,6 +5289,260 @@ function App() {
             </div>
           )}
 
+          {/* Financial Management Tab (Admin and above) */}
+          {adminView === 'financial' && (isAdmin || isGod) && (
+            <div className="admin-section">
+              <h3>💰 {t.financialOverview}</h3>
+              
+              {financialLoading ? (
+                <div className="loading">Loading financial data...</div>
+              ) : (
+                <>
+                  {/* Financial Overview Cards */}
+                  {financialOverview && (
+                    <div className="financial-overview">
+                      <div className="overview-cards">
+                        <div className="overview-card">
+                          <div className="card-icon">👥</div>
+                          <div className="card-info">
+                            <h4>{financialOverview.total_affiliates}</h4>
+                            <p>{t.totalAffiliates}</p>
+                            <span className="card-sub">{financialOverview.active_affiliates} active</span>
+                          </div>
+                        </div>
+                        
+                        <div className="overview-card">
+                          <div className="card-icon">⏳</div>
+                          <div className="card-info">
+                            <h4>€{financialOverview.total_pending_payouts?.toFixed(2)}</h4>
+                            <p>{t.totalPendingPayouts}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="overview-card">
+                          <div className="card-icon">💰</div>
+                          <div className="card-info">
+                            <h4>€{financialOverview.total_commissions_owed?.toFixed(2)}</h4>
+                            <p>{t.totalCommissionsOwed}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="overview-card">
+                          <div className="card-icon">📊</div>
+                          <div className="card-info">
+                            <h4>€{financialOverview.monthly_commission_costs?.toFixed(2)}</h4>
+                            <p>{t.monthlyCommissionCosts}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="overview-card">
+                          <div className="card-icon">🏆</div>
+                          <div className="card-info">
+                            <h4>€{financialOverview.platform_revenue?.toFixed(2)}</h4>
+                            <p>{t.platformRevenue}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="overview-card">
+                          <div className="card-icon">📈</div>
+                          <div className="card-info">
+                            <h4>{financialOverview.affiliate_conversion_rate?.toFixed(1)}%</h4>
+                            <p>{t.affiliateConversionRate}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Financial Summary */}
+                      <div className="financial-summary">
+                        <h4>📋 {t.financialSummary}</h4>
+                        <div className="summary-grid">
+                          <div className="summary-item">
+                            <span className="summary-label">{t.totalPlatformCosts}:</span>
+                            <span className="summary-value">€{financialOverview.financial_summary?.total_platform_costs?.toFixed(2)}</span>
+                          </div>
+                          <div className="summary-item">
+                            <span className="summary-label">{t.estimatedMonthlyRevenue}:</span>
+                            <span className="summary-value">€{financialOverview.financial_summary?.estimated_monthly_revenue?.toFixed(2)}</span>
+                          </div>
+                          <div className="summary-item">
+                            <span className="summary-label">{t.profitMargin}:</span>
+                            <span className="summary-value">{financialOverview.financial_summary?.profit_margin?.toFixed(1)}%</span>
+                          </div>
+                          <div className="summary-item">
+                            <span className="summary-label">{t.costPerAcquisition}:</span>
+                            <span className="summary-value">€{financialOverview.financial_summary?.cost_per_acquisition?.toFixed(2)}</span>
+                          </div>
+                          <div className="summary-item">
+                            <span className="summary-label">{t.roiPercentage}:</span>
+                            <span className="summary-value">{financialOverview.financial_summary?.roi_percentage?.toFixed(1)}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Top Affiliates */}
+                  <div className="top-affiliates">
+                    <h4>🏆 {t.topAffiliates}</h4>
+                    {financialOverview?.top_affiliates?.length > 0 ? (
+                      <div className="affiliates-grid">
+                        {financialOverview.top_affiliates.slice(0, 10).map((affiliate, index) => (
+                          <div key={affiliate.user_id} className="affiliate-card">
+                            <div className="affiliate-rank">#{index + 1}</div>
+                            <div className="affiliate-info">
+                              <strong>{affiliate.full_name}</strong>
+                              <span>@{affiliate.username}</span>
+                            </div>
+                            <div className="affiliate-stats">
+                              <div className="stat">
+                                <span className="stat-label">Earnings:</span>
+                                <span className="stat-value">€{affiliate.total_earnings?.toFixed(2)}</span>
+                              </div>
+                              <div className="stat">
+                                <span className="stat-label">Referrals:</span>
+                                <span className="stat-value">{affiliate.total_referrals}</span>
+                              </div>
+                              <div className="stat">
+                                <span className="stat-label">Status:</span>
+                                <span className={`stat-badge ${affiliate.status}`}>{affiliate.status}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="no-data">
+                        <p>No affiliates found</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Pending Payouts */}
+                  <div className="pending-payouts">
+                    <div className="section-header">
+                      <h4>⏳ Pending Payouts</h4>
+                      {financialOverview?.pending_payouts?.length > 0 && (
+                        <button 
+                          className="btn btn-primary"
+                          onClick={() => {
+                            const payoutIds = financialOverview.pending_payouts.map(p => p.id);
+                            if (confirm(`Process ${payoutIds.length} pending payouts?`)) {
+                              // TODO: Implement bulk payout processing
+                              alert('Bulk payout processing not implemented yet');
+                            }
+                          }}
+                        >
+                          💳 {t.processBulkPayout}
+                        </button>
+                      )}
+                    </div>
+                    
+                    {financialOverview?.pending_payouts?.length > 0 ? (
+                      <div className="payouts-table">
+                        <div className="table-header">
+                          <div>User</div>
+                          <div>Amount</div>
+                          <div>Method</div>
+                          <div>Requested</div>
+                          <div>Actions</div>
+                        </div>
+                        {financialOverview.pending_payouts.map((payout) => (
+                          <div key={payout.id} className="table-row">
+                            <div className="payout-user">
+                              {payout.username || 'Unknown User'}
+                            </div>
+                            <div className="payout-amount">€{payout.amount?.toFixed(2)}</div>
+                            <div className="payout-method">{payout.payment_method}</div>
+                            <div className="payout-date">
+                              {new Date(payout.created_at).toLocaleDateString()}
+                            </div>
+                            <div className="payout-actions">
+                              <button 
+                                className="btn btn-success btn-small"
+                                onClick={() => {
+                                  if (confirm(`Approve payout of €${payout.amount} for ${payout.username}?`)) {
+                                    // TODO: Implement individual payout approval
+                                    alert('Individual payout approval not implemented yet');
+                                  }
+                                }}
+                              >
+                                ✅ Approve
+                              </button>
+                              <button 
+                                className="btn btn-danger btn-small"
+                                onClick={() => {
+                                  if (confirm(`Reject payout of €${payout.amount} for ${payout.username}?`)) {
+                                    // TODO: Implement payout rejection
+                                    alert('Payout rejection not implemented yet');
+                                  }
+                                }}
+                              >
+                                ❌ Reject
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="no-data">
+                        <p>No pending payouts</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Recent Transactions */}
+                  <div className="recent-transactions">
+                    <h4>📋 Recent Transactions</h4>
+                    {financialOverview?.recent_transactions?.length > 0 ? (
+                      <div className="transactions-list">
+                        {financialOverview.recent_transactions.slice(0, 10).map((transaction) => (
+                          <div key={transaction.id} className="transaction-item">
+                            <div className="transaction-info">
+                              <div className="transaction-type">
+                                {transaction.transaction_type === 'commission_earned' ? '💰 Commission' :
+                                 transaction.transaction_type === 'payout_completed' ? '💳 Payout' :
+                                 transaction.transaction_type === 'payout_requested' ? '⏳ Payout Request' :
+                                 transaction.transaction_type === 'manual_adjustment' ? '⚙️ Manual Adjustment' :
+                                 transaction.transaction_type}
+                              </div>
+                              <div className="transaction-user">
+                                {transaction.username || 'Unknown User'}
+                              </div>
+                            </div>
+                            <div className={`transaction-amount ${transaction.amount >= 0 ? 'positive' : 'negative'}`}>
+                              {transaction.amount >= 0 ? '+' : ''}€{transaction.amount?.toFixed(2)}
+                            </div>
+                            <div className="transaction-date">
+                              {new Date(transaction.created_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="no-data">
+                        <p>No recent transactions</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Manual Adjustment Section */}
+                  <div className="manual-adjustment">
+                    <div className="section-header">
+                      <h4>⚙️ {t.manualAdjustment}</h4>
+                      <button 
+                        className="btn btn-secondary"
+                        onClick={() => setShowManualAdjustmentModal(true)}
+                      >
+                        ➕ Create Adjustment
+                      </button>
+                    </div>
+                    <p>Manually adjust user wallet balances for corrections, bonuses, or penalties.</p>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {/* Admin Actions Tab (God only) */}
           {adminView === 'actions' && isGod && (
             <div className="admin-section">
