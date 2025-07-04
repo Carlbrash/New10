@@ -365,6 +365,7 @@ const translations = {
     top_three: 'Top 3',
     
     // Entry Fee Categories
+    free: 'Free',
     basic: 'Basic (€1-10)',
     standard: 'Standard (€11-50)',
     premium: 'Premium (€51-100)',
