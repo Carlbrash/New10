@@ -3200,47 +3200,7 @@ function App() {
             </div>
           </div>
           
-          {/* Tournament Bracket Section */}
-          {(tournament.status === 'ongoing' || tournament.status === 'completed') && (
-            <div className="tournament-bracket-card">
-              <div className="bracket-header">
-                <h3>🏆 Tournament Bracket</h3>
-                <button 
-                  className={`btn btn-secondary ${showBracket ? 'active' : ''}`}
-                  onClick={() => setShowBracket(!showBracket)}
-                >
-                  {showBracket ? 'Hide Bracket' : 'Show Bracket'}
-                </button>
-              </div>
-              
-              {showBracket && (
-                <div className="bracket-content">
-                  {bracketLoading ? (
-                    <div className="loading">Loading bracket...</div>
-                  ) : tournamentBracket ? (
-                    <div className="bracket-view">
-                      {renderTournamentBracket()}
-                    </div>
-                  ) : (
-                    <div className="no-bracket">
-                      <p>Bracket not generated yet.</p>
-                      {isAdmin && (
-                        <button 
-                          className="btn btn-primary"
-                          onClick={() => generateTournamentBracket(tournament.id)}
-                          disabled={bracketLoading}
-                        >
-                          Generate Bracket
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Admin Bracket Generation */}
+          {/* Admin Bracket Generation Section */}
           {tournament.status === 'open' && isAdmin && (
             <div className="admin-bracket-card">
               <h3>🔧 Admin: Bracket Management</h3>
@@ -3262,17 +3222,31 @@ function App() {
             </div>
           )}
           
-          {/* Tournament Bracket Section */}
-          {(tournament.status === 'ongoing' || tournament.status === 'completed') && (
+          {/* Tournament Bracket Section - Available for all tournament states if bracket exists */}
+          {(tournamentBracket || tournament.status === 'ongoing' || tournament.status === 'completed') && (
             <div className="tournament-bracket-card">
               <div className="bracket-header">
                 <h3>🏆 Tournament Bracket</h3>
-                <button 
-                  className={`btn btn-secondary ${showBracket ? 'active' : ''}`}
-                  onClick={() => setShowBracket(!showBracket)}
-                >
-                  {showBracket ? 'Hide Bracket' : 'Show Bracket'}
-                </button>
+                <div className="bracket-actions">
+                  <button 
+                    className={`btn btn-secondary ${showBracket ? 'active' : ''}`}
+                    onClick={() => setShowBracket(!showBracket)}
+                  >
+                    {showBracket ? 'Hide Bracket' : 'Show Bracket'}
+                  </button>
+                  
+                  {/* Admin can generate bracket if it doesn't exist */}
+                  {!tournamentBracket && isAdmin && tournament.current_participants >= 2 && 
+                   tournament.status !== 'completed' && tournament.status !== 'cancelled' && (
+                    <button 
+                      className="btn btn-primary"
+                      onClick={() => generateTournamentBracket(tournament.id)}
+                      disabled={bracketLoading}
+                    >
+                      {bracketLoading ? 'Generating...' : 'Generate Bracket'}
+                    </button>
+                  )}
+                </div>
               </div>
               
               {showBracket && (
@@ -3286,14 +3260,10 @@ function App() {
                   ) : (
                     <div className="no-bracket">
                       <p>Bracket not generated yet.</p>
-                      {isAdmin && (
-                        <button 
-                          className="btn btn-primary"
-                          onClick={() => generateTournamentBracket(tournament.id)}
-                          disabled={bracketLoading}
-                        >
-                          Generate Bracket
-                        </button>
+                      {tournament.status === 'ongoing' || tournament.status === 'completed' ? (
+                        <p>This tournament should have a bracket but it's not available.</p>
+                      ) : (
+                        <p>Bracket will be generated when the tournament starts.</p>
                       )}
                     </div>
                   )}
