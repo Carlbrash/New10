@@ -3753,6 +3753,8 @@ async def reset_data():
         referrals_collection.delete_many({})
         commissions_collection.delete_many({})
         payouts_collection.delete_many({})
+        wallet_balances_collection.delete_many({})
+        transactions_collection.delete_many({})
         
         # Recreate sample data
         await startup_event()
