@@ -1821,11 +1821,24 @@ function App() {
     <div className="rankings-container">
       <div className="rankings-header">
         <h2>{t.globalRankingsTitle}</h2>
-        <img 
-          src="https://images.unsplash.com/photo-1573684955725-34046d1ea9f3" 
-          alt="Championship Trophy" 
-          className="rankings-trophy"
-        />
+        <div className="user-profile-section">
+          <div className="user-avatar-large">
+            {user && user.avatar_url ? (
+              <img 
+                src={user.avatar_url} 
+                alt={user.full_name || user.username} 
+                className="user-profile-image"
+              />
+            ) : (
+              <div className="no-avatar-large">
+                <span className="avatar-placeholder">👤</span>
+              </div>
+            )}
+          </div>
+          <div className="user-nickname">
+            {user ? (user.nickname || user.full_name || user.username) : 'Guest'}
+          </div>
+        </div>
       </div>
 
       {/* My Position Quick View */}
