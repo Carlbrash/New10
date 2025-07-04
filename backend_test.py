@@ -1858,6 +1858,127 @@ class TournamentBracketTester(unittest.TestCase):
             self.assertEqual(response.status_code, 200, f"Failed to join tournament: {response.text}")
             print(f"✅ Successfully joined tournament as test user")
         
+        # Create a second test user to join the tournament
+        import random
+        import string
+        
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_user2 = {
+            "username": f"bracket_user_{random_suffix}",
+            "email": f"bracket_{random_suffix}@example.com",
+            "password": "Test@123",
+            "country": "GR",
+            "full_name": f"Bracket Test User {random_suffix}",
+            "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
+        }
+        
+        # Register the second test user
+        print("  Registering second test user...")
+        response = requests.post(
+            f"{self.base_url}/api/register",
+            json=test_user2
+        )
+        
+        print(f"  Register second user response: {response.status_code}")
+        if response.status_code == 200:
+            data = response.json()
+            user2_token = data["token"]
+            user2_id = data["user_id"]
+            print(f"  Second user registered with ID: {user2_id}")
+            
+            # Join the tournament with the second test user
+            headers = {"Authorization": f"Bearer {user2_token}"}
+            response = requests.post(
+                f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/join",
+                headers=headers
+            )
+            
+            print(f"  Second user join tournament response: {response.status_code}")
+            if response.status_code == 200:
+                print("✅ Successfully added second participant")
+            else:
+                print(f"  Failed to add second participant: {response.text}")
+        else:
+            print(f"  Failed to register second user: {response.text}")
+            
+            # Try with a different username
+            random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            test_user3 = {
+                "username": f"bracket_user3_{random_suffix}",
+                "email": f"bracket3_{random_suffix}@example.com",
+                "password": "Test@123",
+                "country": "GR",
+                "full_name": f"Bracket Test User 3 {random_suffix}",
+                "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
+            }
+            
+            print("  Trying with a different username...")
+            response = requests.post(
+                f"{self.base_url}/api/register",
+                json=test_user3
+            )
+            
+            print(f"  Register third user response: {response.status_code}")
+            if response.status_code == 200:
+                data = response.json()
+                user3_token = data["token"]
+                user3_id = data["user_id"]
+                print(f"  Third user registered with ID: {user3_id}")
+                
+                # Join the tournament with the third test user
+                headers = {"Authorization": f"Bearer {user3_token}"}
+                response = requests.post(
+                    f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/join",
+                    headers=headers
+                )
+                
+                print(f"  Third user join tournament response: {response.status_code}")
+                if response.status_code == 200:
+                    print("✅ Successfully added third participant")
+                else:
+                    print(f"  Failed to add third participant: {response.text}")
+            else:
+                print(f"  Failed to register third user: {response.text}")
+        
+        # Check final participant count
+        response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}")
+        self.assertEqual(response.status_code, 200)
+        tournament = response.json()
+        
+        print(f"  Tournament has {len(tournament['participants'])} participant(s)")
+        
+        # Ensure we have at least 2 participants
+        if len(tournament['participants']) < 2:
+            print("  Warning: Not enough participants for bracket generation")
+            print("  This will cause the bracket generation test to fail")
+        else:
+            print("✅ Tournament has enough participants for bracket generation")
+        
+        # Skip if no test tournament ID or user token
+        if not TournamentBracketTester.test_tournament_id or not TournamentBracketTester.user_token:
+            self.skipTest("No test tournament ID or user token available")
+        
+        print(f"  Tournament ID: {TournamentBracketTester.test_tournament_id}")
+        print(f"  User token available: {bool(TournamentBracketTester.user_token)}")
+        
+        # Join the tournament with our test user
+        headers = {"Authorization": f"Bearer {TournamentBracketTester.user_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/join",
+            headers=headers
+        )
+        
+        print(f"  Join tournament response: {response.status_code}")
+        if response.status_code != 200:
+            print(f"  Response text: {response.text}")
+        
+        # If user is already registered, this will fail with 400
+        if response.status_code == 400 and "already registered" in response.text.lower():
+            print("  User is already registered for this tournament")
+        else:
+            self.assertEqual(response.status_code, 200, f"Failed to join tournament: {response.text}")
+            print(f"✅ Successfully joined tournament as test user")
+        
         # For testing purposes, we need at least 2 participants
         # Since we can't create multiple real users, we'll simulate additional participants
         response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}")
