@@ -2116,7 +2116,11 @@ class TournamentBracketTester(unittest.TestCase):
         if not TournamentBracketTester.test_tournament_id:
             self.skipTest("No test tournament ID available")
         
+        print(f"  Tournament ID: {TournamentBracketTester.test_tournament_id}")
+        
         response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/matches")
+        print(f"  Response status: {response.status_code}")
+        
         self.assertEqual(response.status_code, 200, f"Failed to get tournament matches: {response.text}")
         data = response.json()
         
@@ -2125,6 +2129,7 @@ class TournamentBracketTester(unittest.TestCase):
         
         # Verify matches are grouped by round
         self.assertIsInstance(matches, list, "Expected matches to be a list")
+        print(f"  Number of rounds: {len(matches)}")
         
         if matches:
             # Check structure of first round
@@ -2132,6 +2137,9 @@ class TournamentBracketTester(unittest.TestCase):
             self.assertIn("round_number", first_round)
             self.assertIn("round_name", first_round)
             self.assertIn("matches", first_round)
+            
+            print(f"  Round 1: {first_round['round_name']}")
+            print(f"  Number of matches in round 1: {len(first_round['matches'])}")
             
             # Check structure of first match in first round
             if first_round["matches"]:
@@ -2141,7 +2149,9 @@ class TournamentBracketTester(unittest.TestCase):
                 self.assertIn("player2_id", first_match)
                 self.assertIn("status", first_match)
                 
-                print(f"  Round 1 ({first_round['round_name']}) has {len(first_round['matches'])} matches")
+                print(f"  First match ID: {first_match['id']}")
+                print(f"  Player1: {first_match['player1_username']}, Player2: {first_match['player2_username']}")
+                print(f"  Match status: {first_match['status']}")
         
         print(f"✅ Found {len(matches)} rounds of matches")
         print("✅ GET /api/tournaments/{tournament_id}/matches endpoint test passed")
@@ -2154,6 +2164,9 @@ class TournamentBracketTester(unittest.TestCase):
         if not hasattr(TournamentBracketTester, 'test_match_id') or not TournamentBracketTester.admin_token:
             self.skipTest("No test match ID or admin token available")
         
+        print(f"  Match ID: {TournamentBracketTester.test_match_id}")
+        print(f"  Admin token available: {bool(TournamentBracketTester.admin_token)}")
+        
         # Choose a winner (player1 or player2)
         winner_id = TournamentBracketTester.test_match_player1_id
         if not winner_id:
@@ -2161,6 +2174,8 @@ class TournamentBracketTester(unittest.TestCase):
         
         if not winner_id:
             self.skipTest("No players assigned to the test match")
+        
+        print(f"  Selected winner ID: {winner_id}")
         
         winner_data = {
             "winner_id": winner_id
@@ -2172,6 +2187,9 @@ class TournamentBracketTester(unittest.TestCase):
             headers=headers,
             json=winner_data
         )
+        
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response text: {response.text}")
         
         self.assertEqual(response.status_code, 200, f"Failed to set match winner: {response.text}")
         data = response.json()
@@ -2185,12 +2203,20 @@ class TournamentBracketTester(unittest.TestCase):
         data = response.json()
         
         # Find our match in the matches list
+        match_found = False
         for match in data["matches"]:
             if match["id"] == TournamentBracketTester.test_match_id:
+                match_found = True
+                print(f"  Updated match status: {match['status']}")
+                print(f"  Winner ID: {match['winner_id']}")
+                
                 self.assertEqual(match["winner_id"], winner_id, "Expected winner_id to be updated")
                 self.assertEqual(match["status"], "completed", "Expected match status to be updated to 'completed'")
                 print("✅ Match winner and status correctly updated")
                 break
+        
+        if not match_found:
+            print("  Warning: Could not find the match in the bracket response")
         
         print("✅ POST /api/tournaments/matches/{match_id}/winner endpoint test passed")
     
