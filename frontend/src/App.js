@@ -6374,20 +6374,6 @@ function App() {
           )}
         </div>
         </div>
-                    className="form-input"
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>{t.adminNotes} (optional):</label>
-                  <textarea
-                    value={manualAdjustmentForm.admin_notes}
-                    onChange={(e) => setManualAdjustmentForm({
-                      ...manualAdjustmentForm,
-                      admin_notes: e.target.value
-                    })}
-                    placeholder="Additional notes..."
                     rows="3"
                     className="form-input"
                   />
