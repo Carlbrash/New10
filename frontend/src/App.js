@@ -307,7 +307,8 @@ function App() {
     email: '',
     avatar_url: '',
     country: '',
-    phone: ''
+    phone: '',
+    nickname: ''
   });
   const [passwordForm, setPasswordForm] = useState({
     current_password: '',
@@ -315,6 +316,8 @@ function App() {
     confirm_password: ''
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
 
   // Admin Panel States
   const [adminView, setAdminView] = useState('users');
