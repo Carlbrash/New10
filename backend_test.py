@@ -1149,6 +1149,25 @@ def run_tests():
     print("TESTING RANKINGS AND SEARCH FUNCTIONALITY")
     print("=" * 50)
     runner.run(rankings_search_suite)
+    
+    # Run wallet system tests
+    wallet_test_suite = unittest.TestSuite()
+    wallet_test_suite.addTest(WalletSystemTester('test_01_user_login'))
+    wallet_test_suite.addTest(WalletSystemTester('test_02_admin_login'))
+    wallet_test_suite.addTest(WalletSystemTester('test_03_get_wallet_balance'))
+    wallet_test_suite.addTest(WalletSystemTester('test_04_get_wallet_stats'))
+    wallet_test_suite.addTest(WalletSystemTester('test_05_get_wallet_transactions'))
+    wallet_test_suite.addTest(WalletSystemTester('test_06_update_wallet_settings'))
+    wallet_test_suite.addTest(WalletSystemTester('test_07_admin_financial_overview'))
+    wallet_test_suite.addTest(WalletSystemTester('test_08_admin_financial_wallets'))
+    wallet_test_suite.addTest(WalletSystemTester('test_09_admin_financial_transactions'))
+    wallet_test_suite.addTest(WalletSystemTester('test_10_admin_manual_adjustment'))
+    wallet_test_suite.addTest(WalletSystemTester('test_11_integration_affiliate_wallet'))
+    
+    print("\n" + "=" * 50)
+    print("TESTING WALLET SYSTEM AND ADMIN FINANCIAL MANAGEMENT")
+    print("=" * 50)
+    runner.run(wallet_test_suite)
 
 class TournamentSystemTester(unittest.TestCase):
     base_url = "https://fc495f42-99f4-4eed-98fe-c062f372264d.preview.emergentagent.com"
