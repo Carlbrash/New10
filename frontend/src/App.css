@@ -2877,7 +2877,7 @@ body {
 }
 
 .country-filter-select {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(20, 20, 30, 0.95);
   border: 1px solid rgba(255, 215, 0, 0.3);
   color: #ffffff;
   padding: 8px 12px;
@@ -2889,7 +2889,14 @@ body {
 .country-filter-select:focus {
   outline: none;
   border-color: #ffd700;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(20, 20, 30, 0.98);
+}
+
+.country-filter-select option {
+  background: rgba(20, 20, 30, 0.95);
+  color: #ffffff;
+  padding: 8px 12px;
+  border: none;
 }
 
 .filter-info {
