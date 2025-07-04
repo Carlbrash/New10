@@ -4512,15 +4512,64 @@ function App() {
                                 fetchTournamentDetails(tournament.id);
                               }}
                             >
-                              View Details & Bracket
+                              📝 View Details
                             </button>
                             
+                            {/* Bracket-specific button */}
+                            {(tournament.status === 'ongoing' || tournament.status === 'completed' || 
+                              tournament.current_participants >= 2) && (
+                              <button 
+                                className="btn btn-outline btn-small"
+                                onClick={() => {
+                                  setCurrentView('tournament');
+                                  fetchTournamentDetails(tournament.id);
+                                  // Auto-show bracket
+                                  setTimeout(() => setShowBracket(true), 500);
+                                }}
+                              >
+                                🏆 View Bracket
+                              </button>
+                            )}
+                            
+                            {/* Generate bracket button */}
+                            {tournament.status === 'open' && tournament.current_participants >= 2 && (
+                              <button 
+                                className="btn btn-success btn-small"
+                                onClick={() => {
+                                  if (confirm('Generate bracket and start tournament?')) {
+                                    generateTournamentBracket(tournament.id);
+                                  }
+                                }}
+                              >
+                                🚀 Start Tournament
+                              </button>
+                            )}
+                            
+                            {/* Update tournament button */}
+                            {tournament.status !== 'cancelled' && tournament.status !== 'completed' && (
+                              <button 
+                                className="btn btn-warning btn-small"
+                                onClick={() => {
+                                  // Set selected tournament for editing
+                                  setSelectedTournament(tournament);
+                                  setShowCreateTournamentModal(true);
+                                }}
+                              >
+                                ✏️ Edit
+                              </button>
+                            )}
+                            
+                            {/* Cancel tournament button */}
                             {tournament.status !== 'cancelled' && tournament.status !== 'completed' && (
                               <button 
                                 className="btn btn-danger btn-small"
-                                onClick={() => cancelTournament(tournament.id)}
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to cancel this tournament?')) {
+                                    cancelTournament(tournament.id);
+                                  }
+                                }}
                               >
-                                Cancel Tournament
+                                ❌ Cancel
                               </button>
                             )}
                           </div>
