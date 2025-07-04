@@ -3314,6 +3314,384 @@ async def create_manual_adjustment(request: ManualAdjustmentRequest, admin_id: s
 # =============================================================================
 
 @app.post("/api/teams")
+async def create_team(team_data: TeamCreate, user_id: str = Depends(verify_token)):
+    """Create a new team with the current user as captain"""
+    try:
+        # Check if team name is unique
+        existing_team = teams_collection.find_one({"name": team_data.name})
+        if existing_team:
+            raise HTTPException(status_code=400, detail="Team name already exists")
+        
+        # Check if user is already a captain or member of another team
+        user = users_collection.find_one({"id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        existing_membership = team_members_collection.find_one({"user_id": user_id, "status": "active"})
+        if existing_membership:
+            raise HTTPException(status_code=400, detail="You are already a member of another team")
+        
+        # Create team
+        team_id = str(uuid.uuid4())
+        team = {
+            "id": team_id,
+            "name": team_data.name,
+            "logo_url": team_data.logo_url,
+            "colors": team_data.colors.dict(),
+            "city": team_data.city,
+            "country": team_data.country,
+            "phone": team_data.phone,
+            "email": team_data.email,
+            "captain_id": user_id,
+            "status": TeamStatus.AMATEUR,
+            "player_count": 1,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        teams_collection.insert_one(team)
+        
+        # Add captain as first team member
+        team_member = {
+            "id": str(uuid.uuid4()),
+            "team_id": team_id,
+            "user_id": user_id,
+            "joined_at": datetime.utcnow(),
+            "status": "active"
+        }
+        team_members_collection.insert_one(team_member)
+        
+        # Update user's current team
+        users_collection.update_one(
+            {"id": user_id},
+            {"$set": {"current_team_id": team_id}}
+        )
+        
+        return {
+            "message": "Team created successfully",
+            "team_id": team_id,
+            "team_name": team_data.name
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating team: {str(e)}")
+
+@app.get("/api/teams")
+async def get_all_teams():
+    """Get all teams with basic information"""
+    try:
+        teams = list(teams_collection.find({}))
+        
+        # Add member count and captain info for each team
+        for team in teams:
+            if "_id" in team:
+                team["_id"] = str(team["_id"])
+            
+            # Get captain info
+            captain = users_collection.find_one({"id": team["captain_id"]})
+            if captain:
+                team["captain_name"] = captain["full_name"]
+                team["captain_username"] = captain["username"]
+            
+            # Get current member count
+            member_count = team_members_collection.count_documents({
+                "team_id": team["id"], 
+                "status": "active"
+            })
+            team["current_player_count"] = member_count
+        
+        return {"teams": teams}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching teams: {str(e)}")
+
+@app.get("/api/teams/{team_id}")
+async def get_team_details(team_id: str):
+    """Get detailed information about a specific team"""
+    try:
+        # Get team
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        if "_id" in team:
+            team["_id"] = str(team["_id"])
+        
+        # Get captain info
+        captain = users_collection.find_one({"id": team["captain_id"]})
+        if captain:
+            team["captain"] = {
+                "id": captain["id"],
+                "username": captain["username"],
+                "full_name": captain["full_name"],
+                "avatar_url": captain.get("avatar_url")
+            }
+        
+        # Get team members
+        members_data = list(team_members_collection.find({
+            "team_id": team_id,
+            "status": "active"
+        }))
+        
+        members = []
+        for member_data in members_data:
+            user = users_collection.find_one({"id": member_data["user_id"]})
+            if user:
+                members.append({
+                    "id": user["id"],
+                    "username": user["username"],
+                    "full_name": user["full_name"],
+                    "avatar_url": user.get("avatar_url"),
+                    "joined_at": member_data["joined_at"],
+                    "is_captain": user["id"] == team["captain_id"]
+                })
+        
+        team["members"] = members
+        team["current_player_count"] = len(members)
+        
+        # Get pending invitations (only for captain)
+        pending_invitations = list(team_invitations_collection.find({
+            "team_id": team_id,
+            "status": InvitationStatus.PENDING
+        }))
+        team["pending_invitations_count"] = len(pending_invitations)
+        
+        return team
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching team details: {str(e)}")
+
+@app.post("/api/teams/{team_id}/invite")
+async def invite_player(team_id: str, invite_data: TeamInvite, user_id: str = Depends(verify_token)):
+    """Invite a player to join the team (Captain only)"""
+    try:
+        # Verify team exists and user is the captain
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        if team["captain_id"] != user_id:
+            raise HTTPException(status_code=403, detail="Only team captain can send invitations")
+        
+        # Check if team has space (max 20 players)
+        current_members = team_members_collection.count_documents({
+            "team_id": team_id,
+            "status": "active"
+        })
+        if current_members >= 20:
+            raise HTTPException(status_code=400, detail="Team is full (maximum 20 players)")
+        
+        # Check pending invitations limit (max 20)
+        pending_invitations = team_invitations_collection.count_documents({
+            "team_id": team_id,
+            "status": InvitationStatus.PENDING
+        })
+        if pending_invitations >= 20:
+            raise HTTPException(status_code=400, detail="Maximum pending invitations reached (20)")
+        
+        # Find the user to invite
+        invited_user = users_collection.find_one({"username": invite_data.username})
+        if not invited_user:
+            raise HTTPException(status_code=404, detail=f"User '{invite_data.username}' not found")
+        
+        # Check if user is already in a team
+        existing_membership = team_members_collection.find_one({
+            "user_id": invited_user["id"],
+            "status": "active"
+        })
+        if existing_membership:
+            raise HTTPException(status_code=400, detail="User is already a member of another team")
+        
+        # Check if invitation already exists
+        existing_invitation = team_invitations_collection.find_one({
+            "team_id": team_id,
+            "invited_user_id": invited_user["id"],
+            "status": InvitationStatus.PENDING
+        })
+        if existing_invitation:
+            raise HTTPException(status_code=400, detail="Invitation already sent to this user")
+        
+        # Create invitation
+        invitation = {
+            "id": str(uuid.uuid4()),
+            "team_id": team_id,
+            "team_name": team["name"],
+            "invited_by": user_id,
+            "invited_user_id": invited_user["id"],
+            "invited_username": invite_data.username,
+            "status": InvitationStatus.PENDING,
+            "sent_at": datetime.utcnow(),
+            "expires_at": datetime.utcnow() + timedelta(days=7)  # 7 days to respond
+        }
+        team_invitations_collection.insert_one(invitation)
+        
+        return {
+            "message": f"Invitation sent to {invite_data.username}",
+            "invitation_id": invitation["id"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sending invitation: {str(e)}")
+
+@app.get("/api/teams/my-invitations")
+async def get_my_invitations(user_id: str = Depends(verify_token)):
+    """Get all pending invitations for the current user"""
+    try:
+        invitations = list(team_invitations_collection.find({
+            "invited_user_id": user_id,
+            "status": InvitationStatus.PENDING,
+            "expires_at": {"$gt": datetime.utcnow()}  # Not expired
+        }))
+        
+        # Add team and captain details
+        for invitation in invitations:
+            if "_id" in invitation:
+                invitation["_id"] = str(invitation["_id"])
+            
+            # Get team details
+            team = teams_collection.find_one({"id": invitation["team_id"]})
+            if team:
+                invitation["team_details"] = {
+                    "name": team["name"],
+                    "city": team["city"],
+                    "country": team["country"],
+                    "colors": team["colors"],
+                    "player_count": team.get("player_count", 0)
+                }
+                
+                # Get captain details
+                captain = users_collection.find_one({"id": team["captain_id"]})
+                if captain:
+                    invitation["captain"] = {
+                        "username": captain["username"],
+                        "full_name": captain["full_name"]
+                    }
+        
+        return {"invitations": invitations}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching invitations: {str(e)}")
+
+@app.post("/api/teams/invitations/{invitation_id}/accept")
+async def accept_invitation(invitation_id: str, user_id: str = Depends(verify_token)):
+    """Accept a team invitation"""
+    try:
+        # Find invitation
+        invitation = team_invitations_collection.find_one({
+            "id": invitation_id,
+            "invited_user_id": user_id,
+            "status": InvitationStatus.PENDING
+        })
+        if not invitation:
+            raise HTTPException(status_code=404, detail="Invitation not found or already processed")
+        
+        # Check if invitation is expired
+        if invitation["expires_at"] < datetime.utcnow():
+            # Mark as expired
+            team_invitations_collection.update_one(
+                {"id": invitation_id},
+                {"$set": {"status": InvitationStatus.EXPIRED}}
+            )
+            raise HTTPException(status_code=400, detail="Invitation has expired")
+        
+        # Check if user is already in a team
+        existing_membership = team_members_collection.find_one({
+            "user_id": user_id,
+            "status": "active"
+        })
+        if existing_membership:
+            raise HTTPException(status_code=400, detail="You are already a member of another team")
+        
+        # Check if team has space
+        team = teams_collection.find_one({"id": invitation["team_id"]})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        current_members = team_members_collection.count_documents({
+            "team_id": invitation["team_id"],
+            "status": "active"
+        })
+        if current_members >= 20:
+            raise HTTPException(status_code=400, detail="Team is full")
+        
+        # Accept invitation
+        team_invitations_collection.update_one(
+            {"id": invitation_id},
+            {"$set": {"status": InvitationStatus.ACCEPTED}}
+        )
+        
+        # Add user to team
+        team_member = {
+            "id": str(uuid.uuid4()),
+            "team_id": invitation["team_id"],
+            "user_id": user_id,
+            "joined_at": datetime.utcnow(),
+            "status": "active"
+        }
+        team_members_collection.insert_one(team_member)
+        
+        # Update team player count
+        new_count = current_members + 1
+        teams_collection.update_one(
+            {"id": invitation["team_id"]},
+            {"$set": {"player_count": new_count, "updated_at": datetime.utcnow()}}
+        )
+        
+        # Update user's current team
+        users_collection.update_one(
+            {"id": user_id},
+            {"$set": {"current_team_id": invitation["team_id"]}}
+        )
+        
+        return {
+            "message": f"Successfully joined {team['name']}",
+            "team_id": invitation["team_id"],
+            "team_name": team["name"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error accepting invitation: {str(e)}")
+
+@app.post("/api/teams/invitations/{invitation_id}/decline")
+async def decline_invitation(invitation_id: str, user_id: str = Depends(verify_token)):
+    """Decline a team invitation"""
+    try:
+        # Find and update invitation
+        result = team_invitations_collection.update_one(
+            {
+                "id": invitation_id,
+                "invited_user_id": user_id,
+                "status": InvitationStatus.PENDING
+            },
+            {"$set": {"status": InvitationStatus.DECLINED}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Invitation not found or already processed")
+        
+        return {"message": "Invitation declined"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error declining invitation: {str(e)}")
+
+# =============================================================================
+# BULK PAYOUT API ENDPOINTS
+# =============================================================================
+
+# =============================================================================
+# TEAM SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.post("/api/teams")
 async def process_bulk_payout(payout_ids: List[str], admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
     """Process multiple payouts in bulk"""
     try:
