@@ -6374,10 +6374,7 @@ function App() {
           )}
         </div>
         </div>
-        {(() => {
-          console.log('MODAL RENDER CHECK - showManualAdjustmentModal:', showManualAdjustmentModal);
-          return showManualAdjustmentModal;
-        })() && (
+
           <div 
             className="modal-overlay" 
             style={{
