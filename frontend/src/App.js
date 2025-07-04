@@ -5531,7 +5531,12 @@ function App() {
                       <h4>⚙️ {t.manualAdjustment}</h4>
                       <button 
                         className="btn btn-secondary"
-                        onClick={() => setShowManualAdjustmentModal(true)}
+                        onClick={() => {
+                          console.log('CREATE ADJUSTMENT BUTTON CLICKED!');
+                          console.log('Current modal state:', showManualAdjustmentModal);
+                          setShowManualAdjustmentModal(true);
+                          console.log('Modal state should now be true');
+                        }}
                       >
                         ➕ Create Adjustment
                       </button>
