@@ -2085,6 +2085,244 @@ function App() {
     }
   }, [currentView, affiliateView, isAffiliate]);
 
+  // =============================================================================
+  // WALLET SYSTEM FUNCTIONS
+  // =============================================================================
+  
+  // Fetch wallet balance
+  const fetchWalletBalance = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/wallet/balance`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setWalletBalance(data);
+        setWalletSettings({
+          auto_payout_enabled: data.auto_payout_enabled,
+          auto_payout_threshold: data.auto_payout_threshold,
+          preferred_payout_method: data.preferred_payout_method
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+    }
+  };
+
+  // Fetch wallet statistics
+  const fetchWalletStats = async () => {
+    if (!token) return;
+    
+    setWalletLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/wallet/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setWalletStats(data);
+        setWalletBalance(data.balance);
+      }
+    } catch (error) {
+      console.error('Error fetching wallet stats:', error);
+    }
+    setWalletLoading(false);
+  };
+
+  // Fetch wallet transactions
+  const fetchWalletTransactions = async () => {
+    if (!token) return;
+    
+    setWalletLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/wallet/transactions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setWalletTransactions(data.transactions);
+      }
+    } catch (error) {
+      console.error('Error fetching wallet transactions:', error);
+    }
+    setWalletLoading(false);
+  };
+
+  // Update wallet settings
+  const updateWalletSettings = async () => {
+    if (!token) return;
+    
+    setWalletLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/wallet/settings`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(walletSettings)
+      });
+      
+      if (response.ok) {
+        alert('Wallet settings updated successfully!');
+        setShowWalletSettingsModal(false);
+        fetchWalletBalance(); // Refresh balance to get updated settings
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to update wallet settings');
+      }
+    } catch (error) {
+      console.error('Error updating wallet settings:', error);
+      alert('Error updating wallet settings');
+    }
+    setWalletLoading(false);
+  };
+
+  // =============================================================================
+  // ADMIN FINANCIAL FUNCTIONS
+  // =============================================================================
+  
+  // Fetch financial overview
+  const fetchFinancialOverview = async () => {
+    if (!token) return;
+    
+    setFinancialLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/financial/overview`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setFinancialOverview(data);
+      }
+    } catch (error) {
+      console.error('Error fetching financial overview:', error);
+    }
+    setFinancialLoading(false);
+  };
+
+  // Fetch admin wallets
+  const fetchAdminWallets = async () => {
+    if (!token) return;
+    
+    setFinancialLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/financial/wallets`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdminWallets(data.wallets);
+      }
+    } catch (error) {
+      console.error('Error fetching admin wallets:', error);
+    }
+    setFinancialLoading(false);
+  };
+
+  // Fetch admin transactions
+  const fetchAdminTransactions = async () => {
+    if (!token) return;
+    
+    setFinancialLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/financial/transactions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdminTransactions(data.transactions);
+      }
+    } catch (error) {
+      console.error('Error fetching admin transactions:', error);
+    }
+    setFinancialLoading(false);
+  };
+
+  // Process manual adjustment
+  const processManualAdjustment = async () => {
+    if (!token) return;
+    
+    const amount = parseFloat(manualAdjustmentForm.amount);
+    if (isNaN(amount) || !manualAdjustmentForm.user_id || !manualAdjustmentForm.reason) {
+      alert('Please fill in all required fields with valid values');
+      return;
+    }
+    
+    setFinancialLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/financial/manual-adjustment`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: manualAdjustmentForm.user_id,
+          amount: amount,
+          reason: manualAdjustmentForm.reason,
+          admin_notes: manualAdjustmentForm.admin_notes
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Manual adjustment processed successfully! Amount: €${data.amount}`);
+        setShowManualAdjustmentModal(false);
+        setManualAdjustmentForm({
+          user_id: '',
+          amount: '',
+          reason: '',
+          admin_notes: ''
+        });
+        fetchAdminWallets(); // Refresh data
+        fetchAdminTransactions();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to process manual adjustment');
+      }
+    } catch (error) {
+      console.error('Error processing manual adjustment:', error);
+      alert('Error processing manual adjustment');
+    }
+    setFinancialLoading(false);
+  };
+
+  // Load wallet data when user logs in
+  useEffect(() => {
+    if (user && token) {
+      fetchWalletBalance();
+    }
+  }, [user, token]);
+
+  // Fetch wallet data when view changes
+  useEffect(() => {
+    if (currentView === 'wallet' && user && token) {
+      if (walletView === 'dashboard') {
+        fetchWalletStats();
+      } else if (walletView === 'transactions') {
+        fetchWalletTransactions();
+      }
+    }
+  }, [currentView, walletView, user, token]);
+
+  // Fetch admin financial data when view changes
+  useEffect(() => {
+    if (currentView === 'admin' && adminView === 'financial' && isAdmin && token) {
+      fetchFinancialOverview();
+      fetchAdminWallets();
+      fetchAdminTransactions();
+    }
+  }, [currentView, adminView, isAdmin, token]);
+
   // Search Users Function
   const handleUserSearch = (searchTerm) => {
     setUserSearchTerm(searchTerm);
