@@ -1043,6 +1043,11 @@ def calculate_wallet_stats(user_id: str) -> dict:
             {"user_id": user_id}
         ).sort("created_at", -1))
         
+        # Convert ObjectId to string in transactions
+        for transaction in transactions:
+            if "_id" in transaction:
+                transaction["_id"] = str(transaction["_id"])
+        
         # Monthly earnings (last 12 months)
         monthly_earnings = []
         now = datetime.utcnow()
