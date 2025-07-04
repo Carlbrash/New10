@@ -1487,6 +1487,8 @@ function App() {
         }
         // Refresh tournaments list
         fetchTournaments(tournamentFilters);
+        // Refresh user tournaments for dashboard
+        fetchUserTournaments();
       } else {
         const error = await response.json();
         alert(error.detail || 'Failed to join tournament');
