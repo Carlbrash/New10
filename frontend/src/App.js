@@ -1912,7 +1912,7 @@ function App() {
   const fetchTeamInvitations = async () => {
     if (!token) return;
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/teams/my-invitations`, {
+      const response = await fetch(`${API_BASE_URL}/api/teams/my-invitations`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
