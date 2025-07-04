@@ -175,6 +175,7 @@ const translations = {
     top_three: 'Top 3',
     
     // Entry Fee Categories
+    free: 'Δωρεάν',
     basic: 'Βασικό (€1-10)',
     standard: 'Κανονικό (€11-50)',
     premium: 'Premium (€51-100)',
