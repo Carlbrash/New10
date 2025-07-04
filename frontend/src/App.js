@@ -410,6 +410,7 @@ const translations = {
     
     // Tournament System
     tournament: 'Tournament',
+    teams: 'Teams',
     tournaments: 'Tournaments',
     tournamentTitle: 'Available Tournaments',
     joinTournament: 'Join Tournament',
