@@ -6374,50 +6374,6 @@ function App() {
           )}
         </div>
         </div>
-                </button>
-              </div>
-              
-              <div className="modal-content">
-                <div className="form-group">
-                  <label>User ID:</label>
-                  <input
-                    type="text"
-                    value={manualAdjustmentForm.user_id}
-                    onChange={(e) => setManualAdjustmentForm({
-                      ...manualAdjustmentForm,
-                      user_id: e.target.value
-                    })}
-                    placeholder="Enter user ID"
-                    className="form-input"
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>{t.adjustAmount} (€):</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={manualAdjustmentForm.amount}
-                    onChange={(e) => setManualAdjustmentForm({
-                      ...manualAdjustmentForm,
-                      amount: e.target.value
-                    })}
-                    placeholder="Enter amount (positive or negative)"
-                    className="form-input"
-                  />
-                  <p className="form-help">Use positive values to add money, negative to deduct</p>
-                </div>
-                
-                <div className="form-group">
-                  <label>{t.adjustmentReason}:</label>
-                  <input
-                    type="text"
-                    value={manualAdjustmentForm.reason}
-                    onChange={(e) => setManualAdjustmentForm({
-                      ...manualAdjustmentForm,
-                      reason: e.target.value
-                    })}
-                    placeholder="Enter reason for adjustment"
                     className="form-input"
                     required
                   />
