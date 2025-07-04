@@ -598,6 +598,23 @@ function App() {
     region: 'Global'
   });
   
+  // Affiliate System States
+  const [affiliateData, setAffiliateData] = useState(null);
+  const [affiliateStats, setAffiliateStats] = useState(null);
+  const [affiliateCommissions, setAffiliateCommissions] = useState([]);
+  const [affiliateReferrals, setAffiliateReferrals] = useState([]);
+  const [affiliateView, setAffiliateView] = useState('dashboard'); // dashboard, commissions, referrals, payouts
+  const [isAffiliate, setIsAffiliate] = useState(false);
+  const [affiliateLoading, setAffiliateLoading] = useState(false);
+  const [showAffiliateModal, setShowAffiliateModal] = useState(false);
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [payoutForm, setPayoutForm] = useState({
+    amount: '',
+    payment_method: 'bank_transfer',
+    payment_details: {},
+    notes: ''
+  });
+  
   // Get current translations
   const t = translations[language];
 
