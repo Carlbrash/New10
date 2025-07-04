@@ -2514,95 +2514,588 @@ def run_tournament_bracket_tests():
     print("=" * 50)
     runner.run(bracket_test_suite)
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "tournaments":
-            run_tournament_tests()
-        elif sys.argv[1] == "brackets":
-            run_tournament_bracket_tests()
-        elif sys.argv[1] == "world_map_only":
-            # Run only world map related tests
-            api_test_suite = unittest.TestSuite()
-            api_test_suite.addTest(BettingFederationAPITest('test_01_health_check'))
-            api_test_suite.addTest(BettingFederationAPITest('test_07_country_stats'))
-            api_test_suite.addTest(BettingFederationAPITest('test_08_country_rankings'))
-            api_test_suite.addTest(WorldMapSearchTester('test_01_country_stats_for_search'))
-            api_test_suite.addTest(WorldMapSearchTester('test_02_enhanced_search_functionality'))
+class WalletSystemTester(unittest.TestCase):
+    base_url = "https://fc495f42-99f4-4eed-98fe-c062f372264d.preview.emergentagent.com"
+    
+    # Test user credentials
+    user_credentials = {
+        "username": "testuser",
+        "password": "test123"
+    }
+    
+    # Admin credentials
+    admin_credentials = {
+        "username": "admin",
+        "password": "Kiki1999@"
+    }
+    
+    user_token = None
+    admin_token = None
+    user_id = None
+    admin_id = None
+    
+    def test_01_user_login(self):
+        """Login as regular user to get token for wallet testing"""
+        print("\n🔍 Testing user login for wallet testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.user_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"User login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("user_id", data)
+        WalletSystemTester.user_token = data["token"]
+        WalletSystemTester.user_id = data["user_id"]
+        print(f"✅ User login successful - Token obtained for wallet testing")
+    
+    def test_02_admin_login(self):
+        """Login as admin to get token for admin financial endpoints"""
+        print("\n🔍 Testing admin login for financial admin endpoints...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.admin_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("user_id", data)
+        WalletSystemTester.admin_token = data["token"]
+        WalletSystemTester.admin_id = data["user_id"]
+        print(f"✅ Admin login successful - Token obtained for financial admin endpoints")
+    
+    def test_03_get_wallet_balance(self):
+        """Test GET /api/wallet/balance endpoint"""
+        print("\n🔍 Testing GET /api/wallet/balance endpoint...")
+        
+        # Skip if no user token
+        if not WalletSystemTester.user_token:
+            self.skipTest("No user token available")
+        
+        headers = {"Authorization": f"Bearer {WalletSystemTester.user_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get wallet balance: {response.text}")
+        wallet = response.json()
+        
+        # Verify wallet structure
+        self.assertIn("id", wallet)
+        self.assertIn("user_id", wallet)
+        self.assertIn("total_earned", wallet)
+        self.assertIn("available_balance", wallet)
+        self.assertIn("pending_balance", wallet)
+        self.assertIn("withdrawn_balance", wallet)
+        self.assertIn("registration_commissions", wallet)
+        self.assertIn("tournament_commissions", wallet)
+        self.assertIn("deposit_commissions", wallet)
+        self.assertIn("bonus_earnings", wallet)
+        self.assertIn("auto_payout_enabled", wallet)
+        self.assertIn("auto_payout_threshold", wallet)
+        self.assertIn("preferred_payout_method", wallet)
+        
+        # Verify user ID matches
+        self.assertEqual(wallet["user_id"], WalletSystemTester.user_id)
+        
+        print(f"✅ Wallet balance retrieved successfully")
+        print(f"  Total earned: €{wallet['total_earned']}")
+        print(f"  Available balance: €{wallet['available_balance']}")
+        print(f"  Registration commissions: €{wallet['registration_commissions']}")
+        print(f"  Tournament commissions: €{wallet['tournament_commissions']}")
+    
+    def test_04_get_wallet_stats(self):
+        """Test GET /api/wallet/stats endpoint"""
+        print("\n🔍 Testing GET /api/wallet/stats endpoint...")
+        
+        # Skip if no user token
+        if not WalletSystemTester.user_token:
+            self.skipTest("No user token available")
+        
+        headers = {"Authorization": f"Bearer {WalletSystemTester.user_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/wallet/stats",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get wallet stats: {response.text}")
+        stats = response.json()
+        
+        # Verify stats structure
+        self.assertIn("balance", stats)
+        self.assertIn("recent_transactions", stats)
+        self.assertIn("monthly_earnings", stats)
+        self.assertIn("commission_breakdown", stats)
+        self.assertIn("payout_summary", stats)
+        self.assertIn("performance_metrics", stats)
+        
+        # Verify balance matches user
+        self.assertEqual(stats["balance"]["user_id"], WalletSystemTester.user_id)
+        
+        # Verify monthly earnings structure
+        self.assertIsInstance(stats["monthly_earnings"], list)
+        if stats["monthly_earnings"]:
+            month_data = stats["monthly_earnings"][0]
+            self.assertIn("month", month_data)
+            self.assertIn("earnings", month_data)
+            self.assertIn("transactions", month_data)
+        
+        # Verify commission breakdown
+        commission_breakdown = stats["commission_breakdown"]
+        self.assertIn("registration", commission_breakdown)
+        self.assertIn("tournament", commission_breakdown)
+        self.assertIn("deposit", commission_breakdown)
+        self.assertIn("bonus", commission_breakdown)
+        
+        # Verify payout summary
+        payout_summary = stats["payout_summary"]
+        self.assertIn("total_withdrawn", payout_summary)
+        self.assertIn("pending_withdrawal", payout_summary)
+        self.assertIn("total_payouts", payout_summary)
+        
+        # Verify performance metrics
+        performance_metrics = stats["performance_metrics"]
+        self.assertIn("total_commissions", performance_metrics)
+        self.assertIn("average_commission", performance_metrics)
+        
+        print(f"✅ Wallet stats retrieved successfully")
+        print(f"  Total commissions: {performance_metrics['total_commissions']}")
+        print(f"  Average commission: €{performance_metrics['average_commission']:.2f}")
+        print(f"  Commission breakdown: {commission_breakdown}")
+    
+    def test_05_get_wallet_transactions(self):
+        """Test GET /api/wallet/transactions endpoint"""
+        print("\n🔍 Testing GET /api/wallet/transactions endpoint...")
+        
+        # Skip if no user token
+        if not WalletSystemTester.user_token:
+            self.skipTest("No user token available")
+        
+        headers = {"Authorization": f"Bearer {WalletSystemTester.user_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/wallet/transactions",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get wallet transactions: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("transactions", data)
+        self.assertIn("total", data)
+        self.assertIn("page", data)
+        self.assertIn("pages", data)
+        
+        transactions = data["transactions"]
+        print(f"✅ Found {len(transactions)} transactions (total: {data['total']})")
+        
+        # Verify transaction structure if any exist
+        if transactions:
+            transaction = transactions[0]
+            self.assertIn("id", transaction)
+            self.assertIn("user_id", transaction)
+            self.assertIn("transaction_type", transaction)
+            self.assertIn("amount", transaction)
+            self.assertIn("balance_before", transaction)
+            self.assertIn("balance_after", transaction)
+            self.assertIn("description", transaction)
+            self.assertIn("created_at", transaction)
             
-            runner = unittest.TextTestRunner(verbosity=2)
-            print("\n" + "=" * 50)
-            print("TESTING WORLD MAP API ENDPOINTS")
-            print("=" * 50)
-            runner.run(api_test_suite)
-        elif sys.argv[1] == "decimal_removal":
-            # Run only decimal removal tests
-            decimal_test_suite = unittest.TestSuite()
-            decimal_test_suite.addTest(DecimalRemovalTester('test_01_ui_decimal_removal_verification'))
+            # Verify all transactions belong to the user
+            for transaction in transactions:
+                self.assertEqual(transaction["user_id"], WalletSystemTester.user_id)
             
-            runner = unittest.TextTestRunner(verbosity=2)
-            print("\n" + "=" * 50)
-            print("TESTING UI DECIMAL REMOVAL")
-            print("=" * 50)
-            runner.run(decimal_test_suite)
-        elif sys.argv[1] == "avatar_only":
-            # Run only avatar tests
-            avatar_test_suite = unittest.TestSuite()
-            avatar_test_suite.addTest(AvatarTester('test_01_register_with_avatar'))
-            avatar_test_suite.addTest(AvatarTester('test_02_verify_avatar_in_profile'))
-            avatar_test_suite.addTest(AvatarTester('test_03_verify_avatar_in_rankings'))
+            # Print some transaction details
+            for i, transaction in enumerate(transactions[:3]):
+                print(f"  Transaction {i+1}: {transaction['transaction_type']} - €{transaction['amount']} - {transaction['description'][:50]}")
+        else:
+            print("  No transactions found for this user")
+    
+    def test_06_update_wallet_settings(self):
+        """Test POST /api/wallet/settings endpoint"""
+        print("\n🔍 Testing POST /api/wallet/settings endpoint...")
+        
+        # Skip if no user token
+        if not WalletSystemTester.user_token:
+            self.skipTest("No user token available")
+        
+        # Get current settings first
+        headers = {"Authorization": f"Bearer {WalletSystemTester.user_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        current_settings = response.json()
+        
+        # Toggle auto_payout_enabled
+        new_auto_payout = not current_settings.get("auto_payout_enabled", False)
+        new_threshold = 150.0  # Change threshold
+        new_method = "paypal"  # Change method
+        
+        settings_data = {
+            "auto_payout_enabled": new_auto_payout,
+            "auto_payout_threshold": new_threshold,
+            "preferred_payout_method": new_method
+        }
+        
+        # Update settings
+        response = requests.post(
+            f"{self.base_url}/api/wallet/settings",
+            headers=headers,
+            json=settings_data
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to update wallet settings: {response.text}")
+        data = response.json()
+        self.assertIn("message", data)
+        
+        # Verify settings were updated
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        updated_settings = response.json()
+        
+        self.assertEqual(updated_settings["auto_payout_enabled"], new_auto_payout)
+        self.assertEqual(updated_settings["auto_payout_threshold"], new_threshold)
+        self.assertEqual(updated_settings["preferred_payout_method"], new_method)
+        
+        print(f"✅ Wallet settings updated successfully")
+        print(f"  Auto payout enabled: {new_auto_payout}")
+        print(f"  Auto payout threshold: €{new_threshold}")
+        print(f"  Preferred payout method: {new_method}")
+        
+        # Restore original settings
+        original_settings = {
+            "auto_payout_enabled": current_settings.get("auto_payout_enabled", False),
+            "auto_payout_threshold": current_settings.get("auto_payout_threshold", 100.0),
+            "preferred_payout_method": current_settings.get("preferred_payout_method", "bank_transfer")
+        }
+        
+        response = requests.post(
+            f"{self.base_url}/api/wallet/settings",
+            headers=headers,
+            json=original_settings
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        print("  Original settings restored")
+    
+    def test_07_admin_financial_overview(self):
+        """Test GET /api/admin/financial/overview endpoint"""
+        print("\n🔍 Testing GET /api/admin/financial/overview endpoint...")
+        
+        # Skip if no admin token
+        if not WalletSystemTester.admin_token:
+            self.skipTest("No admin token available")
+        
+        headers = {"Authorization": f"Bearer {WalletSystemTester.admin_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/admin/financial/overview",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get financial overview: {response.text}")
+        overview = response.json()
+        
+        # Verify overview structure
+        self.assertIn("total_affiliates", overview)
+        self.assertIn("active_affiliates", overview)
+        self.assertIn("total_pending_payouts", overview)
+        self.assertIn("total_commissions_owed", overview)
+        self.assertIn("monthly_commission_costs", overview)
+        self.assertIn("platform_revenue", overview)
+        self.assertIn("affiliate_conversion_rate", overview)
+        self.assertIn("top_affiliates", overview)
+        self.assertIn("pending_payouts", overview)
+        self.assertIn("recent_transactions", overview)
+        self.assertIn("financial_summary", overview)
+        
+        # Verify financial summary
+        financial_summary = overview["financial_summary"]
+        self.assertIn("total_platform_costs", financial_summary)
+        self.assertIn("estimated_monthly_revenue", financial_summary)
+        self.assertIn("monthly_commission_costs", financial_summary)
+        self.assertIn("profit_margin", financial_summary)
+        
+        print(f"✅ Financial overview retrieved successfully")
+        print(f"  Total affiliates: {overview['total_affiliates']}")
+        print(f"  Active affiliates: {overview['active_affiliates']}")
+        print(f"  Total commissions owed: €{overview['total_commissions_owed']}")
+        print(f"  Monthly commission costs: €{overview['monthly_commission_costs']}")
+        print(f"  Platform revenue: €{overview['platform_revenue']}")
+        print(f"  Profit margin: {financial_summary['profit_margin']:.2f}%")
+    
+    def test_08_admin_financial_wallets(self):
+        """Test GET /api/admin/financial/wallets endpoint"""
+        print("\n🔍 Testing GET /api/admin/financial/wallets endpoint...")
+        
+        # Skip if no admin token
+        if not WalletSystemTester.admin_token:
+            self.skipTest("No admin token available")
+        
+        headers = {"Authorization": f"Bearer {WalletSystemTester.admin_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/admin/financial/wallets",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get wallets: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("wallets", data)
+        self.assertIn("total", data)
+        self.assertIn("page", data)
+        self.assertIn("pages", data)
+        
+        wallets = data["wallets"]
+        print(f"✅ Found {len(wallets)} wallets (total: {data['total']})")
+        
+        # Verify wallet structure if any exist
+        if wallets:
+            wallet = wallets[0]
+            self.assertIn("id", wallet)
+            self.assertIn("user_id", wallet)
+            self.assertIn("total_earned", wallet)
+            self.assertIn("available_balance", wallet)
+            self.assertIn("user_details", wallet)
             
-            runner = unittest.TextTestRunner(verbosity=2)
-            print("\n" + "=" * 50)
-            print("TESTING AVATAR FUNCTIONALITY")
-            print("=" * 50)
-            runner.run(avatar_test_suite)
-        elif sys.argv[1] == "global_rankings":
-            # Run only global rankings tests
-            rankings_test_suite = unittest.TestSuite()
-            rankings_test_suite.addTest(GlobalRankingsTester('test_01_global_rankings_data'))
+            # Verify user details
+            user_details = wallet["user_details"]
+            self.assertIn("username", user_details)
+            self.assertIn("full_name", user_details)
             
-            runner = unittest.TextTestRunner(verbosity=2)
-            print("\n" + "=" * 50)
-            print("TESTING GLOBAL RANKINGS FUNCTIONALITY")
-            print("=" * 50)
-            runner.run(rankings_test_suite)
-        elif sys.argv[1] == "enhanced_search":
-            # Run only enhanced search tests
-            search_test_suite = unittest.TestSuite()
-            search_test_suite.addTest(WorldMapSearchTester('test_01_country_stats_for_search'))
-            search_test_suite.addTest(WorldMapSearchTester('test_02_enhanced_search_functionality'))
+            # Print some wallet details
+            for i, wallet in enumerate(wallets[:3]):
+                print(f"  Wallet {i+1}: {wallet['user_details']['username']} - Total earned: €{wallet['total_earned']} - Available: €{wallet['available_balance']}")
+        else:
+            print("  No wallets found")
+    
+    def test_09_admin_financial_transactions(self):
+        """Test GET /api/admin/financial/transactions endpoint"""
+        print("\n🔍 Testing GET /api/admin/financial/transactions endpoint...")
+        
+        # Skip if no admin token
+        if not WalletSystemTester.admin_token:
+            self.skipTest("No admin token available")
+        
+        headers = {"Authorization": f"Bearer {WalletSystemTester.admin_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/admin/financial/transactions",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get transactions: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("transactions", data)
+        self.assertIn("total", data)
+        self.assertIn("page", data)
+        self.assertIn("pages", data)
+        
+        transactions = data["transactions"]
+        print(f"✅ Found {len(transactions)} transactions (total: {data['total']})")
+        
+        # Verify transaction structure if any exist
+        if transactions:
+            transaction = transactions[0]
+            self.assertIn("id", transaction)
+            self.assertIn("user_id", transaction)
+            self.assertIn("transaction_type", transaction)
+            self.assertIn("amount", transaction)
+            self.assertIn("balance_before", transaction)
+            self.assertIn("balance_after", transaction)
+            self.assertIn("description", transaction)
+            self.assertIn("created_at", transaction)
+            self.assertIn("user_details", transaction)
             
-            runner = unittest.TextTestRunner(verbosity=2)
-            print("\n" + "=" * 50)
-            print("TESTING ENHANCED SEARCH FUNCTIONALITY")
-            print("=" * 50)
-            runner.run(search_test_suite)
-        elif sys.argv[1] == "site_messages":
-            # Run only site messages tests
-            site_messages_suite = unittest.TestSuite()
-            site_messages_suite.addTest(SiteMessagesTester('test_01_admin_login'))
-            site_messages_suite.addTest(SiteMessagesTester('test_02_get_current_site_messages'))
-            site_messages_suite.addTest(SiteMessagesTester('test_03_create_site_message'))
-            site_messages_suite.addTest(SiteMessagesTester('test_04_verify_created_message'))
-            
-            runner = unittest.TextTestRunner(verbosity=2)
-            print("\n" + "=" * 50)
-            print("TESTING SITE MESSAGES FUNCTIONALITY")
-            print("=" * 50)
-            runner.run(site_messages_suite)
-        elif sys.argv[1] == "rankings_search":
-            # Run only rankings and search tests
-            rankings_search_suite = unittest.TestSuite()
-            rankings_search_suite.addTest(RankingsAndSearchTester('test_01_admin_login'))
-            rankings_search_suite.addTest(RankingsAndSearchTester('test_02_rankings_api_data_structure'))
-            rankings_search_suite.addTest(RankingsAndSearchTester('test_03_top_100_users_api'))
-            rankings_search_suite.addTest(RankingsAndSearchTester('test_04_site_messages_api'))
-            rankings_search_suite.addTest(RankingsAndSearchTester('test_05_user_search_data_availability'))
-            
-            runner = unittest.TextTestRunner(verbosity=2)
-            print("\n" + "=" * 50)
-            print("TESTING RANKINGS AND SEARCH FUNCTIONALITY")
-            print("=" * 50)
-            runner.run(rankings_search_suite)
-    else:
-        run_tests()
+            # Print some transaction details
+            for i, transaction in enumerate(transactions[:3]):
+                username = transaction["user_details"]["username"] if "user_details" in transaction else "Unknown"
+                print(f"  Transaction {i+1}: {username} - {transaction['transaction_type']} - €{transaction['amount']} - {transaction['description'][:50]}")
+        else:
+            print("  No transactions found")
+    
+    def test_10_admin_manual_adjustment(self):
+        """Test POST /api/admin/financial/manual-adjustment endpoint"""
+        print("\n🔍 Testing POST /api/admin/financial/manual-adjustment endpoint...")
+        
+        # Skip if no admin token or user ID
+        if not WalletSystemTester.admin_token or not WalletSystemTester.user_id:
+            self.skipTest("No admin token or user ID available")
+        
+        # Get current balance first
+        headers = {"Authorization": f"Bearer {WalletSystemTester.user_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        current_balance = response.json()
+        initial_balance = current_balance["available_balance"]
+        
+        # Create a small adjustment (€1.00)
+        adjustment_amount = 1.00
+        adjustment_data = {
+            "user_id": WalletSystemTester.user_id,
+            "amount": adjustment_amount,
+            "reason": "Test adjustment for API testing",
+            "admin_notes": "This is a test adjustment that will be reversed"
+        }
+        
+        # Make the adjustment
+        admin_headers = {"Authorization": f"Bearer {WalletSystemTester.admin_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/admin/financial/manual-adjustment",
+            headers=admin_headers,
+            json=adjustment_data
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to create manual adjustment: {response.text}")
+        data = response.json()
+        self.assertIn("message", data)
+        self.assertIn("amount", data)
+        self.assertEqual(data["amount"], adjustment_amount)
+        
+        # Verify balance was updated
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        updated_balance = response.json()
+        expected_balance = initial_balance + adjustment_amount
+        self.assertAlmostEqual(updated_balance["available_balance"], expected_balance, places=2)
+        
+        print(f"✅ Manual adjustment created successfully")
+        print(f"  Initial balance: €{initial_balance}")
+        print(f"  Adjustment amount: €{adjustment_amount}")
+        print(f"  New balance: €{updated_balance['available_balance']}")
+        
+        # Reverse the adjustment to restore original balance
+        reverse_adjustment_data = {
+            "user_id": WalletSystemTester.user_id,
+            "amount": -adjustment_amount,
+            "reason": "Reversing test adjustment",
+            "admin_notes": "Reversing the test adjustment to restore original balance"
+        }
+        
+        response = requests.post(
+            f"{self.base_url}/api/admin/financial/manual-adjustment",
+            headers=admin_headers,
+            json=reverse_adjustment_data
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Verify balance was restored
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        final_balance = response.json()
+        self.assertAlmostEqual(final_balance["available_balance"], initial_balance, places=2)
+        
+        print("  Original balance restored")
+    
+    def test_11_integration_affiliate_wallet(self):
+        """Test integration between affiliate system and wallet"""
+        print("\n🔍 Testing integration between affiliate system and wallet...")
+        
+        # Skip if no user token
+        if not WalletSystemTester.user_token:
+            self.skipTest("No user token available")
+        
+        headers = {"Authorization": f"Bearer {WalletSystemTester.user_token}"}
+        
+        # Get affiliate profile
+        response = requests.get(
+            f"{self.base_url}/api/affiliate/profile",
+            headers=headers
+        )
+        
+        if response.status_code != 200:
+            print("  User is not an affiliate, skipping integration test")
+            return
+        
+        affiliate_profile = response.json()
+        
+        # Get affiliate commissions
+        response = requests.get(
+            f"{self.base_url}/api/affiliate/commissions",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        commissions_data = response.json()
+        commissions = commissions_data.get("commissions", [])
+        
+        # Get wallet balance
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        wallet = response.json()
+        
+        # Get wallet transactions
+        response = requests.get(
+            f"{self.base_url}/api/wallet/transactions",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        transactions_data = response.json()
+        transactions = transactions_data.get("transactions", [])
+        
+        # Verify commissions are reflected in wallet
+        commission_total = sum(commission["amount"] for commission in commissions)
+        
+        # Check if wallet has commission transactions
+        commission_transactions = [t for t in transactions if t["transaction_type"] == "commission_earned"]
+        
+        print(f"✅ Integration test completed")
+        print(f"  Affiliate total earnings: €{affiliate_profile.get('total_earnings', 0)}")
+        print(f"  Wallet total earned: €{wallet['total_earned']}")
+        print(f"  Commission transactions found: {len(commission_transactions)}")
+        
+        # Verify wallet reflects affiliate earnings
+        self.assertGreaterEqual(wallet["total_earned"], affiliate_profile.get("total_earnings", 0) * 0.99)  # Allow for small rounding differences
+        
+        # Verify commission transactions exist if there are commissions
+        if commissions:
+            self.assertGreater(len(commission_transactions), 0, "Expected commission transactions in wallet")
+
+def run_wallet_tests():
+    """Run wallet system tests"""
+    # Create a test suite for wallet system tests
+    wallet_test_suite = unittest.TestSuite()
+    wallet_test_suite.addTest(WalletSystemTester('test_01_user_login'))
+    wallet_test_suite.addTest(WalletSystemTester('test_02_admin_login'))
+    wallet_test_suite.addTest(WalletSystemTester('test_03_get_wallet_balance'))
+    wallet_test_suite.addTest(WalletSystemTester('test_04_get_wallet_stats'))
+    wallet_test_suite.addTest(WalletSystemTester('test_05_get_wallet_transactions'))
+    wallet_test_suite.addTest(WalletSystemTester('test_06_update_wallet_settings'))
+    wallet_test_suite.addTest(WalletSystemTester('test_07_admin_financial_overview'))
+    wallet_test_suite.addTest(WalletSystemTester('test_08_admin_financial_wallets'))
+    wallet_test_suite.addTest(WalletSystemTester('test_09_admin_financial_transactions'))
+    wallet_test_suite.addTest(WalletSystemTester('test_10_admin_manual_adjustment'))
+    wallet_test_suite.addTest(WalletSystemTester('test_11_integration_affiliate_wallet'))
+    
+    runner = unittest.TextTestRunner(verbosity=2)
+    print("\n" + "=" * 50)
+    print("TESTING WALLET SYSTEM AND ADMIN FINANCIAL MANAGEMENT")
+    print("=" * 50)
+    runner.run(wallet_test_suite)
