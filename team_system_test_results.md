@@ -63,8 +63,8 @@ invitations = list(team_invitations_collection.find({
 
 ## Action Items for Main Agent
 
-- Fix the GET /api/teams/my-invitations endpoint to properly retrieve invitations for a user
-- The issue is likely in the error handling or query logic in the endpoint implementation
-- The endpoint might be trying to find a team instead of invitations for the user
+- Fix the GET /api/teams/my-invitations endpoint to handle the case when no invitations are found more gracefully (return an empty list instead of a 404 error)
+- Fix the error message to be more accurate (e.g., "No pending invitations found" instead of "Team not found")
+- Consider adding an option to retrieve all invitations (both pending and accepted) with a query parameter
 
 YOU MUST ASK USER BEFORE DOING FRONTEND TESTING
