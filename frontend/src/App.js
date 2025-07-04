@@ -5760,6 +5760,148 @@ function App() {
   };
 
   // =============================================================================
+  // TEAM SYSTEM RENDER FUNCTIONS
+  // =============================================================================
+
+  const renderTeams = () => {
+    return (
+      <div className="teams-page">
+        <div className="teams-header">
+          <h2>🏆 {t.teams}</h2>
+          
+          {/* Team Invitations Banner */}
+          {teamInvitations.length > 0 && (
+            <div className="team-invitations-banner">
+              <div className="invitations-alert">
+                <h3>📨 Team Invitations ({teamInvitations.length})</h3>
+                <p>You have pending team invitations!</p>
+                <div className="invitations-list">
+                  {teamInvitations.map(invitation => (
+                    <div key={invitation.id} className="invitation-item">
+                      <div className="invitation-info">
+                        <strong>{invitation.team_details?.name}</strong>
+                        <span>from {invitation.captain?.full_name}</span>
+                        <small>{invitation.team_details?.city}, {invitation.team_details?.country}</small>
+                      </div>
+                      <div className="invitation-actions">
+                        <button 
+                          className="btn btn-primary btn-small"
+                          onClick={() => acceptTeamInvitation(invitation.id)}
+                          disabled={teamLoading}
+                        >
+                          ✅ Accept
+                        </button>
+                        <button 
+                          className="btn btn-secondary btn-small"
+                          onClick={() => declineTeamInvitation(invitation.id)}
+                          disabled={teamLoading}
+                        >
+                          ❌ Decline
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Create Team Button */}
+          {user && (
+            <div className="teams-actions">
+              <button 
+                className="btn btn-primary"
+                onClick={() => setShowCreateTeamModal(true)}
+              >
+                ➕ Create Team
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Teams List */}
+        <div className="teams-grid">
+          {teams.length === 0 ? (
+            <div className="no-teams">
+              <h3>No teams found</h3>
+              <p>Be the first to create a team!</p>
+            </div>
+          ) : (
+            teams.map(team => (
+              <div key={team.id} className="team-card">
+                <div className="team-header">
+                  <div className="team-logo">
+                    {team.logo_url ? (
+                      <img src={team.logo_url} alt={`${team.name} logo`} />
+                    ) : (
+                      <div className="default-logo" style={{backgroundColor: team.colors?.primary || '#FF0000'}}>
+                        {team.name.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="team-info">
+                    <h3>{team.name}</h3>
+                    <p>📍 {team.city}, {team.country}</p>
+                    <p>👑 Captain: {team.captain_name}</p>
+                  </div>
+                </div>
+                
+                <div className="team-stats">
+                  <div className="stat">
+                    <span className="stat-value">{team.current_player_count}</span>
+                    <span className="stat-label">Players</span>
+                  </div>
+                  <div className="stat">
+                    <span className="stat-value">{team.status}</span>
+                    <span className="stat-label">Status</span>
+                  </div>
+                </div>
+
+                <div className="team-colors">
+                  <div 
+                    className="color-primary" 
+                    style={{backgroundColor: team.colors?.primary}}
+                    title="Primary Color"
+                  ></div>
+                  {team.colors?.secondary && (
+                    <div 
+                      className="color-secondary" 
+                      style={{backgroundColor: team.colors.secondary}}
+                      title="Secondary Color"
+                    ></div>
+                  )}
+                </div>
+
+                <div className="team-actions">
+                  <button 
+                    className="btn btn-outline"
+                    onClick={() => setCurrentView(`team-${team.id}`)}
+                  >
+                    👁️ View Details
+                  </button>
+                  
+                  {/* Captain actions */}
+                  {user && user.id === team.captain_id && (
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        setSelectedTeamForInvite(team);
+                        setShowTeamInviteModal(true);
+                      }}
+                    >
+                      📧 Invite Player
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // =============================================================================
   // AFFILIATE SYSTEM RENDER FUNCTION
   // =============================================================================
   
