@@ -3149,18 +3149,41 @@ function App() {
             {t.worldMap}
           </button>
           
-          {/* Language Selector */}
-          <button className="language-selector" onClick={() => changeLanguage(language === 'gr' ? 'en' : 'gr')}>
-            {language === 'gr' ? (
-              <>
-                🇬🇷 <span className="lang-text">EL</span>
-              </>
-            ) : (
-              <>
-                🇺🇸 <span className="lang-text">EN</span>
-              </>
+          {/* Language Selector Dropdown */}
+          <div className="language-dropdown">
+            <button 
+              className="language-selector" 
+              onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+            >
+              {language === 'gr' ? (
+                <>
+                  🇬🇷 <span className="lang-text">EL</span>
+                </>
+              ) : (
+                <>
+                  🇺🇸 <span className="lang-text">EN</span>
+                </>
+              )}
+              <span className="dropdown-arrow">▼</span>
+            </button>
+            
+            {showLanguageDropdown && (
+              <div className="language-dropdown-menu">
+                <button 
+                  className={`language-option ${language === 'en' ? 'active' : ''}`}
+                  onClick={() => changeLanguage('en')}
+                >
+                  🇺🇸 <span>English</span>
+                </button>
+                <button 
+                  className={`language-option ${language === 'gr' ? 'active' : ''}`}
+                  onClick={() => changeLanguage('gr')}
+                >
+                  🇬🇷 <span>Ελληνικά</span>
+                </button>
+              </div>
             )}
-          </button>
+          </div>
 
           {token ? (
             <>
