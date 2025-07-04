@@ -737,7 +737,6 @@ function App() {
   const [walletTransactions, setWalletTransactions] = useState([]);
   const [walletView, setWalletView] = useState('dashboard'); // dashboard, transactions, settings
   const [walletLoading, setWalletLoading] = useState(false);
-  const [showWalletSettingsModal, setShowWalletSettingsModal] = useState(false);
   const [walletSettings, setWalletSettings] = useState({
     auto_payout_enabled: false,
     auto_payout_threshold: 100.0,
