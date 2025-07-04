@@ -4941,6 +4941,456 @@ function App() {
     );
   };
 
+  // =============================================================================
+  // AFFILIATE SYSTEM RENDER FUNCTION
+  // =============================================================================
+  
+  const renderAffiliate = () => {
+    if (!user || !token) {
+      return (
+        <div className="container">
+          <div className="auth-required">
+            <h2>🔒 {t.loginTitle}</h2>
+            <p>Please login to access the affiliate program.</p>
+            <button 
+              className="btn btn-primary"
+              onClick={() => setCurrentView('home')}
+            >
+              {t.loginBtn}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (!isAffiliate) {
+      return (
+        <div className="container">
+          <div className="affiliate-welcome">
+            <h2>💰 {t.affiliateProgram}</h2>
+            <div className="affiliate-info">
+              <h3>Why become an affiliate?</h3>
+              <div className="benefits-grid">
+                <div className="benefit-card">
+                  <div className="benefit-icon">💶</div>
+                  <h4>€5 per Registration</h4>
+                  <p>Earn €5 for every new user who registers using your referral link.</p>
+                </div>
+                <div className="benefit-card">
+                  <div className="benefit-icon">🏆</div>
+                  <h4>10% Tournament Commission</h4>
+                  <p>Get 10% commission on tournament entry fees from your referrals.</p>
+                </div>
+                <div className="benefit-card">
+                  <div className="benefit-icon">📈</div>
+                  <h4>Recurring Income</h4>
+                  <p>Earn commissions every time your referrals participate in tournaments.</p>
+                </div>
+                <div className="benefit-card">
+                  <div className="benefit-icon">💳</div>
+                  <h4>Easy Payouts</h4>
+                  <p>Request payouts starting from €50 via bank transfer or PayPal.</p>
+                </div>
+              </div>
+              
+              <div className="apply-section">
+                <h3>Ready to start earning?</h3>
+                <p>Join our affiliate program and start earning money by referring your friends!</p>
+                <button 
+                  className="btn btn-primary btn-large"
+                  onClick={applyForAffiliate}
+                  disabled={affiliateLoading}
+                >
+                  {affiliateLoading ? '⏳ Processing...' : `🚀 ${t.becomeAffiliate}`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="container">
+        <div className="affiliate-dashboard">
+          <div className="affiliate-header">
+            <h2>💰 {t.affiliateDashboard}</h2>
+            <div className="affiliate-status">
+              <span className={`status-badge ${affiliateData?.status}`}>
+                {affiliateData?.status === 'active' ? '✅' : '⏳'} {t[affiliateData?.status] || affiliateData?.status}
+              </span>
+            </div>
+          </div>
+
+          {/* Affiliate Navigation */}
+          <div className="affiliate-nav">
+            <button 
+              className={`tab-btn ${affiliateView === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setAffiliateView('dashboard')}
+            >
+              📊 Dashboard
+            </button>
+            <button 
+              className={`tab-btn ${affiliateView === 'commissions' ? 'active' : ''}`}
+              onClick={() => setAffiliateView('commissions')}
+            >
+              💰 {t.commissions}
+            </button>
+            <button 
+              className={`tab-btn ${affiliateView === 'referrals' ? 'active' : ''}`}
+              onClick={() => setAffiliateView('referrals')}
+            >
+              👥 {t.referrals}
+            </button>
+          </div>
+
+          {/* Dashboard View */}
+          {affiliateView === 'dashboard' && (
+            <div className="affiliate-content">
+              {/* Referral Link Section */}
+              <div className="referral-link-section">
+                <h3>🔗 {t.referralLink}</h3>
+                <div className="referral-link-box">
+                  <div className="link-display">
+                    <input 
+                      type="text" 
+                      value={affiliateData?.referral_link || ''} 
+                      readOnly 
+                      className="referral-input"
+                    />
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={copyReferralLink}
+                    >
+                      📋 {t.copyLink}
+                    </button>
+                  </div>
+                  <div className="referral-code">
+                    <strong>{t.referralCode}:</strong> {affiliateData?.referral_code}
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              {affiliateStats && (
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-icon">👥</div>
+                    <div className="stat-info">
+                      <h4>{affiliateStats.total_referrals}</h4>
+                      <p>{t.totalReferrals}</p>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">✅</div>
+                    <div className="stat-info">
+                      <h4>{affiliateStats.active_referrals}</h4>
+                      <p>{t.activeReferrals}</p>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">💰</div>
+                    <div className="stat-info">
+                      <h4>€{affiliateStats.total_earnings?.toFixed(2)}</h4>
+                      <p>{t.totalEarnings}</p>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">⏳</div>
+                    <div className="stat-info">
+                      <h4>€{affiliateStats.pending_earnings?.toFixed(2)}</h4>
+                      <p>{t.pendingEarnings}</p>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">💳</div>
+                    <div className="stat-info">
+                      <h4>€{affiliateStats.paid_earnings?.toFixed(2)}</h4>
+                      <p>{t.paidEarnings}</p>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">📅</div>
+                    <div className="stat-info">
+                      <h4>{affiliateStats.this_month_referrals}</h4>
+                      <p>{t.thisMonthReferrals}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Payout Section */}
+              <div className="payout-section">
+                <div className="section-header">
+                  <h3>💳 {t.requestPayout}</h3>
+                  {affiliateStats && affiliateStats.pending_earnings >= 50 && (
+                    <button 
+                      className="btn btn-success"
+                      onClick={() => setShowPayoutModal(true)}
+                    >
+                      💰 {t.requestPayout}
+                    </button>
+                  )}
+                </div>
+                <p className="payout-info">
+                  {affiliateStats && affiliateStats.pending_earnings < 50 ? (
+                    `${t.minimumPayout} (${t.pendingEarnings}: €${affiliateStats.pending_earnings?.toFixed(2)})`
+                  ) : (
+                    `Available for payout: €${affiliateStats?.pending_earnings?.toFixed(2) || '0.00'}`
+                  )}
+                </p>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="recent-activity">
+                <h3>📈 {t.recentActivity}</h3>
+                <div className="activity-grid">
+                  <div className="activity-section">
+                    <h4>Recent Commissions</h4>
+                    {affiliateStats?.recent_commissions?.length > 0 ? (
+                      <div className="activity-list">
+                        {affiliateStats.recent_commissions.slice(0, 5).map((commission, index) => (
+                          <div key={index} className="activity-item">
+                            <div className="activity-info">
+                              <span className="activity-type">
+                                {commission.type === 'registration' ? '👤' : '🏆'} {commission.description}
+                              </span>
+                              <span className="activity-amount">€{commission.amount}</span>
+                            </div>
+                            <div className="activity-date">
+                              {new Date(commission.created_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-activity">{t.noCommissions}</p>
+                    )}
+                  </div>
+
+                  <div className="activity-section">
+                    <h4>Recent Referrals</h4>
+                    {affiliateStats?.recent_referrals?.length > 0 ? (
+                      <div className="activity-list">
+                        {affiliateStats.recent_referrals.slice(0, 5).map((referral, index) => (
+                          <div key={index} className="activity-item">
+                            <div className="activity-info">
+                              <span className="activity-type">
+                                👤 New referral
+                              </span>
+                              <span className="activity-amount">{referral.tournaments_joined} tournaments</span>
+                            </div>
+                            <div className="activity-date">
+                              {new Date(referral.registered_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-activity">{t.noReferrals}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Commissions View */}
+          {affiliateView === 'commissions' && (
+            <div className="affiliate-content">
+              <h3>💰 {t.commissionHistory}</h3>
+              {affiliateLoading ? (
+                <div className="loading">Loading commissions...</div>
+              ) : affiliateCommissions.length > 0 ? (
+                <div className="commissions-table">
+                  <div className="table-header">
+                    <div>Type</div>
+                    <div>Amount</div>
+                    <div>Status</div>
+                    <div>Date</div>
+                    <div>Description</div>
+                  </div>
+                  {affiliateCommissions.map((commission) => (
+                    <div key={commission.id} className="table-row">
+                      <div className="commission-type">
+                        {commission.commission_type === 'registration' ? '👤 Registration' : '🏆 Tournament'}
+                      </div>
+                      <div className="commission-amount">€{commission.amount}</div>
+                      <div className={`commission-status ${commission.is_paid ? 'paid' : 'pending'}`}>
+                        {commission.is_paid ? '✅ Paid' : '⏳ Pending'}
+                      </div>
+                      <div className="commission-date">
+                        {new Date(commission.created_at).toLocaleDateString()}
+                      </div>
+                      <div className="commission-description">{commission.description}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-data">
+                  <p>{t.noCommissions}</p>
+                  <p>{t.shareYourLink}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Referrals View */}
+          {affiliateView === 'referrals' && (
+            <div className="affiliate-content">
+              <h3>👥 {t.referrals}</h3>
+              {affiliateLoading ? (
+                <div className="loading">Loading referrals...</div>
+              ) : affiliateReferrals.length > 0 ? (
+                <div className="referrals-grid">
+                  {affiliateReferrals.map((referral) => (
+                    <div key={referral.id} className="referral-card">
+                      <div className="referral-header">
+                        <div className="referral-user">
+                          {referral.user_details && (
+                            <>
+                              <Avatar 
+                                src={referral.user_details.avatar_url} 
+                                name={referral.user_details.full_name} 
+                                size="small" 
+                              />
+                              <div className="user-info">
+                                <strong>{referral.user_details.full_name}</strong>
+                                <span className="username">@{referral.user_details.username}</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <div className={`referral-status ${referral.is_active ? 'active' : 'inactive'}`}>
+                          {referral.is_active ? '✅ Active' : '❌ Inactive'}
+                        </div>
+                      </div>
+                      <div className="referral-stats">
+                        <div className="stat">
+                          <span className="stat-label">Joined:</span>
+                          <span className="stat-value">{new Date(referral.registered_at).toLocaleDateString()}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="stat-label">Tournaments:</span>
+                          <span className="stat-value">{referral.tournaments_joined}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="stat-label">Total Fees:</span>
+                          <span className="stat-value">€{referral.total_tournament_fees?.toFixed(2) || '0.00'}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="stat-label">Commissions Earned:</span>
+                          <span className="stat-value">€{referral.total_commissions_earned?.toFixed(2) || '0.00'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-data">
+                  <p>{t.noReferrals}</p>
+                  <p>{t.inviteFriends}</p>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={copyReferralLink}
+                  >
+                    📋 {t.copyLink}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Payout Modal */}
+        {showPayoutModal && (
+          <div className="modal-overlay" onClick={() => setShowPayoutModal(false)}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>💳 {t.requestPayout}</h3>
+                <button 
+                  className="modal-close"
+                  onClick={() => setShowPayoutModal(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="modal-content">
+                <div className="form-group">
+                  <label>Amount (€):</label>
+                  <input
+                    type="number"
+                    min="50"
+                    max={affiliateStats?.pending_earnings || 0}
+                    value={payoutForm.amount}
+                    onChange={(e) => setPayoutForm({...payoutForm, amount: e.target.value})}
+                    placeholder="Minimum €50"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Payment Method:</label>
+                  <select
+                    value={payoutForm.payment_method}
+                    onChange={(e) => setPayoutForm({...payoutForm, payment_method: e.target.value})}
+                  >
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="crypto">Cryptocurrency</option>
+                  </select>
+                </div>
+                
+                <div className="form-group">
+                  <label>Payment Details:</label>
+                  <textarea
+                    value={JSON.stringify(payoutForm.payment_details)}
+                    onChange={(e) => {
+                      try {
+                        const details = JSON.parse(e.target.value);
+                        setPayoutForm({...payoutForm, payment_details: details});
+                      } catch (error) {
+                        // Invalid JSON, just update the string
+                      }
+                    }}
+                    placeholder='{"account": "Your account details", "email": "your@email.com"}'
+                    rows="3"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Notes (optional):</label>
+                  <textarea
+                    value={payoutForm.notes}
+                    onChange={(e) => setPayoutForm({...payoutForm, notes: e.target.value})}
+                    placeholder="Any additional notes..."
+                    rows="2"
+                  />
+                </div>
+                
+                <div className="modal-actions">
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => setShowPayoutModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="btn btn-success"
+                    onClick={requestPayout}
+                    disabled={affiliateLoading || !payoutForm.amount || parseFloat(payoutForm.amount) < 50}
+                  >
+                    {affiliateLoading ? '⏳ Processing...' : '💰 Request Payout'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="App">
       <nav className="navbar">
