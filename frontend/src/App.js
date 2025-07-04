@@ -4201,33 +4201,9 @@ function App() {
               <div className="admin-controls">
                 <button 
                   className="btn btn-primary"
-                  onClick={() => {
-                    const name = prompt('Competition name:');
-                    const description = prompt('Description:');
-                    const region = prompt('Region (Global/Europe/Americas/Asia/Africa):') || 'Global';
-                    const maxParticipants = prompt('Max participants:') || '100';
-                    const prizePool = prompt('Prize pool (€):') || '1000';
-                    
-                    if (name && description) {
-                      const startDate = new Date();
-                      startDate.setDate(startDate.getDate() + 7); // Start in 7 days
-                      const endDate = new Date();
-                      endDate.setDate(endDate.getDate() + 37); // End in 37 days
-                      
-                      createCompetition({
-                        name,
-                        description,
-                        region,
-                        start_date: startDate.toISOString(),
-                        end_date: endDate.toISOString(),
-                        max_participants: parseInt(maxParticipants),
-                        prize_pool: parseFloat(prizePool),
-                        status: 'upcoming'
-                      });
-                    }
-                  }}
+                  onClick={() => setShowCompetitionModal(true)}
                 >
-                  ➕ {t.createCompetition}
+                  ➕ Create New Competition
                 </button>
               </div>
 
