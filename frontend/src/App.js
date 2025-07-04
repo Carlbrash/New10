@@ -3156,6 +3156,13 @@ function App() {
             </button>
             
             <button 
+              className={`admin-tab ${adminView === 'tournaments' ? 'active' : ''}`}
+              onClick={() => setAdminView('tournaments')}
+            >
+              🏆 Tournaments
+            </button>
+            
+            <button 
               className={`admin-tab ${adminView === 'content' ? 'active' : ''}`}
               onClick={() => setAdminView('content')}
             >
