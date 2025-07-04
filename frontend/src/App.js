@@ -1303,6 +1303,152 @@ function App() {
     }
   };
 
+  // =============================================================================
+  // TOURNAMENT FUNCTIONS
+  // =============================================================================
+  
+  // Fetch all tournaments
+  const fetchTournaments = async (filters = {}) => {
+    setTournamentLoading(true);
+    try {
+      const queryParams = new URLSearchParams();
+      if (filters.status) queryParams.append('status', filters.status);
+      if (filters.category) queryParams.append('category', filters.category);
+      if (filters.duration) queryParams.append('duration', filters.duration);
+      if (user) queryParams.append('user_id', user.id);
+      
+      const response = await fetch(`${API_BASE_URL}/api/tournaments?${queryParams}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTournaments(data.tournaments);
+      } else {
+        console.error('Failed to fetch tournaments:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching tournaments:', error);
+    }
+    setTournamentLoading(false);
+  };
+
+  // Get tournament details
+  const fetchTournamentDetails = async (tournamentId) => {
+    setTournamentLoading(true);
+    try {
+      const queryParams = new URLSearchParams();
+      if (user) queryParams.append('user_id', user.id);
+      
+      const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}?${queryParams}`);
+      if (response.ok) {
+        const tournament = await response.json();
+        setSelectedTournament(tournament);
+        setTournamentView('details');
+      } else {
+        console.error('Failed to fetch tournament details:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching tournament details:', error);
+    }
+    setTournamentLoading(false);
+  };
+
+  // Join tournament
+  const joinTournament = async (tournamentId) => {
+    if (!token) {
+      alert(t.loginRequired || 'Please login to join tournaments');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/join`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        alert(t.joinSuccessful || 'Successfully joined tournament!');
+        // Refresh tournament details
+        if (selectedTournament && selectedTournament.id === tournamentId) {
+          fetchTournamentDetails(tournamentId);
+        }
+        // Refresh tournaments list
+        fetchTournaments(tournamentFilters);
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to join tournament');
+      }
+    } catch (error) {
+      console.error('Error joining tournament:', error);
+      alert('Error joining tournament');
+    }
+  };
+
+  // Leave tournament
+  const leaveTournament = async (tournamentId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/leave`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        alert(t.leaveSuccessful || 'Successfully left tournament!');
+        // Refresh tournament details
+        if (selectedTournament && selectedTournament.id === tournamentId) {
+          fetchTournamentDetails(tournamentId);
+        }
+        // Refresh tournaments list
+        fetchTournaments(tournamentFilters);
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to leave tournament');
+      }
+    } catch (error) {
+      console.error('Error leaving tournament:', error);
+      alert('Error leaving tournament');
+    }
+  };
+
+  // Fetch user tournaments
+  const fetchUserTournaments = async () => {
+    if (!user || !token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tournaments/user/${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUserTournaments(data.tournaments);
+      }
+    } catch (error) {
+      console.error('Error fetching user tournaments:', error);
+    }
+  };
+
+  // Load tournaments when component mounts or when view changes to tournament
+  useEffect(() => {
+    if (currentView === 'tournament') {
+      fetchTournaments(tournamentFilters);
+    }
+  }, [currentView]);
+
+  // Load user tournaments when user logs in
+  useEffect(() => {
+    if (user && token) {
+      fetchUserTournaments();
+    }
+  }, [user, token]);
+
   // Search Users Function
   const handleUserSearch = (searchTerm) => {
     setUserSearchTerm(searchTerm);
