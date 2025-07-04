@@ -941,6 +941,18 @@ function App() {
       fetchDashboardStats();
     }
   }, [user, rankings]);
+
+  // Close language dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showLanguageDropdown && !event.target.closest('.language-dropdown')) {
+        setShowLanguageDropdown(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showLanguageDropdown]);
   
   // Additional useEffect to fetch rankings when navigating to Rankings
   useEffect(() => {
