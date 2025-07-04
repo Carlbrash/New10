@@ -1323,6 +1323,99 @@ function App() {
   };
 
   // =============================================================================
+  // TOURNAMENT ADMIN FUNCTIONS
+  // =============================================================================
+  
+  const fetchAdminTournaments = async () => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/tournaments`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdminTournaments(data.tournaments);
+      } else {
+        console.error('Failed to fetch admin tournaments:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching admin tournaments:', error);
+    }
+  };
+
+  const createTournament = async (tournamentData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/tournaments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tournamentData)
+      });
+      
+      if (response.ok) {
+        alert('Tournament created successfully!');
+        fetchAdminTournaments(); // Refresh tournaments list
+        setShowTournamentModal(false);
+        // Reset form
+        setTournamentForm({
+          name: '',
+          description: '',
+          duration_type: 'daily',
+          tournament_format: 'single_elimination',
+          entry_fee: 10,
+          max_participants: 16,
+          prize_distribution: 'winner_takes_all',
+          registration_start: '',
+          registration_end: '',
+          tournament_start: '',
+          tournament_end: '',
+          rules: '',
+          region: 'Global'
+        });
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to create tournament');
+      }
+    } catch (error) {
+      console.error('Error creating tournament:', error);
+      alert('Error creating tournament');
+    }
+  };
+
+  const cancelTournament = async (tournamentId) => {
+    if (!confirm('Are you sure you want to cancel this tournament?')) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/tournaments/${tournamentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        alert('Tournament cancelled successfully!');
+        fetchAdminTournaments(); // Refresh tournaments list
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to cancel tournament');
+      }
+    } catch (error) {
+      console.error('Error cancelling tournament:', error);
+      alert('Error cancelling tournament');
+    }
+  };
+
+  // Load admin tournaments when switching to tournaments tab
+  useEffect(() => {
+    if (adminView === 'tournaments' && token && isAdmin) {
+      fetchAdminTournaments();
+    }
+  }, [adminView, token, isAdmin]);
+
+  // =============================================================================
   // TOURNAMENT FUNCTIONS
   // =============================================================================
   
