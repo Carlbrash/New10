@@ -4150,6 +4150,192 @@ function App() {
             </div>
           )}
 
+          {/* Tournament Creation Modal - Available in both Tournament and Competitions tabs */}
+          {showTournamentModal && (
+            <div className="modal-overlay" onClick={() => setShowTournamentModal(false)}>
+              <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>🏆 Create New Tournament</h3>
+                  <button 
+                    className="modal-close"
+                    onClick={() => setShowTournamentModal(false)}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  createTournament(tournamentForm);
+                }}>
+                  <div className="modal-body">
+                    <div className="form-grid">
+                      <div className="form-group">
+                        <label>Tournament Name*</label>
+                        <input
+                          type="text"
+                          value={tournamentForm.name}
+                          onChange={(e) => setTournamentForm({...tournamentForm, name: e.target.value})}
+                          className="form-input"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label>Entry Fee (€)* (0 for Free)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={tournamentForm.entry_fee}
+                          onChange={(e) => setTournamentForm({...tournamentForm, entry_fee: parseFloat(e.target.value)})}
+                          className="form-input"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label>Max Participants*</label>
+                        <input
+                          type="number"
+                          min="2"
+                          max="1000"
+                          value={tournamentForm.max_participants}
+                          onChange={(e) => setTournamentForm({...tournamentForm, max_participants: parseInt(e.target.value)})}
+                          className="form-input"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label>Duration Type*</label>
+                        <select
+                          value={tournamentForm.duration_type}
+                          onChange={(e) => setTournamentForm({...tournamentForm, duration_type: e.target.value})}
+                          className="form-input"
+                          required
+                        >
+                          <option value="instant">Instant</option>
+                          <option value="daily">Daily</option>
+                          <option value="two_day">2-Day</option>
+                          <option value="weekly">Weekly</option>
+                          <option value="monthly">Monthly</option>
+                          <option value="long_term">Long Term</option>
+                        </select>
+                      </div>
+                      
+                      <div className="form-group">
+                        <label>Prize Distribution*</label>
+                        <select
+                          value={tournamentForm.prize_distribution}
+                          onChange={(e) => setTournamentForm({...tournamentForm, prize_distribution: e.target.value})}
+                          className="form-input"
+                          required
+                        >
+                          <option value="winner_takes_all">Winner Takes All</option>
+                          <option value="top_three">Top 3 (50%/30%/20%)</option>
+                        </select>
+                      </div>
+                      
+                      <div className="form-group">
+                        <label>Region</label>
+                        <select
+                          value={tournamentForm.region}
+                          onChange={(e) => setTournamentForm({...tournamentForm, region: e.target.value})}
+                          className="form-input"
+                        >
+                          <option value="Global">Global</option>
+                          <option value="Europe">Europe</option>
+                          <option value="Asia">Asia</option>
+                          <option value="Americas">Americas</option>
+                          <option value="Africa">Africa</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>Description*</label>
+                      <textarea
+                        value={tournamentForm.description}
+                        onChange={(e) => setTournamentForm({...tournamentForm, description: e.target.value})}
+                        className="form-input"
+                        rows="3"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>Rules*</label>
+                      <textarea
+                        value={tournamentForm.rules}
+                        onChange={(e) => setTournamentForm({...tournamentForm, rules: e.target.value})}
+                        className="form-input"
+                        rows="4"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="date-grid">
+                      <div className="form-group">
+                        <label>Registration Start*</label>
+                        <input
+                          type="datetime-local"
+                          value={tournamentForm.registration_start}
+                          onChange={(e) => setTournamentForm({...tournamentForm, registration_start: e.target.value})}
+                          className="form-input"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label>Registration End*</label>
+                        <input
+                          type="datetime-local"
+                          value={tournamentForm.registration_end}
+                          onChange={(e) => setTournamentForm({...tournamentForm, registration_end: e.target.value})}
+                          className="form-input"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label>Tournament Start*</label>
+                        <input
+                          type="datetime-local"
+                          value={tournamentForm.tournament_start}
+                          onChange={(e) => setTournamentForm({...tournamentForm, tournament_start: e.target.value})}
+                          className="form-input"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label>Tournament End*</label>
+                        <input
+                          type="datetime-local"
+                          value={tournamentForm.tournament_end}
+                          onChange={(e) => setTournamentForm({...tournamentForm, tournament_end: e.target.value})}
+                          className="form-input"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button 
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowTournamentModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Create Tournament
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
           {/* Competitions Tab */}
           {adminView === 'competitions' && (
             <div className="admin-section">
