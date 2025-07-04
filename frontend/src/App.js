@@ -5752,6 +5752,362 @@ function App() {
     );
   };
 
+  // =============================================================================
+  // WALLET SYSTEM RENDER FUNCTION
+  // =============================================================================
+  
+  const renderWallet = () => {
+    if (!user || !token) {
+      return (
+        <div className="container">
+          <div className="auth-required">
+            <h2>🔒 {t.loginTitle}</h2>
+            <p>Please login to access your wallet.</p>
+            <button 
+              className="btn btn-primary"
+              onClick={() => setCurrentView('home')}
+            >
+              {t.loginBtn}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="container">
+        <div className="wallet-dashboard">
+          <div className="wallet-header">
+            <h2>💰 {t.walletDashboard}</h2>
+            <div className="wallet-balance-summary">
+              {walletBalance && (
+                <div className="balance-card">
+                  <div className="balance-main">
+                    <span className="balance-label">{t.availableBalance}</span>
+                    <span className="balance-amount">€{walletBalance.available_balance?.toFixed(2)}</span>
+                  </div>
+                  <div className="balance-details">
+                    <span>{t.totalEarned}: €{walletBalance.total_earned?.toFixed(2)}</span>
+                    <span>{t.withdrawnBalance}: €{walletBalance.withdrawn_balance?.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Wallet Navigation */}
+          <div className="wallet-nav">
+            <button 
+              className={`tab-btn ${walletView === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setWalletView('dashboard')}
+            >
+              📊 Dashboard
+            </button>
+            <button 
+              className={`tab-btn ${walletView === 'transactions' ? 'active' : ''}`}
+              onClick={() => setWalletView('transactions')}
+            >
+              📋 {t.transactionHistory}
+            </button>
+            <button 
+              className={`tab-btn ${walletView === 'settings' ? 'active' : ''}`}
+              onClick={() => setWalletView('settings')}
+            >
+              ⚙️ {t.walletSettings}
+            </button>
+          </div>
+
+          {/* Dashboard View */}
+          {walletView === 'dashboard' && (
+            <div className="wallet-content">
+              {walletLoading ? (
+                <div className="loading">Loading wallet data...</div>
+              ) : walletStats ? (
+                <>
+                  {/* Balance Breakdown */}
+                  <div className="balance-breakdown">
+                    <h3>💼 {t.balance} {t.recentActivity}</h3>
+                    <div className="balance-grid">
+                      <div className="balance-item">
+                        <div className="balance-icon">💰</div>
+                        <div className="balance-info">
+                          <h4>€{walletStats.balance?.total_earned?.toFixed(2) || '0.00'}</h4>
+                          <p>{t.totalEarned}</p>
+                        </div>
+                      </div>
+                      <div className="balance-item">
+                        <div className="balance-icon">✅</div>
+                        <div className="balance-info">
+                          <h4>€{walletStats.balance?.available_balance?.toFixed(2) || '0.00'}</h4>
+                          <p>{t.availableBalance}</p>
+                        </div>
+                      </div>
+                      <div className="balance-item">
+                        <div className="balance-icon">⏳</div>
+                        <div className="balance-info">
+                          <h4>€{walletStats.balance?.pending_withdrawal?.toFixed(2) || '0.00'}</h4>
+                          <p>{t.pendingBalance}</p>
+                        </div>
+                      </div>
+                      <div className="balance-item">
+                        <div className="balance-icon">💳</div>
+                        <div className="balance-info">
+                          <h4>€{walletStats.balance?.lifetime_withdrawals?.toFixed(2) || '0.00'}</h4>
+                          <p>{t.lifetimeWithdrawals}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Commission Breakdown */}
+                  <div className="commission-breakdown">
+                    <h3>📊 Commission Breakdown</h3>
+                    <div className="breakdown-grid">
+                      <div className="breakdown-item">
+                        <span className="breakdown-label">{t.registrationBonus}</span>
+                        <span className="breakdown-value">€{walletStats.commission_breakdown?.registration?.toFixed(2) || '0.00'}</span>
+                      </div>
+                      <div className="breakdown-item">
+                        <span className="breakdown-label">{t.tournamentCommission}</span>
+                        <span className="breakdown-value">€{walletStats.commission_breakdown?.tournament?.toFixed(2) || '0.00'}</span>
+                      </div>
+                      <div className="breakdown-item">
+                        <span className="breakdown-label">{t.depositCommission}</span>
+                        <span className="breakdown-value">€{walletStats.commission_breakdown?.deposit?.toFixed(2) || '0.00'}</span>
+                      </div>
+                      <div className="breakdown-item">
+                        <span className="breakdown-label">Bonus Earnings</span>
+                        <span className="breakdown-value">€{walletStats.commission_breakdown?.bonus?.toFixed(2) || '0.00'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Performance Metrics */}
+                  <div className="performance-metrics">
+                    <h3>📈 {t.performanceMetrics}</h3>
+                    <div className="metrics-grid">
+                      <div className="metric-card">
+                        <div className="metric-icon">🎯</div>
+                        <div className="metric-info">
+                          <h4>{walletStats.performance_metrics?.total_commissions || 0}</h4>
+                          <p>{t.totalCommissions}</p>
+                        </div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="metric-icon">💵</div>
+                        <div className="metric-info">
+                          <h4>€{walletStats.performance_metrics?.average_commission?.toFixed(2) || '0.00'}</h4>
+                          <p>{t.averageCommission}</p>
+                        </div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="metric-icon">📊</div>
+                        <div className="metric-info">
+                          <h4>{walletStats.performance_metrics?.conversion_rate?.toFixed(1) || '0.0'}%</h4>
+                          <p>{t.conversionRate}</p>
+                        </div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="metric-icon">⚡</div>
+                        <div className="metric-info">
+                          <h4>{walletStats.performance_metrics?.efficiency_score?.toFixed(0) || '0'}</h4>
+                          <p>{t.efficiencyScore}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Monthly Earnings Chart */}
+                  <div className="monthly-earnings">
+                    <h3>📅 {t.monthlyEarnings}</h3>
+                    <div className="earnings-chart">
+                      {walletStats.monthly_earnings?.length > 0 ? (
+                        <div className="chart-bars">
+                          {walletStats.monthly_earnings.slice(0, 6).reverse().map((month, index) => (
+                            <div key={index} className="chart-bar">
+                              <div 
+                                className="bar"
+                                style={{
+                                  height: `${Math.max(10, (month.earnings / Math.max(...walletStats.monthly_earnings.map(m => m.earnings))) * 100)}%`
+                                }}
+                              ></div>
+                              <div className="bar-label">
+                                <span className="month">{month.month}</span>
+                                <span className="amount">€{month.earnings?.toFixed(0)}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="no-data">
+                          <p>No earnings data yet</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Payout Summary */}
+                  <div className="payout-summary">
+                    <h3>💳 Payout Summary</h3>
+                    <div className="payout-info">
+                      <div className="payout-stats">
+                        <div className="payout-stat">
+                          <span className="stat-label">{t.totalWithdrawals}:</span>
+                          <span className="stat-value">€{walletStats.payout_summary?.total_withdrawn?.toFixed(2) || '0.00'}</span>
+                        </div>
+                        <div className="payout-stat">
+                          <span className="stat-label">{t.pendingWithdrawal}:</span>
+                          <span className="stat-value">€{walletStats.payout_summary?.pending_withdrawal?.toFixed(2) || '0.00'}</span>
+                        </div>
+                        <div className="payout-stat">
+                          <span className="stat-label">Total Payouts:</span>
+                          <span className="stat-value">{walletStats.payout_summary?.total_payouts || 0}</span>
+                        </div>
+                        {walletStats.payout_summary?.last_payout && (
+                          <div className="payout-stat">
+                            <span className="stat-label">{t.lastPayout}:</span>
+                            <span className="stat-value">
+                              {new Date(walletStats.payout_summary.last_payout).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {walletStats.balance?.available_balance >= 50 && (
+                        <div className="payout-actions">
+                          <button 
+                            className="btn btn-success"
+                            onClick={() => setShowPayoutModal(true)}
+                          >
+                            💰 {t.requestPayout}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="no-data">
+                  <p>Loading wallet dashboard...</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Transactions View */}
+          {walletView === 'transactions' && (
+            <div className="wallet-content">
+              <h3>📋 {t.transactionHistory}</h3>
+              {walletLoading ? (
+                <div className="loading">Loading transactions...</div>
+              ) : walletTransactions.length > 0 ? (
+                <div className="transactions-table">
+                  <div className="table-header">
+                    <div>Type</div>
+                    <div>Amount</div>
+                    <div>Balance</div>
+                    <div>Date</div>
+                    <div>Description</div>
+                  </div>
+                  {walletTransactions.map((transaction) => (
+                    <div key={transaction.id} className="table-row">
+                      <div className="transaction-type">
+                        {transaction.transaction_type === 'commission_earned' ? '💰 Commission' :
+                         transaction.transaction_type === 'payout_completed' ? '💳 Payout' :
+                         transaction.transaction_type === 'payout_requested' ? '⏳ Payout Request' :
+                         transaction.transaction_type === 'bonus' ? '🎁 Bonus' :
+                         transaction.transaction_type === 'manual_adjustment' ? '⚙️ Adjustment' :
+                         transaction.transaction_type}
+                      </div>
+                      <div className={`transaction-amount ${transaction.amount >= 0 ? 'positive' : 'negative'}`}>
+                        {transaction.amount >= 0 ? '+' : ''}€{transaction.amount?.toFixed(2)}
+                      </div>
+                      <div className="transaction-balance">€{transaction.balance_after?.toFixed(2)}</div>
+                      <div className="transaction-date">
+                        {new Date(transaction.created_at).toLocaleDateString()}
+                      </div>
+                      <div className="transaction-description">{transaction.description}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-data">
+                  <p>No transactions yet</p>
+                  <p>Start earning commissions to see your transaction history!</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Settings View */}
+          {walletView === 'settings' && (
+            <div className="wallet-content">
+              <h3>⚙️ {t.walletSettings}</h3>
+              <div className="settings-form">
+                <div className="form-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={walletSettings.auto_payout_enabled}
+                      onChange={(e) => setWalletSettings({
+                        ...walletSettings,
+                        auto_payout_enabled: e.target.checked
+                      })}
+                    />
+                    {t.autoPayoutEnabled}
+                  </label>
+                  <p className="form-help">Automatically request payout when balance reaches threshold</p>
+                </div>
+                
+                <div className="form-group">
+                  <label>{t.autoPayoutThreshold} (€):</label>
+                  <input
+                    type="number"
+                    min="50"
+                    max="1000"
+                    value={walletSettings.auto_payout_threshold}
+                    onChange={(e) => setWalletSettings({
+                      ...walletSettings,
+                      auto_payout_threshold: parseFloat(e.target.value) || 100
+                    })}
+                    className="form-input"
+                  />
+                  <p className="form-help">Minimum €50, maximum €1000</p>
+                </div>
+                
+                <div className="form-group">
+                  <label>{t.preferredPayoutMethod}:</label>
+                  <select
+                    value={walletSettings.preferred_payout_method}
+                    onChange={(e) => setWalletSettings({
+                      ...walletSettings,
+                      preferred_payout_method: e.target.value
+                    })}
+                    className="form-input"
+                  >
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="crypto">Cryptocurrency</option>
+                  </select>
+                </div>
+                
+                <div className="form-actions">
+                  <button 
+                    className="btn btn-primary"
+                    onClick={updateWalletSettings}
+                    disabled={walletLoading}
+                  >
+                    {walletLoading ? '⏳ Saving...' : '💾 Save Settings'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="App">
       <nav className="navbar">
