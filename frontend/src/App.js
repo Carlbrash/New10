@@ -6803,7 +6803,7 @@ function App() {
               <div className="form-group">
                 <label>User Selection:</label>
                 <div style={{ marginBottom: '8px', fontSize: '14px', color: '#94a3b8' }}>
-                  💡 Common User IDs: testuser, admin, God, or type any username
+                  💡 Enter User ID or Username (e.g., testuser, admin, God)
                 </div>
                 <input
                   type="text"
@@ -6812,7 +6812,7 @@ function App() {
                     ...manualAdjustmentForm,
                     user_id: e.target.value
                   })}
-                  placeholder="Enter User ID (e.g., testuser, admin, God)"
+                  placeholder="Enter User ID or Username (e.g., testuser, admin, God)"
                   className="form-input"
                 />
                 <div style={{ 
@@ -6823,7 +6823,9 @@ function App() {
                   fontSize: '12px',
                   color: '#ffd700'
                 }}>
-                  ℹ️ Tip: You can use usernames like 'testuser', 'admin', 'God' or any valid user ID from the system
+                  ℹ️ You can use either:<br/>
+                  🆔 <strong>User ID</strong>: Found in user settings (copy button available)<br/>
+                  👤 <strong>Username</strong>: Like 'testuser', 'admin', 'God', etc.
                 </div>
               </div>
               
