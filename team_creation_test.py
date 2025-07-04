@@ -73,19 +73,19 @@ class TeamCreationTest(unittest.TestCase):
         # If team already exists, this is expected
         if response.status_code == 400 and "already exists" in response.text:
             print("⚠️ Team already exists - This is expected if the test has been run before")
-            return
         # If user is already a member of another team, this is also expected
         elif response.status_code == 400 and "already a member of another team" in response.text:
             print("⚠️ User is already a member of another team - This is expected if the test has been run before")
-            return
-            
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
-        self.assertIn("message", data)
-        self.assertIn("team_id", data)
-        self.assertIn("team_name", data)
-        self.assertEqual(data["team_name"], team_data["name"])
-        print(f"✅ Team created successfully - Team ID: {data['team_id']}")
+        elif response.status_code == 200:
+            data = response.json()
+            self.assertIn("message", data)
+            self.assertIn("team_id", data)
+            self.assertIn("team_name", data)
+            self.assertEqual(data["team_name"], team_data["name"])
+            print(f"✅ Team created successfully - Team ID: {data['team_id']}")
+        else:
+            print(f"❌ Unexpected response: {response.status_code} - {response.text}")
+            self.fail(f"Unexpected response: {response.status_code} - {response.text}")
         
     def test_04_verify_team_created(self):
         """Test GET /api/teams endpoint again to verify the team was created"""
