@@ -1315,10 +1315,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Team System Render Function (renderTeams)"
-    - "Team Creation Modal"
-    - "Team Invitation Modal"
-    - "Team System CSS Styles"
+    - "Team System API - GET /api/teams"
+    - "Team System API - POST /api/teams"
+    - "Team System API - GET /api/teams/{team_id}"
+    - "Team System API - POST /api/teams/{team_id}/invite"
+    - "Team System API - GET /api/teams/my-invitations"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
