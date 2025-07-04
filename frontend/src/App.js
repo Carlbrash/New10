@@ -1899,7 +1899,7 @@ function App() {
 
   const fetchTeams = async () => {
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/teams`);
+      const response = await fetch(`${API_BASE_URL}/api/teams`);
       if (response.ok) {
         const data = await response.json();
         setTeams(data.teams || []);
