@@ -628,7 +628,6 @@ function App() {
   const [showBracket, setShowBracket] = useState(false);
 
   // Settings states
-  const [showSettings, setShowSettings] = useState(false);
   const [settingsForm, setSettingsForm] = useState({
     full_name: '',
     email: '',
