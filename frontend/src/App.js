@@ -3200,6 +3200,68 @@ function App() {
             </div>
           </div>
           
+          {/* Tournament Bracket Section */}
+          {(tournament.status === 'ongoing' || tournament.status === 'completed') && (
+            <div className="tournament-bracket-card">
+              <div className="bracket-header">
+                <h3>🏆 Tournament Bracket</h3>
+                <button 
+                  className={`btn btn-secondary ${showBracket ? 'active' : ''}`}
+                  onClick={() => setShowBracket(!showBracket)}
+                >
+                  {showBracket ? 'Hide Bracket' : 'Show Bracket'}
+                </button>
+              </div>
+              
+              {showBracket && (
+                <div className="bracket-content">
+                  {bracketLoading ? (
+                    <div className="loading">Loading bracket...</div>
+                  ) : tournamentBracket ? (
+                    <div className="bracket-view">
+                      {renderTournamentBracket()}
+                    </div>
+                  ) : (
+                    <div className="no-bracket">
+                      <p>Bracket not generated yet.</p>
+                      {isAdmin && (
+                        <button 
+                          className="btn btn-primary"
+                          onClick={() => generateTournamentBracket(tournament.id)}
+                          disabled={bracketLoading}
+                        >
+                          Generate Bracket
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Admin Bracket Generation */}
+          {tournament.status === 'open' && isAdmin && (
+            <div className="admin-bracket-card">
+              <h3>🔧 Admin: Bracket Management</h3>
+              <div className="admin-bracket-actions">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => generateTournamentBracket(tournament.id)}
+                  disabled={bracketLoading || tournament.current_participants < 2}
+                >
+                  {bracketLoading ? 'Generating...' : 'Generate Bracket & Start Tournament'}
+                </button>
+                <p className="bracket-info">
+                  Current participants: {tournament.current_participants}
+                  {tournament.current_participants < 2 && (
+                    <span className="warning"> (Need at least 2 participants)</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+          
           <div className="tournament-actions">
             {tournament.status === 'open' && !tournament.user_registered && (
               <button 
