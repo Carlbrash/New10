@@ -4204,8 +4204,18 @@ function App() {
               className={`admin-tab ${adminView === 'tournaments' ? 'active' : ''}`}
               onClick={() => setAdminView('tournaments')}
             >
-              🏆 Tournaments
+              🏆 Tournament Management
             </button>
+            
+            {/* Financial Management - only for Admin and above */}
+            {(isAdmin || isGod) && (
+              <button 
+                className={`admin-tab ${adminView === 'financial' ? 'active' : ''}`}
+                onClick={() => setAdminView('financial')}
+              >
+                💰 {t.financialOverview}
+              </button>
+            )}
             
             <button 
               className={`admin-tab ${adminView === 'content' ? 'active' : ''}`}
