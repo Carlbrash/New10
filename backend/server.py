@@ -65,7 +65,7 @@ payouts_collection = db.payouts
 wallet_balances_collection = db.wallet_balances
 transactions_collection = db.transactions
 
-app = FastAPI(title="WoBeRa - World Betting Rank API")
+app = FastAPI(title="WoBeRa - World Betting Rank API", default_response_class=CustomJSONResponse)
 
 # CORS configuration
 app.add_middleware(
