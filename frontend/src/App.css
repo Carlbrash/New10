@@ -3861,8 +3861,442 @@ body {
     padding: 15px;
   }
   
-  .avatar-placeholder {
+/* Enhanced Mobile Accessibility Styles */
+
+/* Touch-Friendly Button Improvements */
+@media (max-width: 768px) {
+  /* Minimum touch target size 44px */
+  .btn, .nav-link, .filter-btn, .quick-action-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    touch-action: manipulation;
+  }
+  
+  /* Enhanced button spacing */
+  .hero-buttons {
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+  
+  .hero-buttons .btn {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  /* Better navigation for mobile */
+  .nav {
+    padding: 10px 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .nav-link {
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    white-space: nowrap;
+    flex: 1;
+    text-align: center;
+    min-width: 80px;
+  }
+  
+  .nav-link:hover, .nav-link.active {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.5);
+    transform: none; /* Remove transform on mobile for better performance */
+  }
+}
+
+/* Mobile Typography Improvements */
+@media (max-width: 768px) {
+  /* Better text hierarchy */
+  h1, .hero-title {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+  
+  h2 {
     font-size: 2rem;
+    line-height: 1.3;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+  
+  h4 {
+    font-size: 1.3rem;
+    line-height: 1.4;
+  }
+  
+  /* Better paragraph spacing */
+  p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  
+  /* Enhanced button text */
+  .btn {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* Mobile Card Layout Improvements */
+@media (max-width: 768px) {
+  .stats-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 10px;
+  }
+  
+  .stat-card {
+    padding: 20px;
+    margin: 0;
+    flex-direction: column;
+    text-align: center;
+    min-height: 120px;
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+    margin: 8px 0;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 15px;
+  }
+  
+  .feature-card {
+    padding: 25px 20px;
+    text-align: center;
+  }
+  
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+  }
+}
+
+/* Mobile Settings Panel Improvements */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+  
+  .modal-large {
+    width: 100%;
+    max-width: 100%;
+    margin: 10px 0;
+    border-radius: 12px;
+    max-height: calc(100vh - 40px);
+  }
+  
+  .modal-content {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding: 15px;
+  }
+  
+  .settings-tabs {
+    gap: 20px;
+  }
+  
+  .settings-tab {
+    padding: 20px 15px;
+    border-radius: 10px;
+  }
+  
+  .settings-tab h4 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .form-input {
+    padding: 14px 16px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+  
+  .form-input:focus {
+    transform: none;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+  }
+}
+
+/* Mobile Dashboard Improvements */
+@media (max-width: 768px) {
+  .enhanced-dashboard {
+    padding: 15px 10px;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .quick-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .quick-action-btn {
+    width: 100%;
+    padding: 16px 20px;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  
+  .achievements-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .achievement-badge {
+    padding: 16px;
+    flex-direction: row;
+    text-align: left;
+  }
+  
+  .achievement-icon {
+    font-size: 1.8rem;
+    min-width: 50px;
+  }
+  
+  .progress-section, 
+  .achievements-section, 
+  .activity-section {
+    padding: 20px 15px;
+    margin-bottom: 20px;
+  }
+}
+
+/* Mobile Rankings Improvements */
+@media (max-width: 768px) {
+  .rankings-container {
+    padding: 15px 10px;
+  }
+  
+  .rankings-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .table-row {
+    min-height: 60px;
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
+  
+  .rank-col, .score-col {
+    min-width: 60px;
+  }
+  
+  .player-col {
+    min-width: 140px;
+  }
+  
+  .country-col {
+    min-width: 80px;
+  }
+  
+  .stats-col {
+    min-width: 100px;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .my-position-card {
+    padding: 16px;
+    margin: 16px 0;
+  }
+  
+  .my-position-details {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+  }
+  
+  .rankings-filters {
+    padding: 16px;
+  }
+  
+  .filter-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .filter-btn {
+    width: 100%;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  
+  .country-filter-select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
+}
+
+/* Mobile World Map Improvements */
+@media (max-width: 768px) {
+  .world-map-container {
+    padding: 15px 10px;
+  }
+  
+  .country-card {
+    padding: 16px;
+    margin-bottom: 12px;
+    min-height: 80px;
+  }
+  
+  .country-flag {
+    font-size: 2rem;
+  }
+  
+  .country-info h3 {
+    font-size: 1.2rem;
+  }
+  
+  .country-stats {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .stat-item {
+    padding: 8px 12px;
+    min-width: auto;
+  }
+}
+
+/* Mobile Form Improvements */
+@media (max-width: 768px) {
+  .auth-form {
+    padding: 20px;
+    margin: 20px 10px;
+    width: calc(100% - 20px);
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  
+  .form-group input, 
+  .form-group select {
+    padding: 14px 16px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+  
+  .photo-upload-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .photo-preview {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Accessibility Improvements */
+@media (max-width: 768px) {
+  /* Focus indicators */
+  button:focus,
+  input:focus,
+  select:focus {
+    outline: 3px solid rgba(255, 215, 0, 0.6);
+    outline-offset: 2px;
+  }
+  
+  /* Better contrast for small screens */
+  .nav-link,
+  .btn,
+  .filter-btn {
+    border-width: 2px;
+  }
+  
+  /* Loading states */
+  .loading-spinner {
+    font-size: 2rem;
+  }
+  
+  /* Error states */
+  .search-result.not-found,
+  .search-result.found {
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+}
+
+/* Extra Small Mobile (iPhone SE, etc.) */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .motto-text {
+    font-size: 1.2rem;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .user-avatar-large {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .user-nickname {
+    font-size: 1rem;
+  }
+  
+  .quick-action-btn {
+    padding: 14px 18px;
+    font-size: 1rem;
+  }
+  
+  .modal-large {
+    border-radius: 8px;
+  }
+  
+  .settings-tab {
+    padding: 16px 12px;
   }
 }
 
