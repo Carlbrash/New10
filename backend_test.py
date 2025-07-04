@@ -3099,6 +3099,104 @@ class WalletSystemTester(unittest.TestCase):
 
 def run_wallet_tests():
     """Run wallet system tests"""
+    wallet_test_suite = unittest.TestSuite()
+    wallet_test_suite.addTest(WalletSystemTester('test_01_user_login'))
+    wallet_test_suite.addTest(WalletSystemTester('test_02_admin_login'))
+    wallet_test_suite.addTest(WalletSystemTester('test_03_get_wallet_balance'))
+    wallet_test_suite.addTest(WalletSystemTester('test_04_get_wallet_stats'))
+    wallet_test_suite.addTest(WalletSystemTester('test_05_get_wallet_transactions'))
+    wallet_test_suite.addTest(WalletSystemTester('test_06_update_wallet_settings'))
+    wallet_test_suite.addTest(WalletSystemTester('test_07_admin_financial_overview'))
+    wallet_test_suite.addTest(WalletSystemTester('test_08_admin_financial_wallets'))
+    wallet_test_suite.addTest(WalletSystemTester('test_09_admin_financial_transactions'))
+    wallet_test_suite.addTest(WalletSystemTester('test_10_admin_manual_adjustment'))
+    wallet_test_suite.addTest(WalletSystemTester('test_11_integration_affiliate_wallet'))
+    
+    runner = unittest.TextTestRunner(verbosity=2)
+    print("\n" + "=" * 50)
+    print("TESTING WALLET SYSTEM AND ADMIN FINANCIAL MANAGEMENT")
+    print("=" * 50)
+    runner.run(wallet_test_suite)
+
+class AdminUsersTester(unittest.TestCase):
+    base_url = "https://67792974-48a1-4e2d-b2d0-93fe13b22f8f.preview.emergentagent.com"
+    
+    # Admin credentials
+    admin_credentials = {
+        "username": "admin",
+        "password": "Kiki1999@"
+    }
+    
+    admin_token = None
+    
+    def test_01_admin_login(self):
+        """Login as admin to get token for admin users endpoint"""
+        print("\n🔍 Testing admin login for admin users endpoint...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.admin_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        AdminUsersTester.admin_token = data["token"]
+        print(f"✅ Admin login successful - Token obtained for admin users endpoint")
+    
+    def test_02_get_admin_users(self):
+        """Test GET /api/admin/users endpoint"""
+        print("\n🔍 Testing GET /api/admin/users endpoint...")
+        
+        # Skip if no admin token
+        if not AdminUsersTester.admin_token:
+            self.skipTest("No admin token available")
+        
+        headers = {"Authorization": f"Bearer {AdminUsersTester.admin_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/admin/users",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get users: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("users", data)
+        
+        users = data["users"]
+        print(f"✅ Found {len(users)} users")
+        
+        # Verify user structure
+        if users:
+            user = users[0]
+            self.assertIn("id", user)
+            self.assertIn("username", user)
+            self.assertIn("email", user)
+            self.assertIn("country", user)
+            self.assertIn("full_name", user)
+            self.assertIn("admin_role", user)
+            self.assertIn("created_at", user)
+            
+            # Print some user details
+            for i, user in enumerate(users[:5]):
+                print(f"  User {i+1}: {user['username']} - {user['full_name']} - Role: {user['admin_role']}")
+        else:
+            print("  No users found")
+        
+        print("✅ GET /api/admin/users endpoint test passed")
+
+def run_admin_users_tests():
+    """Run admin users tests"""
+    admin_users_suite = unittest.TestSuite()
+    admin_users_suite.addTest(AdminUsersTester('test_01_admin_login'))
+    admin_users_suite.addTest(AdminUsersTester('test_02_get_admin_users'))
+    
+    runner = unittest.TextTestRunner(verbosity=2)
+    print("\n" + "=" * 50)
+    print("TESTING ADMIN USERS ENDPOINT")
+    print("=" * 50)
+    runner.run(admin_users_suite)
+
+    """Run wallet system tests"""
     # Create a test suite for wallet system tests
     wallet_test_suite = unittest.TestSuite()
     wallet_test_suite.addTest(WalletSystemTester('test_01_user_login'))
