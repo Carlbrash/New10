@@ -6375,9 +6375,44 @@ function App() {
         </div>
         
         {/* Manual Adjustment Modal */}
-        {showManualAdjustmentModal && (
-          <div className="modal-overlay" onClick={() => setShowManualAdjustmentModal(false)}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
+        {(() => {
+          console.log('MODAL RENDER CHECK - showManualAdjustmentModal:', showManualAdjustmentModal);
+          return showManualAdjustmentModal;
+        })() && (
+          <div 
+            className="modal-overlay" 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(255, 0, 0, 0.8)',
+              zIndex: 99999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={() => {
+              console.log('MODAL OVERLAY CLICKED - CLOSING');
+              setShowManualAdjustmentModal(false);
+            }}
+          >
+            <div 
+              className="modal" 
+              style={{
+                backgroundColor: '#1a1a2e',
+                border: '3px solid #ffd700',
+                borderRadius: '20px',
+                minWidth: '500px',
+                maxWidth: '90vw',
+                zIndex: 100000
+              }}
+              onClick={(e) => {
+                console.log('MODAL CONTENT CLICKED - STOPPING PROPAGATION');
+                e.stopPropagation();
+              }}
+            >
               <div className="modal-header">
                 <h3>⚙️ {t.manualAdjustment}</h3>
                 <button 
