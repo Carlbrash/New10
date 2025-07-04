@@ -319,6 +319,10 @@ function App() {
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
 
+  // Mobile swipe states
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
   // Admin Panel States
   const [adminView, setAdminView] = useState('users');
   const [allUsers, setAllUsers] = useState([]);
