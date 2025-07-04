@@ -261,6 +261,78 @@ backend:
         agent: "testing"
         comment: "Tournament data validation is working correctly. Tournament participant counts update correctly when users join/leave, prize pools calculate correctly based on entry fee and participant count, and tournament status transitions work as expected."
 
+  - task: "Tournament Bracket API - GET /api/tournaments/{tournament_id}/bracket"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/tournaments/{tournament_id}/bracket endpoint is working correctly. Returns tournament bracket information including rounds and matches. Properly formats round names (Finals, Semi-Finals, Quarter-Finals, etc.)."
+
+  - task: "Tournament Bracket API - POST /api/tournaments/{tournament_id}/generate-bracket"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/tournaments/{tournament_id}/generate-bracket endpoint is working correctly. Successfully generates brackets for tournaments with at least 2 participants. Properly restricts access to admin users only. Correctly updates tournament status to 'ongoing' after bracket generation."
+
+  - task: "Tournament Bracket API - POST /api/tournaments/matches/{match_id}/winner"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/tournaments/matches/{match_id}/winner endpoint is working correctly. Successfully sets match winners and advances them to the next round. Properly validates that the winner must be one of the match players. Correctly restricts access to admin users only."
+
+  - task: "Tournament Bracket API - GET /api/tournaments/{tournament_id}/matches"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/tournaments/{tournament_id}/matches endpoint is working correctly. Returns matches grouped by round with the correct number of matches per round."
+
+  - task: "Tournament Bracket Generation Logic"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tournament bracket generation logic is working correctly. Properly handles different participant counts (2, 4, 8, 16, 32) and non-power-of-2 counts with byes. Correctly generates round names and match pairings."
+
+  - task: "Tournament Match Winner Logic"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tournament match winner logic is working correctly. Successfully advances winners to the next round in the correct position. Properly updates tournament status to 'completed' when finals are completed. Correctly sets tournament winner when tournament is completed."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
@@ -275,6 +347,9 @@ test_plan:
     - "Tournament Authentication"
     - "Tournament Join/Leave Logic"
     - "Tournament Data Validation"
+    - "Tournament Bracket API"
+    - "Tournament Bracket Generation Logic"
+    - "Tournament Match Winner Logic"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
@@ -284,6 +359,8 @@ agent_communication:
     message: "I've completed comprehensive testing of the Tournament System backend. All endpoints are working correctly with proper authentication, data validation, and business logic. The system correctly handles tournament creation, joining, leaving, and administration. Sample data is correctly created with the expected variety of entry fees, durations, and statuses."
   - agent: "main"
     message: "✅ TOURNAMENT SYSTEM SUCCESSFULLY IMPLEMENTED: Backend development completed with comprehensive API endpoints for tournament management. Added 5 sample tournaments with different entry fees (€5-€500), durations (instant to monthly), and statuses. Frontend development completed with Tournament menu item, tournament listing, details view, join/leave functionality, filtering, and responsive design. All backend testing passed successfully."
+  - agent: "testing"
+    message: "I've completed comprehensive testing of the Tournament Bracket System backend. All bracket-related endpoints are working correctly with proper authentication and validation. The bracket generation logic correctly handles different participant counts, including non-power-of-2 counts with byes. The match winner logic properly advances winners to the next round and updates tournament status when completed. All tests passed successfully."
 
 user_problem_statement: "Tournament System - Enhanced tournament management implementation requested by user. Added new Tournament section between World Map and language selector. Features include: 1) Tournament listing with filters by status/category/duration, 2) Tournament details view with participant list, 3) Join/Leave tournament functionality with payment integration placeholder, 4) Different tournament types (instant, daily, weekly, monthly), 5) Entry fee categories (€1-10 Basic, €11-50 Standard, €51-100 Premium, €101+ VIP), 6) Prize distribution options (Winner takes all, Top 3 split), 7) Admin tournament management endpoints."
 
