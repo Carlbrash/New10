@@ -3806,13 +3806,14 @@ function App() {
         {currentView === 'dashboard' && renderDashboard()}
         {currentView === 'rankings' && renderRankings()}
         {currentView === 'worldmap' && renderWorldMap()}
+        {currentView === 'tournament' && renderTournament()}
         {currentView === 'admin' && isAdmin && renderAdminPanel()}
         {currentView === 'download' && <DownloadBackup />}
         
         {/* Mobile Navigation Indicator */}
         <div className="mobile-nav-indicator">
           <div className="nav-dots">
-            {['home', 'dashboard', 'rankings', 'worldmap'].map((view, index) => (
+            {['home', 'dashboard', 'rankings', 'worldmap', 'tournament'].map((view, index) => (
               <div 
                 key={view}
                 className={`nav-dot ${currentView === view ? 'active' : ''}`}
