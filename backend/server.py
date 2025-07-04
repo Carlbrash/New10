@@ -69,6 +69,7 @@ class UserRegister(BaseModel):
     full_name: str
     avatar_url: Optional[str] = None
     admin_role: Optional[AdminRole] = AdminRole.USER
+    referral_code: Optional[str] = None  # For affiliate referrals
 
 class UserLogin(BaseModel):
     username: str
