@@ -1673,6 +1673,137 @@ async def delete_tournament(tournament_id: str, user_id: str = Depends(verify_ad
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error cancelling tournament: {str(e)}")
 
+# =============================================================================
+# TOURNAMENT BRACKET ENDPOINTS
+# =============================================================================
+
+@app.get("/api/tournaments/{tournament_id}/bracket")
+async def get_tournament_bracket(tournament_id: str):
+    """Get tournament bracket and matches"""
+    try:
+        # Get tournament
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+        
+        # Get bracket
+        bracket = tournament_brackets_collection.find_one({"tournament_id": tournament_id})
+        if bracket:
+            bracket.pop("_id", None)
+        
+        # Get matches
+        matches = list(tournament_matches_collection.find({"tournament_id": tournament_id}))
+        for match in matches:
+            match.pop("_id", None)
+        
+        return {
+            "tournament": {
+                "id": tournament["id"],
+                "name": tournament["name"],
+                "status": tournament["status"],
+                "current_participants": tournament.get("current_participants", 0),
+                "max_participants": tournament["max_participants"]
+            },
+            "bracket": bracket,
+            "matches": matches
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching tournament bracket: {str(e)}")
+
+@app.post("/api/tournaments/{tournament_id}/generate-bracket")
+async def generate_tournament_bracket(tournament_id: str, user_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Generate bracket for tournament (Admin only)"""
+    try:
+        # Get tournament
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+        
+        # Check if bracket already exists
+        existing_bracket = tournament_brackets_collection.find_one({"tournament_id": tournament_id})
+        if existing_bracket:
+            raise HTTPException(status_code=400, detail="Bracket already generated for this tournament")
+        
+        # Get participants
+        participants = list(tournament_participants_collection.find({"tournament_id": tournament_id}))
+        if len(participants) < 2:
+            raise HTTPException(status_code=400, detail="Need at least 2 participants to generate bracket")
+        
+        # Generate bracket
+        bracket_data = generate_bracket(tournament_id, participants)
+        
+        # Update tournament status to ongoing
+        tournaments_collection.update_one(
+            {"id": tournament_id},
+            {"$set": {"status": "ongoing"}}
+        )
+        
+        # Log admin action
+        log_admin_action(
+            user_id=user_id,
+            action_type="generate_bracket",
+            target_tournament_id=tournament_id,
+            details={"participants_count": len(participants), "total_rounds": bracket_data["total_rounds"]}
+        )
+        
+        return {"message": "Bracket generated successfully", "bracket_id": bracket_data["id"]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating bracket: {str(e)}")
+
+@app.post("/api/tournaments/matches/{match_id}/winner")
+async def set_match_winner(match_id: str, winner_data: dict, user_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Set winner for a match (Admin only)"""
+    try:
+        winner_id = winner_data.get("winner_id")
+        if not winner_id:
+            raise HTTPException(status_code=400, detail="Winner ID required")
+        
+        # Get match
+        match = tournament_matches_collection.find_one({"id": match_id})
+        if not match:
+            raise HTTPException(status_code=404, detail="Match not found")
+        
+        # Validate winner is one of the players
+        if winner_id not in [match.get("player1_id"), match.get("player2_id")]:
+            raise HTTPException(status_code=400, detail="Winner must be one of the match players")
+        
+        # Advance winner
+        success = advance_winner(match_id, winner_id)
+        if not success:
+            raise HTTPException(status_code=500, detail="Error advancing winner")
+        
+        # Log admin action
+        log_admin_action(
+            user_id=user_id,
+            action_type="set_match_winner",
+            target_tournament_id=match["tournament_id"],
+            details={"match_id": match_id, "winner_id": winner_id}
+        )
+        
+        return {"message": "Match winner set successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error setting match winner: {str(e)}")
+
+@app.get("/api/tournaments/{tournament_id}/matches")
+async def get_tournament_matches(tournament_id: str):
+    """Get all matches for a tournament"""
+    try:
+        matches = list(tournament_matches_collection.find({"tournament_id": tournament_id}))
+        for match in matches:
+            match.pop("_id", None)
+        
+        # Group matches by round
+        matches_by_round = {}
+        for match in matches:
+            round_num = match["round_number"]
+            if round_num not in matches_by_round:
+                matches_by_round[round_num] = []
+            matches_by_round[round_num].append(match)
+        
+        return {"matches_by_round": matches_by_round, "total_matches": len(matches)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching tournament matches: {str(e)}")
+
 # Helper function for admin actions
 def log_admin_action(user_id: str, action_type: str, target_tournament_id: str = None, details: dict = None):
     """Log admin action for tournaments"""
