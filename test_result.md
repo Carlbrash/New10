@@ -1140,7 +1140,9 @@ test_plan:
     - "Tournament Listing View"
     - "Tournament Details View"
     - "Tournament CSS Styling"
-  stuck_tasks: []
+    - "Manual Adjustment Modal"
+  stuck_tasks:
+    - "Manual Adjustment Modal"
   test_all: false
   test_priority: "high_first"
   next_phase: "ready_for_frontend_testing"
