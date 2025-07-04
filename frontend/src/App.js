@@ -3498,7 +3498,12 @@ function App() {
         </div>
       )}
 
-      <main className="main-content">
+      <main 
+        className="main-content"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {currentView === 'home' && renderHome()}
         {currentView === 'login' && renderLogin()}
         {currentView === 'register' && renderRegister()}
@@ -3507,6 +3512,22 @@ function App() {
         {currentView === 'worldmap' && renderWorldMap()}
         {currentView === 'admin' && isAdmin && renderAdminPanel()}
         {currentView === 'download' && <DownloadBackup />}
+        
+        {/* Mobile Navigation Indicator */}
+        <div className="mobile-nav-indicator">
+          <div className="nav-dots">
+            {['home', 'dashboard', 'rankings', 'worldmap'].map((view, index) => (
+              <div 
+                key={view}
+                className={`nav-dot ${currentView === view ? 'active' : ''}`}
+                onClick={() => setCurrentView(view)}
+              />
+            ))}
+          </div>
+          <div className="swipe-hint">
+            <span className="swipe-text">👈 Swipe to navigate 👉</span>
+          </div>
+        </div>
       </main>
     </div>
   );
