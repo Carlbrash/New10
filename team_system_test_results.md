@@ -32,19 +32,34 @@ I've completed testing of the Team System backend endpoints. Most endpoints are 
 
 ## Issue Details
 
-The GET /api/teams/my-invitations endpoint is not working correctly. When testing with the admin user who was invited to a team, the endpoint returned a 404 error with 'Team not found' message. This suggests an issue with the invitation retrieval logic.
+The GET /api/teams/my-invitations endpoint is not working correctly. When testing with the admin user who was invited to a team, the endpoint returned a 404 error with 'Team not found' message.
 
 Response:
 ```
-Response status: 404
-Response body: {"detail":"Team not found"}
+Status: 404
+Response: {"detail":"Team not found"}
+```
+
+After investigating the database, we found that:
+1. The invitation exists in the database with ID "736372e3-81a3-44db-aba1-8337ae8dae9f"
+2. The invitation status is set to "accepted" (not "PENDING")
+3. The endpoint is only looking for invitations with status "PENDING"
+4. The error message "Team not found" is misleading and doesn't accurately reflect the actual issue
+
+The code in the endpoint is:
+```python
+invitations = list(team_invitations_collection.find({
+    "invited_user_id": user_id,
+    "status": InvitationStatus.PENDING,
+    "expires_at": {"$gt": datetime.utcnow()}  # Not expired
+}))
 ```
 
 ## Recommendations
 
-1. Fix the GET /api/teams/my-invitations endpoint to properly retrieve invitations for a user.
-2. The issue might be in the error handling or query logic in the endpoint implementation.
-3. Check if the endpoint is trying to find a team instead of invitations for the user.
+1. Fix the GET /api/teams/my-invitations endpoint to handle the case when no invitations are found more gracefully (return an empty list instead of a 404 error)
+2. Consider adding an option to retrieve all invitations (both pending and accepted) with a query parameter
+3. Fix the error message to be more accurate (e.g., "No pending invitations found" instead of "Team not found")
 
 ## Action Items for Main Agent
 
