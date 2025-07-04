@@ -5141,9 +5141,123 @@ body {
 
 .tournament-card-footer {
   display: flex;
-  gap: 0.8rem;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 215, 0, 0.1);
+  border-radius: 0 0 15px 15px;
+}
+
+.tournament-card-footer .btn {
+  flex: 1;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.tournament-card-footer .btn-outline {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+}
+
+.tournament-card-footer .btn-outline:hover {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.tournament-status-text {
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  font-size: 0.9rem;
+  flex: 1;
+  text-align: center;
+}
+
+/* Bracket Actions Enhancements */
+.bracket-actions {
+  display: flex;
+  gap: 10px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.bracket-actions .btn {
+  min-width: 120px;
+}
+
+/* Enhanced Admin Actions */
+.tournament-admin-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.tournament-admin-actions .btn-small {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tournament-admin-actions .btn-outline {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+}
+
+.tournament-admin-actions .btn-outline:hover {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.tournament-admin-actions .btn-success {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  color: white;
+}
+
+.tournament-admin-actions .btn-success:hover {
+  background: linear-gradient(135deg, #059669, #10b981);
+  transform: translateY(-1px);
+}
+
+/* Responsive Tournament Cards */
+@media (max-width: 768px) {
+  .tournament-card-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tournament-card-footer .btn {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .tournament-admin-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .tournament-admin-actions .btn-small {
+    width: 100%;
+    justify-content: center;
+    min-width: auto;
+  }
+  
+  .bracket-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .bracket-actions .btn {
+    width: 100%;
+    min-width: auto;
+  }
 }
 
 .tournament-status-text {
