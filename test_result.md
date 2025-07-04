@@ -1186,14 +1186,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Tournament Menu Item"
-    - "Tournament Translations"
-    - "Tournament State Management"
-    - "Tournament API Functions"
-    - "Tournament Listing View"
-    - "Tournament Details View"
-    - "Tournament CSS Styling"
-    - "Manual Adjustment Modal"
+    - "Team System Render Function (renderTeams)"
+    - "Team Creation Modal"
+    - "Team Invitation Modal"
+    - "Team System CSS Styles"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
