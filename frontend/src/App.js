@@ -6373,8 +6373,7 @@ function App() {
             </div>
           )}
         </div>
-        
-        {/* Manual Adjustment Modal */}
+        </div>
         {(() => {
           console.log('MODAL RENDER CHECK - showManualAdjustmentModal:', showManualAdjustmentModal);
           return showManualAdjustmentModal;
