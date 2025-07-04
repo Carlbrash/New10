@@ -871,6 +871,13 @@ function App() {
     // Fetch country stats regardless of login status
     fetchCountryStats();
   }, [token]);
+
+  // Enhanced dashboard effect
+  useEffect(() => {
+    if (user && rankings.length > 0) {
+      fetchDashboardStats();
+    }
+  }, [user, rankings]);
   
   // Additional useEffect to fetch rankings when navigating to Rankings
   useEffect(() => {
