@@ -349,6 +349,47 @@ class TournamentBracket(BaseModel):
     is_generated: bool = False
 
 # =============================================================================
+# TEAM SYSTEM MODELS
+# =============================================================================
+
+class TeamColors(BaseModel):
+    primary: str
+    secondary: str = None
+
+class TeamStatus(str, Enum):
+    AMATEUR = "amateur"
+    OFFICIAL = "official"
+
+class TeamCreate(BaseModel):
+    name: str
+    logo_url: str = None
+    colors: TeamColors
+    city: str
+    country: str
+    phone: str
+    email: str
+
+class TeamInvite(BaseModel):
+    username: str
+
+class TeamApplicationRequest(BaseModel):
+    application_text: str
+
+class TeamTransferCaptaincy(BaseModel):
+    new_captain_id: str
+
+class InvitationStatus(str, Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    DECLINED = "declined"
+    EXPIRED = "expired"
+
+class ApplicationStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+# =============================================================================
 # AFFILIATE SYSTEM MODELS
 # =============================================================================
 
