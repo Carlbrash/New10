@@ -504,6 +504,7 @@ function App() {
   
   // Tournament Admin States
   const [adminTournaments, setAdminTournaments] = useState([]);
+  const [tournamentSearch, setTournamentSearch] = useState('');
   const [showTournamentModal, setShowTournamentModal] = useState(false);
   const [tournamentForm, setTournamentForm] = useState({
     name: '',
