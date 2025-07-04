@@ -5271,6 +5271,7 @@ function App() {
         {currentView === 'rankings' && renderRankings()}
         {currentView === 'worldmap' && renderWorldMap()}
         {currentView === 'tournament' && renderTournament()}
+        {currentView === 'affiliate' && user && renderAffiliate()}
         {currentView === 'admin' && isAdmin && renderAdminPanel()}
         {currentView === 'download' && <DownloadBackup />}
         
