@@ -420,6 +420,18 @@ function App() {
   const [activeSiteMessages, setActiveSiteMessages] = useState([]);
   const [bannerUpdateTrigger, setBannerUpdateTrigger] = useState(0);
 
+  // Tournament states
+  const [tournaments, setTournaments] = useState([]);
+  const [selectedTournament, setSelectedTournament] = useState(null);
+  const [tournamentView, setTournamentView] = useState('list'); // 'list', 'details'
+  const [tournamentFilters, setTournamentFilters] = useState({
+    status: '',
+    category: '',
+    duration: ''
+  });
+  const [tournamentLoading, setTournamentLoading] = useState(false);
+  const [userTournaments, setUserTournaments] = useState([]);
+
   // Settings states
   const [showSettings, setShowSettings] = useState(false);
   const [settingsForm, setSettingsForm] = useState({
