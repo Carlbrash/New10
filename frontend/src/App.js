@@ -3037,6 +3037,7 @@ function App() {
                 </div>
                 
                 <div className="tournament-card-footer">
+                  {/* View Details button - Always available */}
                   <button 
                     className="btn btn-secondary"
                     onClick={() => fetchTournamentDetails(tournament.id)}
@@ -3044,7 +3045,24 @@ function App() {
                     {t.viewDetails}
                   </button>
                   
-                  {tournament.status === 'open' && !tournament.user_registered && (
+                  {/* View Bracket button - Show if tournament has started or has bracket */}
+                  {(tournament.status === 'ongoing' || tournament.status === 'completed' || 
+                    (tournament.status === 'open' && tournament.current_participants >= 2)) && (
+                    <button 
+                      className="btn btn-outline"
+                      onClick={() => {
+                        fetchTournamentDetails(tournament.id);
+                        // Auto-show bracket after details load
+                        setTimeout(() => setShowBracket(true), 500);
+                      }}
+                    >
+                      {tournament.status === 'ongoing' || tournament.status === 'completed' ? 
+                        '🏆 View Bracket' : '🏆 Preview Bracket'}
+                    </button>
+                  )}
+                  
+                  {/* Join Tournament button */}
+                  {tournament.status === 'open' && !tournament.user_registered && user && (
                     <button 
                       className="btn btn-primary"
                       onClick={() => joinTournament(tournament.id)}
@@ -3056,6 +3074,7 @@ function App() {
                     </button>
                   )}
                   
+                  {/* Leave Tournament button */}
                   {tournament.user_registered && (
                     <button 
                       className="btn btn-warning"
@@ -3066,6 +3085,17 @@ function App() {
                     </button>
                   )}
                   
+                  {/* Login prompt for unauthenticated users */}
+                  {tournament.status === 'open' && !tournament.user_registered && !user && (
+                    <button 
+                      className="btn btn-outline"
+                      onClick={() => setCurrentView('login')}
+                    >
+                      Login to Join
+                    </button>
+                  )}
+                  
+                  {/* Tournament status indicator */}
                   {tournament.status !== 'open' && tournament.status !== 'ongoing' && (
                     <span className="tournament-status-text">
                       {tournament.status === 'upcoming' ? t.upcoming : 
