@@ -183,6 +183,7 @@ class PrizeDistribution(str, Enum):
     TOP_THREE = "top_three"
 
 class EntryFeeCategory(str, Enum):
+    FREE = "free"          # €0
     BASIC = "basic"        # €1-10
     STANDARD = "standard"  # €11-50
     PREMIUM = "premium"    # €51-100
