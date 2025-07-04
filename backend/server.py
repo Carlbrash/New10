@@ -3186,10 +3186,10 @@ async def create_manual_adjustment(request: ManualAdjustmentRequest, admin_id: s
         
         # Log admin action
         log_admin_action(
-            admin_id=admin_id,
-            action="manual_wallet_adjustment",
-            target_id=actual_user_id,
-            details=f"Adjusted wallet balance by €{request.amount} for user {user['username']} ({user['full_name']}). Reason: {request.reason}"
+            user_id=admin_id,
+            action_type="manual_wallet_adjustment",
+            target_tournament_id=actual_user_id,
+            details={"amount": request.amount, "reason": request.reason, "target_user": user["username"]}
         )
         
         return {
