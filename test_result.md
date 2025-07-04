@@ -1179,8 +1179,8 @@ frontend:
         comment: "✅ FIXED: Updated the background color of the modal overlay from rgba(255, 0, 0, 0.8) to rgba(0, 0, 0, 0.8) in App.js. The modal now displays correctly with a dark overlay background as expected."
 
   - task: "Team System Render Function (renderTeams)"
-    implemented: true
-    working: "NA"
+    implemented: false
+    working: false
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
@@ -1189,6 +1189,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Implemented the renderTeams function to display the teams page with grid layout, team invitations banner, create team button, and team cards showing logo, name, captain, player count, and status."
+      - working: false
+        agent: "testing"
+        comment: "❌ ISSUE FOUND: The renderTeams function is referenced in the code but not defined. Additionally, there are two declarations of the fetchTeams function (lines 1900 and 2067) causing a compilation error: 'SyntaxError: /app/frontend/src/App.js: Identifier 'fetchTeams' has already been declared. (2067:8)'"
 
   - task: "Team Creation Modal"
     implemented: true
