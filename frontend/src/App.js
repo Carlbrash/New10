@@ -5529,6 +5529,12 @@ function App() {
                   <div className="manual-adjustment">
                     <div className="section-header">
                       <h4>⚙️ {t.manualAdjustment}</h4>
+                      <button 
+                        className="btn btn-secondary"
+                        onClick={() => setShowManualAdjustmentModal(true)}
+                      >
+                        ➕ Create Adjustment
+                      </button>
                     </div>
                     <p>Manually adjust user wallet balances for corrections, bonuses, or penalties.</p>
                   </div>
