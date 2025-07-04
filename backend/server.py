@@ -849,6 +849,316 @@ def calculate_affiliate_stats(affiliate_user_id: str) -> dict:
         print(f"Error calculating affiliate stats: {e}")
         return {}
 
+# =============================================================================
+# WALLET SYSTEM HELPER FUNCTIONS
+# =============================================================================
+
+def get_or_create_wallet(user_id: str) -> dict:
+    """Get or create wallet balance for user"""
+    try:
+        wallet = wallet_balances_collection.find_one({"user_id": user_id})
+        if not wallet:
+            # Create new wallet
+            wallet_id = str(uuid.uuid4())
+            wallet_data = {
+                "id": wallet_id,
+                "user_id": user_id,
+                "total_earned": 0.0,
+                "available_balance": 0.0,
+                "pending_balance": 0.0,
+                "withdrawn_balance": 0.0,
+                "registration_commissions": 0.0,
+                "tournament_commissions": 0.0,
+                "deposit_commissions": 0.0,
+                "bonus_earnings": 0.0,
+                "lifetime_withdrawals": 0.0,
+                "pending_withdrawal": 0.0,
+                "auto_payout_enabled": False,
+                "auto_payout_threshold": 100.0,
+                "preferred_payout_method": "bank_transfer",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            wallet_balances_collection.insert_one(wallet_data)
+            return wallet_data
+        return wallet
+    except Exception as e:
+        print(f"Error getting/creating wallet: {e}")
+        return {}
+
+def add_transaction(user_id: str, transaction_type: str, amount: float, description: str, 
+                   commission_id: str = None, payout_id: str = None, referral_id: str = None,
+                   tournament_id: str = None, metadata: dict = None, processed_by: str = None,
+                   admin_notes: str = None) -> bool:
+    """Add a transaction and update wallet balance"""
+    try:
+        # Get current wallet
+        wallet = get_or_create_wallet(user_id)
+        
+        # Calculate new balance
+        balance_before = wallet.get("available_balance", 0.0)
+        
+        if transaction_type in ["commission_earned", "bonus", "manual_adjustment"]:
+            balance_after = balance_before + amount
+        elif transaction_type in ["payout_requested", "payout_completed", "penalty"]:
+            balance_after = balance_before - amount
+        else:
+            balance_after = balance_before
+        
+        # Create transaction record
+        transaction_id = str(uuid.uuid4())
+        transaction_data = {
+            "id": transaction_id,
+            "user_id": user_id,
+            "transaction_type": transaction_type,
+            "amount": amount,
+            "currency": "EUR",
+            "commission_id": commission_id,
+            "payout_id": payout_id,
+            "referral_id": referral_id,
+            "tournament_id": tournament_id,
+            "balance_before": balance_before,
+            "balance_after": balance_after,
+            "description": description,
+            "metadata": metadata or {},
+            "processed_by": processed_by,
+            "admin_notes": admin_notes,
+            "is_processed": True,
+            "processed_at": datetime.utcnow(),
+            "created_at": datetime.utcnow()
+        }
+        transactions_collection.insert_one(transaction_data)
+        
+        # Update wallet balance
+        update_data = {"updated_at": datetime.utcnow()}
+        
+        if transaction_type == "commission_earned":
+            update_data.update({
+                "available_balance": balance_after,
+                "total_earned": wallet.get("total_earned", 0.0) + amount,
+            })
+            
+            # Update commission type breakdown
+            if commission_id:
+                commission = commissions_collection.find_one({"id": commission_id})
+                if commission and commission.get("commission_type") == "registration":
+                    update_data["registration_commissions"] = wallet.get("registration_commissions", 0.0) + amount
+                elif commission and commission.get("commission_type") == "tournament_entry":
+                    update_data["tournament_commissions"] = wallet.get("tournament_commissions", 0.0) + amount
+                elif commission and commission.get("commission_type") == "deposit":
+                    update_data["deposit_commissions"] = wallet.get("deposit_commissions", 0.0) + amount
+        
+        elif transaction_type == "bonus":
+            update_data.update({
+                "available_balance": balance_after,
+                "total_earned": wallet.get("total_earned", 0.0) + amount,
+                "bonus_earnings": wallet.get("bonus_earnings", 0.0) + amount
+            })
+        
+        elif transaction_type == "payout_requested":
+            update_data.update({
+                "available_balance": balance_after,
+                "pending_withdrawal": wallet.get("pending_withdrawal", 0.0) + amount
+            })
+        
+        elif transaction_type == "payout_completed":
+            update_data.update({
+                "lifetime_withdrawals": wallet.get("lifetime_withdrawals", 0.0) + amount,
+                "withdrawn_balance": wallet.get("withdrawn_balance", 0.0) + amount,
+                "pending_withdrawal": max(0, wallet.get("pending_withdrawal", 0.0) - amount),
+                "last_payout_date": datetime.utcnow()
+            })
+        
+        elif transaction_type == "payout_failed":
+            # Return money to available balance
+            update_data.update({
+                "available_balance": balance_after + amount,  # Add back the amount
+                "pending_withdrawal": max(0, wallet.get("pending_withdrawal", 0.0) - amount)
+            })
+        
+        elif transaction_type == "manual_adjustment":
+            update_data.update({
+                "available_balance": balance_after,
+                "total_earned": wallet.get("total_earned", 0.0) + amount if amount > 0 else wallet.get("total_earned", 0.0)
+            })
+        
+        wallet_balances_collection.update_one(
+            {"user_id": user_id},
+            {"$set": update_data}
+        )
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error adding transaction: {e}")
+        return False
+
+def calculate_wallet_stats(user_id: str) -> dict:
+    """Calculate comprehensive wallet statistics"""
+    try:
+        wallet = get_or_create_wallet(user_id)
+        transactions = list(transactions_collection.find(
+            {"user_id": user_id}
+        ).sort("created_at", -1))
+        
+        # Monthly earnings (last 12 months)
+        monthly_earnings = []
+        now = datetime.utcnow()
+        for i in range(12):
+            month_start = (now.replace(day=1) - timedelta(days=i*30))
+            month_end = month_start.replace(day=28) + timedelta(days=4)
+            month_end = month_end - timedelta(days=month_end.day)
+            
+            month_transactions = [
+                t for t in transactions 
+                if month_start <= t["created_at"] <= month_end and 
+                t["transaction_type"] in ["commission_earned", "bonus"]
+            ]
+            month_total = sum([t["amount"] for t in month_transactions])
+            
+            monthly_earnings.append({
+                "month": month_start.strftime("%Y-%m"),
+                "earnings": month_total,
+                "transactions": len(month_transactions)
+            })
+        
+        # Commission breakdown
+        commission_breakdown = {
+            "registration": wallet.get("registration_commissions", 0.0),
+            "tournament": wallet.get("tournament_commissions", 0.0),
+            "deposit": wallet.get("deposit_commissions", 0.0),
+            "bonus": wallet.get("bonus_earnings", 0.0)
+        }
+        
+        # Payout summary
+        completed_payouts = [t for t in transactions if t["transaction_type"] == "payout_completed"]
+        pending_payouts = [t for t in transactions if t["transaction_type"] == "payout_requested"]
+        
+        payout_summary = {
+            "total_withdrawn": wallet.get("lifetime_withdrawals", 0.0),
+            "pending_withdrawal": wallet.get("pending_withdrawal", 0.0),
+            "total_payouts": len(completed_payouts),
+            "last_payout": wallet.get("last_payout_date"),
+            "next_auto_payout": wallet.get("available_balance", 0.0) >= wallet.get("auto_payout_threshold", 100.0)
+        }
+        
+        # Performance metrics
+        total_commissions = len([t for t in transactions if t["transaction_type"] == "commission_earned"])
+        avg_commission = sum([t["amount"] for t in transactions if t["transaction_type"] == "commission_earned"]) / max(1, total_commissions)
+        
+        performance_metrics = {
+            "total_commissions": total_commissions,
+            "average_commission": avg_commission,
+            "conversion_rate": 0.0,  # Calculate based on referrals vs successful registrations
+            "monthly_growth": 0.0,   # Calculate based on month-over-month growth
+            "efficiency_score": min(100, (total_commissions * avg_commission) / 10)  # Custom score
+        }
+        
+        return {
+            "balance": wallet,
+            "recent_transactions": transactions[:20],
+            "monthly_earnings": monthly_earnings,
+            "commission_breakdown": commission_breakdown,
+            "payout_summary": payout_summary,
+            "performance_metrics": performance_metrics
+        }
+        
+    except Exception as e:
+        print(f"Error calculating wallet stats: {e}")
+        return {}
+
+def calculate_admin_financial_overview() -> dict:
+    """Calculate comprehensive financial overview for admins"""
+    try:
+        # Basic affiliate stats
+        total_affiliates = affiliates_collection.count_documents({})
+        active_affiliates = affiliates_collection.count_documents({"status": "active"})
+        
+        # Pending payouts
+        pending_payouts = list(payouts_collection.find({"status": "pending"}))
+        total_pending_payouts = sum([p["amount"] for p in pending_payouts])
+        
+        # Total commissions owed (all unpaid commissions)
+        unpaid_commissions = list(commissions_collection.find({"is_paid": False}))
+        total_commissions_owed = sum([c["amount"] for c in unpaid_commissions])
+        
+        # Monthly commission costs
+        current_month_start = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        monthly_commissions = list(commissions_collection.find({
+            "created_at": {"$gte": current_month_start}
+        }))
+        monthly_commission_costs = sum([c["amount"] for c in monthly_commissions])
+        
+        # Platform revenue (this would be calculated based on tournament entries, deposits, etc.)
+        # For now, let's estimate based on tournament entries
+        monthly_tournaments = list(tournament_participants_collection.find({
+            "joined_at": {"$gte": current_month_start}
+        }))
+        estimated_revenue = len(monthly_tournaments) * 10  # Estimate €10 average per entry
+        
+        # Affiliate conversion rate
+        total_referrals = referrals_collection.count_documents({})
+        active_referrals = referrals_collection.count_documents({"is_active": True})
+        affiliate_conversion_rate = (active_referrals / max(1, total_referrals)) * 100
+        
+        # Top affiliates
+        top_affiliates_data = list(affiliates_collection.find({}).sort("total_earnings", -1).limit(10))
+        top_affiliates = []
+        for affiliate in top_affiliates_data:
+            user = users_collection.find_one({"id": affiliate["user_id"]})
+            if user:
+                top_affiliates.append({
+                    "user_id": affiliate["user_id"],
+                    "username": user["username"],
+                    "full_name": user["full_name"],
+                    "total_earnings": affiliate.get("total_earnings", 0.0),
+                    "total_referrals": affiliate.get("total_referrals", 0),
+                    "status": affiliate["status"]
+                })
+        
+        # Recent transactions (all users)
+        recent_transactions = list(transactions_collection.find({}).sort("created_at", -1).limit(20))
+        for transaction in recent_transactions:
+            user = users_collection.find_one({"id": transaction["user_id"]})
+            if user:
+                transaction["username"] = user["username"]
+        
+        # Financial summary
+        total_platform_costs = total_commissions_owed + total_pending_payouts
+        profit_margin = ((estimated_revenue - monthly_commission_costs) / max(1, estimated_revenue)) * 100
+        
+        financial_summary = {
+            "total_platform_costs": total_platform_costs,
+            "estimated_monthly_revenue": estimated_revenue,
+            "monthly_commission_costs": monthly_commission_costs,
+            "profit_margin": profit_margin,
+            "cost_per_acquisition": monthly_commission_costs / max(1, len(monthly_tournaments)),
+            "roi_percentage": ((estimated_revenue - monthly_commission_costs) / max(1, monthly_commission_costs)) * 100
+        }
+        
+        return {
+            "total_affiliates": total_affiliates,
+            "active_affiliates": active_affiliates,
+            "total_pending_payouts": total_pending_payouts,
+            "total_commissions_owed": total_commissions_owed,
+            "monthly_commission_costs": monthly_commission_costs,
+            "platform_revenue": estimated_revenue,
+            "affiliate_conversion_rate": affiliate_conversion_rate,
+            "top_affiliates": top_affiliates,
+            "pending_payouts": [
+                {
+                    **p,
+                    "username": users_collection.find_one({"id": p["affiliate_user_id"]}, {"username": 1, "_id": 0}).get("username", "Unknown") if users_collection.find_one({"id": p["affiliate_user_id"]}) else "Unknown"
+                } for p in pending_payouts
+            ],
+            "recent_transactions": recent_transactions,
+            "financial_summary": financial_summary
+        }
+        
+    except Exception as e:
+        print(f"Error calculating admin financial overview: {e}")
+        return {}
+
 # Routes
 @app.get("/api/health")
 async def health_check():
