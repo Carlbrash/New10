@@ -6374,30 +6374,6 @@ function App() {
           )}
         </div>
         </div>
-            }}
-          >
-            <div 
-              className="modal" 
-              style={{
-                backgroundColor: '#1a1a2e',
-                border: '3px solid #ffd700',
-                borderRadius: '20px',
-                minWidth: '500px',
-                maxWidth: '90vw',
-                zIndex: 100000
-              }}
-              onClick={(e) => {
-                console.log('MODAL CONTENT CLICKED - STOPPING PROPAGATION');
-                e.stopPropagation();
-              }}
-            >
-              <div className="modal-header">
-                <h3>⚙️ {t.manualAdjustment}</h3>
-                <button 
-                  className="modal-close"
-                  onClick={() => setShowManualAdjustmentModal(false)}
-                >
-                  ✕
                 </button>
               </div>
               
