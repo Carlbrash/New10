@@ -284,6 +284,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "POST /api/tournaments/{tournament_id}/generate-bracket endpoint is working correctly. Successfully generates brackets for tournaments with at least 2 participants. Properly restricts access to admin users only. Correctly updates tournament status to 'ongoing' after bracket generation."
+      - working: true
+        agent: "testing"
+        comment: "Verified that the endpoint correctly validates that at least 2 participants are required to generate a bracket. The endpoint returns a 400 error with appropriate message when attempting to generate a bracket for a tournament with fewer than 2 participants."
 
   - task: "Tournament Bracket API - POST /api/tournaments/matches/{match_id}/winner"
     implemented: true
