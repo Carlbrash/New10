@@ -133,7 +133,67 @@ const translations = {
     active: 'Ενεργός',
     godLevel: 'God Level',
     superAdmin: 'Super Admin',
-    adminLevel: 'Admin'
+    adminLevel: 'Admin',
+    
+    // Tournament System
+    tournament: 'Tournament',
+    tournaments: 'Tournaments',
+    tournamentTitle: 'Διαθέσιμα Tournaments',
+    joinTournament: 'Συμμετοχή',
+    leaveTournament: 'Αποχώρηση',
+    entryFee: 'Κόστος Εισόδου',
+    prizePool: 'Έπαθλα',
+    participants: 'Συμμετέχοντες',
+    tournamentStatus: 'Κατάσταση',
+    tournamentDuration: 'Διάρκεια',
+    tournamentFormat: 'Τύπος',
+    registrationPeriod: 'Περίοδος Εγγραφής',
+    tournamentPeriod: 'Περίοδος Tournament',
+    prizeDistribution: 'Κατανομή Επάθλων',
+    rules: 'Κανόνες',
+    
+    // Tournament Status
+    upcoming: 'Σύντομα',
+    open: 'Ανοιχτό',
+    ongoing: 'Σε Εξέλιξη',
+    completed: 'Ολοκληρωμένο',
+    cancelled: 'Ακυρωμένο',
+    
+    // Tournament Duration
+    instant: 'Άμεσο',
+    daily: 'Ημερήσιο',
+    two_day: '2 Ημέρες',
+    weekly: 'Εβδομαδιαίο',
+    monthly: 'Μηνιαίο',
+    long_term: 'Μακροπρόθεσμο',
+    
+    // Tournament Format
+    single_elimination: 'Single Elimination',
+    
+    // Prize Distribution
+    winner_takes_all: 'Όλα στον Νικητή',
+    top_three: 'Top 3',
+    
+    // Entry Fee Categories
+    basic: 'Βασικό (€1-10)',
+    standard: 'Κανονικό (€11-50)',
+    premium: 'Premium (€51-100)',
+    vip: 'VIP (€101+)',
+    
+    // Tournament Actions
+    viewDetails: 'Λεπτομέρειες',
+    backToTournaments: 'Πίσω στα Tournaments',
+    joinNow: 'Συμμετοχή Τώρα',
+    paymentRequired: 'Απαιτείται Πληρωμή',
+    tournamentFull: 'Γεμάτο',
+    registrationClosed: 'Κλειστές Εγγραφές',
+    alreadyJoined: 'Έχετε Συμμετάσχει',
+    
+    // Filters
+    allTournaments: 'Όλα τα Tournaments',
+    filterByStatus: 'Φιλτράρισμα κατά Κατάσταση',
+    filterByCategory: 'Φιλτράρισμα κατά Κατηγορία',
+    filterByDuration: 'Φιλτράρισμα κατά Διάρκεια'
   },
   en: {
     // Navbar
