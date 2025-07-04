@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wobera Admin Panel - Backup Download</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #ffd700;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .backup-info {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .backup-info h3 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            color: #ffffff;
+        }
+        .feature-list li:before {
+            content: "✅ ";
+            color: #10b981;
+            font-weight: bold;
+        }
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin: 20px 10px;
+        }
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, #ffed4e, #ffd700);
+        }
+        .back-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+        .file-info {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            color: #94a3b8;
+        }
+        .warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #fecaca;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Wobera Admin Panel</h1>
+        <p class="subtitle">Complete Project Backup</p>
+        
+        <div class="backup-info">
+            <h3>🎯 What's Included in This Backup:</h3>
+            <ul class="feature-list">
+                <li>Enhanced Admin Panel with Search Functionality</li>
+                <li>Block/Unblock Users with Reasons</li>
+                <li>Points Adjustment System (God Level)</li>
+                <li>Complete Frontend (React + Tailwind CSS)</li>
+                <li>Complete Backend (FastAPI + MongoDB)</li>
+                <li>All Database Models and APIs</li>
+                <li>JWT Authentication System</li>
+                <li>Role-based Access Control</li>
+                <li>Professional UI/UX Design</li>
+                <li>Documentation and Configuration Files</li>
+            </ul>
+        </div>
+
+        <div class="file-info">
+            📂 File: backup.tar.gz<br>
+            📊 Size: ~1.1MB (without node_modules)<br>
+            📅 Created: July 3, 2025<br>
+            🔧 Format: TAR.GZ compressed archive
+        </div>
+
+        <div class="warning">
+            ⚠️ <strong>Important:</strong> After download, you'll need to run <code>yarn install</code> 
+            in the frontend directory and <code>pip install -r requirements.txt</code> in the backend 
+            directory to restore dependencies.
+        </div>
+
+        <a href="backup.tar.gz" download="wobera_admin_panel_backup.tar.gz" class="download-btn">
+            📥 Download Backup (1.1MB)
+        </a>
+
+        <br><br>
+
+        <a href="/" class="back-btn">
+            ← Back to Wobera App
+        </a>
+
+        <div style="margin-top: 30px; color: #64748b; font-size: 0.9rem;">
+            <p>This backup contains the complete Wobera project with all admin panel enhancements.</p>
+            <p>Keep this backup safe for future restoration if needed.</p>
+        </div>
+    </div>
+
+    <script>
+        // Add download tracking
+        document.querySelector('.download-btn').addEventListener('click', function() {
+            console.log('Backup download initiated at:', new Date().toISOString());
+        });
+    </script>
+</body>
+</html>

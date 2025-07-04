@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoBeRa Downloads - Direct Links</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #ccc;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+        .download-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 2rem;
+        }
+        .download-section h2 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        .download-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+        .btn {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #000;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+            color: #000;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #ffd700;
+            border: 2px solid #ffd700;
+        }
+        .btn-secondary:hover {
+            background: #ffd700;
+            color: #000;
+        }
+        .info {
+            background: rgba(255, 215, 0, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            margin: 1rem 0;
+        }
+        .info h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+        .info ul, .info ol {
+            color: #ccc;
+            padding-left: 1.5rem;
+        }
+        .info li {
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        .link-direct {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            margin: 1rem 0;
+            word-break: break-all;
+            font-family: monospace;
+            color: #ffd700;
+            font-size: 0.9rem;
+        }
+        .warning {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            color: #ffb366;
+        }
+        .file-size {
+            color: #999;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 WoBeRa Downloads</h1>
+        <p class="subtitle">Direct download links για το WoBeRa (World Betting Rank) project</p>
+
+        <!-- Netlify Ready ZIP -->
+        <div class="download-section">
+            <h2>🚀 Netlify Ready Package</h2>
+            <p>Έτοιμο για άμεσο deploy στο Netlify - περιλαμβάνει όλα τα αρχεία</p>
+            
+            <div class="download-links">
+                <a href="/WoBeRa_Netlify_Ready.zip" download="WoBeRa_Netlify_Ready.zip" class="btn">
+                    📥 Download ZIP για Netlify
+                </a>
+                <button class="btn btn-secondary" onclick="copyToClipboard('netlify')">
+                    📋 Copy Link
+                </button>
+            </div>
+            
+            <div class="file-size">Μέγεθος: 256KB | Τύπος: ZIP</div>
+            
+            <div class="info">
+                <h3>📋 Netlify Deployment Steps:</h3>
+                <ol>
+                    <li>Κατεβάστε το ZIP αρχείο</li>
+                    <li>Extract το ZIP</li>
+                    <li>Upload τον φάκελο "netlify_deployment" στο Netlify</li>
+                    <li>Στο Netlify dashboard, πηγαίνετε στο Site Settings → Environment Variables</li>
+                    <li>Προσθέστε: <code>REACT_APP_BACKEND_URL = https://your-backend-url.com</code></li>
+                    <li>Deploy!</li>
+                </ol>
+            </div>
+
+            <div class="link-direct">
+                Direct Link: https://67792974-48a1-4e2d-b2d0-93fe13b22f8f.preview.emergentagent.com/WoBeRa_Netlify_Ready.zip
+            </div>
+        </div>
+
+        <!-- Development Backup -->
+        <div class="download-section">
+            <h2>💾 Development Backup</h2>
+            <p>Compact backup για development και backup purposes</p>
+            
+            <div class="download-links">
+                <a href="/WoBeRa_backup.tar.gz" download="WoBeRa_backup.tar.gz" class="btn">
+                    📥 Download TAR.GZ
+                </a>
+                <button class="btn btn-secondary" onclick="copyToClipboard('backup')">
+                    📋 Copy Link
+                </button>
+            </div>
+            
+            <div class="file-size">Μέγεθος: 32KB | Τύπος: TAR.GZ</div>
+            
+            <div class="link-direct">
+                Direct Link: https://67792974-48a1-4e2d-b2d0-93fe13b22f8f.preview.emergentagent.com/WoBeRa_backup.tar.gz
+            </div>
+        </div>
+
+        <!-- What's Included -->
+        <div class="info">
+            <h3>📁 Τι περιλαμβάνει το WoBeRa package:</h3>
+            <ul>
+                <li>✅ <strong>Frontend:</strong> React app με luxury design</li>
+                <li>✅ <strong>Backend:</strong> FastAPI server με MongoDB</li>
+                <li>✅ <strong>Authentication:</strong> JWT login/register system</li>
+                <li>✅ <strong>Rankings:</strong> Παγκόσμιες κατατάξεις</li>
+                <li>✅ <strong>Competitions:</strong> Διαγωνισμοί ανά περιοχή</li>
+                <li>✅ <strong>World Map:</strong> Στατιστικά ανά χώρα</li>
+                <li>✅ <strong>Luxury UI:</strong> Μαύρο/μπλε θέμα με χρυσές λεπτομέρειες</li>
+                <li>✅ <strong>Responsive:</strong> Λειτουργεί σε όλες τις συσκευές</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <strong>💡 Συμβουλή:</strong> Αν τα download buttons δεν λειτουργούν, κάντε δεξί κλικ στα "Direct Link" URLs και επιλέξτε "Save link as..." ή αντιγράψτε τα links σε νέο tab.
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem; color: #666;">
+            <p>WoBeRa (World Betting Rank) - Luxury Sports Betting Federation Platform</p>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(type) {
+            let url;
+            if (type === 'netlify') {
+                url = 'https://67792974-48a1-4e2d-b2d0-93fe13b22f8f.preview.emergentagent.com/WoBeRa_Netlify_Ready.zip';
+            } else {
+                url = 'https://67792974-48a1-4e2d-b2d0-93fe13b22f8f.preview.emergentagent.com/WoBeRa_backup.tar.gz';
+            }
+            
+            navigator.clipboard.writeText(url).then(function() {
+                alert('Link αντιγράφηκε στο clipboard!');
+            }, function(err) {
+                alert('Δεν μπόρεσε να αντιγραφεί το link. Χρησιμοποιήστε manual copy.');
+            });
+        }
+    </script>
+</body>
+</html>
