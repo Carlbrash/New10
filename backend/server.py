@@ -710,6 +710,16 @@ def process_referral_registration(referred_user_id: str, referral_code: str, reg
         }
         commissions_collection.insert_one(commission_data)
         
+        # Add transaction to wallet
+        add_transaction(
+            user_id=affiliate["user_id"],
+            transaction_type="commission_earned",
+            amount=commission_amount,
+            description=f"Registration commission for new user referral",
+            commission_id=commission_id,
+            referral_id=referral_id
+        )
+        
         # Update affiliate stats
         affiliates_collection.update_one(
             {"user_id": affiliate["user_id"]},
