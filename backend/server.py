@@ -262,6 +262,60 @@ class TournamentCreate(BaseModel):
 class TournamentJoin(BaseModel):
     tournament_id: str
 
+# =============================================================================
+# BRACKET SYSTEM MODELS
+# =============================================================================
+
+class MatchStatus(str, Enum):
+    PENDING = "pending"
+    ONGOING = "ongoing"
+    COMPLETED = "completed"
+
+class Match(BaseModel):
+    id: str
+    tournament_id: str
+    round_number: int
+    match_number: int  # Position in round (1, 2, 3, etc.)
+    
+    # Players
+    player1_id: Optional[str] = None
+    player1_username: Optional[str] = None
+    player2_id: Optional[str] = None  
+    player2_username: Optional[str] = None
+    
+    # Match Results
+    winner_id: Optional[str] = None
+    winner_username: Optional[str] = None
+    status: MatchStatus = MatchStatus.PENDING
+    
+    # Timestamps
+    scheduled_at: Optional[datetime] = None
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    
+    # Next match progression
+    next_match_id: Optional[str] = None
+
+class TournamentRound(BaseModel):
+    round_number: int
+    round_name: str  # "Round 1", "Quarter-Finals", "Semi-Finals", "Finals"
+    total_matches: int
+    completed_matches: int = 0
+    status: str = "pending"  # pending, ongoing, completed
+
+class TournamentBracket(BaseModel):
+    id: str
+    tournament_id: str
+    total_rounds: int
+    current_round: int = 1
+    rounds: List[TournamentRound] = []
+    matches: List[Match] = []
+    
+    # Bracket metadata
+    created_at: datetime
+    updated_at: datetime
+    is_generated: bool = False
+
 # Helper functions
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
