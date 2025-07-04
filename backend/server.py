@@ -666,7 +666,7 @@ def generate_referral_code(username: str, user_id: str) -> str:
 
 def generate_referral_link(referral_code: str) -> str:
     """Generate full referral link"""
-    base_url = "https://fc495f42-99f4-4eed-98fe-c062f372264d.preview.emergentagent.com"
+    base_url = "https://67792974-48a1-4e2d-b2d0-93fe13b22f8f.preview.emergentagent.com"
     return f"{base_url}/?ref={referral_code}"
 
 def process_referral_registration(referred_user_id: str, referral_code: str, registration_ip: str = None) -> bool:

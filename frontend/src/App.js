@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import DownloadBackup from './DownloadBackup';
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://fc495f42-99f4-4eed-98fe-c062f372264d.preview.emergentagent.com';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://67792974-48a1-4e2d-b2d0-93fe13b22f8f.preview.emergentagent.com';
 
 // Language translations
 const translations = {
