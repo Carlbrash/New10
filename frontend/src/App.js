@@ -419,7 +419,42 @@ const translations = {
     allTournaments: 'All Tournaments',
     filterByStatus: 'Filter by Status',
     filterByCategory: 'Filter by Category',
-    filterByDuration: 'Filter by Duration'
+    filterByDuration: 'Filter by Duration',
+    
+    // Affiliate System
+    affiliate: 'Affiliate',
+    affiliateProgram: 'Affiliate Program',
+    affiliateDashboard: 'Affiliate Dashboard',
+    becomeAffiliate: 'Become Affiliate',
+    applyForAffiliate: 'Apply for Affiliate',
+    referralCode: 'Referral Code',
+    referralLink: 'Referral Link',
+    copyLink: 'Copy Link',
+    totalReferrals: 'Total Referrals',
+    activeReferrals: 'Active Referrals',
+    totalEarnings: 'Total Earnings',
+    pendingEarnings: 'Pending Earnings',
+    paidEarnings: 'Paid Earnings',
+    thisMonthReferrals: 'This Month Referrals',
+    thisMonthEarnings: 'This Month Earnings',
+    commissions: 'Commissions',
+    referrals: 'Referrals',
+    payouts: 'Payouts',
+    requestPayout: 'Request Payout',
+    minimumPayout: 'Minimum payout €50',
+    commissionHistory: 'Commission History',
+    registrationBonus: 'Registration Bonus',
+    tournamentCommission: 'Tournament Commission',
+    depositCommission: 'Deposit Commission',
+    affiliateStatus: 'Affiliate Status',
+    active: 'Active',
+    pending: 'Pending',
+    suspended: 'Suspended',
+    recentActivity: 'Recent Activity',
+    noCommissions: 'No commissions yet',
+    noReferrals: 'No referrals yet',
+    shareYourLink: 'Share your link to start earning!',
+    inviteFriends: 'Invite Friends'
   }
 };
 
