@@ -3188,7 +3188,7 @@ async def create_manual_adjustment(request: ManualAdjustmentRequest, admin_id: s
         log_admin_action(
             user_id=admin_id,
             action_type="manual_wallet_adjustment",
-            target_tournament_id=actual_user_id,
+            target_user_id=actual_user_id,
             details={"amount": request.amount, "reason": request.reason, "target_user": user["username"]}
         )
         
