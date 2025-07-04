@@ -1562,6 +1562,8 @@ function App() {
 
   const renderRankings = () => {
     console.log('🏆 Rendering rankings, players count:', rankings.length);
+    const filteredRankings = getFilteredRankings();
+    const availableCountries = getAvailableCountries();
     
     return (
     <div className="rankings-container">
@@ -1573,6 +1575,34 @@ function App() {
           className="rankings-trophy"
         />
       </div>
+
+      {/* My Position Quick View */}
+      {user && myPosition && (
+        <div className="my-position-card">
+          <div className="my-position-header">
+            <h3>👤 My Current Position</h3>
+            <div className="position-badge">
+              #{myPosition.rank}
+            </div>
+          </div>
+          <div className="my-position-details">
+            <div className="position-stat">
+              <span className="stat-label">Score:</span>
+              <span className="stat-value">{Math.round(myPosition.score)} pts</span>
+            </div>
+            <div className="position-stat">
+              <span className="stat-label">Win Rate:</span>
+              <span className="stat-value">
+                {myPosition.total_bets > 0 ? Math.round((myPosition.won_bets / myPosition.total_bets) * 100) : 0}%
+              </span>
+            </div>
+            <div className="position-stat">
+              <span className="stat-label">Total Bets:</span>
+              <span className="stat-value">{myPosition.total_bets}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search Section */}
       <div className="rankings-search-section">
@@ -1603,6 +1633,42 @@ function App() {
             )}
           </div>
         )}
+      </div>
+
+      {/* Filters Section */}
+      <div className="rankings-filters">
+        <h4>🌍 Filter Rankings</h4>
+        <div className="filter-buttons">
+          <button 
+            className={`filter-btn ${rankingsFilter === 'all' ? 'active' : ''}`}
+            onClick={() => setRankingsFilter('all')}
+          >
+            🌐 Global ({rankings.length})
+          </button>
+          {user && (
+            <button 
+              className={`filter-btn ${rankingsFilter === 'country' ? 'active' : ''}`}
+              onClick={() => setRankingsFilter('country')}
+            >
+              {countryFlags[user.country] || '🏳️'} My Country ({rankings.filter(p => p.country === user.country).length})
+            </button>
+          )}
+          <select 
+            className="country-filter-select"
+            value={rankingsFilter}
+            onChange={(e) => setRankingsFilter(e.target.value)}
+          >
+            <option value="all">Select Country Filter</option>
+            {availableCountries.map(countryCode => (
+              <option key={countryCode} value={countryCode}>
+                {countryFlags[countryCode] || '🏳️'} {t.countries[countryCode] || countryCode} ({rankings.filter(p => p.country === countryCode).length})
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="filter-info">
+          Showing {filteredRankings.length} of {rankings.length} players
+        </div>
       </div>
 
       {/* Top 100 Players Section - Moved to top */}
@@ -1673,13 +1739,18 @@ function App() {
           <div className="stats-col">{t.statistics}</div>
           <div className="score-col">{t.score}</div>
         </div>
-        {rankings.length > 0 ? rankings.map((player, index) => (
-          <div key={player.id} className={`table-row ${index < 3 ? 'top-3' : ''}`}>
+        {filteredRankings.length > 0 ? filteredRankings.map((player, index) => {
+          const isCurrentUser = user && player.id === user.id;
+          const actualRank = rankings.findIndex(p => p.id === player.id) + 1;
+          
+          return (
+          <div key={player.id} className={`table-row ${index < 3 ? 'top-3' : ''} ${isCurrentUser ? 'current-user' : ''}`}>
             <div className="rank-col">
-              <span className="rank">{player.rank}</span>
+              <span className="rank">#{actualRank}</span>
               {index === 0 && <span className="medal gold">🥇</span>}
               {index === 1 && <span className="medal silver">🥈</span>}
               {index === 2 && <span className="medal bronze">🥉</span>}
+              {isCurrentUser && <span className="you-badge">YOU</span>}
             </div>
             <div className="player-col">
               <div className="player-info">
@@ -1690,17 +1761,29 @@ function App() {
                 </div>
               </div>
             </div>
-            <div className="country-col">{t.countries[player.country] || player.country}</div>
+            <div className="country-col">
+              <span className="country-flag">{countryFlags[player.country] || '🏳️'}</span>
+              {t.countries[player.country] || player.country}
+            </div>
             <div className="stats-col">
               <span>W: {player.won_bets}</span>
               <span>L: {player.lost_bets}</span>
               <span>Total: {player.total_bets}</span>
             </div>
-            <div className="score-col">{Math.round(player.score)}</div>
+            <div className="score-col">
+              {Math.round(player.score)}
+              {isCurrentUser && <span className="trend-icon">📈</span>}
+            </div>
           </div>
-        )) : (
+        )}) : (
           <div className="no-players">
-            <p>Loading rankings...</p>
+            <p>No players found with current filter...</p>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setRankingsFilter('all')}
+            >
+              Show All Players
+            </button>
           </div>
         )}
       </div>
