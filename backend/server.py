@@ -774,6 +774,17 @@ def process_tournament_commission(user_id: str, tournament_id: str, entry_fee: f
         }
         commissions_collection.insert_one(commission_data)
         
+        # Add transaction to wallet
+        add_transaction(
+            user_id=affiliate["user_id"],
+            transaction_type="commission_earned",
+            amount=commission_amount,
+            description=f"Tournament entry commission (€{entry_fee} × {commission_rate*100}%)",
+            commission_id=commission_id,
+            referral_id=referral["id"],
+            tournament_id=tournament_id
+        )
+        
         # Update affiliate stats
         affiliates_collection.update_one(
             {"user_id": affiliate["user_id"]},
