@@ -3513,6 +3513,12 @@ function App() {
           >
             {t.worldMap}
           </button>
+          <button 
+            className={`nav-link ${currentView === 'tournament' ? 'active' : ''}`}
+            onClick={() => setCurrentView('tournament')}
+          >
+            {t.tournament}
+          </button>
           
           {/* Language Selector Dropdown */}
           <div className="language-dropdown">
