@@ -1442,6 +1442,9 @@ function App() {
             <br />
             <span className="hero-subtitle">{t.heroSubtitle}</span>
           </h1>
+          <div className="federation-motto">
+            <span className="motto-text">"Are You Ready to Prove ?"</span>
+          </div>
           <p className="hero-description">
             {t.heroDescription}
           </p>
