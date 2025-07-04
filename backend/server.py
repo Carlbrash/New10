@@ -918,6 +918,11 @@ def get_or_create_wallet(user_id: str) -> dict:
             }
             wallet_balances_collection.insert_one(wallet_data)
             return wallet_data
+        
+        # Convert ObjectId to string
+        if "_id" in wallet:
+            wallet["_id"] = str(wallet["_id"])
+        
         return wallet
     except Exception as e:
         print(f"Error getting/creating wallet: {e}")
