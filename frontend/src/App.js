@@ -4190,6 +4190,144 @@ function App() {
                   </div>
                 </div>
               )}
+              
+              {/* Competition Creation Modal */}
+              {showCompetitionModal && (
+                <div className="modal-overlay" onClick={() => setShowCompetitionModal(false)}>
+                  <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-header">
+                      <h3>🏆 Create New Competition</h3>
+                      <button 
+                        className="modal-close"
+                        onClick={() => setShowCompetitionModal(false)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const startDate = new Date(competitionForm.start_date);
+                      const endDate = new Date(competitionForm.end_date);
+                      
+                      createCompetition({
+                        name: competitionForm.name,
+                        description: competitionForm.description,
+                        region: competitionForm.region,
+                        start_date: startDate.toISOString(),
+                        end_date: endDate.toISOString(),
+                        max_participants: competitionForm.max_participants,
+                        current_participants: 0,
+                        status: 'upcoming',
+                        prize_pool: competitionForm.prize_pool
+                      });
+                    }}>
+                      <div className="modal-body">
+                        <div className="form-grid">
+                          <div className="form-group">
+                            <label>Competition Name*</label>
+                            <input
+                              type="text"
+                              value={competitionForm.name}
+                              onChange={(e) => setCompetitionForm({...competitionForm, name: e.target.value})}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Max Participants*</label>
+                            <input
+                              type="number"
+                              min="10"
+                              max="10000"
+                              value={competitionForm.max_participants}
+                              onChange={(e) => setCompetitionForm({...competitionForm, max_participants: parseInt(e.target.value)})}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Prize Pool (€)*</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={competitionForm.prize_pool}
+                              onChange={(e) => setCompetitionForm({...competitionForm, prize_pool: parseFloat(e.target.value)})}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Region*</label>
+                            <select
+                              value={competitionForm.region}
+                              onChange={(e) => setCompetitionForm({...competitionForm, region: e.target.value})}
+                              className="form-input"
+                              required
+                            >
+                              <option value="Global">Global</option>
+                              <option value="Europe">Europe</option>
+                              <option value="Americas">Americas</option>
+                              <option value="Asia">Asia</option>
+                              <option value="Africa">Africa</option>
+                              <option value="Oceania">Oceania</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        <div className="form-group">
+                          <label>Description*</label>
+                          <textarea
+                            value={competitionForm.description}
+                            onChange={(e) => setCompetitionForm({...competitionForm, description: e.target.value})}
+                            className="form-input"
+                            rows="3"
+                            required
+                          />
+                        </div>
+                        
+                        <div className="date-grid">
+                          <div className="form-group">
+                            <label>Competition Start*</label>
+                            <input
+                              type="datetime-local"
+                              value={competitionForm.start_date}
+                              onChange={(e) => setCompetitionForm({...competitionForm, start_date: e.target.value})}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Competition End*</label>
+                            <input
+                              type="datetime-local"
+                              value={competitionForm.end_date}
+                              onChange={(e) => setCompetitionForm({...competitionForm, end_date: e.target.value})}
+                              className="form-input"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="modal-footer">
+                        <button 
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={() => setShowCompetitionModal(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button type="submit" className="btn btn-primary">
+                          Create Competition
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
