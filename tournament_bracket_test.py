@@ -143,36 +143,79 @@ class TournamentBracketSystemTest(unittest.TestCase):
         
         # Add participants until we have at least 2
         participants_added = 0
-        for user in potential_participants:
+        for user in potential_participants[:5]:  # Limit to 5 additional users
             if tournament["current_participants"] + participants_added >= 2:
                 break
                 
-            # Create participant record directly (simulating a join)
-            participant_data = {
-                "id": str(random.randint(10000000, 99999999)),  # Simple random ID for testing
-                "tournament_id": TournamentBracketSystemTest.test_tournament_id,
-                "user_id": user["id"],
-                "username": user["username"],
-                "full_name": user["full_name"],
-                "country": user["country"],
-                "avatar_url": user.get("avatar_url"),
-                "registered_at": datetime.utcnow().isoformat(),
-                "payment_status": "paid",  # Mark as paid for testing
-                "current_round": 1,
-                "is_eliminated": False,
-                "eliminated_at": None,
-                "final_position": None,
-                "prize_won": None
+            # Use the user's credentials to join the tournament
+            # For testing purposes, we'll use our admin token to simulate the join
+            # This is not ideal but works for testing
+            join_headers = {"Authorization": f"Bearer {TournamentBracketSystemTest.admin_token}"}
+            
+            # Create a temporary user token
+            login_data = {
+                "username": "testuser",  # Use our test user for simplicity
+                "password": "testpass123"
+            }
+            login_response = requests.post(
+                f"{self.base_url}/api/login",
+                json=login_data
+            )
+            
+            if login_response.status_code == 200:
+                temp_token = login_response.json()["token"]
+                
+                # Join the tournament with this token
+                join_headers = {"Authorization": f"Bearer {temp_token}"}
+                join_response = requests.post(
+                    f"{self.base_url}/api/tournaments/{TournamentBracketSystemTest.test_tournament_id}/join",
+                    headers=join_headers
+                )
+                
+                if join_response.status_code == 200:
+                    participants_added += 1
+                    print(f"✅ Added participant: {user['username']}")
+                else:
+                    print(f"⚠️ Failed to add participant {user['username']}: {join_response.text}")
+            
+            # Create a new random user and join the tournament
+            random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            new_user = {
+                "username": f"testuser_{random_suffix}",
+                "email": f"test_{random_suffix}@example.com",
+                "password": "Test@123",
+                "country": "GR",
+                "full_name": f"Test User {random_suffix}",
+                "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
             }
             
-            # We can't directly insert into the database, so we'll use the join endpoint
-            # with the user's token, but this might not work for all users
-            # This is a limitation of the testing approach
+            register_response = requests.post(
+                f"{self.base_url}/api/register",
+                json=new_user
+            )
             
-            # For simplicity, we'll just report how many participants we have
-            participants_added += 1
+            if register_response.status_code == 200:
+                new_token = register_response.json()["token"]
+                
+                # Join the tournament with this new user
+                join_headers = {"Authorization": f"Bearer {new_token}"}
+                join_response = requests.post(
+                    f"{self.base_url}/api/tournaments/{TournamentBracketSystemTest.test_tournament_id}/join",
+                    headers=join_headers
+                )
+                
+                if join_response.status_code == 200:
+                    participants_added += 1
+                    print(f"✅ Added new participant: {new_user['username']}")
+                else:
+                    print(f"⚠️ Failed to add new participant {new_user['username']}: {join_response.text}")
         
-        print(f"✅ Tournament should have {tournament['current_participants'] + participants_added} participants after additions")
+        # Get updated tournament state
+        response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketSystemTest.test_tournament_id}")
+        self.assertEqual(response.status_code, 200)
+        updated_tournament = response.json()
+        
+        print(f"✅ Tournament now has {updated_tournament['current_participants']} participants")
     
     def test_06_generate_bracket(self):
         """Test generating a bracket for the tournament"""
