@@ -2052,7 +2052,7 @@ function App() {
   const declineTeamInvitation = async (invitationId) => {
     setTeamLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/teams/invitations/${invitationId}/decline`, {
+      const response = await fetch(`${API_BASE_URL}/api/teams/invitations/${invitationId}/decline`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
