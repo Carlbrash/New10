@@ -3155,17 +3155,24 @@ async def get_all_transactions(admin_id: str = Depends(verify_admin_token(AdminR
 async def create_manual_adjustment(request: ManualAdjustmentRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
     """Create a manual wallet adjustment"""
     try:
-        # Verify user exists
+        # Try to find user by ID first, then by username
         user = users_collection.find_one({"id": request.user_id})
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            # Try to find by username
+            user = users_collection.find_one({"username": request.user_id})
+        
+        if not user:
+            raise HTTPException(status_code=404, detail=f"User not found with ID or username: {request.user_id}")
+        
+        # Use the actual user ID from the found user
+        actual_user_id = user["id"]
         
         # Add transaction
         transaction_type = "manual_adjustment"
         description = f"Manual adjustment: {request.reason}"
         
         success = add_transaction(
-            user_id=request.user_id,
+            user_id=actual_user_id,
             transaction_type=transaction_type,
             amount=request.amount,
             description=description,
@@ -3181,14 +3188,16 @@ async def create_manual_adjustment(request: ManualAdjustmentRequest, admin_id: s
         log_admin_action(
             admin_id=admin_id,
             action="manual_wallet_adjustment",
-            target_id=request.user_id,
-            details=f"Adjusted wallet balance by €{request.amount}. Reason: {request.reason}"
+            target_id=actual_user_id,
+            details=f"Adjusted wallet balance by €{request.amount} for user {user['username']} ({user['full_name']}). Reason: {request.reason}"
         )
         
         return {
             "message": "Manual adjustment processed successfully",
             "amount": request.amount,
-            "user_id": request.user_id,
+            "user_id": actual_user_id,
+            "username": user["username"],
+            "full_name": user["full_name"],
             "reason": request.reason
         }
         
