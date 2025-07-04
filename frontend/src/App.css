@@ -5037,6 +5037,205 @@ body {
   50% { opacity: 0.5; }
 }
 
+/* Tournament Dashboard Styles */
+.user-tournaments-section {
+  background: linear-gradient(145deg, rgba(26, 26, 46, 0.9), rgba(22, 33, 62, 0.9));
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.user-tournaments-section h3 {
+  color: #ffd700;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.no-tournaments-dash {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.no-tournaments-dash p {
+  margin-bottom: 1rem;
+}
+
+.user-tournaments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.user-tournament-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 215, 0, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.user-tournament-card:hover {
+  border-color: rgba(255, 215, 0, 0.3);
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.user-tournament-card h4 {
+  color: #ffd700;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.tournament-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+}
+
+.tournament-info-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.tournament-info-item span:first-child {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tournament-info-item span:last-child {
+  color: #ffd700;
+  font-weight: 600;
+}
+
+.participation-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.status-badge {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.joined-date {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.view-all-tournaments {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Tournament Admin Styles */
+.tournament-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.tournaments-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+}
+
+.tournament-admin-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.tournament-admin-card:hover {
+  border-color: rgba(255, 215, 0, 0.4);
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.tournament-admin-card .tournament-admin-header {
+  margin-bottom: 1rem;
+}
+
+.tournament-admin-card h4 {
+  color: #ffd700;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.tournament-admin-details {
+  margin-bottom: 1rem;
+}
+
+.tournament-admin-details p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tournament-admin-details strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tournament-admin-actions {
+  text-align: right;
+}
+
+/* Form Grid for Tournament Modal */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.date-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .user-tournaments-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tournaments-admin-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-grid,
+  .date-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .user-tournaments-section {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-tournament-card {
+    padding: 0.8rem;
+  }
+  
+  .tournament-info-item {
+    font-size: 0.8rem;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .tournament-container,
