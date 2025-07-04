@@ -10,7 +10,7 @@ class BettingFederationAPITest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(BettingFederationAPITest, self).__init__(*args, **kwargs)
         # Use the public endpoint from frontend/.env
-        self.base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+        self.base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         
@@ -209,7 +209,7 @@ class BettingFederationAPITest(unittest.TestCase):
 class DecimalRemovalTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(DecimalRemovalTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+        self.base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
     
     def test_01_ui_decimal_removal_verification(self):
         """Test that UI correctly rounds decimal values from the API"""
@@ -279,7 +279,7 @@ class DecimalRemovalTester(unittest.TestCase):
 class BackupTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(BackupTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+        self.base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
 
     def test_01_direct_targz_download(self):
         """Test direct download of TAR.GZ backup file"""
@@ -340,7 +340,7 @@ class BackupTester(unittest.TestCase):
 class AvatarTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(AvatarTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+        self.base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
         
         # Generate random user data for testing with avatar
         random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
@@ -428,7 +428,7 @@ class AvatarTester(unittest.TestCase):
 class WorldMapSearchTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(WorldMapSearchTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+        self.base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
     
     def test_01_country_stats_for_search(self):
         """Test that country stats API returns data needed for search functionality"""
@@ -481,7 +481,7 @@ class WorldMapSearchTester(unittest.TestCase):
 class GlobalRankingsTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(GlobalRankingsTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+        self.base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
     
     def test_01_global_rankings_data(self):
         """Test that global rankings API returns complete data with avatars"""
@@ -547,7 +547,7 @@ class GlobalRankingsTester(unittest.TestCase):
         print("✅ Enhanced search functionality test completed - UI testing required for full verification")
 
 class SiteMessagesTester(unittest.TestCase):
-    base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+    base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
     # Using the correct credentials from server.py
     admin_credentials = {
         "username": "God",
@@ -801,7 +801,7 @@ def run_tests():
     runner.run(site_messages_suite)
 
 class RankingsAndSearchTester(unittest.TestCase):
-    base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+    base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
     # Using the correct credentials from server.py
     admin_credentials = {
         "username": "admin",
@@ -1151,7 +1151,7 @@ def run_tests():
     runner.run(rankings_search_suite)
 
 class TournamentSystemTester(unittest.TestCase):
-    base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+    base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
     
     # Admin credentials for admin endpoints
     admin_credentials = {

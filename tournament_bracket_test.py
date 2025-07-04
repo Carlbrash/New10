@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import sys
 
 class TournamentBracketSystemTest(unittest.TestCase):
-    base_url = "https://9a155af6-4fb4-409a-bd7d-4ed787a6621a.preview.emergentagent.com"
+    base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
     
     # Admin credentials for admin endpoints
     admin_credentials = {
