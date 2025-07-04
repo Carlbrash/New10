@@ -1194,6 +1194,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ ISSUE FOUND: The renderTeams function is referenced in the code but not defined. Additionally, there are two declarations of the fetchTeams function (lines 1900 and 2067) causing a compilation error: 'SyntaxError: /app/frontend/src/App.js: Identifier 'fetchTeams' has already been declared. (2067:8)'"
+      - working: false
+        agent: "testing"
+        comment: "Confirmed the duplicate fetchTeams declaration error. The first declaration is at line 1900 and there appears to be another declaration around line 2067. This is causing a compilation error that prevents the app from loading properly. The error message in the frontend logs is: 'SyntaxError: /app/frontend/src/App.js: Identifier 'fetchTeams' has already been declared. (2067:8)'"
 
   - task: "Team Creation Modal"
     implemented: false
