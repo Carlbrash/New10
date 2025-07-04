@@ -24,7 +24,7 @@ I've completed testing of the Team System backend endpoints. Most endpoints are 
 
 ### 5. GET /api/teams/my-invitations (get invitations)
 - **Status**: ❌ Not Working
-- **Details**: When testing with the admin user who was invited to a team, the endpoint returned a 404 error with 'Team not found' message. This suggests an issue with the invitation retrieval logic.
+- **Details**: When testing with the admin user who was invited to a team, the endpoint returned a 404 error with 'Team not found' message. After investigating the database, we found that the invitation status was already set to "accepted", but the endpoint is only looking for invitations with status "PENDING". The error message "Team not found" is misleading and doesn't accurately reflect the actual issue.
 
 ### 6. POST /api/teams/invitations/{invitation_id}/accept (accept invitation)
 - **Status**: ✅ Working
