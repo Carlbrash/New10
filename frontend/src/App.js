@@ -4160,7 +4160,9 @@ function App() {
                   className="btn btn-primary"
                   onClick={() => {
                     console.log('🏆 Create Tournament button clicked!');
+                    console.log('showTournamentModal before:', showTournamentModal);
                     setShowTournamentModal(true);
+                    console.log('setShowTournamentModal(true) called');
                   }}
                 >
                   🏆 Create New Tournament
