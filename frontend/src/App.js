@@ -137,6 +137,7 @@ const translations = {
     
     // Tournament System
     tournament: 'Tournament',
+    teams: 'Teams',
     tournaments: 'Tournaments',
     tournamentTitle: 'Διαθέσιμα Tournaments',
     joinTournament: 'Συμμετοχή',
