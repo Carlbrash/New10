@@ -1749,6 +1749,31 @@ async def startup_event():
                 "is_active": True,
                 "winner_id": None,
                 "results": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Free Beginner Tournament",
+                "description": "Free tournament for new players to practice. No entry fee, pure fun competition!",
+                "duration_type": "daily",
+                "tournament_format": "single_elimination",
+                "status": "open",
+                "entry_fee": 0.0,
+                "entry_fee_category": "free",
+                "max_participants": 32,
+                "current_participants": 0,
+                "prize_distribution": "winner_takes_all",
+                "total_prize_pool": 0.0,
+                "created_at": now,
+                "registration_start": now,
+                "registration_end": now + timedelta(hours=18),
+                "tournament_start": now + timedelta(hours=20),
+                "tournament_end": now + timedelta(days=1, hours=4),
+                "rules": "Free tournament for beginners. No entry fee required. Perfect for practice and learning.",
+                "region": "Global",
+                "created_by": "admin",
+                "is_active": True,
+                "winner_id": None,
+                "results": None
             }
         ]
         
