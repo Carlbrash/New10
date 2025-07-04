@@ -6750,7 +6750,10 @@ function App() {
             
             <div className="modal-content">
               <div className="form-group">
-                <label>User ID:</label>
+                <label>User Selection:</label>
+                <div style={{ marginBottom: '8px', fontSize: '14px', color: '#94a3b8' }}>
+                  💡 Common User IDs: testuser, admin, God, or type any username
+                </div>
                 <input
                   type="text"
                   value={manualAdjustmentForm.user_id}
@@ -6758,9 +6761,19 @@ function App() {
                     ...manualAdjustmentForm,
                     user_id: e.target.value
                   })}
-                  placeholder="Enter user ID"
+                  placeholder="Enter User ID (e.g., testuser, admin, God)"
                   className="form-input"
                 />
+                <div style={{ 
+                  marginTop: '8px', 
+                  padding: '8px', 
+                  backgroundColor: 'rgba(255, 215, 0, 0.1)', 
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  color: '#ffd700'
+                }}>
+                  ℹ️ Tip: You can use usernames like 'testuser', 'admin', 'God' or any valid user ID from the system
+                </div>
               </div>
               
               <div className="form-group">
