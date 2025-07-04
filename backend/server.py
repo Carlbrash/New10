@@ -345,6 +345,79 @@ class PayoutStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
 
+class TransactionType(str, Enum):
+    COMMISSION_EARNED = "commission_earned"
+    PAYOUT_REQUESTED = "payout_requested"
+    PAYOUT_COMPLETED = "payout_completed"
+    PAYOUT_FAILED = "payout_failed"
+    MANUAL_ADJUSTMENT = "manual_adjustment"
+    BONUS = "bonus"
+    PENALTY = "penalty"
+
+class WalletBalance(BaseModel):
+    id: str
+    user_id: str
+    
+    # Balance breakdown
+    total_earned: float = 0.0          # Total ever earned
+    available_balance: float = 0.0     # Available for withdrawal
+    pending_balance: float = 0.0       # Pending approval
+    withdrawn_balance: float = 0.0     # Already withdrawn
+    
+    # Commission breakdown
+    registration_commissions: float = 0.0
+    tournament_commissions: float = 0.0
+    deposit_commissions: float = 0.0
+    bonus_earnings: float = 0.0
+    
+    # Payout info
+    lifetime_withdrawals: float = 0.0
+    pending_withdrawal: float = 0.0
+    last_payout_date: Optional[datetime] = None
+    
+    # Settings
+    auto_payout_enabled: bool = False
+    auto_payout_threshold: float = 100.0  # Auto payout when balance reaches this
+    preferred_payout_method: str = "bank_transfer"
+    
+    # Timestamps
+    created_at: datetime
+    updated_at: datetime
+
+class Transaction(BaseModel):
+    id: str
+    user_id: str
+    
+    # Transaction details
+    transaction_type: TransactionType
+    amount: float
+    currency: str = "EUR"
+    
+    # Related records
+    commission_id: Optional[str] = None
+    payout_id: Optional[str] = None
+    referral_id: Optional[str] = None
+    tournament_id: Optional[str] = None
+    
+    # Balance impact
+    balance_before: float
+    balance_after: float
+    
+    # Description and metadata
+    description: str
+    metadata: dict = {}
+    
+    # Admin info
+    processed_by: Optional[str] = None  # Admin who processed (for manual adjustments)
+    admin_notes: Optional[str] = None
+    
+    # Status
+    is_processed: bool = True
+    processed_at: datetime
+    
+    # Timestamps
+    created_at: datetime
+
 class Affiliate(BaseModel):
     id: str
     user_id: str  # The user who becomes an affiliate
