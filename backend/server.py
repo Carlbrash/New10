@@ -1123,10 +1123,20 @@ def calculate_admin_financial_overview() -> dict:
         
         # Pending payouts
         pending_payouts = list(payouts_collection.find({"status": "pending"}))
+        # Convert ObjectId to string
+        for payout in pending_payouts:
+            if "_id" in payout:
+                payout["_id"] = str(payout["_id"])
+        
         total_pending_payouts = sum([p["amount"] for p in pending_payouts])
         
         # Total commissions owed (all unpaid commissions)
         unpaid_commissions = list(commissions_collection.find({"is_paid": False}))
+        # Convert ObjectId to string
+        for commission in unpaid_commissions:
+            if "_id" in commission:
+                commission["_id"] = str(commission["_id"])
+        
         total_commissions_owed = sum([c["amount"] for c in unpaid_commissions])
         
         # Monthly commission costs
@@ -1134,6 +1144,11 @@ def calculate_admin_financial_overview() -> dict:
         monthly_commissions = list(commissions_collection.find({
             "created_at": {"$gte": current_month_start}
         }))
+        # Convert ObjectId to string
+        for commission in monthly_commissions:
+            if "_id" in commission:
+                commission["_id"] = str(commission["_id"])
+        
         monthly_commission_costs = sum([c["amount"] for c in monthly_commissions])
         
         # Platform revenue (this would be calculated based on tournament entries, deposits, etc.)
@@ -1141,6 +1156,11 @@ def calculate_admin_financial_overview() -> dict:
         monthly_tournaments = list(tournament_participants_collection.find({
             "joined_at": {"$gte": current_month_start}
         }))
+        # Convert ObjectId to string
+        for tournament in monthly_tournaments:
+            if "_id" in tournament:
+                tournament["_id"] = str(tournament["_id"])
+        
         estimated_revenue = len(monthly_tournaments) * 10  # Estimate €10 average per entry
         
         # Affiliate conversion rate
@@ -1150,6 +1170,11 @@ def calculate_admin_financial_overview() -> dict:
         
         # Top affiliates
         top_affiliates_data = list(affiliates_collection.find({}).sort("total_earnings", -1).limit(10))
+        # Convert ObjectId to string
+        for affiliate in top_affiliates_data:
+            if "_id" in affiliate:
+                affiliate["_id"] = str(affiliate["_id"])
+        
         top_affiliates = []
         for affiliate in top_affiliates_data:
             user = users_collection.find_one({"id": affiliate["user_id"]})
@@ -1165,6 +1190,11 @@ def calculate_admin_financial_overview() -> dict:
         
         # Recent transactions (all users)
         recent_transactions = list(transactions_collection.find({}).sort("created_at", -1).limit(20))
+        # Convert ObjectId to string
+        for transaction in recent_transactions:
+            if "_id" in transaction:
+                transaction["_id"] = str(transaction["_id"])
+        
         for transaction in recent_transactions:
             user = users_collection.find_one({"id": transaction["user_id"]})
             if user:
