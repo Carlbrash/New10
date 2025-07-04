@@ -687,6 +687,39 @@ function App() {
     }
   };
 
+  // Mobile swipe navigation
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe || isRightSwipe) {
+      handleSwipeNavigation(isLeftSwipe);
+    }
+  };
+
+  const handleSwipeNavigation = (isLeftSwipe) => {
+    const views = ['home', 'dashboard', 'rankings', 'worldmap'];
+    const currentIndex = views.indexOf(currentView);
+    
+    if (isLeftSwipe && currentIndex < views.length - 1) {
+      setCurrentView(views[currentIndex + 1]);
+    } else if (!isLeftSwipe && currentIndex > 0) {
+      setCurrentView(views[currentIndex - 1]);
+    }
+  };
+
   const updateProfile = async (e) => {
     e.preventDefault();
     setSettingsLoading(true);
