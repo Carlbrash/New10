@@ -1574,6 +1574,91 @@ function App() {
     }
   }, [user, token]);
 
+  // =============================================================================
+  // TOURNAMENT BRACKET FUNCTIONS
+  // =============================================================================
+  
+  const fetchTournamentBracket = async (tournamentId) => {
+    setBracketLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/bracket`);
+      if (response.ok) {
+        const data = await response.json();
+        setTournamentBracket(data.bracket);
+        setTournamentMatches(data.matches);
+      } else {
+        console.error('Failed to fetch tournament bracket:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching tournament bracket:', error);
+    }
+    setBracketLoading(false);
+  };
+
+  const generateTournamentBracket = async (tournamentId) => {
+    if (!token || !isAdmin) {
+      alert('Admin access required');
+      return;
+    }
+    
+    setBracketLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/generate-bracket`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        alert('Bracket generated successfully!');
+        fetchTournamentBracket(tournamentId);
+        // Refresh tournament details
+        fetchTournamentDetails(tournamentId);
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to generate bracket');
+      }
+    } catch (error) {
+      console.error('Error generating bracket:', error);
+      alert('Error generating bracket');
+    }
+    setBracketLoading(false);
+  };
+
+  const setMatchWinner = async (matchId, winnerId) => {
+    if (!token || !isAdmin) {
+      alert('Admin access required');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tournaments/matches/${matchId}/winner`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ winner_id: winnerId })
+      });
+      
+      if (response.ok) {
+        alert('Match winner set successfully!');
+        // Refresh bracket
+        if (selectedTournament) {
+          fetchTournamentBracket(selectedTournament.id);
+        }
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to set match winner');
+      }
+    } catch (error) {
+      console.error('Error setting match winner:', error);
+      alert('Error setting match winner');
+    }
+  };
+
   // Search Users Function
   const handleUserSearch = (searchTerm) => {
     setUserSearchTerm(searchTerm);
