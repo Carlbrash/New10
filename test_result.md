@@ -102,10 +102,10 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Added search functionality to Rankings page and Top 100 players list in both Rankings page and Admin panel. User requested: 'stin selida Ranking thelo na prosthesoyme pano apo thn arxh ths lista kai kato apo tin epikefalida GLOBAL RANKING ena pedio sertche poy tha mporrei o kathenas na pliktrologi to onoma i to user name kai na vriksi ti thesi einai kapoios sto pagosmio ranking ( episis sto telos tis listas thelo me ton tropo poy eixame valei sto admin panel tin lista ton 100 ana dekades (prpei na tin diorthosoyme pali giati sto teleytaio update xalase ) na thn valoyme kai edw sto ranking'"
+user_problem_statement: "Test the new Tournament System backend that was just implemented."
 
 backend:
-  - task: "Rankings API Endpoint"
+  - task: "Tournament API Endpoints - GET /api/tournaments"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -115,9 +115,9 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "Rankings API (/api/rankings) is working correctly. Returns proper ranking data with scores, includes all required fields for search functionality (username, full_name, country, score). Score calculations are working as expected."
+        comment: "GET /api/tournaments endpoint is working correctly. Returns list of tournaments with proper filtering by status, category, and duration. Found 5 sample tournaments with different entry fees (€5, €10, €25, €100, €500) and different durations (instant, daily, two_day, weekly, monthly)."
 
-  - task: "Top 100 Users API Endpoint"
+  - task: "Tournament API Endpoints - GET /api/tournaments/{tournament_id}"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -127,9 +127,9 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "Top 100 Users API (/api/admin/users/top100) is working correctly. Returns sorted users by score in descending order, includes all required fields for the Top 100 display functionality."
+        comment: "GET /api/tournaments/{tournament_id} endpoint is working correctly. Returns detailed tournament information including participants list and correctly calculated prize pool."
 
-  - task: "Site Messages GET Endpoint"
+  - task: "Tournament API Endpoints - POST /api/tournaments/{tournament_id}/join"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -139,9 +139,9 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "GET /api/site-messages endpoint is working correctly. It returns an array of messages with the expected structure."
+        comment: "POST /api/tournaments/{tournament_id}/join endpoint is working correctly. Successfully joins open tournaments and properly handles authentication. Correctly prevents joining tournaments that are not open for registration."
 
-  - task: "Site Messages POST Endpoint"
+  - task: "Tournament API Endpoints - DELETE /api/tournaments/{tournament_id}/leave"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -151,9 +151,9 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "POST /api/admin/site-message endpoint is working correctly. Successfully created a new site message with admin authentication."
+        comment: "DELETE /api/tournaments/{tournament_id}/leave endpoint is working correctly. Successfully leaves tournaments and properly handles authentication. Correctly prevents leaving tournaments that have already started."
 
-  - task: "Site Messages Database Integration"
+  - task: "Tournament API Endpoints - GET /api/tournaments/user/{user_id}"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -163,9 +163,9 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "MongoDB integration for site messages is working correctly. Created messages are properly stored in the database and can be retrieved via the GET endpoint."
+        comment: "GET /api/tournaments/user/{user_id} endpoint is working correctly. Returns list of tournaments that a user has joined with proper authentication checks."
 
-  - task: "Rankings API Endpoint"
+  - task: "Admin Tournament Endpoints - GET /api/admin/tournaments"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -175,9 +175,9 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "GET /api/rankings endpoint is working correctly. It returns an array of users with proper score calculations. The data includes all required fields for search functionality: username, full_name, country, and score. The score calculation logic is working as expected."
+        comment: "GET /api/admin/tournaments endpoint is working correctly. Returns all tournaments (including inactive ones) with admin authentication. Properly restricts access to admin users only."
 
-  - task: "Top 100 Users API Endpoint"
+  - task: "Admin Tournament Endpoints - POST /api/admin/tournaments"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -187,139 +187,98 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "GET /api/admin/users/top100 endpoint is working correctly. It returns up to 100 users sorted by score in descending order. The data includes all required fields for the Top 100 functionality: full_name, username, score, and country. Authentication is working properly for this admin endpoint."
+        comment: "POST /api/admin/tournaments endpoint is working correctly. Successfully creates new tournaments with admin authentication. Properly sets entry fee category based on the entry fee amount."
 
-frontend:
-  - task: "Rankings Page Search Functionality"
+  - task: "Admin Tournament Endpoints - PUT /api/admin/tournaments/{tournament_id}"
     implemented: true
     working: true
-    file: "/app/frontend/src/App.js"
+    file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
-      - working: true
-        agent: "main"
-        comment: "✅ IMPLEMENTED: Added search functionality to Rankings page. Users can now search by name or username to find their ranking position. Search includes real-time results with visual feedback for found/not found users."
-
-  - task: "Rankings Page Top 100 Display"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/App.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "✅ IMPLEMENTED: Added Top 100 players display to Rankings page. Shows complete Top 100 list organized in groups of 10, with toggle show/hide functionality and refresh capability."
-
-  - task: "Admin Panel Top 100 Display"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/App.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "✅ IMPLEMENTED: Added Top 100 players display to Admin Panel User Management section. Shows same functionality as Rankings page with groups of 10 players, organized by ranking positions."
-
-  - task: "Site Messages Banner Display"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/App.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "testing"
-        comment: "Frontend testing was not part of this test scope. Only backend functionality was tested."
-      - working: false
-        agent: "testing"
-        comment: "The site messages banner is visible and displays existing messages correctly. However, newly created messages do not appear in the banner immediately after creation. When creating a new message through the admin panel, the message is saved to the backend (API returns 422 error), but it doesn't appear in the banner even after using the manual refresh button."
       - working: true
         agent: "testing"
-        comment: "The fix for the site messages banner functionality is working correctly. Successfully created two new messages: one without an expiration date and one with a future expiration date. Both messages appeared in the banner immediately after creation."
+        comment: "PUT /api/admin/tournaments/{tournament_id} endpoint is working correctly. Successfully updates tournament details with admin authentication. Properly prevents updating tournaments that are ongoing or completed."
+
+  - task: "Admin Tournament Endpoints - DELETE /api/admin/tournaments/{tournament_id}"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
       - working: true
-        agent: "main"
-        comment: "✅ ISSUE RESOLVED: Fixed the data validation issue where frontend was sending empty string for expires_at instead of null. Modified createSiteMessage function in App.js to properly handle optional expiration dates. Added comprehensive debug logging for troubleshooting."
+        agent: "testing"
+        comment: "DELETE /api/admin/tournaments/{tournament_id} endpoint is working correctly. Successfully cancels tournaments with admin authentication. Properly marks tournaments as cancelled instead of deleting them."
+
+  - task: "Tournament Sample Data"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
       - working: true
-        agent: "main"
-        comment: "✅ USER CONFIRMED: User tested the application and confirmed the fix is working correctly - 'ναι τςρα δουλεθει' (yes now it works). Site messages now appear in the banner immediately after creation."
+        agent: "testing"
+        comment: "Sample tournament data is correctly created during startup. Found 5 sample tournaments with different entry fees (€5, €10, €25, €100, €500), different statuses (open, upcoming), and different durations (instant, daily, two_day, weekly, monthly)."
 
-metadata:
-  created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 5
-  run_ui: false
-  final_status: "COMPLETED"
+  - task: "Tournament Authentication"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tournament authentication is working correctly. User endpoints require valid user token, admin endpoints require admin credentials, and unauthorized access is properly rejected with appropriate status codes (401 for no auth, 403 for insufficient privileges)."
 
-test_plan:
-  current_focus: []
-  stuck_tasks: []
-  test_all: false
-  test_priority: "completed"
-  next_phase: "ready_for_frontend_testing_or_user_validation"
+  - task: "Tournament Join/Leave Logic"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tournament join/leave logic is working correctly. Users can join open tournaments and leave tournaments before they start. The system correctly prevents joining full tournaments, joining upcoming tournaments, and leaving ongoing tournaments."
 
-agent_communication:
-  - agent: "testing"
-    message: "I've completed testing of the site messages functionality in the backend. All tests are passing. The GET /api/site-messages endpoint correctly returns active messages, and the POST /api/admin/site-message endpoint successfully creates new messages with proper admin authentication."
-  - agent: "testing"
-    message: "I've tested the site messages banner functionality in the frontend. The banner is visible and displays existing messages correctly. However, there's an issue with newly created messages not appearing in the banner. When creating a new message through the admin panel, the API returns a 422 error, and the message doesn't appear in the banner even after using the manual refresh button."
-  - agent: "testing"  
-    message: "After the fix was implemented, I successfully tested the site messages banner functionality. The 422 validation error has been resolved, and new messages now appear in the banner immediately after creation."
-  - agent: "main"
-    message: "✅ SUCCESSFULLY FIXED: The site messages banner issue has been completely resolved. The problem was a data validation error where the frontend was sending an empty string for expires_at instead of null when no expiration date was selected. This caused a 422 error on the backend. The fix involved modifying the createSiteMessage function to properly convert empty expiration date strings to null before sending to the backend."
-  - agent: "main"
-    message: "✅ USER CONFIRMATION: User tested the live application and confirmed the fix is working correctly. The site messages banner now displays new messages immediately after creation as expected. Ready to proceed with additional enhancements."
-  - agent: "testing"
-    message: "I've completed comprehensive testing of the Rankings API and Top 100 Users API for the new search functionality. All tests passed successfully: Rankings API returns proper data with scores and all required fields for search (username, full_name, country, score). Top 100 Users API returns correctly sorted users by score. Site messages API continues to work correctly."
-  - agent: "main"
-    message: "✅ SUCCESSFULLY IMPLEMENTED: Added search functionality to Rankings page and Top 100 players display to both Rankings page and Admin panel. Features include: 1) Real-time search in Rankings page to find user position by name/username, 2) Complete Top 100 players list organized in groups of 10 with toggle show/hide, 3) Same Top 100 functionality added to Admin Panel User Management section. All backend APIs tested and working correctly."
-  - agent: "testing"
-    message: "I've completed testing of the rankings and search functionality in the backend. All tests are passing. The GET /api/rankings endpoint correctly returns users with proper score calculations. The GET /api/admin/users/top100 endpoint returns sorted users by score. The user data includes all required fields for search functionality: full_name, username, score, and country. Authentication is working properly for admin endpoints."
-
-metadata:
-  created_by: "main_agent"
-  version: "1.1"
-  test_sequence: 3
-  run_ui: true
-
-test_plan:
-  current_focus: []
-  stuck_tasks: []
-  test_all: false
-  test_priority: "completed"
-
-agent_communication:
-  - agent: "testing"
-    message: "I've completed testing of the site messages functionality in the backend. All tests are passing. The GET /api/site-messages endpoint correctly returns active messages, and the POST /api/admin/site-message endpoint successfully creates new messages with proper admin authentication. The database integration is working correctly, with messages being stored and retrieved properly."
-  - agent: "testing"
-    message: "I've tested the site messages banner functionality in the frontend. The banner is visible and displays existing messages correctly. However, there's an issue with newly created messages not appearing in the banner. When creating a new message through the admin panel, the API returns a 422 error, and the message doesn't appear in the banner even after using the manual refresh button. The banner only shows the existing test message."
-  - agent: "testing"
-    message: "After the fix was implemented, I successfully tested the site messages banner functionality. The 422 validation error has been resolved, and new messages now appear in the banner immediately after creation. Created two test messages with different configurations and both appeared correctly in the scrolling banner."
-  - agent: "main"
-    message: "✅ SUCCESSFULLY FIXED: The site messages banner issue has been completely resolved. The problem was a data validation error where the frontend was sending an empty string for expires_at instead of null when no expiration date was selected. This caused a 422 error on the backend. The fix involved modifying the createSiteMessage function to properly convert empty expiration date strings to null before sending to the backend. All functionality now works as expected."
+  - task: "Tournament Data Validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tournament data validation is working correctly. Tournament participant counts update correctly when users join/leave, prize pools calculate correctly based on entry fee and participant count, and tournament status transitions work as expected."
 
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 2
-  run_ui: true
+  test_sequence: 1
+  run_ui: false
 
 test_plan:
   current_focus:
-    - "Site Messages Banner Display"
-  stuck_tasks: 
-    - "Site Messages Banner Display"
-  test_all: false
+    - "Tournament API Endpoints"
+    - "Admin Tournament Endpoints"
+    - "Tournament Sample Data"
+    - "Tournament Authentication"
+    - "Tournament Join/Leave Logic"
+    - "Tournament Data Validation"
+  stuck_tasks: []
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "testing"
-    message: "I've completed testing of the site messages functionality in the backend. All tests are passing. The GET /api/site-messages endpoint correctly returns active messages, and the POST /api/admin/site-message endpoint successfully creates new messages with proper admin authentication. The database integration is working correctly, with messages being stored and retrieved properly."
-  - agent: "testing"
-    message: "I've tested the site messages banner functionality in the frontend. The banner is visible and displays existing messages correctly. However, there's an issue with newly created messages not appearing in the banner. When creating a new message through the admin panel, the API returns a 422 error, and the message doesn't appear in the banner even after using the manual refresh button. The banner only shows the existing test message. The console logs show 'Failed to fetch' errors when trying to fetch site messages, which might be related to the issue."
+    message: "I've completed comprehensive testing of the Tournament System backend. All endpoints are working correctly with proper authentication, data validation, and business logic. The system correctly handles tournament creation, joining, leaving, and administration. Sample data is correctly created with the expected variety of entry fees, durations, and statuses."
