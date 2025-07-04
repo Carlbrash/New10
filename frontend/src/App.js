@@ -6374,8 +6374,6 @@ function App() {
           )}
         </div>
         </div>
-
-          <div 
             className="modal-overlay" 
             style={{
               position: 'fixed',
