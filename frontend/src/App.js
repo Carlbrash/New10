@@ -436,17 +436,48 @@ function App() {
   };
 
   const fetchTop100Users = async () => {
+    setTop100Loading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/users/top100`, {
+      // Try with token first (for admin users)
+      let response = await fetch(`${API_BASE_URL}/api/admin/users/top100`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (response.ok) {
+      
+      // If admin endpoint fails, try to get from rankings (fallback)
+      if (!response.ok) {
+        console.log('Admin endpoint failed, using rankings fallback...');
+        response = await fetch(`${API_BASE_URL}/api/rankings?limit=100`);
+        if (response.ok) {
+          const data = await response.json();
+          // Take first 100 from rankings and format them
+          const top100 = data.rankings.slice(0, 100).map(user => ({
+            full_name: user.full_name,
+            username: user.username,
+            score: user.score,
+            country: user.country,
+            avatar_url: user.avatar_url
+          }));
+          setTop100Users(top100);
+        }
+      } else {
         const data = await response.json();
         setTop100Users(data.top_users);
       }
     } catch (error) {
       console.error('Error fetching top 100 users:', error);
+      // Last fallback: use current rankings
+      if (rankings.length > 0) {
+        const top100 = rankings.slice(0, 100).map(user => ({
+          full_name: user.full_name,
+          username: user.username,
+          score: user.score,
+          country: user.country,
+          avatar_url: user.avatar_url
+        }));
+        setTop100Users(top100);
+      }
     }
+    setTop100Loading(false);
   };
 
   // Search for user in rankings
