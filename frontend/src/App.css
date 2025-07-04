@@ -4669,6 +4669,39 @@ body {
   padding: 0.5rem;
 }
 
+/* Form inputs and dropdowns in modals */
+.form-input {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  color: #ffd700;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+  outline: none;
+}
+
+.form-input option {
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffd700;
+  padding: 0.5rem;
+}
+
+.form-input select option {
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffd700;
+}
+
+.form-input::placeholder {
+  color: rgba(255, 215, 0, 0.6);
+}
+
 .tournament-filter:hover,
 .tournament-filter:focus {
   border-color: #ffd700;
