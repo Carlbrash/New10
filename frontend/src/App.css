@@ -3861,6 +3861,11 @@ body {
     padding: 15px;
   }
   
+  .avatar-placeholder {
+    font-size: 2rem;
+  }
+}
+  
 /* Enhanced Mobile Accessibility Styles */
 
 /* Touch-Friendly Button Improvements */
