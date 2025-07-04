@@ -1036,6 +1036,380 @@ async def update_menu_item(item_id: str, item_data: dict, admin_id: str = Depend
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating menu item: {str(e)}")
 
+# =============================================================================
+# TOURNAMENT SYSTEM ENDPOINTS
+# =============================================================================
+
+@app.get("/api/tournaments")
+async def get_tournaments(
+    status: Optional[str] = None,
+    category: Optional[str] = None,
+    duration: Optional[str] = None,
+    user_id: Optional[str] = Depends(lambda: None)
+):
+    """Get list of tournaments with optional filters"""
+    try:
+        query = {"is_active": True}
+        
+        if status:
+            query["status"] = status
+        if category:
+            query["entry_fee_category"] = category
+        if duration:
+            query["duration_type"] = duration
+            
+        tournaments = list(tournaments_collection.find(query))
+        
+        # Convert ObjectId to string and add participant info
+        for tournament in tournaments:
+            tournament.pop("_id", None)
+            
+            # Get participant count
+            participant_count = tournament_participants_collection.count_documents({
+                "tournament_id": tournament["id"]
+            })
+            tournament["current_participants"] = participant_count
+            
+            # Calculate total prize pool
+            tournament["total_prize_pool"] = participant_count * tournament["entry_fee"]
+            
+            # Check if current user is registered (if user_id provided)
+            if user_id:
+                user_registered = tournament_participants_collection.find_one({
+                    "tournament_id": tournament["id"],
+                    "user_id": user_id
+                })
+                tournament["user_registered"] = user_registered is not None
+            else:
+                tournament["user_registered"] = False
+                
+        return {"tournaments": tournaments}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching tournaments: {str(e)}")
+
+@app.get("/api/tournaments/{tournament_id}")
+async def get_tournament_details(tournament_id: str, user_id: Optional[str] = Depends(lambda: None)):
+    """Get detailed tournament information"""
+    try:
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+            
+        tournament.pop("_id", None)
+        
+        # Get participants
+        participants = list(tournament_participants_collection.find({"tournament_id": tournament_id}))
+        for participant in participants:
+            participant.pop("_id", None)
+            
+        tournament["participants"] = participants
+        tournament["current_participants"] = len(participants)
+        tournament["total_prize_pool"] = len(participants) * tournament["entry_fee"]
+        
+        # Check if current user is registered
+        if user_id:
+            user_registered = tournament_participants_collection.find_one({
+                "tournament_id": tournament_id,
+                "user_id": user_id
+            })
+            tournament["user_registered"] = user_registered is not None
+        else:
+            tournament["user_registered"] = False
+            
+        return tournament
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching tournament details: {str(e)}")
+
+@app.post("/api/tournaments/{tournament_id}/join")
+async def join_tournament(tournament_id: str, user_id: str = Depends(verify_token)):
+    """Join a tournament"""
+    try:
+        # Check if tournament exists and is open
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+            
+        if tournament["status"] != "open":
+            raise HTTPException(status_code=400, detail="Tournament is not open for registration")
+            
+        # Check if user is already registered
+        existing_participant = tournament_participants_collection.find_one({
+            "tournament_id": tournament_id,
+            "user_id": user_id
+        })
+        if existing_participant:
+            raise HTTPException(status_code=400, detail="User already registered for this tournament")
+            
+        # Check if tournament is full
+        current_participants = tournament_participants_collection.count_documents({
+            "tournament_id": tournament_id
+        })
+        if current_participants >= tournament["max_participants"]:
+            raise HTTPException(status_code=400, detail="Tournament is full")
+            
+        # Get user data
+        user_data = users_collection.find_one({"id": user_id})
+        if not user_data:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        # Create participant record
+        participant_id = str(uuid.uuid4())
+        participant_data = {
+            "id": participant_id,
+            "tournament_id": tournament_id,
+            "user_id": user_id,
+            "username": user_data["username"],
+            "full_name": user_data["full_name"],
+            "country": user_data["country"],
+            "avatar_url": user_data.get("avatar_url"),
+            "registered_at": datetime.utcnow(),
+            "payment_status": "pending",  # For now, we'll mark as pending
+            "current_round": 1,
+            "is_eliminated": False,
+            "eliminated_at": None,
+            "final_position": None,
+            "prize_won": None
+        }
+        
+        tournament_participants_collection.insert_one(participant_data)
+        
+        # Update tournament participant count
+        new_participant_count = current_participants + 1
+        tournaments_collection.update_one(
+            {"id": tournament_id},
+            {"$set": {"current_participants": new_participant_count}}
+        )
+        
+        return {"message": "Successfully joined tournament", "participant_id": participant_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error joining tournament: {str(e)}")
+
+@app.delete("/api/tournaments/{tournament_id}/leave")
+async def leave_tournament(tournament_id: str, user_id: str = Depends(verify_token)):
+    """Leave a tournament (only if it hasn't started)"""
+    try:
+        # Check if tournament exists
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+            
+        # Check if tournament has started
+        if tournament["status"] in ["ongoing", "completed"]:
+            raise HTTPException(status_code=400, detail="Cannot leave tournament that has started")
+            
+        # Check if user is registered
+        participant = tournament_participants_collection.find_one({
+            "tournament_id": tournament_id,
+            "user_id": user_id
+        })
+        if not participant:
+            raise HTTPException(status_code=404, detail="User not registered for this tournament")
+            
+        # Remove participant
+        tournament_participants_collection.delete_one({
+            "tournament_id": tournament_id,
+            "user_id": user_id
+        })
+        
+        # Update tournament participant count
+        new_participant_count = tournament_participants_collection.count_documents({
+            "tournament_id": tournament_id
+        })
+        tournaments_collection.update_one(
+            {"id": tournament_id},
+            {"$set": {"current_participants": new_participant_count}}
+        )
+        
+        return {"message": "Successfully left tournament"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error leaving tournament: {str(e)}")
+
+@app.get("/api/tournaments/user/{user_id}")
+async def get_user_tournaments(user_id: str, requesting_user_id: str = Depends(verify_token)):
+    """Get tournaments that a user has joined"""
+    try:
+        # Users can only see their own tournaments unless they're admin
+        if user_id != requesting_user_id:
+            # Check if requesting user is admin
+            user_data = users_collection.find_one({"id": requesting_user_id})
+            if not user_data or user_data.get("admin_role", "user") == "user":
+                raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Get user's tournament participations
+        participants = list(tournament_participants_collection.find({"user_id": user_id}))
+        
+        tournaments = []
+        for participant in participants:
+            tournament = tournaments_collection.find_one({"id": participant["tournament_id"]})
+            if tournament:
+                tournament.pop("_id", None)
+                participant.pop("_id", None)
+                tournament["participation"] = participant
+                tournaments.append(tournament)
+                
+        return {"tournaments": tournaments}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching user tournaments: {str(e)}")
+
+# =============================================================================
+# ADMIN TOURNAMENT ENDPOINTS
+# =============================================================================
+
+@app.post("/api/admin/tournaments")
+async def create_tournament(tournament: TournamentCreate, user_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Create a new tournament (Admin only)"""
+    try:
+        # Determine entry fee category
+        entry_fee_category = EntryFeeCategory.BASIC
+        if tournament.entry_fee <= 10:
+            entry_fee_category = EntryFeeCategory.BASIC
+        elif tournament.entry_fee <= 50:
+            entry_fee_category = EntryFeeCategory.STANDARD
+        elif tournament.entry_fee <= 100:
+            entry_fee_category = EntryFeeCategory.PREMIUM
+        else:
+            entry_fee_category = EntryFeeCategory.VIP
+            
+        # Create tournament
+        tournament_id = str(uuid.uuid4())
+        tournament_data = {
+            "id": tournament_id,
+            "name": tournament.name,
+            "description": tournament.description,
+            "duration_type": tournament.duration_type.value,
+            "tournament_format": tournament.tournament_format.value,
+            "status": TournamentStatus.UPCOMING.value,
+            "entry_fee": tournament.entry_fee,
+            "entry_fee_category": entry_fee_category.value,
+            "max_participants": tournament.max_participants,
+            "current_participants": 0,
+            "prize_distribution": tournament.prize_distribution.value,
+            "total_prize_pool": 0.0,
+            "created_at": datetime.utcnow(),
+            "registration_start": tournament.registration_start,
+            "registration_end": tournament.registration_end,
+            "tournament_start": tournament.tournament_start,
+            "tournament_end": tournament.tournament_end,
+            "rules": tournament.rules,
+            "region": tournament.region,
+            "created_by": user_id,
+            "is_active": True,
+            "winner_id": None,
+            "results": None
+        }
+        
+        tournaments_collection.insert_one(tournament_data)
+        
+        # Log admin action
+        log_admin_action(
+            user_id=user_id,
+            action_type="create_tournament",
+            target_tournament_id=tournament_id,
+            details={"tournament_name": tournament.name, "entry_fee": tournament.entry_fee}
+        )
+        
+        return {"message": "Tournament created successfully", "tournament_id": tournament_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating tournament: {str(e)}")
+
+@app.get("/api/admin/tournaments")
+async def get_all_tournaments(user_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all tournaments for admin management"""
+    try:
+        tournaments = list(tournaments_collection.find({}))
+        
+        for tournament in tournaments:
+            tournament.pop("_id", None)
+            
+            # Get participant count
+            participant_count = tournament_participants_collection.count_documents({
+                "tournament_id": tournament["id"]
+            })
+            tournament["current_participants"] = participant_count
+            tournament["total_prize_pool"] = participant_count * tournament["entry_fee"]
+            
+        return {"tournaments": tournaments}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching tournaments: {str(e)}")
+
+@app.put("/api/admin/tournaments/{tournament_id}")
+async def update_tournament(
+    tournament_id: str, 
+    tournament_update: dict, 
+    user_id: str = Depends(verify_admin_token(AdminRole.ADMIN))
+):
+    """Update tournament details (Admin only)"""
+    try:
+        # Check if tournament exists
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+            
+        # Don't allow updating if tournament is ongoing or completed
+        if tournament["status"] in ["ongoing", "completed"]:
+            raise HTTPException(status_code=400, detail="Cannot update tournament that is ongoing or completed")
+            
+        # Update tournament
+        tournaments_collection.update_one(
+            {"id": tournament_id},
+            {"$set": tournament_update}
+        )
+        
+        # Log admin action
+        log_admin_action(
+            user_id=user_id,
+            action_type="update_tournament",
+            target_tournament_id=tournament_id,
+            details=tournament_update
+        )
+        
+        return {"message": "Tournament updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating tournament: {str(e)}")
+
+@app.delete("/api/admin/tournaments/{tournament_id}")
+async def delete_tournament(tournament_id: str, user_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Delete/cancel a tournament (Admin only)"""
+    try:
+        # Check if tournament exists
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+            
+        # Mark as cancelled instead of deleting
+        tournaments_collection.update_one(
+            {"id": tournament_id},
+            {"$set": {"status": "cancelled", "is_active": False}}
+        )
+        
+        # Log admin action
+        log_admin_action(
+            user_id=user_id,
+            action_type="cancel_tournament",
+            target_tournament_id=tournament_id,
+            details={"tournament_name": tournament["name"]}
+        )
+        
+        return {"message": "Tournament cancelled successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error cancelling tournament: {str(e)}")
+
+# Helper function for admin actions
+def log_admin_action(user_id: str, action_type: str, target_tournament_id: str = None, details: dict = None):
+    """Log admin action for tournaments"""
+    try:
+        action_data = {
+            "id": str(uuid.uuid4()),
+            "admin_id": user_id,
+            "action_type": action_type,
+            "target_tournament_id": target_tournament_id,
+            "details": details or {},
+            "timestamp": datetime.utcnow()
+        }
+        admin_actions_collection.insert_one(action_data)
+    except Exception as e:
+        print(f"Error logging admin action: {e}")
+
 # Initialize some sample data
 @app.on_event("startup")
 async def startup_event():
