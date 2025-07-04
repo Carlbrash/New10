@@ -93,6 +93,9 @@ class TeamSystemAPITest(unittest.TestCase):
         print(f"Response status: {response.status_code}")
         print(f"Response body: {response.text}")
         
+        # Print the request data for debugging
+        print(f"Request data: {json.dumps(team_data, indent=2)}")
+        
         # If team already exists, this might fail with 400
         if response.status_code == 400 and "already a member" in response.text:
             print("⚠️ User is already a member of a team, skipping team creation")
