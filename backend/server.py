@@ -2967,6 +2967,84 @@ async def startup_event():
         users_collection.insert_one(test_user)
         print("Test user created: testuser")
 
+    # Create sample affiliate data
+    if affiliates_collection.count_documents({}) == 0:
+        # Create affiliate for the demo user
+        demo_user = users_collection.find_one({"username": "testuser"})
+        if demo_user:
+            affiliate_data = {
+                "id": str(uuid.uuid4()),
+                "user_id": demo_user["id"],
+                "referral_code": "DEMO2024",
+                "referral_link": generate_referral_link("DEMO2024"),
+                "status": "active",
+                "approved_at": datetime.utcnow(),
+                "approved_by": "system",
+                "total_referrals": 3,
+                "active_referrals": 3,
+                "total_earnings": 35.0,
+                "pending_earnings": 35.0,
+                "paid_earnings": 0.0,
+                "commission_rate_registration": 5.0,
+                "commission_rate_tournament": 0.1,
+                "commission_rate_deposit": 0.05,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            affiliates_collection.insert_one(affiliate_data)
+            print("Sample affiliate created for demo user")
+            
+            # Create some sample referrals and commissions
+            now = datetime.utcnow()
+            
+            # Sample referral 1
+            ref1_id = str(uuid.uuid4())
+            ref1_user_id = str(uuid.uuid4())
+            referral1 = {
+                "id": ref1_id,
+                "affiliate_user_id": demo_user["id"],
+                "referred_user_id": ref1_user_id,
+                "referral_code": "DEMO2024",
+                "registered_at": now - timedelta(days=5),
+                "is_active": True,
+                "total_commissions_earned": 15.0,
+                "tournaments_joined": 2,
+                "total_tournament_fees": 100.0
+            }
+            referrals_collection.insert_one(referral1)
+            
+            # Sample commissions
+            commission1 = {
+                "id": str(uuid.uuid4()),
+                "affiliate_user_id": demo_user["id"],
+                "referred_user_id": ref1_user_id,
+                "referral_id": ref1_id,
+                "commission_type": "registration",
+                "amount": 5.0,
+                "rate_applied": 5.0,
+                "is_paid": False,
+                "created_at": now - timedelta(days=5),
+                "description": "Registration commission for new user referral"
+            }
+            commissions_collection.insert_one(commission1)
+            
+            commission2 = {
+                "id": str(uuid.uuid4()),
+                "affiliate_user_id": demo_user["id"],
+                "referred_user_id": ref1_user_id,
+                "referral_id": ref1_id,
+                "commission_type": "tournament_entry",
+                "amount": 10.0,
+                "rate_applied": 0.1,
+                "tournament_id": "sample_tournament_1",
+                "is_paid": False,
+                "created_at": now - timedelta(days=3),
+                "description": "Tournament entry commission (€100 × 10%)"
+            }
+            commissions_collection.insert_one(commission2)
+            
+            print("Sample affiliate data created")
+
 @app.get("/api/reset-data")
 async def reset_data():
     """Reset all sample data for testing"""
