@@ -45,6 +45,9 @@ affiliates_collection = db.affiliates
 referrals_collection = db.referrals
 commissions_collection = db.commissions
 payouts_collection = db.payouts
+# Financial System Collections
+wallet_balances_collection = db.wallet_balances
+transactions_collection = db.transactions
 
 app = FastAPI(title="WoBeRa - World Betting Rank API")
 
