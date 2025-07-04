@@ -564,6 +564,27 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showWalletSettingsModal, setShowWalletSettingsModal] = useState(false);
+  
+  // Team System States
+  const [teams, setTeams] = useState([]);
+  const [currentTeam, setCurrentTeam] = useState(null);
+  const [teamInvitations, setTeamInvitations] = useState([]);
+  const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+  const [showTeamInviteModal, setShowTeamInviteModal] = useState(false);
+  const [selectedTeamForInvite, setSelectedTeamForInvite] = useState(null);
+  const [teamFormData, setTeamFormData] = useState({
+    name: '',
+    logo_url: '',
+    colors: { primary: '#FF0000', secondary: '#FFFFFF' },
+    city: '',
+    country: '',
+    phone: '',
+    email: ''
+  });
+  const [inviteUsername, setInviteUsername] = useState('');
+  const [teamLoading, setTeamLoading] = useState(false);
   // Rankings search states
   const [rankingSearch, setRankingSearch] = useState('');
   const [rankingSearchResult, setRankingSearchResult] = useState(null);
