@@ -1925,6 +1925,9 @@ function App() {
   };
 
   const createTeam = async () => {
+    console.log('🏆 CREATE TEAM CALLED');
+    console.log('📝 Form data:', teamFormData);
+    
     if (!teamFormData.name || !teamFormData.city || !teamFormData.country || !teamFormData.email) {
       alert('Please fill in all required fields');
       return;
@@ -1932,6 +1935,10 @@ function App() {
     
     setTeamLoading(true);
     try {
+      console.log('📡 Making request to:', `${import.meta.env.REACT_APP_BACKEND_URL}/api/teams`);
+      console.log('🔑 Token available:', !!token);
+      console.log('📦 Payload:', JSON.stringify(teamFormData, null, 2));
+      
       const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/teams`, {
         method: 'POST',
         headers: {
@@ -1941,8 +1948,12 @@ function App() {
         body: JSON.stringify(teamFormData)
       });
 
+      console.log('📨 Response status:', response.status);
+      console.log('📨 Response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Success data:', data);
         alert(`Team "${data.team_name}" created successfully!`);
         setShowCreateTeamModal(false);
         setTeamFormData({
@@ -1957,12 +1968,21 @@ function App() {
         fetchTeams(); // Refresh teams list
         fetchProfile(); // Update user profile with new team
       } else {
-        const error = await response.json();
-        alert(error.detail || 'Failed to create team');
+        const errorText = await response.text();
+        console.log('❌ Error response text:', errorText);
+        
+        try {
+          const error = JSON.parse(errorText);
+          console.log('❌ Error object:', error);
+          alert(`Error: ${error.detail || 'Failed to create team'}`);
+        } catch (e) {
+          console.log('❌ Could not parse error as JSON');
+          alert(`Error: ${errorText || 'Failed to create team'}`);
+        }
       }
     } catch (error) {
-      console.error('Error creating team:', error);
-      alert('Failed to create team');
+      console.error('💥 Network/other error:', error);
+      alert(`Network error: ${error.message}`);
     } finally {
       setTeamLoading(false);
     }
