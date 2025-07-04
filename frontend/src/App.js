@@ -500,6 +500,25 @@ function App() {
     expires_at: ''
   });
   
+  // Tournament Admin States
+  const [adminTournaments, setAdminTournaments] = useState([]);
+  const [showTournamentModal, setShowTournamentModal] = useState(false);
+  const [tournamentForm, setTournamentForm] = useState({
+    name: '',
+    description: '',
+    duration_type: 'daily',
+    tournament_format: 'single_elimination',
+    entry_fee: 10,
+    max_participants: 16,
+    prize_distribution: 'winner_takes_all',
+    registration_start: '',
+    registration_end: '',
+    tournament_start: '',
+    tournament_end: '',
+    rules: '',
+    region: 'Global'
+  });
+  
   // Get current translations
   const t = translations[language];
 
