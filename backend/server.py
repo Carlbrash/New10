@@ -157,6 +157,110 @@ class MenuItem(BaseModel):
     parent_id: Optional[str] = None  # For submenus
     icon: Optional[str] = None
 
+# Tournament System Models
+class TournamentDuration(str, Enum):
+    INSTANT = "instant"
+    DAILY = "daily"
+    TWO_DAY = "two_day"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    LONG_TERM = "long_term"
+
+class TournamentStatus(str, Enum):
+    UPCOMING = "upcoming"
+    OPEN = "open"
+    ONGOING = "ongoing"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class TournamentFormat(str, Enum):
+    SINGLE_ELIMINATION = "single_elimination"
+    ROUND_ROBIN = "round_robin"
+    SWISS = "swiss"
+
+class PrizeDistribution(str, Enum):
+    WINNER_TAKES_ALL = "winner_takes_all"
+    TOP_THREE = "top_three"
+
+class EntryFeeCategory(str, Enum):
+    BASIC = "basic"        # €1-10
+    STANDARD = "standard"  # €11-50
+    PREMIUM = "premium"    # €51-100
+    VIP = "vip"           # €101-10000
+
+class Tournament(BaseModel):
+    id: str
+    name: str
+    description: str
+    duration_type: TournamentDuration
+    tournament_format: TournamentFormat = TournamentFormat.SINGLE_ELIMINATION
+    status: TournamentStatus = TournamentStatus.UPCOMING
+    
+    # Entry & Participants
+    entry_fee: float
+    entry_fee_category: EntryFeeCategory
+    max_participants: int
+    current_participants: int = 0
+    
+    # Prize Distribution
+    prize_distribution: PrizeDistribution
+    total_prize_pool: float = 0.0
+    
+    # Dates
+    created_at: datetime
+    registration_start: datetime
+    registration_end: datetime
+    tournament_start: datetime
+    tournament_end: datetime
+    
+    # Tournament Details
+    rules: str
+    region: Optional[str] = None
+    created_by: str  # Admin who created it
+    
+    # Tournament State
+    is_active: bool = True
+    winner_id: Optional[str] = None
+    results: Optional[dict] = None
+
+class TournamentParticipant(BaseModel):
+    id: str
+    tournament_id: str
+    user_id: str
+    username: str
+    full_name: str
+    country: str
+    avatar_url: Optional[str] = None
+    
+    # Registration
+    registered_at: datetime
+    payment_status: str = "pending"  # pending, paid, refunded
+    
+    # Tournament Progress
+    current_round: int = 1
+    is_eliminated: bool = False
+    eliminated_at: Optional[datetime] = None
+    final_position: Optional[int] = None
+    prize_won: Optional[float] = None
+
+class TournamentCreate(BaseModel):
+    name: str
+    description: str
+    duration_type: TournamentDuration
+    tournament_format: TournamentFormat = TournamentFormat.SINGLE_ELIMINATION
+    entry_fee: float
+    max_participants: int
+    prize_distribution: PrizeDistribution
+    registration_start: datetime
+    registration_end: datetime
+    tournament_start: datetime
+    tournament_end: datetime
+    rules: str
+    region: Optional[str] = None
+
+class TournamentJoin(BaseModel):
+    tournament_id: str
+
 # Helper functions
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
