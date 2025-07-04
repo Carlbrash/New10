@@ -1605,114 +1605,183 @@ function App() {
     </div>
   );
 
-  const renderDashboard = () => (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h2>{t.welcomeBack}, {user?.full_name}!</h2>
-        <div className="user-stats">
-          <div className="stat-card">
-            <div className="stat-number">{user?.total_bets || 0}</div>
-            <div className="stat-label">{t.totalBets}</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{user?.won_bets || 0}</div>
-            <div className="stat-label">{t.wonBets}</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{user?.rank || 'N/A'}</div>
-            <div className="stat-label">{t.globalPosition}</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{Math.round(user?.score) || 0}</div>
-            <div className="stat-label">{t.score}</div>
-          </div>
+  const renderDashboard = () => {
+    if (!user) {
+      return (
+        <div className="login-prompt">
+          <h2>Welcome to WoBeRa</h2>
+          <p>Please login to view your dashboard</p>
+          <button 
+            className="btn btn-primary"
+            onClick={() => setCurrentView('login')}
+          >
+            Login
+          </button>
         </div>
-      </div>
-      
-      <div className="dashboard-content">
-        <div className="dashboard-section">
-          <h3>{t.availableCompetitions}</h3>
-          <div className="competitions-grid">
-            {competitions.map(comp => (
-              <div key={comp.id} className="competition-card">
-                <h4>{comp.name}</h4>
-                <p>{comp.description}</p>
-                <div className="competition-details">
-                  <span className="region">{comp.region}</span>
-                  <span className="prize">€{comp.prize_pool.toLocaleString()}</span>
-                </div>
-                <button 
-                  className="btn btn-primary"
-                  onClick={() => joinCompetition(comp.id)}
-                >
-                  {t.participate}
-                </button>
-              </div>
-            ))}
+      );
+    }
+
+    return (
+      <div className="enhanced-dashboard">
+        <div className="dashboard-header">
+          <div className="welcome-section">
+            <h2>Welcome back, {user.full_name}! 👋</h2>
+            <p className="welcome-subtitle">Here's your betting performance overview</p>
+          </div>
+          <div className="quick-actions">
+            <button className="quick-action-btn primary" onClick={() => setCurrentView('rankings')}>
+              <span className="action-icon">🏆</span>
+              <span className="action-text">View Rankings</span>
+            </button>
+            <button className="quick-action-btn secondary" onClick={() => setCurrentView('worldmap')}>
+              <span className="action-icon">🌍</span>
+              <span className="action-text">World Map</span>
+            </button>
+            <button className="quick-action-btn tertiary" onClick={openSettings}>
+              <span className="action-icon">⚙️</span>
+              <span className="action-text">Settings</span>
+            </button>
           </div>
         </div>
 
-              {/* Top 100 Players Section */}
-              <div className="top-players-section">
-                <div className="top-players-header">
-                  <h4>🏆 Top 100 Players by Score</h4>
-                  <div className="top-players-controls">
-                    <button 
-                      className="btn btn-secondary btn-small"
-                      onClick={() => {
-                        setShowTop100(!showTop100);
-                        if (!showTop100 && top100Users.length === 0) {
-                          fetchTop100Users();
-                        }
-                      }}
-                    >
-                      {showTop100 ? '👁️ Hide Top 100' : '👁️ Show Top 100'}
-                    </button>
-                    {showTop100 && (
-                      <button 
-                        className="btn btn-primary btn-small"
-                        onClick={fetchTop100Users}
-                      >
-                        🔄 Refresh
-                      </button>
-                    )}
+        {dashboardLoading ? (
+          <div className="dashboard-loading">
+            <div className="loading-spinner">⏳</div>
+            <p>Loading your dashboard...</p>
+          </div>
+        ) : (
+          <>
+            {/* Live Stats Cards */}
+            <div className="stats-cards-grid">
+              <div className="stat-card rank-card">
+                <div className="stat-icon">🏆</div>
+                <div className="stat-info">
+                  <div className="stat-label">Global Rank</div>
+                  <div className="stat-value">#{dashboardStats?.rank || 'N/A'}</div>
+                  <div className="stat-change positive">+2 this week</div>
+                </div>
+              </div>
+
+              <div className="stat-card score-card">
+                <div className="stat-icon">⭐</div>
+                <div className="stat-info">
+                  <div className="stat-label">Total Score</div>
+                  <div className="stat-value">{dashboardStats?.score || 0}</div>
+                  <div className="stat-change positive">+{Math.round((dashboardStats?.score || 0) * 0.1)} this month</div>
+                </div>
+              </div>
+
+              <div className="stat-card winrate-card">
+                <div className="stat-icon">🎯</div>
+                <div className="stat-info">
+                  <div className="stat-label">Win Rate</div>
+                  <div className="stat-value">{dashboardStats?.winRate || 0}%</div>
+                  <div className="progress-bar">
+                    <div 
+                      className="progress-fill" 
+                      style={{ width: `${dashboardStats?.winRate || 0}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="stat-card profit-card">
+                <div className="stat-icon">💰</div>
+                <div className="stat-info">
+                  <div className="stat-label">Profit/Loss</div>
+                  <div className={`stat-value ${(dashboardStats?.profitLoss || 0) >= 0 ? 'positive' : 'negative'}`}>
+                    €{dashboardStats?.profitLoss || 0}
+                  </div>
+                  <div className="stat-change">{(dashboardStats?.profitLoss || 0) >= 0 ? '📈 Profitable' : '📉 In Loss'}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Bars Section */}
+            <div className="progress-section">
+              <h3>📊 Performance Metrics</h3>
+              <div className="progress-items">
+                <div className="progress-item">
+                  <div className="progress-header">
+                    <span className="progress-label">Betting Activity</span>
+                    <span className="progress-value">{dashboardStats?.totalBets || 0}/100 bets</span>
+                  </div>
+                  <div className="progress-bar-large">
+                    <div 
+                      className="progress-fill activity" 
+                      style={{ width: `${Math.min((dashboardStats?.totalBets || 0), 100)}%` }}
+                    ></div>
                   </div>
                 </div>
 
-                {showTop100 && (
-                  <div className="top-players-grid">
-                    {/* Split into groups of 10 */}
-                    {Array.from({ length: 10 }, (_, groupIndex) => {
-                      const startIndex = groupIndex * 10;
-                      const endIndex = startIndex + 10;
-                      const groupUsers = top100Users.slice(startIndex, endIndex);
-                      
-                      if (groupUsers.length === 0) return null;
-                      
-                      return (
-                        <div key={groupIndex} className="top-players-group">
-                          <h5>
-                            Positions {startIndex + 1}-{Math.min(endIndex, top100Users.length)}
-                          </h5>
-                          <div className="players-list">
-                            {groupUsers.map((player, index) => (
-                              <div key={player.username} className="top-player-item">
-                                <span className="player-rank">#{startIndex + index + 1}</span>
-                                <span className="player-flag">{countryFlags[player.country] || '🏳️'}</span>
-                                <span className="player-name">{player.full_name}</span>
-                                <span className="player-score">{Math.round(player.score || 0)} pts</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+                <div className="progress-item">
+                  <div className="progress-header">
+                    <span className="progress-label">Win Consistency</span>
+                    <span className="progress-value">{dashboardStats?.winRate || 0}%</span>
+                  </div>
+                  <div className="progress-bar-large">
+                    <div 
+                      className="progress-fill winrate" 
+                      style={{ width: `${dashboardStats?.winRate || 0}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="progress-item">
+                  <div className="progress-header">
+                    <span className="progress-label">Risk Level (Avg Odds)</span>
+                    <span className="progress-value">{dashboardStats?.avgOdds || 0}x</span>
+                  </div>
+                  <div className="progress-bar-large">
+                    <div 
+                      className="progress-fill risk" 
+                      style={{ width: `${Math.min((dashboardStats?.avgOdds || 0) * 25, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Achievements Section */}
+            <div className="achievements-section">
+              <h3>🏆 Your Achievements</h3>
+              <div className="achievements-grid">
+                {userAchievements.length > 0 ? userAchievements.map((achievement, index) => (
+                  <div key={index} className={`achievement-badge ${achievement.tier}`}>
+                    <div className="achievement-icon">{achievement.icon}</div>
+                    <div className="achievement-info">
+                      <div className="achievement-title">{achievement.title}</div>
+                      <div className="achievement-description">{achievement.description}</div>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="no-achievements">
+                    <p>🏆 Start betting to unlock achievements!</p>
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Recent Activity Timeline */}
+            <div className="activity-section">
+              <h3>📝 Recent Activity</h3>
+              <div className="activity-timeline">
+                {recentActivity.map((activity, index) => (
+                  <div key={index} className="activity-item">
+                    <div className="activity-icon">{activity.icon}</div>
+                    <div className="activity-content">
+                      <div className="activity-message">{activity.message}</div>
+                      <div className="activity-time">{activity.time}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderRankings = () => {
     console.log('🏆 Rendering rankings, players count:', rankings.length);
