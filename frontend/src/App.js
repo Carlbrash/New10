@@ -5795,6 +5795,16 @@ function App() {
             </button>
           )}
           
+          {/* Wallet menu item - only show for logged in users */}
+          {user && (
+            <button 
+              className={`nav-link ${currentView === 'wallet' ? 'active' : ''}`}
+              onClick={() => setCurrentView('wallet')}
+            >
+              {t.wallet}
+            </button>
+          )}
+          
           {/* Language Selector Dropdown */}
           <div className="language-dropdown">
             <button 
