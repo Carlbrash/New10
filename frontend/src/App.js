@@ -4974,6 +4974,16 @@ function App() {
             {t.tournament}
           </button>
           
+          {/* Affiliate menu item - only show for logged in users */}
+          {user && (
+            <button 
+              className={`nav-link ${currentView === 'affiliate' ? 'active' : ''}`}
+              onClick={() => setCurrentView('affiliate')}
+            >
+              {t.affiliate}
+            </button>
+          )}
+          
           {/* Language Selector Dropdown */}
           <div className="language-dropdown">
             <button 
