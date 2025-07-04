@@ -4663,6 +4663,12 @@ body {
   transition: all 0.3s ease;
 }
 
+.tournament-filter option {
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffd700;
+  padding: 0.5rem;
+}
+
 .tournament-filter:hover,
 .tournament-filter:focus {
   border-color: #ffd700;
