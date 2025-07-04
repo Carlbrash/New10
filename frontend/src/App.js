@@ -1734,33 +1734,50 @@ function App() {
 
         {showTop100Rankings && (
           <div className="top-players-grid">
-            {/* Split into groups of 10 */}
-            {Array.from({ length: 10 }, (_, groupIndex) => {
-              const startIndex = groupIndex * 10;
-              const endIndex = startIndex + 10;
-              const groupUsers = top100Users.slice(startIndex, endIndex);
-              
-              if (groupUsers.length === 0) return null;
-              
-              return (
-                <div key={groupIndex} className="top-players-group">
-                  <h4>
-                    Positions {startIndex + 1}-{Math.min(endIndex, top100Users.length)}
-                  </h4>
-                  <div className="players-list">
-                    {groupUsers.map((player, index) => (
-                      <div key={player.username} className="top-player-item">
-                        <span className="player-rank">#{startIndex + index + 1}</span>
-                        <span className="player-flag">{countryFlags[player.country] || '🏳️'}</span>
-                        <span className="player-name">{player.full_name}</span>
-                        <span className="player-username">@{player.username}</span>
-                        <span className="player-score">{Math.round(player.score || 0)} pts</span>
-                      </div>
-                    ))}
+            {top100Loading ? (
+              <div className="loading-message">
+                <div className="loading-spinner">⏳</div>
+                <p>Loading Top 100 Players...</p>
+              </div>
+            ) : top100Users.length > 0 ? (
+              /* Split into groups of 10 */
+              Array.from({ length: 10 }, (_, groupIndex) => {
+                const startIndex = groupIndex * 10;
+                const endIndex = startIndex + 10;
+                const groupUsers = top100Users.slice(startIndex, endIndex);
+                
+                if (groupUsers.length === 0) return null;
+                
+                return (
+                  <div key={groupIndex} className="top-players-group">
+                    <h4>
+                      Positions {startIndex + 1}-{Math.min(endIndex, top100Users.length)}
+                    </h4>
+                    <div className="players-list">
+                      {groupUsers.map((player, index) => (
+                        <div key={player.username} className="top-player-item">
+                          <span className="player-rank">#{startIndex + index + 1}</span>
+                          <span className="player-flag">{countryFlags[player.country] || '🏳️'}</span>
+                          <span className="player-name">{player.full_name}</span>
+                          <span className="player-username">@{player.username}</span>
+                          <span className="player-score">{Math.round(player.score || 0)} pts</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="no-data-message">
+                <p>No players data available. Try refreshing.</p>
+                <button 
+                  className="btn btn-primary btn-small"
+                  onClick={fetchTop100Users}
+                >
+                  🔄 Try Again
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
