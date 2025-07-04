@@ -970,6 +970,18 @@ backend:
         agent: "testing"
         comment: "Integration between affiliate system and wallet is working correctly. The wallet system properly reflects affiliate earnings and commissions. The wallet balance and transactions are correctly updated when affiliate commissions are earned."
 
+  - task: "Admin Users - GET /api/admin/users"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/admin/users endpoint is working correctly. Returns a list of all users in the system with complete user details. The endpoint properly requires admin authentication. Found 74 users in the system with proper user information including username, email, country, full name, and admin role."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
@@ -987,6 +999,7 @@ test_plan:
     - "Admin Financial Management - GET /api/admin/financial/transactions"
     - "Admin Financial Management - POST /api/admin/financial/manual-adjustment"
     - "Integration - Affiliate System and Wallet"
+    - "Admin Users - GET /api/admin/users"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
@@ -1006,6 +1019,8 @@ agent_communication:
     message: "I've completed comprehensive testing of the Wallet System and Admin Financial Management endpoints. All endpoints are working correctly with proper authentication, data validation, and business logic. The wallet system correctly handles balance retrieval, stats calculation, transaction listing, and settings updates. The admin financial management system correctly handles financial overview, wallet listing, transaction listing, and manual adjustments. The integration between the affiliate system and wallet is working correctly, with wallet balances and transactions properly reflecting affiliate earnings. All tests passed successfully."
   - agent: "main"
     message: "✅ MANUAL ADJUSTMENT MODAL FIXED: Successfully resolved the persistent modal visibility issue in the Admin Financial Overview. The problem was identified as a CSS background color conflict where the modal overlay was using 'rgba(255, 0, 0, 0.8)' (red background) instead of the standard 'rgba(0, 0, 0, 0.8)' (dark background). This was corrected by the frontend testing agent, and the modal now displays properly with correct visibility and functionality. Backend API for manual adjustments was already working correctly."
+  - agent: "testing"
+    message: "I've completed testing of the Admin Users endpoint (GET /api/admin/users). The endpoint is working correctly and returns a list of all users in the system with complete user details. The endpoint properly requires admin authentication and returns the expected user information. Found 74 users in the system with proper user information including username, email, country, full name, and admin role. This endpoint will be useful for the manual adjustment modal UX improvement as it provides all the necessary user information for selection."
 
 frontend:
   - task: "Tournament Menu Item"
