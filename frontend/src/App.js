@@ -711,6 +711,33 @@ function App() {
     notes: ''
   });
   
+  // Wallet System States
+  const [walletBalance, setWalletBalance] = useState(null);
+  const [walletStats, setWalletStats] = useState(null);
+  const [walletTransactions, setWalletTransactions] = useState([]);
+  const [walletView, setWalletView] = useState('dashboard'); // dashboard, transactions, settings
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [showWalletSettingsModal, setShowWalletSettingsModal] = useState(false);
+  const [walletSettings, setWalletSettings] = useState({
+    auto_payout_enabled: false,
+    auto_payout_threshold: 100.0,
+    preferred_payout_method: 'bank_transfer'
+  });
+  
+  // Admin Financial States
+  const [financialOverview, setFinancialOverview] = useState(null);
+  const [adminWallets, setAdminWallets] = useState([]);
+  const [adminTransactions, setAdminTransactions] = useState([]);
+  const [financialLoading, setFinancialLoading] = useState(false);
+  const [showManualAdjustmentModal, setShowManualAdjustmentModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [manualAdjustmentForm, setManualAdjustmentForm] = useState({
+    user_id: '',
+    amount: '',
+    reason: '',
+    admin_notes: ''
+  });
+  
   // Get current translations
   const t = translations[language];
 
