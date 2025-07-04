@@ -529,6 +529,115 @@ function App() {
     return countries;
   };
 
+  // Enhanced Dashboard functions
+  const fetchDashboardStats = async () => {
+    if (!user) return;
+    
+    setDashboardLoading(true);
+    try {
+      // Calculate user stats
+      const userRanking = rankings.find(player => player.id === user.id);
+      const winRate = user.total_bets > 0 ? (user.won_bets / user.total_bets) * 100 : 0;
+      const profitLoss = (user.total_winnings || 0) - (user.total_amount || 0);
+      const avgBetAmount = user.total_bets > 0 ? (user.total_amount || 0) / user.total_bets : 0;
+      
+      setDashboardStats({
+        rank: userRanking?.rank || 'Unranked',
+        score: Math.round(user.score || 0),
+        totalBets: user.total_bets || 0,
+        wonBets: user.won_bets || 0,
+        lostBets: user.lost_bets || 0,
+        winRate: Math.round(winRate),
+        totalAmount: user.total_amount || 0,
+        totalWinnings: user.total_winnings || 0,
+        profitLoss: Math.round(profitLoss),
+        avgBetAmount: Math.round(avgBetAmount),
+        avgOdds: user.avg_odds || 0,
+        country: user.country,
+        joinedDate: user.created_at
+      });
+
+      // Generate achievements based on user stats
+      generateAchievements(user, userRanking);
+      
+      // Generate recent activity (mock data for now)
+      generateRecentActivity(user);
+      
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+    }
+    setDashboardLoading(false);
+  };
+
+  const generateAchievements = (userData, ranking) => {
+    const achievements = [];
+    
+    // Win Rate Achievements
+    const winRate = userData.total_bets > 0 ? (userData.won_bets / userData.total_bets) * 100 : 0;
+    if (winRate >= 70) achievements.push({ icon: '🎯', title: 'Sharpshooter', description: '70%+ Win Rate', tier: 'gold' });
+    else if (winRate >= 60) achievements.push({ icon: '🎯', title: 'Good Eye', description: '60%+ Win Rate', tier: 'silver' });
+    else if (winRate >= 50) achievements.push({ icon: '🎯', title: 'Balanced', description: '50%+ Win Rate', tier: 'bronze' });
+
+    // Betting Volume Achievements  
+    if (userData.total_bets >= 100) achievements.push({ icon: '🔥', title: 'High Roller', description: '100+ Bets Placed', tier: 'gold' });
+    else if (userData.total_bets >= 50) achievements.push({ icon: '🔥', title: 'Active Bettor', description: '50+ Bets Placed', tier: 'silver' });
+    else if (userData.total_bets >= 10) achievements.push({ icon: '🔥', title: 'Getting Started', description: '10+ Bets Placed', tier: 'bronze' });
+
+    // Ranking Achievements
+    if (ranking?.rank <= 10) achievements.push({ icon: '👑', title: 'Elite Player', description: 'Top 10 Global', tier: 'gold' });
+    else if (ranking?.rank <= 50) achievements.push({ icon: '🏆', title: 'Top Performer', description: 'Top 50 Global', tier: 'silver' });
+    else if (ranking?.rank <= 100) achievements.push({ icon: '🥉', title: 'Top 100', description: 'Top 100 Global', tier: 'bronze' });
+
+    // Profit Achievements
+    const profit = (userData.total_winnings || 0) - (userData.total_amount || 0);
+    if (profit > 1000) achievements.push({ icon: '💰', title: 'Profit Master', description: '€1000+ Profit', tier: 'gold' });
+    else if (profit > 100) achievements.push({ icon: '💰', title: 'In the Green', description: '€100+ Profit', tier: 'silver' });
+    else if (profit > 0) achievements.push({ icon: '💰', title: 'First Profit', description: 'Positive P&L', tier: 'bronze' });
+
+    // Special Achievements
+    if (userData.avg_odds >= 3.0) achievements.push({ icon: '🎰', title: 'Risk Taker', description: '3.0+ Avg Odds', tier: 'special' });
+    if (userData.total_bets >= 5 && winRate === 100) achievements.push({ icon: '🌟', title: 'Perfect Record', description: 'Undefeated!', tier: 'legendary' });
+
+    setUserAchievements(achievements);
+  };
+
+  const generateRecentActivity = (userData) => {
+    const activities = [
+      { 
+        type: 'rank_change', 
+        message: `Your ranking updated to #${dashboardStats?.rank || 'N/A'}`, 
+        time: '2 hours ago',
+        icon: '📈'
+      },
+      { 
+        type: 'achievement', 
+        message: 'New achievement unlocked!', 
+        time: '1 day ago',
+        icon: '🏆'
+      },
+      { 
+        type: 'bet_win', 
+        message: 'Won a bet with 2.5x odds', 
+        time: '2 days ago',
+        icon: '🎯'
+      },
+      { 
+        type: 'profile', 
+        message: 'Profile updated successfully', 
+        time: '3 days ago',
+        icon: '👤'
+      },
+      { 
+        type: 'milestone', 
+        message: `Reached ${userData.total_bets} total bets!`, 
+        time: '5 days ago',
+        icon: '🎯'
+      }
+    ];
+    
+    setRecentActivity(activities);
+  };
+
   // Settings functions
   const openSettings = () => {
     if (user) {
