@@ -281,6 +281,7 @@ function App() {
   const [showTop100Rankings, setShowTop100Rankings] = useState(false);
   const [rankingsFilter, setRankingsFilter] = useState('all'); // 'all', 'country', specific country code
   const [myPosition, setMyPosition] = useState(null);
+  const [top100Loading, setTop100Loading] = useState(false);
   
   // World Map states
   const [countrySearch, setCountrySearch] = useState('');
