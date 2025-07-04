@@ -3150,7 +3150,7 @@ function App() {
           </button>
           
           {/* Language Selector */}
-          <button className="language-selector" onClick={toggleLanguage}>
+          <button className="language-selector" onClick={() => changeLanguage(language === 'gr' ? 'en' : 'gr')}>
             {language === 'gr' ? (
               <>
                 🇬🇷 <span className="lang-text">EL</span>
