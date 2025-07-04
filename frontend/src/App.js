@@ -1996,7 +1996,7 @@ function App() {
     
     setTeamLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/teams/${teamId}/invite`, {
+      const response = await fetch(`${API_BASE_URL}/api/teams/${teamId}/invite`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
