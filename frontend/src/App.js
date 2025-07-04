@@ -1794,6 +1794,17 @@ function App() {
       if (response.ok) {
         alert('Competition created successfully');
         fetchCompetitions();
+        setShowCompetitionModal(false);
+        // Reset form
+        setCompetitionForm({
+          name: '',
+          description: '',
+          region: 'Global',
+          max_participants: 100,
+          prize_pool: 1000,
+          start_date: '',
+          end_date: ''
+        });
       } else {
         alert('Error creating competition');
       }
