@@ -322,7 +322,67 @@ const translations = {
     active: 'Active',
     godLevel: 'God Level',
     superAdmin: 'Super Admin',
-    adminLevel: 'Admin'
+    adminLevel: 'Admin',
+    
+    // Tournament System
+    tournament: 'Tournament',
+    tournaments: 'Tournaments',
+    tournamentTitle: 'Available Tournaments',
+    joinTournament: 'Join Tournament',
+    leaveTournament: 'Leave Tournament',
+    entryFee: 'Entry Fee',
+    prizePool: 'Prize Pool',
+    participants: 'Participants',
+    tournamentStatus: 'Status',
+    tournamentDuration: 'Duration',
+    tournamentFormat: 'Format',
+    registrationPeriod: 'Registration Period',
+    tournamentPeriod: 'Tournament Period',
+    prizeDistribution: 'Prize Distribution',
+    rules: 'Rules',
+    
+    // Tournament Status
+    upcoming: 'Upcoming',
+    open: 'Open',
+    ongoing: 'Ongoing',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+    
+    // Tournament Duration
+    instant: 'Instant',
+    daily: 'Daily',
+    two_day: '2-Day',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    long_term: 'Long Term',
+    
+    // Tournament Format
+    single_elimination: 'Single Elimination',
+    
+    // Prize Distribution
+    winner_takes_all: 'Winner Takes All',
+    top_three: 'Top 3',
+    
+    // Entry Fee Categories
+    basic: 'Basic (€1-10)',
+    standard: 'Standard (€11-50)',
+    premium: 'Premium (€51-100)',
+    vip: 'VIP (€101+)',
+    
+    // Tournament Actions
+    viewDetails: 'View Details',
+    backToTournaments: 'Back to Tournaments',
+    joinNow: 'Join Now',
+    paymentRequired: 'Payment Required',
+    tournamentFull: 'Tournament Full',
+    registrationClosed: 'Registration Closed',
+    alreadyJoined: 'Already Joined',
+    
+    // Filters
+    allTournaments: 'All Tournaments',
+    filterByStatus: 'Filter by Status',
+    filterByCategory: 'Filter by Category',
+    filterByDuration: 'Filter by Duration'
   }
 };
 
