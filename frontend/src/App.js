@@ -2015,7 +2015,7 @@ function App() {
         const data = await response.json();
         alert(data.message);
         fetchTeamInvitations(); // Refresh invitations
-        fetchUserProfile(); // Update user profile
+        fetchProfile(); // Update user profile
         fetchTeams(); // Refresh teams
       } else {
         const error = await response.json();
