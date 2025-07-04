@@ -1712,19 +1712,21 @@ function App() {
               className="btn btn-secondary btn-small"
               onClick={() => {
                 setShowTop100Rankings(!showTop100Rankings);
-                if (!showTop100Rankings && top100Users.length === 0) {
+                if (!showTop100Rankings) {
                   fetchTop100Users();
                 }
               }}
+              disabled={top100Loading}
             >
-              {showTop100Rankings ? '👁️ Hide Top 100' : '👁️ Show Complete Top 100'}
+              {top100Loading ? '⏳ Loading...' : showTop100Rankings ? '👁️ Hide Top 100' : '👁️ Show Complete Top 100'}
             </button>
             {showTop100Rankings && (
               <button 
                 className="btn btn-primary btn-small"
                 onClick={fetchTop100Users}
+                disabled={top100Loading}
               >
-                🔄 Refresh
+                {top100Loading ? '⏳ Loading...' : '🔄 Refresh'}
               </button>
             )}
           </div>
