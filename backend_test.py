@@ -3118,3 +3118,98 @@ def run_wallet_tests():
     print("TESTING WALLET SYSTEM AND ADMIN FINANCIAL MANAGEMENT")
     print("=" * 50)
     runner.run(wallet_test_suite)
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "tournaments":
+            run_tournament_tests()
+        elif sys.argv[1] == "brackets":
+            run_tournament_bracket_tests()
+        elif sys.argv[1] == "wallet":
+            run_wallet_tests()
+        elif sys.argv[1] == "world_map_only":
+            # Run only world map related tests
+            api_test_suite = unittest.TestSuite()
+            api_test_suite.addTest(BettingFederationAPITest('test_01_health_check'))
+            api_test_suite.addTest(BettingFederationAPITest('test_07_country_stats'))
+            api_test_suite.addTest(BettingFederationAPITest('test_08_country_rankings'))
+            api_test_suite.addTest(WorldMapSearchTester('test_01_country_stats_for_search'))
+            api_test_suite.addTest(WorldMapSearchTester('test_02_enhanced_search_functionality'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING WORLD MAP API ENDPOINTS")
+            print("=" * 50)
+            runner.run(api_test_suite)
+        elif sys.argv[1] == "decimal_removal":
+            # Run only decimal removal tests
+            decimal_test_suite = unittest.TestSuite()
+            decimal_test_suite.addTest(DecimalRemovalTester('test_01_ui_decimal_removal_verification'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING UI DECIMAL REMOVAL")
+            print("=" * 50)
+            runner.run(decimal_test_suite)
+        elif sys.argv[1] == "avatar_only":
+            # Run only avatar tests
+            avatar_test_suite = unittest.TestSuite()
+            avatar_test_suite.addTest(AvatarTester('test_01_register_with_avatar'))
+            avatar_test_suite.addTest(AvatarTester('test_02_verify_avatar_in_profile'))
+            avatar_test_suite.addTest(AvatarTester('test_03_verify_avatar_in_rankings'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING AVATAR FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(avatar_test_suite)
+        elif sys.argv[1] == "global_rankings":
+            # Run only global rankings tests
+            rankings_test_suite = unittest.TestSuite()
+            rankings_test_suite.addTest(GlobalRankingsTester('test_01_global_rankings_data'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING GLOBAL RANKINGS FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(rankings_test_suite)
+        elif sys.argv[1] == "enhanced_search":
+            # Run only enhanced search tests
+            search_test_suite = unittest.TestSuite()
+            search_test_suite.addTest(WorldMapSearchTester('test_01_country_stats_for_search'))
+            search_test_suite.addTest(WorldMapSearchTester('test_02_enhanced_search_functionality'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING ENHANCED SEARCH FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(search_test_suite)
+        elif sys.argv[1] == "site_messages":
+            # Run only site messages tests
+            site_messages_suite = unittest.TestSuite()
+            site_messages_suite.addTest(SiteMessagesTester('test_01_admin_login'))
+            site_messages_suite.addTest(SiteMessagesTester('test_02_get_current_site_messages'))
+            site_messages_suite.addTest(SiteMessagesTester('test_03_create_site_message'))
+            site_messages_suite.addTest(SiteMessagesTester('test_04_verify_created_message'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING SITE MESSAGES FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(site_messages_suite)
+        elif sys.argv[1] == "rankings_search":
+            # Run only rankings and search tests
+            rankings_search_suite = unittest.TestSuite()
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_01_admin_login'))
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_02_rankings_api_data_structure'))
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_03_top_100_users_api'))
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_04_site_messages_api'))
+            rankings_search_suite.addTest(RankingsAndSearchTester('test_05_user_search_data_availability'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING RANKINGS AND SEARCH FUNCTIONALITY")
+            print("=" * 50)
+            runner.run(rankings_search_suite)
+    else:
+        run_tests()
