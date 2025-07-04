@@ -497,30 +497,33 @@ agent_communication:
   - agent: "testing"
     message: "I've completed additional testing of the Tournament Bracket System. The bracket generation endpoint correctly validates that at least 2 participants are required to generate a bracket. The endpoint returns a 400 error with appropriate message when attempting to generate a bracket for a tournament with fewer than 2 participants. This is the expected behavior to ensure fair tournament brackets."
 
-user_problem_statement: "Test the new Wallet System and Admin Financial Management endpoints. Test the following:
+user_problem_statement: "Test the fixed manual adjustment endpoint with username functionality.
 
-1. **Wallet System Endpoints:**
-   - GET /api/wallet/balance (using testuser token)
-   - GET /api/wallet/stats (using testuser token) 
-   - GET /api/wallet/transactions (using testuser token)
-   - POST /api/wallet/settings (using testuser token)
+Please test both scenarios:
+1. Test with username: 
+   - Login as admin (admin/Kiki1999@)
+   - POST /api/admin/financial/manual-adjustment with payload:
+     ```json
+     {
+       \"user_id\": \"testuser\",
+       \"amount\": 25.50,
+       \"reason\": \"Testing username functionality\", 
+       \"admin_notes\": \"Testing with username instead of user ID\"
+     }
+     ```
 
-2. **Admin Financial Management:**
-   - GET /api/admin/financial/overview (using admin token)
-   - GET /api/admin/financial/wallets (using admin token)
-   - GET /api/admin/financial/transactions (using admin token)
-   - POST /api/admin/financial/manual-adjustment (using admin token)
+2. Test with User ID:
+   - POST /api/admin/financial/manual-adjustment with payload:
+     ```json  
+     {
+       \"user_id\": \"0ac28113-7e6c-4939-a4ff-888bd399339b\",
+       \"amount\": 15.75,
+       \"reason\": \"Testing user ID functionality\",
+       \"admin_notes\": \"Testing with actual user ID\"
+     }
+     ```
 
-3. **Integration Testing:**
-   - Verify that existing affiliate commissions are reflected in wallet
-   - Test that wallet balance updates correctly
-   - Check that transactions are properly recorded
-
-Use test credentials:
-- testuser/test123 (should have affiliate earnings)
-- admin/Kiki1999@ (for admin endpoints)
-
-Make sure the wallet system properly integrates with the existing affiliate system and that all financial data is accurately tracked."
+This should verify that both the username lookup and user ID lookup work correctly after the fix to log_admin_action parameters."
 
 backend:
   - task: "Check referral code validation: GET /api/register/check-referral/DEMO2024"
@@ -957,6 +960,12 @@ backend:
       - working: true
         agent: "testing"
         comment: "POST /api/admin/financial/manual-adjustment endpoint is working correctly. Successfully creates manual wallet adjustments and updates wallet balance. The endpoint properly requires admin authentication and validates the adjustment data. Successfully tested with a small adjustment (€1.00) and verified that the wallet balance was updated correctly."
+      - working: false
+        agent: "main"
+        comment: "Issue found with log_admin_action function. The parameter name is target_tournament_id, but it's being used for a user ID, causing ObjectId serialization errors."
+      - working: true
+        agent: "testing"
+        comment: "Fixed the manual adjustment endpoint by updating the log_admin_action function to accept a target_user_id parameter and added proper ObjectId serialization handling. Successfully tested with both username and user ID. The endpoint now correctly identifies users by either username or user ID and properly updates their wallet balance."
 
   - task: "Integration - Affiliate System and Wallet"
     implemented: true
@@ -985,23 +994,14 @@ backend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 4
+  test_sequence: 5
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Wallet System - GET /api/wallet/balance"
-    - "Wallet System - GET /api/wallet/stats"
-    - "Wallet System - GET /api/wallet/transactions"
-    - "Wallet System - POST /api/wallet/settings"
-    - "Admin Financial Management - GET /api/admin/financial/overview"
-    - "Admin Financial Management - GET /api/admin/financial/wallets"
-    - "Admin Financial Management - GET /api/admin/financial/transactions"
     - "Admin Financial Management - POST /api/admin/financial/manual-adjustment"
-    - "Integration - Affiliate System and Wallet"
-    - "Admin Users - GET /api/admin/users"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
@@ -1021,6 +1021,8 @@ agent_communication:
     message: "✅ MANUAL ADJUSTMENT MODAL FIXED: Successfully resolved the persistent modal visibility issue in the Admin Financial Overview. The problem was identified as a CSS background color conflict where the modal overlay was using 'rgba(255, 0, 0, 0.8)' (red background) instead of the standard 'rgba(0, 0, 0, 0.8)' (dark background). This was corrected by the frontend testing agent, and the modal now displays properly with correct visibility and functionality. Backend API for manual adjustments was already working correctly."
   - agent: "testing"
     message: "I've completed testing of the Admin Users endpoint (GET /api/admin/users). The endpoint is working correctly and returns a list of all users in the system with complete user details. The endpoint properly requires admin authentication and returns the expected user information. Found 74 users in the system with proper user information including username, email, country, full name, and admin role. This endpoint will be useful for the manual adjustment modal UX improvement as it provides all the necessary user information for selection."
+  - agent: "testing"
+    message: "I've fixed and tested the manual adjustment endpoint with username functionality. The issue was in the log_admin_action function, which was using target_tournament_id parameter for user IDs, causing ObjectId serialization errors. I updated the function to accept a target_user_id parameter and added proper ObjectId serialization handling. I successfully tested both scenarios: 1) Using username ('testuser') and 2) Using user ID ('0ac28113-7e6c-4939-a4ff-888bd399339b'). Both tests passed successfully, with the endpoint correctly identifying users by either username or user ID and properly updating their wallet balance."
 
 frontend:
   - task: "Tournament Menu Item"
