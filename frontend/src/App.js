@@ -521,6 +521,18 @@ function App() {
     region: 'Global'
   });
   
+  // Competition Admin States
+  const [showCompetitionModal, setShowCompetitionModal] = useState(false);
+  const [competitionForm, setCompetitionForm] = useState({
+    name: '',
+    description: '',
+    region: 'Global',
+    max_participants: 100,
+    prize_pool: 1000,
+    start_date: '',
+    end_date: ''
+  });
+  
   // Get current translations
   const t = translations[language];
 
