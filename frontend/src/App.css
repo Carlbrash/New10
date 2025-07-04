@@ -4300,6 +4300,177 @@ body {
   }
 }
 
+/* Mobile Navigation Indicator */
+.mobile-nav-indicator {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 30, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 25px;
+  padding: 12px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.nav-dots {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+  justify-content: center;
+}
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-dot.active {
+  background: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  transform: scale(1.2);
+}
+
+.swipe-hint {
+  text-align: center;
+}
+
+.swipe-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  animation: pulse-hint 2s ease-in-out infinite;
+}
+
+@keyframes pulse-hint {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Show mobile navigation only on small screens */
+@media (max-width: 768px) {
+  .mobile-nav-indicator {
+    display: block;
+  }
+  
+  /* Hide regular navigation on very small screens when needed */
+  .nav {
+    position: relative;
+    z-index: 100;
+  }
+}
+
+/* Swipe animations */
+.main-content {
+  transition: transform 0.3s ease;
+  touch-action: pan-x;
+}
+
+/* Mobile-specific improvements for better UX */
+@media (max-width: 768px) {
+  /* Better scrolling */
+  body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Better tap highlighting */
+  * {
+    -webkit-tap-highlight-color: rgba(255, 215, 0, 0.3);
+  }
+  
+  /* Smooth transitions */
+  .nav-link, .btn, .filter-btn, .achievement-badge, .stat-card {
+    transition: all 0.2s ease;
+  }
+  
+  /* Loading improvements */
+  .loading-spinner {
+    animation: spin 1.5s linear infinite;
+  }
+  
+  /* Better modal experience */
+  .modal-overlay {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero-section {
+    min-height: 70vh;
+  }
+  
+  .enhanced-dashboard {
+    padding: 10px;
+  }
+  
+  .stats-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .mobile-nav-indicator {
+    bottom: 10px;
+    padding: 8px 16px;
+  }
+  
+  .swipe-text {
+    font-size: 0.6rem;
+  }
+}
+
+/* Ultra-wide mobile screens */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .stats-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .achievements-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Performance optimizations for mobile */
+@media (max-width: 768px) {
+  /* Reduce animations on low-end devices */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  /* GPU acceleration for smoother scrolling */
+  .main-content,
+  .modal-content,
+  .rankings-table {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
 /* Settings Modal Styles */
 .settings-modal {
   max-width: 700px;
