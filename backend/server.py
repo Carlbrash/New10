@@ -541,6 +541,33 @@ class PayoutRequest(BaseModel):
     payment_details: dict
     notes: Optional[str] = None
 
+class WalletStatsResponse(BaseModel):
+    balance: WalletBalance
+    recent_transactions: List[Transaction]
+    monthly_earnings: List[dict]  # Last 12 months
+    commission_breakdown: dict
+    payout_summary: dict
+    performance_metrics: dict
+
+class AdminFinancialOverview(BaseModel):
+    total_affiliates: int
+    active_affiliates: int
+    total_pending_payouts: float
+    total_commissions_owed: float
+    monthly_commission_costs: float
+    platform_revenue: float
+    affiliate_conversion_rate: float
+    top_affiliates: List[dict]
+    pending_payouts: List[dict]
+    recent_transactions: List[dict]
+    financial_summary: dict
+
+class ManualAdjustmentRequest(BaseModel):
+    user_id: str
+    amount: float  # Can be positive or negative
+    reason: str
+    admin_notes: Optional[str] = None
+
 # Helper functions
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
