@@ -282,6 +282,12 @@ function App() {
   const [rankingsFilter, setRankingsFilter] = useState('all'); // 'all', 'country', specific country code
   const [myPosition, setMyPosition] = useState(null);
   const [top100Loading, setTop100Loading] = useState(false);
+
+  // Enhanced Dashboard states
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [userAchievements, setUserAchievements] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
   
   // World Map states
   const [countrySearch, setCountrySearch] = useState('');
