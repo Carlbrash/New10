@@ -2622,7 +2622,7 @@ async def get_tournament_matches(tournament_id: str):
         raise HTTPException(status_code=500, detail=f"Error fetching tournament matches: {str(e)}")
 
 # Helper function for admin actions
-def log_admin_action(user_id: str, action_type: str, target_tournament_id: str = None, details: dict = None):
+def log_admin_action(user_id: str, action_type: str, target_tournament_id: str = None, target_user_id: str = None, details: dict = None):
     """Log admin action for tournaments"""
     try:
         action_data = {
@@ -2630,6 +2630,7 @@ def log_admin_action(user_id: str, action_type: str, target_tournament_id: str =
             "admin_id": user_id,
             "action_type": action_type,
             "target_tournament_id": target_tournament_id,
+            "target_user_id": target_user_id,
             "details": details or {},
             "timestamp": datetime.utcnow()
         }
