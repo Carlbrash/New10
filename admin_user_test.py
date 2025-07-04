@@ -142,8 +142,8 @@ class AdminUserTest(unittest.TestCase):
         )
         
         print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text[:200]}...")  # Print first 200 chars
         if response.status_code != 200:
-            print(f"Response body: {response.text}")
             self.fail(f"Failed to get users with admin token: {response.text}")
         
         data = response.json()
