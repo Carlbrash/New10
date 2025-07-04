@@ -102,7 +102,137 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the new Tournament System backend that was just implemented."
+user_problem_statement: "Test the new Affiliate System endpoints that were just implemented. Test the following:
+
+1. Check referral code validation: GET /api/register/check-referral/DEMO2024
+2. Test affiliate application: POST /api/affiliate/apply (using testuser credentials)
+3. Test affiliate stats: GET /api/affiliate/stats (using testuser credentials) 
+4. Test affiliate profile: GET /api/affiliate/profile (using testuser credentials)
+5. Test affiliate commissions: GET /api/affiliate/commissions (using testuser credentials)
+6. Test affiliate referrals: GET /api/affiliate/referrals (using testuser credentials)
+7. Test admin affiliate list: GET /api/admin/affiliates (using admin credentials)
+8. Test user registration with referral code: POST /api/register (with referral_code: \"DEMO2024\")"
+
+backend:
+  - task: "Check referral code validation: GET /api/register/check-referral/DEMO2024"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Referral code validation endpoint is working correctly. Returns valid=true for DEMO2024 code with affiliate name and commission info."
+
+  - task: "Test affiliate application: POST /api/affiliate/apply"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate application endpoint is working correctly. The testuser is already an affiliate, so the endpoint returns a 400 error with 'already has an affiliate account' message, which is the expected behavior."
+
+  - task: "Test affiliate stats: GET /api/affiliate/stats"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate stats endpoint is working correctly. Returns comprehensive statistics including total referrals, active referrals, earnings, and recent activity."
+
+  - task: "Test affiliate profile: GET /api/affiliate/profile"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate profile endpoint is working correctly. Returns complete profile information including referral code, status, and commission rates."
+
+  - task: "Test affiliate commissions: GET /api/affiliate/commissions"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate commissions endpoint is working correctly. Returns paginated list of commissions with proper details."
+
+  - task: "Test affiliate referrals: GET /api/affiliate/referrals"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Affiliate referrals endpoint is working correctly. Returns paginated list of referrals with user details."
+
+  - task: "Test admin affiliate list: GET /api/admin/affiliates"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Admin affiliates endpoint is working correctly. Returns paginated list of all affiliates with user details. Properly requires admin authentication."
+
+  - task: "Test user registration with referral code: POST /api/register"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "User registration with referral code is working correctly. Successfully registers new user and processes the referral, returning appropriate confirmation messages."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Check referral code validation: GET /api/register/check-referral/DEMO2024"
+    - "Test affiliate application: POST /api/affiliate/apply"
+    - "Test affiliate stats: GET /api/affiliate/stats"
+    - "Test affiliate profile: GET /api/affiliate/profile"
+    - "Test affiliate commissions: GET /api/affiliate/commissions"
+    - "Test affiliate referrals: GET /api/affiliate/referrals"
+    - "Test admin affiliate list: GET /api/admin/affiliates"
+    - "Test user registration with referral code: POST /api/register"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "I've completed comprehensive testing of the Affiliate System backend. All endpoints are working correctly with proper authentication, data validation, and business logic. The system correctly handles referral code validation, affiliate application, stats retrieval, profile management, commission tracking, referral listing, admin affiliate management, and user registration with referral codes. All tests passed successfully."
 
 backend:
   - task: "Tournament API Endpoints - GET /api/tournaments"
