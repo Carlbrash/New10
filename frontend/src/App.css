@@ -3101,6 +3101,29 @@ body {
   bottom: 0;
   z-index: 10;
 }
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #ffd700;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-group label:after {
+  content: " *";
+  color: #ff6b6b;
+}
+
+.form-group label:not([required]):after {
+  content: "";
+}
+
 .loading-message, .no-data-message {
   text-align: center;
   padding: 40px 20px;
