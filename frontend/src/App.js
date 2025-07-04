@@ -4353,23 +4353,53 @@ function App() {
                 />
               </div>
 
-              <div className="competitions-admin-grid">
-                {competitions.map(comp => (
-                  <div key={comp.id} className="competition-admin-card">
-                    <h4>{comp.name}</h4>
-                    <p>{comp.description}</p>
-                    <div className="competition-details">
-                      <span className="region">🌍 {comp.region}</span>
-                      <span className="participants">👥 {comp.current_participants}/{comp.max_participants}</span>
-                      <span className="prize">💰 €{comp.prize_pool.toLocaleString()}</span>
-                      <span className={`status ${comp.status}`}>📊 {comp.status}</span>
-                    </div>
-                    <div className="competition-dates">
-                      <span>📅 {new Date(comp.start_date).toLocaleDateString()}</span>
-                      <span>📅 {new Date(comp.end_date).toLocaleDateString()}</span>
-                    </div>
+              {/* Tournaments List with Search */}
+              <div className="tournaments-admin-section">
+                {adminTournaments.length === 0 ? (
+                  <div className="no-tournaments">
+                    <p>No tournaments found. Click "Create New Tournament" to add one.</p>
                   </div>
-                ))}
+                ) : (
+                  <div className="tournaments-admin-grid">
+                    {adminTournaments
+                      .filter(tournament => 
+                        tournament.name.toLowerCase().includes(tournamentSearch.toLowerCase()) ||
+                        tournament.status.toLowerCase().includes(tournamentSearch.toLowerCase()) ||
+                        tournament.entry_fee_category.toLowerCase().includes(tournamentSearch.toLowerCase())
+                      )
+                      .map((tournament) => (
+                        <div key={tournament.id} className="tournament-admin-card">
+                          <div className="tournament-admin-header">
+                            <h4>{tournament.name}</h4>
+                            <span className={`tournament-status status-${tournament.status}`}>
+                              {tournament.status}
+                            </span>
+                          </div>
+                          
+                          <div className="tournament-admin-details">
+                            <p><strong>Entry Fee:</strong> €{tournament.entry_fee} ({tournament.entry_fee_category})</p>
+                            <p><strong>Participants:</strong> {tournament.current_participants}/{tournament.max_participants}</p>
+                            <p><strong>Prize Pool:</strong> €{tournament.total_prize_pool}</p>
+                            <p><strong>Duration:</strong> {tournament.duration_type}</p>
+                            <p><strong>Prize Distribution:</strong> {tournament.prize_distribution}</p>
+                            <p><strong>Format:</strong> {tournament.tournament_format}</p>
+                          </div>
+                          
+                          <div className="tournament-admin-actions">
+                            {tournament.status !== 'cancelled' && tournament.status !== 'completed' && (
+                              <button 
+                                className="btn btn-danger btn-small"
+                                onClick={() => cancelTournament(tournament.id)}
+                              >
+                                Cancel Tournament
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                )}
               </div>
             </div>
           )}
