@@ -824,10 +824,10 @@ function App() {
     avatar_url: ''
   });
 
-  const toggleLanguage = () => {
-    const newLang = language === 'gr' ? 'en' : 'gr';
+  const changeLanguage = (newLang) => {
     setLanguage(newLang);
     localStorage.setItem('language', newLang);
+    setShowLanguageDropdown(false);
   };
 
   // Avatar component
