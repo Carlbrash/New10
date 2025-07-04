@@ -2245,6 +2245,76 @@ function App() {
                 ))}
               </div>
             </div>
+
+            {/* User Tournaments Section */}
+            <div className="user-tournaments-section">
+              <h3>🏆 My Tournaments</h3>
+              {userTournaments.length === 0 ? (
+                <div className="no-tournaments-dash">
+                  <p>You haven't joined any tournaments yet.</p>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => setCurrentView('tournament')}
+                  >
+                    Browse Tournaments
+                  </button>
+                </div>
+              ) : (
+                <div className="user-tournaments-grid">
+                  {userTournaments.slice(0, 3).map((tournament) => (
+                    <div key={tournament.id} className="user-tournament-card">
+                      <div className="tournament-card-header">
+                        <h4>{tournament.name}</h4>
+                        <span className={`tournament-status status-${tournament.status}`}>
+                          {t[tournament.status] || tournament.status}
+                        </span>
+                      </div>
+                      <div className="tournament-card-info">
+                        <div className="tournament-info-item">
+                          <span>Entry Fee:</span>
+                          <span>€{tournament.entry_fee}</span>
+                        </div>
+                        <div className="tournament-info-item">
+                          <span>Participants:</span>
+                          <span>{tournament.current_participants}/{tournament.max_participants}</span>
+                        </div>
+                        <div className="tournament-info-item">
+                          <span>Prize Pool:</span>
+                          <span>€{tournament.total_prize_pool}</span>
+                        </div>
+                        {tournament.participation && (
+                          <div className="participation-status">
+                            <span className="status-badge">✅ Joined</span>
+                            <span className="joined-date">
+                              {new Date(tournament.participation.registered_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <button 
+                        className="btn btn-secondary btn-small"
+                        onClick={() => {
+                          setCurrentView('tournament');
+                          fetchTournamentDetails(tournament.id);
+                        }}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {userTournaments.length > 3 && (
+                <div className="view-all-tournaments">
+                  <button 
+                    className="btn btn-outline"
+                    onClick={() => setCurrentView('tournament')}
+                  >
+                    View All My Tournaments ({userTournaments.length})
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
