@@ -1004,6 +1004,8 @@ agent_communication:
     message: "I've completed testing of the login authentication functionality. All specified credentials (testuser/test123, admin/Kiki1999@, God/Kiki1999@) work correctly with the /api/login endpoint. Each login returns a valid JWT token that can be used to access protected endpoints. The authentication system correctly validates credentials and returns appropriate user information. All tests passed successfully."
   - agent: "testing"
     message: "I've completed comprehensive testing of the Wallet System and Admin Financial Management endpoints. All endpoints are working correctly with proper authentication, data validation, and business logic. The wallet system correctly handles balance retrieval, stats calculation, transaction listing, and settings updates. The admin financial management system correctly handles financial overview, wallet listing, transaction listing, and manual adjustments. The integration between the affiliate system and wallet is working correctly, with wallet balances and transactions properly reflecting affiliate earnings. All tests passed successfully."
+  - agent: "testing"
+    message: "I've identified an issue with the Manual Adjustment modal in the Admin Financial Overview. The modal is not displaying correctly because the modal overlay has an incorrect background color (rgba(255, 0, 0, 0.8)) which is making it appear as a red overlay instead of the standard dark overlay. This is defined in App.js around line 6390. The correct background color should be rgba(0, 0, 0, 0.8) as defined in the modal-overlay CSS class. This is preventing the modal from being visible to users."
 
 frontend:
   - task: "Tournament Menu Item"
