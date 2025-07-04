@@ -6764,6 +6764,12 @@ function App() {
           >
             {t.tournament}
           </button>
+          <button 
+            className={`nav-link ${currentView === 'teams' ? 'active' : ''}`}
+            onClick={() => setCurrentView('teams')}
+          >
+            {t.teams}
+          </button>
           
           {/* Affiliate menu item - only show for logged in users */}
           {user && (
