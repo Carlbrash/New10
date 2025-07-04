@@ -650,14 +650,36 @@ function App() {
         email: user.email || '',
         avatar_url: user.avatar_url || '',
         country: user.country || '',
-        phone: user.phone || ''
+        phone: user.phone || '',
+        nickname: user.nickname || ''
       });
       setPasswordForm({
         current_password: '',
         new_password: '',
         confirm_password: ''
       });
+      setPhotoFile(null);
+      setPhotoPreview(null);
       setShowSettings(true);
+    }
+  };
+
+  const handlePhotoUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert('Photo size must be less than 5MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64Data = e.target.result;
+        setPhotoFile(file);
+        setPhotoPreview(base64Data);
+        setSettingsForm({...settingsForm, avatar_url: base64Data});
+      };
+      reader.readAsDataURL(file);
     }
   };
 
