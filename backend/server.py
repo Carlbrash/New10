@@ -3309,7 +3309,11 @@ async def create_manual_adjustment(request: ManualAdjustmentRequest, admin_id: s
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing manual adjustment: {str(e)}")
 
-@app.post("/api/admin/financial/bulk-payout")
+# =============================================================================
+# TEAM SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.post("/api/teams")
 async def process_bulk_payout(payout_ids: List[str], admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
     """Process multiple payouts in bulk"""
     try:
