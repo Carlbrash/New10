@@ -1422,9 +1422,9 @@ function App() {
     }
   };
 
-  // Load admin tournaments when switching to tournaments tab
+  // Load admin tournaments when switching to tournaments or competitions tab
   useEffect(() => {
-    if (adminView === 'tournaments' && token && isAdmin) {
+    if ((adminView === 'tournaments' || adminView === 'competitions') && token && isAdmin) {
       fetchAdminTournaments();
     }
   }, [adminView, token, isAdmin]);
