@@ -3094,57 +3094,6 @@ function App() {
                   </button>
                 </div>
               )}
-              
-              {/* User ID Display */}
-              <div className="form-group">
-                <label>Your User ID:</label>
-                <div style={{
-                  padding: '12px 16px',
-                  backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                  border: '2px solid rgba(255, 215, 0, 0.3)',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '8px'
-                }}>
-                  <div>
-                    <strong style={{ color: '#ffd700', fontSize: '16px' }}>{user.id}</strong>
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
-                      🆔 This is your unique user identifier
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(user.id);
-                      // Show temporary feedback
-                      const btn = event.target;
-                      const originalText = btn.textContent;
-                      btn.textContent = '✅ Copied!';
-                      btn.style.color = '#00ff00';
-                      setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.style.color = '#ffd700';
-                      }, 2000);
-                    }}
-                    style={{
-                      background: 'none',
-                      border: '1px solid rgba(255, 215, 0, 0.5)',
-                      color: '#ffd700',
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    📋 Copy ID
-                  </button>
-                </div>
-                <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0' }}>
-                  💡 Use this ID for manual adjustments, admin operations, or support requests
-                </p>
-              </div>
             </div>
           </>
         )}
