@@ -3282,6 +3282,40 @@ function App() {
                   <h4>👤 Profile Information</h4>
                   <form onSubmit={updateProfile}>
                     <div className="form-group">
+                      <label>Profile Photo:</label>
+                      <div className="photo-upload-section">
+                        <div className="photo-preview">
+                          {photoPreview || settingsForm.avatar_url ? (
+                            <img 
+                              src={photoPreview || settingsForm.avatar_url} 
+                              alt="Profile preview" 
+                              className="preview-image"
+                            />
+                          ) : (
+                            <div className="no-photo">
+                              <span className="photo-icon">📷</span>
+                              <span>No photo</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="photo-upload-controls">
+                          <input
+                            type="file"
+                            id="photo-upload"
+                            accept="image/*"
+                            onChange={handlePhotoUpload}
+                            className="photo-input"
+                            style={{ display: 'none' }}
+                          />
+                          <label htmlFor="photo-upload" className="btn btn-secondary btn-small">
+                            📷 Upload Photo
+                          </label>
+                          <p className="upload-hint">Max 5MB • JPG, PNG, GIF</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
                       <label>Full Name:</label>
                       <input
                         type="text"
@@ -3289,6 +3323,17 @@ function App() {
                         onChange={(e) => setSettingsForm({...settingsForm, full_name: e.target.value})}
                         className="form-input"
                         required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Nickname (Display Name):</label>
+                      <input
+                        type="text"
+                        value={settingsForm.nickname}
+                        onChange={(e) => setSettingsForm({...settingsForm, nickname: e.target.value})}
+                        className="form-input"
+                        placeholder="How you want to be displayed"
                       />
                     </div>
                     
