@@ -4552,7 +4552,7 @@ function App() {
                                 onClick={() => {
                                   // Set selected tournament for editing
                                   setSelectedTournament(tournament);
-                                  setShowCreateTournamentModal(true);
+                                  setShowTournamentModal(true);
                                 }}
                               >
                                 ✏️ Edit
