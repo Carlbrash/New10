@@ -3525,6 +3525,221 @@ body {
   }
 }
 
+/* Federation Motto Styles */
+.federation-motto {
+  margin: 20px 0;
+  padding: 0;
+}
+
+.motto-text {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #ffd700, #ff6b35, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  animation: motto-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes motto-glow {
+  from { 
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+    transform: scale(1);
+  }
+  to { 
+    filter: drop-shadow(0 0 20px rgba(255, 107, 53, 0.7));
+    transform: scale(1.05);
+  }
+}
+
+/* Language Dropdown Styles */
+.language-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.language-selector:hover {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.dropdown-arrow {
+  font-size: 0.7rem;
+  transition: transform 0.3s ease;
+}
+
+.language-dropdown.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.language-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(20, 20, 30, 0.95);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 150px;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.language-option:hover {
+  background: rgba(255, 215, 0, 0.2);
+}
+
+.language-option.active {
+  background: rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+  font-weight: 600;
+}
+
+/* Photo Upload Styles */
+.photo-upload-section {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.photo-preview {
+  width: 120px;
+  height: 120px;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.no-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.photo-icon {
+  font-size: 2rem;
+  margin-bottom: 5px;
+}
+
+.photo-upload-controls {
+  flex: 1;
+  min-width: 200px;
+}
+
+.upload-hint {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+/* Enhanced Settings Modal */
+.settings-tab .form-group {
+  margin-bottom: 20px;
+}
+
+.settings-tab .form-group label {
+  display: block;
+  color: #ffffff;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+/* Responsive for Photo Upload */
+@media (max-width: 768px) {
+  .photo-upload-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .photo-preview {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .photo-upload-controls {
+    text-align: center;
+    min-width: auto;
+  }
+  
+  .motto-text {
+    font-size: 1.4rem;
+  }
+  
+  .language-dropdown-menu {
+    right: auto;
+    left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .motto-text {
+    font-size: 1.2rem;
+  }
+  
+  .photo-preview {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .language-selector {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}
+
 /* Settings Modal Styles */
 .settings-modal {
   max-width: 700px;
