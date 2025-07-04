@@ -3247,6 +3247,61 @@ function App() {
             </div>
           )}
 
+          {/* Tournament Management Tab */}
+          {adminView === 'tournaments' && (
+            <div className="admin-section">
+              <h3>🏆 Tournament Management</h3>
+              
+              <div className="tournament-admin-header">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setShowTournamentModal(true)}
+                >
+                  ➕ Create New Tournament
+                </button>
+              </div>
+              
+              <div className="admin-tournaments-list">
+                {adminTournaments.length === 0 ? (
+                  <p>No tournaments found.</p>
+                ) : (
+                  <div className="tournaments-admin-grid">
+                    {adminTournaments.map((tournament) => (
+                      <div key={tournament.id} className="tournament-admin-card">
+                        <div className="tournament-admin-header">
+                          <h4>{tournament.name}</h4>
+                          <span className={`tournament-status status-${tournament.status}`}>
+                            {tournament.status}
+                          </span>
+                        </div>
+                        
+                        <div className="tournament-admin-details">
+                          <p><strong>Entry Fee:</strong> €{tournament.entry_fee}</p>
+                          <p><strong>Participants:</strong> {tournament.current_participants}/{tournament.max_participants}</p>
+                          <p><strong>Prize Pool:</strong> €{tournament.total_prize_pool}</p>
+                          <p><strong>Duration:</strong> {tournament.duration_type}</p>
+                          <p><strong>Format:</strong> {tournament.tournament_format}</p>
+                          <p><strong>Status:</strong> {tournament.status}</p>
+                        </div>
+                        
+                        <div className="tournament-admin-actions">
+                          {tournament.status !== 'cancelled' && tournament.status !== 'completed' && (
+                            <button 
+                              className="btn btn-danger btn-small"
+                              onClick={() => cancelTournament(tournament.id)}
+                            >
+                              Cancel Tournament
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Content Management Tab */}
           {adminView === 'content' && (
             <div className="admin-section">
