@@ -1866,69 +1866,101 @@ class TournamentBracketTester(unittest.TestCase):
         
         print(f"  Current participants: {len(tournament['participants'])}")
         
-        if len(tournament["participants"]) < 2:
-            print("  Need to add simulated participants for bracket testing")
+        # Create a second test user to join the tournament
+        import random
+        import string
+        
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_user2 = {
+            "username": f"bracket_user_{random_suffix}",
+            "email": f"bracket_{random_suffix}@example.com",
+            "password": "Test@123",
+            "country": "GR",
+            "full_name": f"Bracket Test User {random_suffix}",
+            "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
+        }
+        
+        # Register the second test user
+        print("  Registering second test user...")
+        response = requests.post(
+            f"{self.base_url}/api/register",
+            json=test_user2
+        )
+        
+        print(f"  Register second user response: {response.status_code}")
+        if response.status_code == 200:
+            data = response.json()
+            user2_token = data["token"]
+            user2_id = data["user_id"]
+            print(f"  Second user registered with ID: {user2_id}")
             
-            # Create a second test user to join the tournament
-            random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-            test_user2 = {
-                "username": f"bracket_user_{random_suffix}",
-                "email": f"bracket_{random_suffix}@example.com",
-                "password": "Test@123",
-                "country": "GR",
-                "full_name": f"Bracket Test User {random_suffix}",
-                "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
-            }
-            
-            # Register the second test user
+            # Join the tournament with the second test user
+            headers = {"Authorization": f"Bearer {user2_token}"}
             response = requests.post(
-                f"{self.base_url}/api/register",
-                json=test_user2
+                f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/join",
+                headers=headers
             )
             
-            print(f"  Register second user response: {response.status_code}")
+            print(f"  Second user join tournament response: {response.status_code}")
             if response.status_code == 200:
-                data = response.json()
-                user2_token = data["token"]
-                
-                # Join the tournament with the second test user
-                headers = {"Authorization": f"Bearer {user2_token}"}
-                response = requests.post(
-                    f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/join",
-                    headers=headers
-                )
-                
-                print(f"  Second user join tournament response: {response.status_code}")
-                if response.status_code == 200:
-                    print("✅ Successfully added second participant")
-                else:
-                    print(f"  Failed to add second participant: {response.text}")
+                print("✅ Successfully added second participant")
             else:
-                print(f"  Failed to register second user: {response.text}")
-                print("  Will try to use admin to update participant count directly")
+                print(f"  Failed to add second participant: {response.text}")
                 
-                # As a fallback, use admin to update participant count directly
+                # Try direct database approach using admin API
                 if TournamentBracketTester.admin_token:
+                    print("  Attempting to add participant directly via admin API...")
+                    
+                    # First, create a participant record manually
+                    import uuid
+                    from datetime import datetime
+                    
+                    # Create a participant record directly in the database
+                    # This is a workaround for testing purposes only
                     admin_headers = {"Authorization": f"Bearer {TournamentBracketTester.admin_token}"}
-                    update_data = {
-                        "current_participants": 2
+                    
+                    # Create a test user for the tournament
+                    test_user3 = {
+                        "username": f"bracket_user2_{random_suffix}",
+                        "email": f"bracket2_{random_suffix}@example.com",
+                        "password": "Test@123",
+                        "country": "GR",
+                        "full_name": f"Bracket Test User 2 {random_suffix}",
+                        "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
                     }
                     
-                    response = requests.put(
-                        f"{self.base_url}/api/admin/tournaments/{TournamentBracketTester.test_tournament_id}",
-                        headers=admin_headers,
-                        json=update_data
+                    response = requests.post(
+                        f"{self.base_url}/api/register",
+                        json=test_user3
                     )
                     
                     if response.status_code == 200:
-                        print("  Successfully updated participant count for testing")
+                        data = response.json()
+                        user3_token = data["token"]
+                        user3_id = data["user_id"]
+                        print(f"  Third user registered with ID: {user3_id}")
+                        
+                        # Join the tournament with the third test user
+                        headers = {"Authorization": f"Bearer {user3_token}"}
+                        response = requests.post(
+                            f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/join",
+                            headers=headers
+                        )
+                        
+                        print(f"  Third user join tournament response: {response.status_code}")
+                        if response.status_code == 200:
+                            print("✅ Successfully added third participant")
+                        else:
+                            print(f"  Failed to add third participant: {response.text}")
                     else:
-                        print(f"  Failed to update participant count: {response.status_code} - {response.text}")
+                        print(f"  Failed to register third user: {response.text}")
+        else:
+            print(f"  Failed to register second user: {response.text}")
         
         # Check final participant count
         response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}")
         tournament = response.json()
-        print(f"✅ Tournament has {tournament['current_participants']} participant(s)")
+        print(f"✅ Tournament has {len(tournament['participants'])} participant(s)")
     
     def test_05_get_tournament_bracket_empty(self):
         """Test GET /api/tournaments/{tournament_id}/bracket endpoint (empty bracket)"""
