@@ -1786,9 +1786,37 @@ async def reset_data():
         # Clear existing data
         users_collection.delete_many({})
         competitions_collection.delete_many({})
+        tournaments_collection.delete_many({})
+        tournament_participants_collection.delete_many({})
         
         # Recreate sample data
         await startup_event()
+        
+        # Force create test user
+        test_user = {
+            "id": str(uuid.uuid4()),
+            "username": "testuser",
+            "email": "testuser@example.com",
+            "password": hash_password("testpass123"),
+            "country": "GR",
+            "full_name": "Test User",
+            "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
+            "admin_role": "user",
+            "is_blocked": False,
+            "blocked_until": None,
+            "blocked_reason": None,
+            "created_at": datetime.utcnow(),
+            "total_bets": 25,
+            "won_bets": 18,
+            "lost_bets": 7,
+            "total_amount": 1200.0,
+            "total_winnings": 1850.0,
+            "avg_odds": 2.8,
+            "rank": 0,
+            "score": 85.5
+        }
+        users_collection.insert_one(test_user)
+        print("Test user created: testuser")
         
         return {"message": "Data reset successfully"}
     except Exception as e:
