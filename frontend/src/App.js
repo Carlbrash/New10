@@ -2889,6 +2889,7 @@ function App() {
               className="tournament-filter"
             >
               <option value="">{t.filterByCategory}</option>
+              <option value="free">{t.free}</option>
               <option value="basic">{t.basic}</option>
               <option value="standard">{t.standard}</option>
               <option value="premium">{t.premium}</option>
