@@ -1463,6 +1463,9 @@ function App() {
         const tournament = await response.json();
         setSelectedTournament(tournament);
         setTournamentView('details');
+        
+        // Also fetch bracket if available
+        fetchTournamentBracket(tournamentId);
       } else {
         console.error('Failed to fetch tournament details:', response.status);
       }
