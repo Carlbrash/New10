@@ -1752,8 +1752,8 @@ async def startup_event():
         tournaments_collection.insert_many(sample_tournaments)
         print("Sample tournaments created")
 
-    # Create test user if not exists
-    if not users_collection.find_one({"username": "testuser"}):
+    # Create test user if not exists (but only if we don't have many users yet)
+    if not users_collection.find_one({"username": "testuser"}) and users_collection.count_documents({}) < 50:
         test_user = {
             "id": str(uuid.uuid4()),
             "username": "testuser",
