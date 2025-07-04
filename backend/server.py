@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from pymongo import MongoClient
 from bson import ObjectId
@@ -11,6 +12,21 @@ import jwt
 from datetime import datetime, timedelta
 import uuid
 from enum import Enum
+import json
+
+# Custom JSON encoder to handle ObjectId
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return super().default(obj)
+
+# Custom JSONResponse class
+class CustomJSONResponse(JSONResponse):
+    def render(self, content: any) -> bytes:
+        return json.dumps(
+            content, ensure_ascii=False, allow_nan=False, indent=None, separators=(",", ":"), cls=CustomJSONEncoder
+        ).encode("utf-8")
 
 # Admin Role Levels
 class AdminRole(str, Enum):
