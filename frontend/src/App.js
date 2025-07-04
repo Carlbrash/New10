@@ -2026,7 +2026,7 @@ function App() {
   const acceptTeamInvitation = async (invitationId) => {
     setTeamLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/teams/invitations/${invitationId}/accept`, {
+      const response = await fetch(`${API_BASE_URL}/api/teams/invitations/${invitationId}/accept`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
