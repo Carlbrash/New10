@@ -3363,7 +3363,7 @@ function App() {
               
               <div className="admin-tournaments-list">
                 {adminTournaments.length === 0 ? (
-                  <p>No tournaments found.</p>
+                  <p>No tournaments found. Click "Create New Tournament" to add one.</p>
                 ) : (
                   <div className="tournaments-admin-grid">
                     {adminTournaments.map((tournament) => (
@@ -3376,12 +3376,11 @@ function App() {
                         </div>
                         
                         <div className="tournament-admin-details">
-                          <p><strong>Entry Fee:</strong> €{tournament.entry_fee}</p>
+                          <p><strong>Entry Fee:</strong> €{tournament.entry_fee} ({tournament.entry_fee_category})</p>
                           <p><strong>Participants:</strong> {tournament.current_participants}/{tournament.max_participants}</p>
                           <p><strong>Prize Pool:</strong> €{tournament.total_prize_pool}</p>
                           <p><strong>Duration:</strong> {tournament.duration_type}</p>
-                          <p><strong>Format:</strong> {tournament.tournament_format}</p>
-                          <p><strong>Status:</strong> {tournament.status}</p>
+                          <p><strong>Prize Distribution:</strong> {tournament.prize_distribution}</p>
                         </div>
                         
                         <div className="tournament-admin-actions">
