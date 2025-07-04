@@ -6373,31 +6373,7 @@ function App() {
             </div>
           )}
         </div>
-        </div>
-                    rows="3"
-                    className="form-input"
-                  />
-                </div>
-                
-                <div className="modal-actions">
-                  <button 
-                    className="btn btn-secondary"
-                    onClick={() => setShowManualAdjustmentModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="btn btn-primary"
-                    onClick={processManualAdjustment}
-                    disabled={financialLoading || !manualAdjustmentForm.user_id || !manualAdjustmentForm.amount || !manualAdjustmentForm.reason}
-                  >
-                    {financialLoading ? '⏳ Processing...' : '⚙️ Process Adjustment'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        </div>}
       </div>
     );
   };
