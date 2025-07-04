@@ -1261,8 +1261,10 @@ async def create_tournament(tournament: TournamentCreate, user_id: str = Depends
     """Create a new tournament (Admin only)"""
     try:
         # Determine entry fee category
-        entry_fee_category = EntryFeeCategory.BASIC
-        if tournament.entry_fee <= 10:
+        entry_fee_category = EntryFeeCategory.FREE
+        if tournament.entry_fee == 0:
+            entry_fee_category = EntryFeeCategory.FREE
+        elif tournament.entry_fee <= 10:
             entry_fee_category = EntryFeeCategory.BASIC
         elif tournament.entry_fee <= 50:
             entry_fee_category = EntryFeeCategory.STANDARD
