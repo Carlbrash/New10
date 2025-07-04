@@ -3054,6 +3054,10 @@ async def reset_data():
         competitions_collection.delete_many({})
         tournaments_collection.delete_many({})
         tournament_participants_collection.delete_many({})
+        affiliates_collection.delete_many({})
+        referrals_collection.delete_many({})
+        commissions_collection.delete_many({})
+        payouts_collection.delete_many({})
         
         # Recreate sample data
         await startup_event()
