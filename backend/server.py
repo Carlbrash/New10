@@ -2172,6 +2172,376 @@ def log_admin_action(user_id: str, action_type: str, target_tournament_id: str =
     except Exception as e:
         print(f"Error logging admin action: {e}")
 
+# =============================================================================
+# AFFILIATE SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.post("/api/affiliate/apply")
+async def apply_for_affiliate(request: AffiliateApplicationRequest, user_id: str = Depends(verify_token)):
+    """Apply to become an affiliate"""
+    try:
+        # Check if user exists
+        user = users_collection.find_one({"id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Check if user already has an affiliate account
+        existing_affiliate = affiliates_collection.find_one({"user_id": user_id})
+        if existing_affiliate:
+            raise HTTPException(status_code=400, detail="User already has an affiliate account")
+        
+        # Generate referral code
+        desired_code = request.desired_referral_code
+        if desired_code and affiliates_collection.find_one({"referral_code": desired_code}):
+            raise HTTPException(status_code=400, detail="Desired referral code already taken")
+        
+        referral_code = desired_code if desired_code else generate_referral_code(user["username"], user_id)
+        referral_link = generate_referral_link(referral_code)
+        
+        # Create affiliate record
+        affiliate_id = str(uuid.uuid4())
+        affiliate_data = {
+            "id": affiliate_id,
+            "user_id": user_id,
+            "referral_code": referral_code,
+            "referral_link": referral_link,
+            "status": "active",  # Auto-approve for now, can be changed to "pending"
+            "approved_at": datetime.utcnow(),
+            "approved_by": "system",
+            "total_referrals": 0,
+            "active_referrals": 0,
+            "total_earnings": 0.0,
+            "pending_earnings": 0.0,
+            "paid_earnings": 0.0,
+            "commission_rate_registration": 5.0,
+            "commission_rate_tournament": 0.1,
+            "commission_rate_deposit": 0.05,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        affiliates_collection.insert_one(affiliate_data)
+        
+        return {
+            "message": "Affiliate application approved!",
+            "affiliate_id": affiliate_id,
+            "referral_code": referral_code,
+            "referral_link": referral_link
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing affiliate application: {str(e)}")
+
+@app.get("/api/affiliate/stats")
+async def get_affiliate_stats(user_id: str = Depends(verify_token)):
+    """Get affiliate statistics for current user"""
+    try:
+        # Check if user is an affiliate
+        affiliate = affiliates_collection.find_one({"user_id": user_id})
+        if not affiliate:
+            raise HTTPException(status_code=404, detail="User is not an affiliate")
+        
+        stats = calculate_affiliate_stats(user_id)
+        return stats
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching affiliate stats: {str(e)}")
+
+@app.get("/api/affiliate/profile")
+async def get_affiliate_profile(user_id: str = Depends(verify_token)):
+    """Get affiliate profile information"""
+    try:
+        affiliate = affiliates_collection.find_one({"user_id": user_id}, {"_id": 0})
+        if not affiliate:
+            raise HTTPException(status_code=404, detail="User is not an affiliate")
+        
+        return affiliate
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching affiliate profile: {str(e)}")
+
+@app.get("/api/affiliate/commissions")
+async def get_affiliate_commissions(user_id: str = Depends(verify_token), limit: int = 50, skip: int = 0):
+    """Get affiliate commission history"""
+    try:
+        # Check if user is an affiliate
+        affiliate = affiliates_collection.find_one({"user_id": user_id})
+        if not affiliate:
+            raise HTTPException(status_code=404, detail="User is not an affiliate")
+        
+        # Get commissions
+        commissions = list(commissions_collection.find(
+            {"affiliate_user_id": user_id},
+            {"_id": 0}
+        ).sort("created_at", -1).skip(skip).limit(limit))
+        
+        total_commissions = commissions_collection.count_documents({"affiliate_user_id": user_id})
+        
+        return {
+            "commissions": commissions,
+            "total": total_commissions,
+            "page": skip // limit + 1,
+            "pages": (total_commissions + limit - 1) // limit
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching commissions: {str(e)}")
+
+@app.get("/api/affiliate/referrals")
+async def get_affiliate_referrals(user_id: str = Depends(verify_token), limit: int = 50, skip: int = 0):
+    """Get affiliate referral history"""
+    try:
+        # Check if user is an affiliate
+        affiliate = affiliates_collection.find_one({"user_id": user_id})
+        if not affiliate:
+            raise HTTPException(status_code=404, detail="User is not an affiliate")
+        
+        # Get referrals with user details
+        referrals = list(referrals_collection.find(
+            {"affiliate_user_id": user_id},
+            {"_id": 0}
+        ).sort("registered_at", -1).skip(skip).limit(limit))
+        
+        # Enrich with user details
+        for referral in referrals:
+            user = users_collection.find_one(
+                {"id": referral["referred_user_id"]},
+                {"username": 1, "full_name": 1, "country": 1, "avatar_url": 1, "_id": 0}
+            )
+            if user:
+                referral["user_details"] = user
+        
+        total_referrals = referrals_collection.count_documents({"affiliate_user_id": user_id})
+        
+        return {
+            "referrals": referrals,
+            "total": total_referrals,
+            "page": skip // limit + 1,
+            "pages": (total_referrals + limit - 1) // limit
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching referrals: {str(e)}")
+
+@app.post("/api/affiliate/payout/request")
+async def request_payout(request: PayoutRequest, user_id: str = Depends(verify_token)):
+    """Request a payout of affiliate earnings"""
+    try:
+        # Check if user is an affiliate
+        affiliate = affiliates_collection.find_one({"user_id": user_id})
+        if not affiliate:
+            raise HTTPException(status_code=404, detail="User is not an affiliate")
+        
+        # Check minimum payout amount (€50)
+        if request.amount < 50.0:
+            raise HTTPException(status_code=400, detail="Minimum payout amount is €50")
+        
+        # Check if user has enough pending earnings
+        if affiliate.get("pending_earnings", 0.0) < request.amount:
+            raise HTTPException(status_code=400, detail="Insufficient pending earnings")
+        
+        # Get unpaid commissions up to the requested amount
+        unpaid_commissions = list(commissions_collection.find(
+            {"affiliate_user_id": user_id, "is_paid": False}
+        ).sort("created_at", 1))
+        
+        commission_total = 0.0
+        commission_ids = []
+        
+        for commission in unpaid_commissions:
+            if commission_total + commission["amount"] <= request.amount:
+                commission_total += commission["amount"]
+                commission_ids.append(commission["id"])
+            else:
+                break
+        
+        if commission_total < request.amount:
+            raise HTTPException(status_code=400, detail=f"Only €{commission_total:.2f} available for payout")
+        
+        # Create payout record
+        payout_id = str(uuid.uuid4())
+        payout_data = {
+            "id": payout_id,
+            "affiliate_user_id": user_id,
+            "amount": commission_total,
+            "currency": "EUR",
+            "status": "pending",
+            "payment_method": request.payment_method,
+            "payment_details": request.payment_details,
+            "commission_ids": commission_ids,
+            "notes": request.notes,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        payouts_collection.insert_one(payout_data)
+        
+        # Mark commissions as part of this payout (but not paid yet)
+        commissions_collection.update_many(
+            {"id": {"$in": commission_ids}},
+            {"$set": {"payout_id": payout_id}}
+        )
+        
+        return {
+            "message": "Payout request submitted successfully",
+            "payout_id": payout_id,
+            "amount": commission_total,
+            "status": "pending"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error requesting payout: {str(e)}")
+
+# =============================================================================
+# ADMIN AFFILIATE MANAGEMENT ENDPOINTS
+# =============================================================================
+
+@app.get("/api/admin/affiliates")
+async def get_all_affiliates(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN)), limit: int = 50, skip: int = 0):
+    """Get all affiliates for admin management"""
+    try:
+        # Get affiliates with user details
+        affiliates = list(affiliates_collection.find({}, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit))
+        
+        # Enrich with user details
+        for affiliate in affiliates:
+            user = users_collection.find_one(
+                {"id": affiliate["user_id"]},
+                {"username": 1, "full_name": 1, "email": 1, "country": 1, "_id": 0}
+            )
+            if user:
+                affiliate["user_details"] = user
+        
+        total_affiliates = affiliates_collection.count_documents({})
+        
+        return {
+            "affiliates": affiliates,
+            "total": total_affiliates,
+            "page": skip // limit + 1,
+            "pages": (total_affiliates + limit - 1) // limit
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching affiliates: {str(e)}")
+
+@app.get("/api/admin/payouts")
+async def get_all_payouts(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN)), status: Optional[str] = None):
+    """Get all payout requests for admin processing"""
+    try:
+        query = {}
+        if status:
+            query["status"] = status
+        
+        payouts = list(payouts_collection.find(query, {"_id": 0}).sort("created_at", -1))
+        
+        # Enrich with user details
+        for payout in payouts:
+            user = users_collection.find_one(
+                {"id": payout["affiliate_user_id"]},
+                {"username": 1, "full_name": 1, "email": 1, "_id": 0}
+            )
+            if user:
+                payout["user_details"] = user
+        
+        return {"payouts": payouts}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payouts: {str(e)}")
+
+@app.post("/api/admin/payouts/{payout_id}/process")
+async def process_payout(payout_id: str, process_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Process a payout request"""
+    try:
+        status = process_data.get("status")  # "completed" or "failed"
+        transaction_reference = process_data.get("transaction_reference")
+        notes = process_data.get("notes", "")
+        
+        if status not in ["completed", "failed"]:
+            raise HTTPException(status_code=400, detail="Status must be 'completed' or 'failed'")
+        
+        # Get payout
+        payout = payouts_collection.find_one({"id": payout_id})
+        if not payout:
+            raise HTTPException(status_code=404, detail="Payout not found")
+        
+        if payout["status"] != "pending":
+            raise HTTPException(status_code=400, detail="Payout is not pending")
+        
+        # Update payout
+        update_data = {
+            "status": status,
+            "processed_by": admin_id,
+            "processed_at": datetime.utcnow(),
+            "transaction_reference": transaction_reference,
+            "notes": notes,
+            "updated_at": datetime.utcnow()
+        }
+        
+        payouts_collection.update_one({"id": payout_id}, {"$set": update_data})
+        
+        if status == "completed":
+            # Mark commissions as paid
+            commission_ids = payout["commission_ids"]
+            commissions_collection.update_many(
+                {"id": {"$in": commission_ids}},
+                {"$set": {"is_paid": True, "paid_at": datetime.utcnow()}}
+            )
+            
+            # Update affiliate earnings
+            payout_amount = payout["amount"]
+            affiliates_collection.update_one(
+                {"user_id": payout["affiliate_user_id"]},
+                {
+                    "$inc": {
+                        "pending_earnings": -payout_amount,
+                        "paid_earnings": payout_amount
+                    },
+                    "$set": {"updated_at": datetime.utcnow()}
+                }
+            )
+        
+        return {"message": f"Payout {status} successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing payout: {str(e)}")
+
+@app.get("/api/register/check-referral/{referral_code}")
+async def check_referral_code(referral_code: str):
+    """Check if referral code is valid (public endpoint for registration)"""
+    try:
+        affiliate = affiliates_collection.find_one({"referral_code": referral_code, "status": "active"})
+        if not affiliate:
+            return {"valid": False, "message": "Invalid or inactive referral code"}
+        
+        # Get affiliate user details
+        user = users_collection.find_one({"id": affiliate["user_id"]}, {"username": 1, "full_name": 1, "_id": 0})
+        
+        return {
+            "valid": True,
+            "affiliate_name": user.get("full_name", user.get("username", "Unknown")) if user else "Unknown",
+            "commission_info": {
+                "registration_bonus": f"€{affiliate.get('commission_rate_registration', 5.0)}",
+                "tournament_commission": f"{affiliate.get('commission_rate_tournament', 0.1) * 100}%"
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error checking referral code: {str(e)}")
+
 # Initialize some sample data
 @app.on_event("startup")
 async def startup_event():
