@@ -44,26 +44,31 @@ SECRET_KEY = "your-secret-key-here"
 client = MongoClient(MONGO_URL)
 db = client[DB_NAME]
 
-# Collections
+# MongoDB Collections
 users_collection = db.users
-rankings_collection = db.rankings
 competitions_collection = db.competitions
+site_messages_collection = db.site_messages
 tournaments_collection = db.tournaments
 tournament_participants_collection = db.tournament_participants
 tournament_brackets_collection = db.tournament_brackets
 tournament_matches_collection = db.tournament_matches
 admin_actions_collection = db.admin_actions
-site_messages_collection = db.site_messages
-content_pages_collection = db.content_pages
-menu_items_collection = db.menu_items
-# Affiliate System Collections
 affiliates_collection = db.affiliates
+affiliate_applications_collection = db.affiliate_applications
 referrals_collection = db.referrals
 commissions_collection = db.commissions
 payouts_collection = db.payouts
-# Financial System Collections
 wallet_balances_collection = db.wallet_balances
 transactions_collection = db.transactions
+rankings_collection = db.rankings
+content_pages_collection = db.content_pages
+menu_items_collection = db.menu_items
+
+# Team System Collections
+teams_collection = db.teams
+team_members_collection = db.team_members
+team_invitations_collection = db.team_invitations
+team_applications_collection = db.team_applications
 
 app = FastAPI(title="WoBeRa - World Betting Rank API", default_response_class=CustomJSONResponse)
 
