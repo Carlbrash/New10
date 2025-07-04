@@ -2657,6 +2657,334 @@ function App() {
     );
   };
 
+  // =============================================================================
+  // TOURNAMENT RENDER FUNCTION
+  // =============================================================================
+  
+  const renderTournament = () => {
+    const t = translations[language];
+    
+    if (tournamentView === 'details' && selectedTournament) {
+      return renderTournamentDetails();
+    }
+    
+    return (
+      <div className="tournament-container">
+        <div className="tournament-header">
+          <h1 className="tournament-title">🏆 {t.tournamentTitle}</h1>
+          
+          {/* Tournament Filters */}
+          <div className="tournament-filters">
+            <select 
+              value={tournamentFilters.status} 
+              onChange={(e) => {
+                const newFilters = {...tournamentFilters, status: e.target.value};
+                setTournamentFilters(newFilters);
+                fetchTournaments(newFilters);
+              }}
+              className="tournament-filter"
+            >
+              <option value="">{t.allTournaments}</option>
+              <option value="open">{t.open}</option>
+              <option value="upcoming">{t.upcoming}</option>
+              <option value="ongoing">{t.ongoing}</option>
+              <option value="completed">{t.completed}</option>
+            </select>
+            
+            <select 
+              value={tournamentFilters.category} 
+              onChange={(e) => {
+                const newFilters = {...tournamentFilters, category: e.target.value};
+                setTournamentFilters(newFilters);
+                fetchTournaments(newFilters);
+              }}
+              className="tournament-filter"
+            >
+              <option value="">{t.filterByCategory}</option>
+              <option value="basic">{t.basic}</option>
+              <option value="standard">{t.standard}</option>
+              <option value="premium">{t.premium}</option>
+              <option value="vip">{t.vip}</option>
+            </select>
+            
+            <select 
+              value={tournamentFilters.duration} 
+              onChange={(e) => {
+                const newFilters = {...tournamentFilters, duration: e.target.value};
+                setTournamentFilters(newFilters);
+                fetchTournaments(newFilters);
+              }}
+              className="tournament-filter"
+            >
+              <option value="">{t.filterByDuration}</option>
+              <option value="instant">{t.instant}</option>
+              <option value="daily">{t.daily}</option>
+              <option value="two_day">{t.two_day}</option>
+              <option value="weekly">{t.weekly}</option>
+              <option value="monthly">{t.monthly}</option>
+              <option value="long_term">{t.long_term}</option>
+            </select>
+          </div>
+        </div>
+        
+        {tournamentLoading ? (
+          <div className="loading-container">
+            <div className="loading">Loading tournaments...</div>
+          </div>
+        ) : (
+          <div className="tournaments-grid">
+            {tournaments.map((tournament) => (
+              <div key={tournament.id} className="tournament-card">
+                <div className="tournament-card-header">
+                  <h3 className="tournament-name">{tournament.name}</h3>
+                  <span className={`tournament-status status-${tournament.status}`}>
+                    {t[tournament.status] || tournament.status}
+                  </span>
+                </div>
+                
+                <div className="tournament-card-body">
+                  <p className="tournament-description">{tournament.description}</p>
+                  
+                  <div className="tournament-details">
+                    <div className="tournament-detail">
+                      <span className="detail-label">{t.entryFee}:</span>
+                      <span className="detail-value">€{tournament.entry_fee}</span>
+                    </div>
+                    
+                    <div className="tournament-detail">
+                      <span className="detail-label">{t.participants}:</span>
+                      <span className="detail-value">
+                        {tournament.current_participants}/{tournament.max_participants}
+                      </span>
+                    </div>
+                    
+                    <div className="tournament-detail">
+                      <span className="detail-label">{t.prizePool}:</span>
+                      <span className="detail-value">€{tournament.total_prize_pool}</span>
+                    </div>
+                    
+                    <div className="tournament-detail">
+                      <span className="detail-label">{t.tournamentDuration}:</span>
+                      <span className="detail-value">{t[tournament.duration_type] || tournament.duration_type}</span>
+                    </div>
+                    
+                    <div className="tournament-detail">
+                      <span className="detail-label">{t.prizeDistribution}:</span>
+                      <span className="detail-value">{t[tournament.prize_distribution] || tournament.prize_distribution}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="tournament-card-footer">
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => fetchTournamentDetails(tournament.id)}
+                  >
+                    {t.viewDetails}
+                  </button>
+                  
+                  {tournament.status === 'open' && !tournament.user_registered && (
+                    <button 
+                      className="btn btn-primary"
+                      onClick={() => joinTournament(tournament.id)}
+                      disabled={tournament.current_participants >= tournament.max_participants}
+                    >
+                      {tournament.current_participants >= tournament.max_participants 
+                        ? t.tournamentFull 
+                        : t.joinNow}
+                    </button>
+                  )}
+                  
+                  {tournament.user_registered && (
+                    <button 
+                      className="btn btn-warning"
+                      onClick={() => leaveTournament(tournament.id)}
+                      disabled={tournament.status === 'ongoing' || tournament.status === 'completed'}
+                    >
+                      {t.leaveTournament}
+                    </button>
+                  )}
+                  
+                  {tournament.status !== 'open' && tournament.status !== 'ongoing' && (
+                    <span className="tournament-status-text">
+                      {tournament.status === 'upcoming' ? t.upcoming : 
+                       tournament.status === 'completed' ? t.completed : 
+                       tournament.status === 'cancelled' ? t.cancelled : t.registrationClosed}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {tournaments.length === 0 && !tournamentLoading && (
+          <div className="no-tournaments">
+            <h3>No tournaments found</h3>
+            <p>Try adjusting your filters or check back later for new tournaments.</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+  
+  const renderTournamentDetails = () => {
+    const t = translations[language];
+    const tournament = selectedTournament;
+    
+    if (!tournament) return null;
+    
+    return (
+      <div className="tournament-details-container">
+        <div className="tournament-details-header">
+          <button 
+            className="btn btn-secondary"
+            onClick={() => {
+              setTournamentView('list');
+              setSelectedTournament(null);
+            }}
+          >
+            ← {t.backToTournaments}
+          </button>
+          
+          <h1 className="tournament-details-title">{tournament.name}</h1>
+          <span className={`tournament-status status-${tournament.status}`}>
+            {t[tournament.status] || tournament.status}
+          </span>
+        </div>
+        
+        <div className="tournament-details-content">
+          <div className="tournament-info-grid">
+            <div className="tournament-info-card">
+              <h3>Tournament Information</h3>
+              <div className="info-list">
+                <div className="info-item">
+                  <span className="info-label">{t.entryFee}:</span>
+                  <span className="info-value">€{tournament.entry_fee}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">{t.participants}:</span>
+                  <span className="info-value">{tournament.current_participants}/{tournament.max_participants}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">{t.prizePool}:</span>
+                  <span className="info-value">€{tournament.total_prize_pool}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">{t.tournamentFormat}:</span>
+                  <span className="info-value">{t[tournament.tournament_format] || tournament.tournament_format}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">{t.prizeDistribution}:</span>
+                  <span className="info-value">{t[tournament.prize_distribution] || tournament.prize_distribution}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="tournament-info-card">
+              <h3>Schedule</h3>
+              <div className="info-list">
+                <div className="info-item">
+                  <span className="info-label">Registration:</span>
+                  <span className="info-value">
+                    {new Date(tournament.registration_start).toLocaleDateString()} - {new Date(tournament.registration_end).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Tournament:</span>
+                  <span className="info-value">
+                    {new Date(tournament.tournament_start).toLocaleDateString()} - {new Date(tournament.tournament_end).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">{t.tournamentDuration}:</span>
+                  <span className="info-value">{t[tournament.duration_type] || tournament.duration_type}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="tournament-description-card">
+            <h3>Description</h3>
+            <p>{tournament.description}</p>
+          </div>
+          
+          <div className="tournament-rules-card">
+            <h3>{t.rules}</h3>
+            <p>{tournament.rules}</p>
+          </div>
+          
+          <div className="tournament-participants-card">
+            <h3>{t.participants} ({tournament.current_participants})</h3>
+            <div className="participants-list">
+              {tournament.participants && tournament.participants.map((participant, index) => (
+                <div key={participant.id} className="participant-item">
+                  <div className="participant-info">
+                    {participant.avatar_url && (
+                      <img 
+                        src={participant.avatar_url} 
+                        alt={participant.full_name}
+                        className="participant-avatar"
+                      />
+                    )}
+                    <div className="participant-details">
+                      <span className="participant-name">{participant.full_name}</span>
+                      <span className="participant-username">@{participant.username}</span>
+                      <span className="participant-country">{participant.country}</span>
+                    </div>
+                  </div>
+                  <span className="participant-position">#{index + 1}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="tournament-actions">
+            {tournament.status === 'open' && !tournament.user_registered && (
+              <button 
+                className="btn btn-primary btn-large"
+                onClick={() => joinTournament(tournament.id)}
+                disabled={tournament.current_participants >= tournament.max_participants}
+              >
+                {tournament.current_participants >= tournament.max_participants 
+                  ? t.tournamentFull 
+                  : `${t.joinNow} - €${tournament.entry_fee}`}
+              </button>
+            )}
+            
+            {tournament.user_registered && (
+              <div className="user-registered-info">
+                <span className="registered-badge">✅ {t.alreadyJoined}</span>
+                {(tournament.status === 'open' || tournament.status === 'upcoming') && (
+                  <button 
+                    className="btn btn-warning"
+                    onClick={() => leaveTournament(tournament.id)}
+                  >
+                    {t.leaveTournament}
+                  </button>
+                )}
+              </div>
+            )}
+            
+            {tournament.status === 'upcoming' && (
+              <div className="tournament-upcoming-info">
+                <span className="upcoming-badge">⏰ {t.upcoming}</span>
+                <p>Registration will open on {new Date(tournament.registration_start).toLocaleDateString()}</p>
+              </div>
+            )}
+            
+            {tournament.status === 'completed' && tournament.winner_id && (
+              <div className="tournament-completed-info">
+                <span className="completed-badge">🏆 {t.completed}</span>
+                <p>Tournament completed!</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Admin Panel Render Function
   const renderAdminPanel = () => {
     return (
