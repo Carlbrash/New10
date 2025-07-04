@@ -3307,6 +3307,81 @@ function App() {
       </div>
     );
   };
+  
+  const renderTournamentBracket = () => {
+    if (!tournamentBracket || !tournamentMatches.length) {
+      return <div>No bracket data available.</div>;
+    }
+    
+    const matchesByRound = {};
+    tournamentMatches.forEach(match => {
+      if (!matchesByRound[match.round_number]) {
+        matchesByRound[match.round_number] = [];
+      }
+      matchesByRound[match.round_number].push(match);
+    });
+    
+    return (
+      <div className="bracket-container">
+        {tournamentBracket.rounds.map((round, roundIndex) => (
+          <div key={round.round_number} className="bracket-round">
+            <h4 className="round-title">{round.round_name}</h4>
+            <div className="round-matches">
+              {(matchesByRound[round.round_number] || []).map((match) => (
+                <div key={match.id} className={`match-card ${match.status}`}>
+                  <div className="match-header">
+                    <span className="match-number">Match {match.match_number}</span>
+                    <span className={`match-status status-${match.status}`}>
+                      {match.status === 'pending' ? '⏳' : 
+                       match.status === 'ongoing' ? '▶️' : '✅'}
+                    </span>
+                  </div>
+                  
+                  <div className="match-players">
+                    <div className={`player ${match.winner_id === match.player1_id ? 'winner' : ''}`}>
+                      <span className="player-name">
+                        {match.player1_username || 'TBD'}
+                      </span>
+                      {match.status === 'pending' && match.player1_id && match.player2_id && isAdmin && (
+                        <button 
+                          className="btn btn-small btn-success"
+                          onClick={() => setMatchWinner(match.id, match.player1_id)}
+                        >
+                          Set Winner
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="vs-divider">VS</div>
+                    
+                    <div className={`player ${match.winner_id === match.player2_id ? 'winner' : ''}`}>
+                      <span className="player-name">
+                        {match.player2_username || 'TBD'}
+                      </span>
+                      {match.status === 'pending' && match.player1_id && match.player2_id && isAdmin && (
+                        <button 
+                          className="btn btn-small btn-success"
+                          onClick={() => setMatchWinner(match.id, match.player2_id)}
+                        >
+                          Set Winner
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {match.winner_username && (
+                    <div className="match-result">
+                      🏆 Winner: <strong>{match.winner_username}</strong>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   // Admin Panel Render Function
   const renderAdminPanel = () => {
