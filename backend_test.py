@@ -1724,6 +1724,447 @@ class TournamentSystemTester(unittest.TestCase):
         
         print("✅ Unauthorized admin access tests passed")
 
+class TournamentBracketTester(unittest.TestCase):
+    base_url = "https://5304053a-6925-4ab4-9c48-86fff21eddb5.preview.emergentagent.com"
+    
+    # Admin credentials for admin endpoints
+    admin_credentials = {
+        "username": "admin",
+        "password": "Kiki1999@"
+    }
+    
+    # Regular user credentials for user endpoints
+    user_credentials = {
+        "username": "testuser",
+        "password": "testpass123"
+    }
+    
+    admin_token = None
+    user_token = None
+    user_id = None
+    test_tournament_id = None
+    test_match_id = None
+    
+    def test_01_user_login(self):
+        """Login as regular user to get token for bracket testing"""
+        print("\n🔍 Testing user login for bracket testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.user_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"User login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("user_id", data)
+        TournamentBracketTester.user_token = data["token"]
+        TournamentBracketTester.user_id = data["user_id"]
+        print(f"✅ User login successful - Token obtained for bracket testing")
+    
+    def test_02_admin_login(self):
+        """Login as admin to get token for admin bracket endpoints"""
+        print("\n🔍 Testing admin login for bracket admin endpoints...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.admin_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        TournamentBracketTester.admin_token = data["token"]
+        print(f"✅ Admin login successful - Token obtained for bracket admin endpoints")
+    
+    def test_03_create_test_tournament(self):
+        """Create a test tournament for bracket testing"""
+        print("\n🔍 Creating a test tournament for bracket testing...")
+        
+        # Skip if no admin token
+        if not TournamentBracketTester.admin_token:
+            self.skipTest("No admin token available")
+        
+        # Create a new tournament
+        from datetime import datetime, timedelta
+        
+        now = datetime.utcnow()
+        tournament_data = {
+            "name": "Bracket Test Tournament",
+            "description": "This is a test tournament for bracket testing",
+            "duration_type": "daily",
+            "tournament_format": "single_elimination",
+            "entry_fee": 10.0,
+            "max_participants": 8,
+            "prize_distribution": "top_three",
+            "registration_start": (now - timedelta(hours=1)).isoformat(),
+            "registration_end": (now + timedelta(hours=12)).isoformat(),
+            "tournament_start": (now + timedelta(hours=24)).isoformat(),
+            "tournament_end": (now + timedelta(hours=48)).isoformat(),
+            "rules": "Test tournament rules for bracket testing.",
+            "region": "Test Region"
+        }
+        
+        headers = {"Authorization": f"Bearer {TournamentBracketTester.admin_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/admin/tournaments",
+            headers=headers,
+            json=tournament_data
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to create tournament: {response.text}")
+        data = response.json()
+        self.assertIn("tournament_id", data)
+        
+        TournamentBracketTester.test_tournament_id = data["tournament_id"]
+        print(f"✅ Successfully created test tournament with ID: {TournamentBracketTester.test_tournament_id}")
+        
+        # Update tournament status to open for registration
+        update_data = {
+            "status": "open"
+        }
+        
+        response = requests.put(
+            f"{self.base_url}/api/admin/tournaments/{TournamentBracketTester.test_tournament_id}",
+            headers=headers,
+            json=update_data
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to update tournament status: {response.text}")
+        print(f"✅ Updated tournament status to 'open'")
+    
+    def test_04_add_participants(self):
+        """Add participants to the test tournament"""
+        print("\n🔍 Adding participants to the test tournament...")
+        
+        # Skip if no test tournament ID or user token
+        if not TournamentBracketTester.test_tournament_id or not TournamentBracketTester.user_token:
+            self.skipTest("No test tournament ID or user token available")
+        
+        # Join the tournament with our test user
+        headers = {"Authorization": f"Bearer {TournamentBracketTester.user_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/join",
+            headers=headers
+        )
+        
+        # If user is already registered, this will fail with 400
+        if response.status_code == 400 and "already registered" in response.text.lower():
+            print("  User is already registered for this tournament")
+        else:
+            self.assertEqual(response.status_code, 200, f"Failed to join tournament: {response.text}")
+            print(f"✅ Successfully joined tournament as test user")
+        
+        # For testing purposes, we need at least 2 participants
+        # Since we can't create multiple real users, we'll check if we need to simulate additional participants
+        response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}")
+        self.assertEqual(response.status_code, 200)
+        tournament = response.json()
+        
+        if len(tournament["participants"]) < 2:
+            print("  Need to add simulated participants for bracket testing")
+            print("  Note: In a real scenario, multiple users would join the tournament")
+            print("  For testing, we'll proceed with the bracket generation test anyway")
+        
+        print(f"✅ Tournament has {len(tournament['participants'])} participant(s)")
+    
+    def test_05_get_tournament_bracket_empty(self):
+        """Test GET /api/tournaments/{tournament_id}/bracket endpoint (empty bracket)"""
+        print("\n🔍 Testing GET /api/tournaments/{tournament_id}/bracket endpoint (empty bracket)...")
+        
+        # Skip if no test tournament ID
+        if not TournamentBracketTester.test_tournament_id:
+            self.skipTest("No test tournament ID available")
+        
+        response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/bracket")
+        self.assertEqual(response.status_code, 200, f"Failed to get tournament bracket: {response.text}")
+        data = response.json()
+        
+        self.assertIn("tournament", data)
+        self.assertIn("bracket", data)
+        self.assertIn("matches", data)
+        
+        # Bracket should be empty or null before generation
+        if data["bracket"] is None:
+            print("  Bracket is null (not yet generated)")
+        else:
+            self.assertFalse(data["bracket"]["is_generated"], "Expected bracket to not be generated yet")
+            print("  Bracket exists but is not yet generated")
+        
+        self.assertEqual(len(data["matches"]), 0, "Expected no matches before bracket generation")
+        print("✅ GET /api/tournaments/{tournament_id}/bracket endpoint test passed (empty bracket)")
+    
+    def test_06_generate_bracket(self):
+        """Test POST /api/tournaments/{tournament_id}/generate-bracket endpoint"""
+        print("\n🔍 Testing POST /api/tournaments/{tournament_id}/generate-bracket endpoint...")
+        
+        # Skip if no test tournament ID or admin token
+        if not TournamentBracketTester.test_tournament_id or not TournamentBracketTester.admin_token:
+            self.skipTest("No test tournament ID or admin token available")
+        
+        headers = {"Authorization": f"Bearer {TournamentBracketTester.admin_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/generate-bracket",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to generate bracket: {response.text}")
+        data = response.json()
+        self.assertIn("message", data)
+        self.assertIn("bracket", data)
+        
+        # Verify bracket structure
+        bracket = data["bracket"]
+        self.assertIn("id", bracket)
+        self.assertEqual(bracket["tournament_id"], TournamentBracketTester.test_tournament_id)
+        self.assertIn("total_rounds", bracket)
+        self.assertIn("current_round", bracket)
+        self.assertIn("rounds", bracket)
+        self.assertTrue(bracket["is_generated"], "Expected bracket to be marked as generated")
+        
+        # Verify rounds
+        rounds = bracket["rounds"]
+        self.assertGreater(len(rounds), 0, "Expected at least one round in the bracket")
+        
+        # Verify first round is named correctly
+        if len(rounds) == 1:
+            self.assertEqual(rounds[0]["round_name"], "Finals", "Expected single round to be named 'Finals'")
+        elif len(rounds) == 2:
+            self.assertEqual(rounds[0]["round_name"], "Semi-Finals", "Expected first round to be named 'Semi-Finals'")
+            self.assertEqual(rounds[1]["round_name"], "Finals", "Expected second round to be named 'Finals'")
+        elif len(rounds) == 3:
+            self.assertEqual(rounds[0]["round_name"], "Quarter-Finals", "Expected first round to be named 'Quarter-Finals'")
+        
+        print(f"✅ Successfully generated bracket with {len(rounds)} rounds")
+        
+        # Verify tournament status was updated to ongoing
+        response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}")
+        self.assertEqual(response.status_code, 200)
+        tournament = response.json()
+        self.assertEqual(tournament["status"], "ongoing", "Expected tournament status to be updated to 'ongoing'")
+        
+        print("✅ Tournament status correctly updated to 'ongoing'")
+    
+    def test_07_get_tournament_bracket(self):
+        """Test GET /api/tournaments/{tournament_id}/bracket endpoint (with generated bracket)"""
+        print("\n🔍 Testing GET /api/tournaments/{tournament_id}/bracket endpoint (with generated bracket)...")
+        
+        # Skip if no test tournament ID
+        if not TournamentBracketTester.test_tournament_id:
+            self.skipTest("No test tournament ID available")
+        
+        response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/bracket")
+        self.assertEqual(response.status_code, 200, f"Failed to get tournament bracket: {response.text}")
+        data = response.json()
+        
+        self.assertIn("tournament", data)
+        self.assertIn("bracket", data)
+        self.assertIn("matches", data)
+        
+        # Bracket should now be generated
+        bracket = data["bracket"]
+        self.assertIsNotNone(bracket, "Expected bracket to exist")
+        self.assertTrue(bracket["is_generated"], "Expected bracket to be marked as generated")
+        
+        # Verify matches
+        matches = data["matches"]
+        self.assertGreater(len(matches), 0, "Expected at least one match after bracket generation")
+        
+        # Save a match ID for the set winner test
+        if matches:
+            # Find a match with both players assigned
+            for match in matches:
+                if match["player1_id"] and match["player2_id"]:
+                    TournamentBracketTester.test_match_id = match["id"]
+                    TournamentBracketTester.test_match_player1_id = match["player1_id"]
+                    TournamentBracketTester.test_match_player2_id = match["player2_id"]
+                    print(f"  Selected match for testing: {match['id']} (Players: {match['player1_username']} vs {match['player2_username']})")
+                    break
+            
+            if not hasattr(TournamentBracketTester, 'test_match_id'):
+                # If no match with both players, just take the first match
+                TournamentBracketTester.test_match_id = matches[0]["id"]
+                TournamentBracketTester.test_match_player1_id = matches[0]["player1_id"]
+                TournamentBracketTester.test_match_player2_id = matches[0]["player2_id"]
+                print(f"  Selected match for testing: {matches[0]['id']}")
+        
+        print(f"✅ Found {len(matches)} matches in the bracket")
+        print("✅ GET /api/tournaments/{tournament_id}/bracket endpoint test passed (with generated bracket)")
+    
+    def test_08_get_tournament_matches(self):
+        """Test GET /api/tournaments/{tournament_id}/matches endpoint"""
+        print("\n🔍 Testing GET /api/tournaments/{tournament_id}/matches endpoint...")
+        
+        # Skip if no test tournament ID
+        if not TournamentBracketTester.test_tournament_id:
+            self.skipTest("No test tournament ID available")
+        
+        response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/matches")
+        self.assertEqual(response.status_code, 200, f"Failed to get tournament matches: {response.text}")
+        data = response.json()
+        
+        self.assertIn("matches", data)
+        matches = data["matches"]
+        
+        # Verify matches are grouped by round
+        self.assertIsInstance(matches, list, "Expected matches to be a list")
+        
+        if matches:
+            # Check structure of first round
+            first_round = matches[0]
+            self.assertIn("round_number", first_round)
+            self.assertIn("round_name", first_round)
+            self.assertIn("matches", first_round)
+            
+            # Check structure of first match in first round
+            if first_round["matches"]:
+                first_match = first_round["matches"][0]
+                self.assertIn("id", first_match)
+                self.assertIn("player1_id", first_match)
+                self.assertIn("player2_id", first_match)
+                self.assertIn("status", first_match)
+                
+                print(f"  Round 1 ({first_round['round_name']}) has {len(first_round['matches'])} matches")
+        
+        print(f"✅ Found {len(matches)} rounds of matches")
+        print("✅ GET /api/tournaments/{tournament_id}/matches endpoint test passed")
+    
+    def test_09_set_match_winner(self):
+        """Test POST /api/tournaments/matches/{match_id}/winner endpoint"""
+        print("\n🔍 Testing POST /api/tournaments/matches/{match_id}/winner endpoint...")
+        
+        # Skip if no test match ID or admin token
+        if not hasattr(TournamentBracketTester, 'test_match_id') or not TournamentBracketTester.admin_token:
+            self.skipTest("No test match ID or admin token available")
+        
+        # Choose a winner (player1 or player2)
+        winner_id = TournamentBracketTester.test_match_player1_id
+        if not winner_id:
+            winner_id = TournamentBracketTester.test_match_player2_id
+        
+        if not winner_id:
+            self.skipTest("No players assigned to the test match")
+        
+        winner_data = {
+            "winner_id": winner_id
+        }
+        
+        headers = {"Authorization": f"Bearer {TournamentBracketTester.admin_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/tournaments/matches/{TournamentBracketTester.test_match_id}/winner",
+            headers=headers,
+            json=winner_data
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to set match winner: {response.text}")
+        data = response.json()
+        self.assertIn("message", data)
+        
+        print(f"✅ Successfully set winner for match {TournamentBracketTester.test_match_id}")
+        
+        # Verify match was updated
+        response = requests.get(f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/bracket")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Find our match in the matches list
+        for match in data["matches"]:
+            if match["id"] == TournamentBracketTester.test_match_id:
+                self.assertEqual(match["winner_id"], winner_id, "Expected winner_id to be updated")
+                self.assertEqual(match["status"], "completed", "Expected match status to be updated to 'completed'")
+                print("✅ Match winner and status correctly updated")
+                break
+        
+        print("✅ POST /api/tournaments/matches/{match_id}/winner endpoint test passed")
+    
+    def test_10_invalid_match_winner(self):
+        """Test setting an invalid match winner (negative test)"""
+        print("\n🔍 Testing setting an invalid match winner (negative test)...")
+        
+        # Skip if no test match ID or admin token
+        if not hasattr(TournamentBracketTester, 'test_match_id') or not TournamentBracketTester.admin_token:
+            self.skipTest("No test match ID or admin token available")
+        
+        # Try to set an invalid winner
+        import uuid
+        invalid_winner_id = str(uuid.uuid4())
+        
+        winner_data = {
+            "winner_id": invalid_winner_id
+        }
+        
+        headers = {"Authorization": f"Bearer {TournamentBracketTester.admin_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/tournaments/matches/{TournamentBracketTester.test_match_id}/winner",
+            headers=headers,
+            json=winner_data
+        )
+        
+        # Should fail with 400 status code
+        self.assertEqual(response.status_code, 400, "Expected 400 error when setting invalid winner")
+        
+        print("✅ Correctly rejected invalid match winner")
+    
+    def test_11_unauthorized_bracket_access(self):
+        """Test unauthorized access to admin bracket endpoints"""
+        print("\n🔍 Testing unauthorized access to admin bracket endpoints...")
+        
+        # Skip if no test tournament ID or test match ID
+        if not TournamentBracketTester.test_tournament_id or not hasattr(TournamentBracketTester, 'test_match_id'):
+            self.skipTest("No test tournament ID or test match ID available")
+        
+        # Test generating bracket without auth
+        response = requests.post(
+            f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/generate-bracket"
+        )
+        self.assertEqual(response.status_code, 401, "Expected 401 error when generating bracket without auth")
+        
+        # Test setting match winner without auth
+        winner_data = {
+            "winner_id": "any_id"
+        }
+        response = requests.post(
+            f"{self.base_url}/api/tournaments/matches/{TournamentBracketTester.test_match_id}/winner",
+            json=winner_data
+        )
+        self.assertEqual(response.status_code, 401, "Expected 401 error when setting match winner without auth")
+        
+        # Test with regular user token if available
+        if TournamentBracketTester.user_token:
+            headers = {"Authorization": f"Bearer {TournamentBracketTester.user_token}"}
+            
+            # Test generating bracket with regular user token
+            response = requests.post(
+                f"{self.base_url}/api/tournaments/{TournamentBracketTester.test_tournament_id}/generate-bracket",
+                headers=headers
+            )
+            self.assertEqual(response.status_code, 403, "Expected 403 error when generating bracket with regular user token")
+            
+            # Test setting match winner with regular user token
+            response = requests.post(
+                f"{self.base_url}/api/tournaments/matches/{TournamentBracketTester.test_match_id}/winner",
+                headers=headers,
+                json=winner_data
+            )
+            self.assertEqual(response.status_code, 403, "Expected 403 error when setting match winner with regular user token")
+            
+            print("  ✅ Correctly prevented regular user from accessing admin bracket endpoints")
+        
+        print("✅ Unauthorized bracket access tests passed")
+    
+    def test_12_cleanup(self):
+        """Clean up test tournament"""
+        print("\n🔍 Cleaning up test tournament...")
+        
+        # Skip if no test tournament ID or admin token
+        if not TournamentBracketTester.test_tournament_id or not TournamentBracketTester.admin_token:
+            self.skipTest("No test tournament ID or admin token available")
+        
+        headers = {"Authorization": f"Bearer {TournamentBracketTester.admin_token}"}
+        response = requests.delete(
+            f"{self.base_url}/api/admin/tournaments/{TournamentBracketTester.test_tournament_id}",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to cancel test tournament: {response.text}")
+        print(f"✅ Successfully cancelled test tournament {TournamentBracketTester.test_tournament_id}")
+
 def run_tournament_tests():
     """Run only tournament system tests"""
     tournament_test_suite = unittest.TestSuite()
