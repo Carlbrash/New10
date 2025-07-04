@@ -5037,6 +5037,49 @@ body {
   50% { opacity: 0.5; }
 }
 
+.admin-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.admin-search {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  color: #ffd700;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  min-width: 250px;
+  transition: all 0.3s ease;
+}
+
+.admin-search:focus {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+  outline: none;
+}
+
+.admin-search::placeholder {
+  color: rgba(255, 215, 0, 0.6);
+}
+
+.tournaments-admin-section {
+  margin-top: 1rem;
+}
+
+.no-tournaments {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
 /* Tournament Dashboard Styles */
 .btn-success {
   background: linear-gradient(135deg, #22c55e, #16a34a);
