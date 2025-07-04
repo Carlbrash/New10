@@ -4338,17 +4338,18 @@ function App() {
               <div className="admin-controls">
                 <button 
                   className="btn btn-primary"
-                  onClick={() => setShowCompetitionModal(true)}
-                >
-                  ➕ Create New Competition
-                </button>
-                
-                <button 
-                  className="btn btn-success"
                   onClick={() => setShowTournamentModal(true)}
                 >
                   🏆 Create New Tournament
                 </button>
+                
+                <input 
+                  type="text"
+                  placeholder="Search tournaments..."
+                  className="admin-search"
+                  value={tournamentSearch}
+                  onChange={(e) => setTournamentSearch(e.target.value)}
+                />
               </div>
 
               <div className="competitions-admin-grid">
