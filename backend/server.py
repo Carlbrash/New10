@@ -1094,6 +1094,226 @@ async def update_menu_item(item_id: str, item_data: dict, admin_id: str = Depend
         raise HTTPException(status_code=500, detail=f"Error updating menu item: {str(e)}")
 
 # =============================================================================
+# BRACKET GENERATION UTILITIES
+# =============================================================================
+
+def generate_bracket(tournament_id: str, participants: List[dict]) -> dict:
+    """Generate tournament bracket for single elimination"""
+    import math
+    import random
+    
+    # Ensure we have a power of 2 participants (pad with byes if needed)
+    participant_count = len(participants)
+    next_power_of_2 = 2 ** math.ceil(math.log2(max(participant_count, 2)))
+    
+    # Calculate total rounds needed
+    total_rounds = int(math.log2(next_power_of_2))
+    
+    # Shuffle participants for fair pairing
+    shuffled_participants = participants.copy()
+    random.shuffle(shuffled_participants)
+    
+    # Pad with byes if needed
+    while len(shuffled_participants) < next_power_of_2:
+        shuffled_participants.append(None)  # Bye
+    
+    # Create bracket structure
+    bracket_id = str(uuid.uuid4())
+    
+    # Generate round names
+    round_names = []
+    if total_rounds == 1:
+        round_names = ["Finals"]
+    elif total_rounds == 2:
+        round_names = ["Semi-Finals", "Finals"] 
+    elif total_rounds == 3:
+        round_names = ["Quarter-Finals", "Semi-Finals", "Finals"]
+    elif total_rounds == 4:
+        round_names = ["Round 1", "Quarter-Finals", "Semi-Finals", "Finals"]
+    else:
+        round_names = [f"Round {i}" for i in range(1, total_rounds-1)] + ["Semi-Finals", "Finals"]
+    
+    # Create rounds
+    rounds = []
+    matches = []
+    
+    for round_num in range(1, total_rounds + 1):
+        matches_in_round = next_power_of_2 // (2 ** round_num)
+        round_name = round_names[round_num - 1] if round_num <= len(round_names) else f"Round {round_num}"
+        
+        round_data = {
+            "round_number": round_num,
+            "round_name": round_name,
+            "total_matches": matches_in_round,
+            "completed_matches": 0,
+            "status": "pending"
+        }
+        rounds.append(round_data)
+        
+        # Create matches for this round
+        for match_num in range(1, matches_in_round + 1):
+            match_id = str(uuid.uuid4())
+            
+            match_data = {
+                "id": match_id,
+                "tournament_id": tournament_id,
+                "round_number": round_num,
+                "match_number": match_num,
+                "player1_id": None,
+                "player1_username": None,
+                "player2_id": None,
+                "player2_username": None,
+                "winner_id": None,
+                "winner_username": None,
+                "status": "pending",
+                "scheduled_at": None,
+                "started_at": None,
+                "completed_at": None,
+                "next_match_id": None
+            }
+            
+            # For first round, assign participants
+            if round_num == 1:
+                player1_idx = (match_num - 1) * 2
+                player2_idx = player1_idx + 1
+                
+                if player1_idx < len(shuffled_participants) and shuffled_participants[player1_idx]:
+                    participant1 = shuffled_participants[player1_idx]
+                    match_data["player1_id"] = participant1["user_id"]
+                    match_data["player1_username"] = participant1["username"]
+                
+                if player2_idx < len(shuffled_participants) and shuffled_participants[player2_idx]:
+                    participant2 = shuffled_participants[player2_idx]
+                    match_data["player2_id"] = participant2["user_id"]
+                    match_data["player2_username"] = participant2["username"]
+                
+                # Handle byes (auto-advance if one player is missing)
+                if match_data["player1_id"] and not match_data["player2_id"]:
+                    match_data["winner_id"] = match_data["player1_id"]
+                    match_data["winner_username"] = match_data["player1_username"]
+                    match_data["status"] = "completed"
+                    match_data["completed_at"] = datetime.utcnow()
+                elif match_data["player2_id"] and not match_data["player1_id"]:
+                    match_data["winner_id"] = match_data["player2_id"]
+                    match_data["winner_username"] = match_data["player2_username"]
+                    match_data["status"] = "completed"
+                    match_data["completed_at"] = datetime.utcnow()
+            
+            matches.append(match_data)
+    
+    # Create bracket
+    bracket_data = {
+        "id": bracket_id,
+        "tournament_id": tournament_id,
+        "total_rounds": total_rounds,
+        "current_round": 1,
+        "rounds": rounds,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+        "is_generated": True
+    }
+    
+    # Save bracket and matches to database
+    tournament_brackets_collection.insert_one(bracket_data)
+    if matches:
+        tournament_matches_collection.insert_many(matches)
+    
+    return bracket_data
+
+def advance_winner(match_id: str, winner_id: str) -> bool:
+    """Advance winner to next round and update bracket"""
+    try:
+        # Get the match
+        match = tournament_matches_collection.find_one({"id": match_id})
+        if not match:
+            return False
+        
+        # Get winner username
+        winner_username = match["player1_username"] if winner_id == match["player1_id"] else match["player2_username"]
+        
+        # Update match with winner
+        tournament_matches_collection.update_one(
+            {"id": match_id},
+            {
+                "$set": {
+                    "winner_id": winner_id,
+                    "winner_username": winner_username,
+                    "status": "completed",
+                    "completed_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        # Find next round match to advance winner to
+        tournament_id = match["tournament_id"]
+        current_round = match["round_number"]
+        next_round = current_round + 1
+        
+        # Find next match in the next round
+        next_round_matches = list(tournament_matches_collection.find({
+            "tournament_id": tournament_id,
+            "round_number": next_round
+        }).sort("match_number", 1))
+        
+        if next_round_matches:
+            # Determine which match to advance to based on current match position
+            current_match_num = match["match_number"]
+            next_match_index = (current_match_num - 1) // 2
+            
+            if next_match_index < len(next_round_matches):
+                next_match = next_round_matches[next_match_index]
+                
+                # Determine if winner goes to player1 or player2 slot
+                if current_match_num % 2 == 1:  # Odd match number -> player1
+                    tournament_matches_collection.update_one(
+                        {"id": next_match["id"]},
+                        {
+                            "$set": {
+                                "player1_id": winner_id,
+                                "player1_username": winner_username
+                            }
+                        }
+                    )
+                else:  # Even match number -> player2
+                    tournament_matches_collection.update_one(
+                        {"id": next_match["id"]},
+                        {
+                            "$set": {
+                                "player2_id": winner_id,
+                                "player2_username": winner_username
+                            }
+                        }
+                    )
+        
+        # Check if tournament is complete (finals completed)
+        bracket = tournament_brackets_collection.find_one({"tournament_id": tournament_id})
+        if bracket:
+            final_round = bracket["total_rounds"]
+            final_matches = list(tournament_matches_collection.find({
+                "tournament_id": tournament_id,
+                "round_number": final_round,
+                "status": "completed"
+            }))
+            
+            if len(final_matches) > 0:
+                # Tournament is complete - update tournament with winner
+                tournaments_collection.update_one(
+                    {"id": tournament_id},
+                    {
+                        "$set": {
+                            "status": "completed",
+                            "winner_id": winner_id
+                        }
+                    }
+                )
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error advancing winner: {e}")
+        return False
+
+# =============================================================================
 # TOURNAMENT SYSTEM ENDPOINTS
 # =============================================================================
 
