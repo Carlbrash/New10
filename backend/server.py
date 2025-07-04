@@ -542,6 +542,209 @@ def calculate_user_score(user_data):
     else:
         return base_score
 
+# =============================================================================
+# AFFILIATE SYSTEM HELPER FUNCTIONS
+# =============================================================================
+
+def generate_referral_code(username: str, user_id: str) -> str:
+    """Generate a unique referral code for user"""
+    # Start with username (first 4 chars) + random string
+    base_code = username[:4].upper()
+    random_suffix = str(uuid.uuid4())[:6].upper()
+    referral_code = f"{base_code}{random_suffix}"
+    
+    # Ensure uniqueness
+    while affiliates_collection.find_one({"referral_code": referral_code}):
+        random_suffix = str(uuid.uuid4())[:6].upper()
+        referral_code = f"{base_code}{random_suffix}"
+    
+    return referral_code
+
+def generate_referral_link(referral_code: str) -> str:
+    """Generate full referral link"""
+    base_url = "https://fc495f42-99f4-4eed-98fe-c062f372264d.preview.emergentagent.com"
+    return f"{base_url}/?ref={referral_code}"
+
+def process_referral_registration(referred_user_id: str, referral_code: str, registration_ip: str = None) -> bool:
+    """Process a new referral registration and award commission"""
+    try:
+        # Find the affiliate
+        affiliate = affiliates_collection.find_one({"referral_code": referral_code, "status": "active"})
+        if not affiliate:
+            return False
+        
+        # Create referral record
+        referral_id = str(uuid.uuid4())
+        referral_data = {
+            "id": referral_id,
+            "affiliate_user_id": affiliate["user_id"],
+            "referred_user_id": referred_user_id,
+            "referral_code": referral_code,
+            "registered_at": datetime.utcnow(),
+            "registration_ip": registration_ip,
+            "is_active": True,
+            "total_commissions_earned": 0.0,
+            "tournaments_joined": 0,
+            "total_tournament_fees": 0.0
+        }
+        referrals_collection.insert_one(referral_data)
+        
+        # Create registration commission
+        commission_id = str(uuid.uuid4())
+        commission_amount = affiliate.get("commission_rate_registration", 5.0)
+        commission_data = {
+            "id": commission_id,
+            "affiliate_user_id": affiliate["user_id"],
+            "referred_user_id": referred_user_id,
+            "referral_id": referral_id,
+            "commission_type": "registration",
+            "amount": commission_amount,
+            "rate_applied": commission_amount,
+            "is_paid": False,
+            "created_at": datetime.utcnow(),
+            "description": f"Registration commission for new user referral"
+        }
+        commissions_collection.insert_one(commission_data)
+        
+        # Update affiliate stats
+        affiliates_collection.update_one(
+            {"user_id": affiliate["user_id"]},
+            {
+                "$inc": {
+                    "total_referrals": 1,
+                    "active_referrals": 1,
+                    "total_earnings": commission_amount,
+                    "pending_earnings": commission_amount
+                },
+                "$set": {"updated_at": datetime.utcnow()}
+            }
+        )
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error processing referral: {e}")
+        return False
+
+def process_tournament_commission(user_id: str, tournament_id: str, entry_fee: float) -> bool:
+    """Process tournament entry commission for referred users"""
+    try:
+        # Check if this user was referred by someone
+        referral = referrals_collection.find_one({"referred_user_id": user_id, "is_active": True})
+        if not referral:
+            return False
+        
+        # Get affiliate
+        affiliate = affiliates_collection.find_one({"user_id": referral["affiliate_user_id"], "status": "active"})
+        if not affiliate:
+            return False
+        
+        # Calculate commission
+        commission_rate = affiliate.get("commission_rate_tournament", 0.1)  # 10%
+        commission_amount = entry_fee * commission_rate
+        
+        # Create tournament commission
+        commission_id = str(uuid.uuid4())
+        commission_data = {
+            "id": commission_id,
+            "affiliate_user_id": affiliate["user_id"],
+            "referred_user_id": user_id,
+            "referral_id": referral["id"],
+            "commission_type": "tournament_entry",
+            "amount": commission_amount,
+            "rate_applied": commission_rate,
+            "tournament_id": tournament_id,
+            "is_paid": False,
+            "created_at": datetime.utcnow(),
+            "description": f"Tournament entry commission (€{entry_fee} × {commission_rate*100}%)"
+        }
+        commissions_collection.insert_one(commission_data)
+        
+        # Update affiliate stats
+        affiliates_collection.update_one(
+            {"user_id": affiliate["user_id"]},
+            {
+                "$inc": {
+                    "total_earnings": commission_amount,
+                    "pending_earnings": commission_amount
+                },
+                "$set": {"updated_at": datetime.utcnow()}
+            }
+        )
+        
+        # Update referral stats
+        referrals_collection.update_one(
+            {"id": referral["id"]},
+            {
+                "$inc": {
+                    "tournaments_joined": 1,
+                    "total_tournament_fees": entry_fee,
+                    "total_commissions_earned": commission_amount
+                },
+                "$set": {"last_activity": datetime.utcnow()}
+            }
+        )
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error processing tournament commission: {e}")
+        return False
+
+def calculate_affiliate_stats(affiliate_user_id: str) -> dict:
+    """Calculate comprehensive affiliate statistics"""
+    try:
+        # Get basic affiliate data
+        affiliate = affiliates_collection.find_one({"user_id": affiliate_user_id})
+        if not affiliate:
+            return {}
+        
+        # Get referrals
+        referrals = list(referrals_collection.find({"affiliate_user_id": affiliate_user_id}))
+        
+        # Get commissions
+        commissions = list(commissions_collection.find({"affiliate_user_id": affiliate_user_id}))
+        
+        # This month stats
+        current_month_start = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        this_month_referrals = len([r for r in referrals if r["registered_at"] >= current_month_start])
+        this_month_earnings = sum([c["amount"] for c in commissions if c["created_at"] >= current_month_start])
+        
+        # Recent activity
+        recent_referrals = sorted(referrals, key=lambda x: x["registered_at"], reverse=True)[:5]
+        recent_commissions = sorted(commissions, key=lambda x: x["created_at"], reverse=True)[:10]
+        
+        return {
+            "total_referrals": len(referrals),
+            "active_referrals": len([r for r in referrals if r["is_active"]]),
+            "total_earnings": affiliate.get("total_earnings", 0.0),
+            "pending_earnings": affiliate.get("pending_earnings", 0.0),
+            "paid_earnings": affiliate.get("paid_earnings", 0.0),
+            "this_month_referrals": this_month_referrals,
+            "this_month_earnings": this_month_earnings,
+            "recent_referrals": [
+                {
+                    "user_id": r["referred_user_id"],
+                    "registered_at": r["registered_at"],
+                    "tournaments_joined": r.get("tournaments_joined", 0),
+                    "total_fees": r.get("total_tournament_fees", 0.0)
+                } for r in recent_referrals
+            ],
+            "recent_commissions": [
+                {
+                    "amount": c["amount"],
+                    "type": c["commission_type"],
+                    "created_at": c["created_at"],
+                    "description": c["description"],
+                    "is_paid": c["is_paid"]
+                } for c in recent_commissions
+            ]
+        }
+        
+    except Exception as e:
+        print(f"Error calculating affiliate stats: {e}")
+        return {}
+
 # Routes
 @app.get("/api/health")
 async def health_check():
