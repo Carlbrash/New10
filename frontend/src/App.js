@@ -6093,6 +6093,7 @@ function App() {
         {currentView === 'worldmap' && renderWorldMap()}
         {currentView === 'tournament' && renderTournament()}
         {currentView === 'affiliate' && user && renderAffiliate()}
+        {currentView === 'wallet' && user && renderWallet()}
         {currentView === 'admin' && isAdmin && renderAdminPanel()}
         {currentView === 'download' && <DownloadBackup />}
         
