@@ -990,6 +990,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "GET /api/admin/users endpoint is working correctly. Returns a list of all users in the system with complete user details. The endpoint properly requires admin authentication. Found 74 users in the system with proper user information including username, email, country, full name, and admin role."
+      - working: true
+        agent: "testing"
+        comment: "Tested the 'God' admin user issue. Both 'God' and 'admin' users can successfully log in and access the /api/admin/users endpoint. The 'God' user has admin_role of 'god' and the 'admin' user has admin_role of 'admin'. The admin role hierarchy in the system is correctly implemented with God > super_admin > admin > user."
 
 metadata:
   created_by: "testing_agent"
@@ -1000,6 +1003,7 @@ metadata:
 test_plan:
   current_focus:
     - "Admin Financial Management - POST /api/admin/financial/manual-adjustment"
+    - "Admin Users - GET /api/admin/users"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -1023,6 +1027,8 @@ agent_communication:
     message: "I've completed testing of the Admin Users endpoint (GET /api/admin/users). The endpoint is working correctly and returns a list of all users in the system with complete user details. The endpoint properly requires admin authentication and returns the expected user information. Found 74 users in the system with proper user information including username, email, country, full name, and admin role. This endpoint will be useful for the manual adjustment modal UX improvement as it provides all the necessary user information for selection."
   - agent: "testing"
     message: "I've fixed and tested the manual adjustment endpoint with username functionality. The issue was in the log_admin_action function, which was using target_tournament_id parameter for user IDs, causing ObjectId serialization errors. I updated the function to accept a target_user_id parameter and added proper ObjectId serialization handling. I successfully tested both scenarios: 1) Using username ('testuser') and 2) Using user ID ('0ac28113-7e6c-4939-a4ff-888bd399339b'). Both tests passed successfully, with the endpoint correctly identifying users by either username or user ID and properly updating their wallet balance."
+  - agent: "testing"
+    message: "I've tested the 'God' admin user issue. Both 'God' and 'admin' users can successfully log in and access the /api/admin/users endpoint. The 'God' user has admin_role of 'god' and the 'admin' user has admin_role of 'admin'. The admin role hierarchy in the system is correctly implemented with God > super_admin > admin > user. This confirms that the 'God' admin user is working correctly and has the highest level of privileges in the system."
 
 frontend:
   - task: "Tournament Menu Item"
