@@ -1935,11 +1935,11 @@ function App() {
     
     setTeamLoading(true);
     try {
-      console.log('📡 Making request to:', `${import.meta.env.REACT_APP_BACKEND_URL}/api/teams`);
+      console.log('📡 Making request to:', `${API_BASE_URL}/api/teams`);
       console.log('🔑 Token available:', !!token);
       console.log('📦 Payload:', JSON.stringify(teamFormData, null, 2));
       
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/teams`, {
+      const response = await fetch(`${API_BASE_URL}/api/teams`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
