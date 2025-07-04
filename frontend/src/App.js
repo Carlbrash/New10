@@ -2275,7 +2275,12 @@ function App() {
       
       if (response.ok) {
         const data = await response.json();
-        alert(`Manual adjustment processed successfully! Amount: €${data.amount}`);
+        // Enhanced success message with user details
+        const successMsg = data.username ? 
+          `✅ Manual adjustment processed successfully!\n\n🆔 User: ${data.username} (${data.full_name})\n💰 Amount: €${data.amount}\n📝 Reason: ${data.reason}` :
+          `✅ Manual adjustment processed successfully!\n\n💰 Amount: €${data.amount}\n📝 Reason: ${data.reason}`;
+        
+        alert(successMsg);
         setShowManualAdjustmentModal(false);
         setManualAdjustmentForm({
           user_id: '',
