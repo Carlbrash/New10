@@ -7235,6 +7235,201 @@ function App() {
           </div>
         </div>
       )}
+      
+      {/* Team Creation Modal */}
+      {showCreateTeamModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateTeamModal(false)}>
+          <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🏆 Create New Team</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowCreateTeamModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-content">
+              <form onSubmit={(e) => { e.preventDefault(); createTeam(); }}>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Team Name *</label>
+                    <input
+                      type="text"
+                      value={teamFormData.name}
+                      onChange={(e) => setTeamFormData({...teamFormData, name: e.target.value})}
+                      placeholder="Enter team name"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Logo URL</label>
+                    <input
+                      type="url"
+                      value={teamFormData.logo_url}
+                      onChange={(e) => setTeamFormData({...teamFormData, logo_url: e.target.value})}
+                      placeholder="https://example.com/logo.png"
+                      className="form-input"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Primary Color *</label>
+                    <input
+                      type="color"
+                      value={teamFormData.colors.primary}
+                      onChange={(e) => setTeamFormData({
+                        ...teamFormData, 
+                        colors: {...teamFormData.colors, primary: e.target.value}
+                      })}
+                      className="form-input color-input"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Secondary Color</label>
+                    <input
+                      type="color"
+                      value={teamFormData.colors.secondary}
+                      onChange={(e) => setTeamFormData({
+                        ...teamFormData, 
+                        colors: {...teamFormData.colors, secondary: e.target.value}
+                      })}
+                      className="form-input color-input"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>City *</label>
+                    <input
+                      type="text"
+                      value={teamFormData.city}
+                      onChange={(e) => setTeamFormData({...teamFormData, city: e.target.value})}
+                      placeholder="Enter city"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Country *</label>
+                    <input
+                      type="text"
+                      value={teamFormData.country}
+                      onChange={(e) => setTeamFormData({...teamFormData, country: e.target.value})}
+                      placeholder="Enter country"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Phone</label>
+                    <input
+                      type="tel"
+                      value={teamFormData.phone}
+                      onChange={(e) => setTeamFormData({...teamFormData, phone: e.target.value})}
+                      placeholder="+30 123 456 7890"
+                      className="form-input"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Email *</label>
+                    <input
+                      type="email"
+                      value={teamFormData.email}
+                      onChange={(e) => setTeamFormData({...teamFormData, email: e.target.value})}
+                      placeholder="team@example.com"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="modal-actions">
+                  <button 
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowCreateTeamModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={teamLoading}
+                  >
+                    {teamLoading ? '⏳ Creating...' : '🏆 Create Team'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Team Invitation Modal */}
+      {showTeamInviteModal && selectedTeamForInvite && (
+        <div className="modal-overlay" onClick={() => setShowTeamInviteModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📧 Invite Player to {selectedTeamForInvite.name}</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowTeamInviteModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-content">
+              <form onSubmit={(e) => { e.preventDefault(); invitePlayerToTeam(selectedTeamForInvite.id); }}>
+                <div className="form-group">
+                  <label>Player Username</label>
+                  <input
+                    type="text"
+                    value={inviteUsername}
+                    onChange={(e) => setInviteUsername(e.target.value)}
+                    placeholder="Enter username to invite"
+                    className="form-input"
+                    required
+                  />
+                  <p className="form-help">
+                    Enter the exact username of the player you want to invite
+                  </p>
+                </div>
+                
+                <div className="team-info-preview">
+                  <h4>Team: {selectedTeamForInvite.name}</h4>
+                  <p>Players: {selectedTeamForInvite.current_player_count}/20</p>
+                  <p>Status: {selectedTeamForInvite.status}</p>
+                </div>
+                
+                <div className="modal-actions">
+                  <button 
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowTeamInviteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={teamLoading || !inviteUsername.trim()}
+                  >
+                    {teamLoading ? '⏳ Sending...' : '📧 Send Invitation'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
