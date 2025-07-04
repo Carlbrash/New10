@@ -40,6 +40,11 @@ admin_actions_collection = db.admin_actions
 site_messages_collection = db.site_messages
 content_pages_collection = db.content_pages
 menu_items_collection = db.menu_items
+# Affiliate System Collections
+affiliates_collection = db.affiliates
+referrals_collection = db.referrals
+commissions_collection = db.commissions
+payouts_collection = db.payouts
 
 app = FastAPI(title="WoBeRa - World Betting Rank API")
 
