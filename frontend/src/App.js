@@ -1955,7 +1955,7 @@ function App() {
           email: ''
         });
         fetchTeams(); // Refresh teams list
-        fetchUserProfile(); // Update user profile with new team
+        fetchProfile(); // Update user profile with new team
       } else {
         const error = await response.json();
         alert(error.detail || 'Failed to create team');
