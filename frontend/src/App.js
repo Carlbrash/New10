@@ -4505,6 +4505,16 @@ function App() {
                           </div>
                           
                           <div className="tournament-admin-actions">
+                            <button 
+                              className="btn btn-secondary btn-small"
+                              onClick={() => {
+                                setCurrentView('tournament');
+                                fetchTournamentDetails(tournament.id);
+                              }}
+                            >
+                              View Details & Bracket
+                            </button>
+                            
                             {tournament.status !== 'cancelled' && tournament.status !== 'completed' && (
                               <button 
                                 className="btn btn-danger btn-small"
