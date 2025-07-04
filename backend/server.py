@@ -323,6 +323,150 @@ class TournamentBracket(BaseModel):
     updated_at: datetime
     is_generated: bool = False
 
+# =============================================================================
+# AFFILIATE SYSTEM MODELS
+# =============================================================================
+
+class AffiliateStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    SUSPENDED = "suspended"
+    PENDING = "pending"
+
+class CommissionType(str, Enum):
+    REGISTRATION = "registration"  # Commission for new user registration
+    TOURNAMENT_ENTRY = "tournament_entry"  # Commission for tournament entry fees
+    DEPOSIT = "deposit"  # Commission for user deposits (future payment integration)
+
+class PayoutStatus(str, Enum):
+    PENDING = "pending"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+class Affiliate(BaseModel):
+    id: str
+    user_id: str  # The user who becomes an affiliate
+    referral_code: str  # Unique referral code
+    referral_link: str  # Full referral link
+    
+    # Status
+    status: AffiliateStatus = AffiliateStatus.PENDING
+    approved_at: Optional[datetime] = None
+    approved_by: Optional[str] = None  # Admin who approved
+    
+    # Statistics
+    total_referrals: int = 0
+    active_referrals: int = 0  # Users who are still active
+    total_earnings: float = 0.0
+    pending_earnings: float = 0.0
+    paid_earnings: float = 0.0
+    
+    # Settings
+    commission_rate_registration: float = 5.0  # €5 per registration
+    commission_rate_tournament: float = 0.1   # 10% of tournament entry fees
+    commission_rate_deposit: float = 0.05     # 5% of deposits (future)
+    
+    # Timestamps
+    created_at: datetime
+    updated_at: datetime
+
+class Referral(BaseModel):
+    id: str
+    affiliate_user_id: str  # Who referred
+    referred_user_id: str   # Who was referred
+    referral_code: str      # Code used for referral
+    
+    # Registration details
+    registered_at: datetime
+    registration_ip: Optional[str] = None
+    user_agent: Optional[str] = None
+    
+    # Activity tracking
+    is_active: bool = True  # Is the referred user still active
+    last_activity: Optional[datetime] = None
+    
+    # Commissions earned from this referral
+    total_commissions_earned: float = 0.0
+    
+    # Tournament participation
+    tournaments_joined: int = 0
+    total_tournament_fees: float = 0.0
+
+class Commission(BaseModel):
+    id: str
+    affiliate_user_id: str
+    referred_user_id: str
+    referral_id: str
+    
+    # Commission details
+    commission_type: CommissionType
+    amount: float
+    rate_applied: float  # Rate that was applied (for record keeping)
+    
+    # Related transaction
+    tournament_id: Optional[str] = None  # If tournament entry commission
+    transaction_id: Optional[str] = None  # If payment commission (future)
+    
+    # Status
+    is_paid: bool = False
+    paid_at: Optional[datetime] = None
+    payout_id: Optional[str] = None
+    
+    # Timestamps
+    created_at: datetime
+    description: str  # Human readable description
+
+class Payout(BaseModel):
+    id: str
+    affiliate_user_id: str
+    
+    # Payout details
+    amount: float
+    currency: str = "EUR"
+    status: PayoutStatus = PayoutStatus.PENDING
+    
+    # Payment details
+    payment_method: str  # bank_transfer, paypal, crypto, etc.
+    payment_details: dict  # Bank account, PayPal email, wallet address, etc.
+    
+    # Commission IDs included in this payout
+    commission_ids: List[str] = []
+    
+    # Processing
+    processed_by: Optional[str] = None  # Admin who processed
+    processed_at: Optional[datetime] = None
+    transaction_reference: Optional[str] = None
+    notes: Optional[str] = None
+    
+    # Timestamps
+    created_at: datetime
+    updated_at: datetime
+
+# Request/Response Models
+class AffiliateApplicationRequest(BaseModel):
+    user_id: str
+    desired_referral_code: Optional[str] = None  # User can suggest a code
+    motivation: Optional[str] = None  # Why they want to be an affiliate
+
+class ReferralStatsResponse(BaseModel):
+    total_referrals: int
+    active_referrals: int
+    total_earnings: float
+    pending_earnings: float
+    paid_earnings: float
+    this_month_referrals: int
+    this_month_earnings: float
+    recent_referrals: List[dict]
+    recent_commissions: List[dict]
+
+class PayoutRequest(BaseModel):
+    affiliate_user_id: str
+    amount: float
+    payment_method: str
+    payment_details: dict
+    notes: Optional[str] = None
+
 # Helper functions
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
