@@ -4343,6 +4343,13 @@ function App() {
                 >
                   ➕ Create New Competition
                 </button>
+                
+                <button 
+                  className="btn btn-success"
+                  onClick={() => setShowTournamentModal(true)}
+                >
+                  🏆 Create New Tournament
+                </button>
               </div>
 
               <div className="competitions-admin-grid">
