@@ -3961,8 +3961,8 @@ function App() {
                   </div>
                 </div>
               )}
-              
-              {/* Tournament Creation Modal */}
+
+          {/* Competitions Tab */}
               {showTournamentModal && (
                 <div className="modal-overlay" onClick={() => setShowTournamentModal(false)}>
                   <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
