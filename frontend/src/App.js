@@ -477,6 +477,20 @@ function App() {
     }
   };
 
+  // Filter rankings based on selected filter
+  const getFilteredRankings = () => {
+    if (rankingsFilter === 'all') return rankings;
+    if (rankingsFilter === 'country' && user) return rankings.filter(player => player.country === user.country);
+    if (rankingsFilter !== 'all' && rankingsFilter !== 'country') return rankings.filter(player => player.country === rankingsFilter);
+    return rankings;
+  };
+
+  // Get available countries from rankings
+  const getAvailableCountries = () => {
+    const countries = [...new Set(rankings.map(player => player.country))].sort();
+    return countries;
+  };
+
   // Settings functions
   const openSettings = () => {
     if (user) {
