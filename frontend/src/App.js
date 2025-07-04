@@ -4013,10 +4013,10 @@ function App() {
                           </div>
                           
                           <div className="form-group">
-                            <label>Entry Fee (€)*</label>
+                            <label>Entry Fee (€)* (0 for Free)</label>
                             <input
                               type="number"
-                              min="1"
+                              min="0"
                               value={tournamentForm.entry_fee}
                               onChange={(e) => setTournamentForm({...tournamentForm, entry_fee: parseFloat(e.target.value)})}
                               className="form-input"
