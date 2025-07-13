@@ -643,6 +643,13 @@ function App() {
   const [showTeamVerificationModal, setShowTeamVerificationModal] = useState(false);
   const [selectedTeamForAdmin, setSelectedTeamForAdmin] = useState(null);
   
+  // UI/UX Enhancement States
+  const [showFloatingMenu, setShowFloatingMenu] = useState(false);
+  const [breadcrumbPath, setBreadcrumbPath] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(0);
+  const [touchStartY, setTouchStartY] = useState(0);
+  
   // Toast Notifications System
   const [toasts, setToasts] = useState([]);
   const [toastId, setToastId] = useState(0);
