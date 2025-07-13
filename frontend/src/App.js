@@ -605,8 +605,19 @@ function App() {
   const [teamInvitations, setTeamInvitations] = useState([]);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const [showTeamInviteModal, setShowTeamInviteModal] = useState(false);
+  const [showEditTeamModal, setShowEditTeamModal] = useState(false);
   const [selectedTeamForInvite, setSelectedTeamForInvite] = useState(null);
+  const [selectedTeamForEdit, setSelectedTeamForEdit] = useState(null);
   const [teamFormData, setTeamFormData] = useState({
+    name: '',
+    logo_url: '',
+    colors: { primary: '#FF0000', secondary: '#FFFFFF' },
+    city: '',
+    country: '',
+    phone: '',
+    email: ''
+  });
+  const [editTeamFormData, setEditTeamFormData] = useState({
     name: '',
     logo_url: '',
     colors: { primary: '#FF0000', secondary: '#FFFFFF' },
@@ -617,6 +628,8 @@ function App() {
   });
   const [inviteUsername, setInviteUsername] = useState('');
   const [teamLoading, setTeamLoading] = useState(false);
+  const [logoUpload, setLogoUpload] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   
   // Toast Notifications System
   const [toasts, setToasts] = useState([]);
