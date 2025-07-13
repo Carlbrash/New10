@@ -8662,6 +8662,9 @@ function App() {
                 )}
               </div>
             )}
+          </div>
+          
+          {/* Teams Dropdown */}
           <div 
             className={`nav-dropdown ${showTeamsDropdown ? 'mobile-open' : ''}`}
             onMouseEnter={() => window.innerWidth > 768 && setShowTeamsDropdown(true)}
