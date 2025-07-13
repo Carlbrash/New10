@@ -633,6 +633,16 @@ function App() {
   const [selectedTeamDetails, setSelectedTeamDetails] = useState(null);
   const [teamInvitationStats, setTeamInvitationStats] = useState(null);
   
+  // Admin Team Management States
+  const [adminTeams, setAdminTeams] = useState([]);
+  const [adminTeamLoading, setAdminTeamLoading] = useState(false);
+  const [teamSearchTerm, setTeamSearchTerm] = useState('');
+  const [filteredTeams, setFilteredTeams] = useState([]);
+  const [selectedTeamsForBulk, setSelectedTeamsForBulk] = useState([]);
+  const [teamStatusFilter, setTeamStatusFilter] = useState('all');
+  const [showTeamVerificationModal, setShowTeamVerificationModal] = useState(false);
+  const [selectedTeamForAdmin, setSelectedTeamForAdmin] = useState(null);
+  
   // Toast Notifications System
   const [toasts, setToasts] = useState([]);
   const [toastId, setToastId] = useState(0);
