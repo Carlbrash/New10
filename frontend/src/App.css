@@ -9102,6 +9102,13 @@ code {
 .form-actions {
   margin-top: 2rem;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.form-actions .btn {
+  min-width: 120px;
 }
 
 /* =============================================================================
