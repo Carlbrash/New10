@@ -2016,6 +2016,7 @@ function App() {
   // =============================================================================
 
   const fetchTeams = async () => {
+    setTeamLoading(true); // Add loading state
     try {
       const response = await fetch(`${API_BASE_URL}/api/teams`);
       if (response.ok) {
@@ -2024,6 +2025,8 @@ function App() {
       }
     } catch (error) {
       console.error('Error fetching teams:', error);
+    } finally {
+      setTeamLoading(false); // Clear loading state
     }
   };
 
