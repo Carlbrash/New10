@@ -705,7 +705,12 @@ function App() {
   // =============================================================================
 
   const TeamCardSkeleton = () => (
-    <div className="team-card-skeleton">
+    <motion.div 
+      className="team-card-skeleton"
+      initial="hidden"
+      animate="visible"
+      variants={cardVariants}
+    >
       <div className="team-header-skeleton">
         <div className="team-logo-skeleton skeleton"></div>
         <div className="team-info-skeleton">
@@ -735,7 +740,7 @@ function App() {
         <div className="action-btn-skeleton skeleton"></div>
         <div className="action-btn-skeleton skeleton"></div>
       </div>
-    </div>
+    </motion.div>
   );
 
   const TournamentCardSkeleton = () => (
