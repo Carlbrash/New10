@@ -387,6 +387,41 @@ class TeamApplicationRequest(BaseModel):
 class TeamTransferCaptaincy(BaseModel):
     new_captain_id: str
 
+class LeagueType(str, Enum):
+    PREMIER = "premier"
+    LEAGUE_2 = "league_2"
+
+class TeamLeagueAssignment(BaseModel):
+    team_id: str
+    country: str
+    league_type: LeagueType
+    assigned_by: str  # admin user id
+    assigned_at: datetime
+
+class NationalLeague(BaseModel):
+    id: str
+    country: str
+    league_type: LeagueType
+    name: str  # e.g., "Greek Premier", "Greek League 2"
+    season: str
+    teams: List[str] = []  # team IDs
+    standings: List[dict] = []
+    created_at: datetime
+    updated_at: datetime
+
+class TeamStanding(BaseModel):
+    team_id: str
+    team_name: str
+    matches_played: int = 0
+    wins: int = 0
+    draws: int = 0
+    losses: int = 0
+    goals_for: int = 0
+    goals_against: int = 0
+    goal_difference: int = 0
+    points: int = 0
+    position: int = 0
+
 class InvitationStatus(str, Enum):
     PENDING = "pending"
     ACCEPTED = "accepted"
