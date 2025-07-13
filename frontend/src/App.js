@@ -8390,13 +8390,19 @@ function App() {
           
           {/* Rankings Dropdown */}
           <div 
-            className="nav-dropdown"
-            onMouseEnter={() => setShowRankingsDropdown(true)}
-            onMouseLeave={() => setShowRankingsDropdown(false)}
+            className={`nav-dropdown ${showRankingsDropdown ? 'mobile-open' : ''}`}
+            onMouseEnter={() => window.innerWidth > 768 && setShowRankingsDropdown(true)}
+            onMouseLeave={() => window.innerWidth > 768 && setShowRankingsDropdown(false)}
           >
             <button 
               className={`nav-link dropdown-trigger ${(currentView === 'rankings' || currentView === 'worldmap') ? 'active' : ''}`}
-              onClick={() => navigateWithBreadcrumb('rankings', 'Rankings')}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  toggleMobileDropdown('rankings');
+                } else {
+                  navigateWithBreadcrumb('rankings', 'Rankings');
+                }
+              }}
             >
               🏆 Rankings <span className="dropdown-arrow">▼</span>
             </button>
@@ -8427,15 +8433,21 @@ function App() {
           
           {/* Tournaments Dropdown */}
           <div 
-            className="nav-dropdown"
-            onMouseEnter={() => setShowTournamentsDropdown(true)}
-            onMouseLeave={() => setShowTournamentsDropdown(false)}
+            className={`nav-dropdown ${showTournamentsDropdown ? 'mobile-open' : ''}`}
+            onMouseEnter={() => window.innerWidth > 768 && setShowTournamentsDropdown(true)}
+            onMouseLeave={() => window.innerWidth > 768 && setShowTournamentsDropdown(false)}
           >
             <button 
               className={`nav-link dropdown-trigger ${currentView === 'tournament' ? 'active' : ''}`}
-              onClick={() => navigateWithBreadcrumb('tournament', 'Tournaments')}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  toggleMobileDropdown('tournaments');
+                } else {
+                  navigateWithBreadcrumb('tournament', 'Tournaments');
+                }
+              }}
             >
-              🏆 Tournaments <span className="dropdown-arrow">▼</span>
+              🎯 Tournaments <span className="dropdown-arrow">▼</span>
             </button>
             
             {showTournamentsDropdown && (
@@ -8464,13 +8476,19 @@ function App() {
           
           {/* Teams Dropdown */}
           <div 
-            className="nav-dropdown"
-            onMouseEnter={() => setShowTeamsDropdown(true)}
-            onMouseLeave={() => setShowTeamsDropdown(false)}
+            className={`nav-dropdown ${showTeamsDropdown ? 'mobile-open' : ''}`}
+            onMouseEnter={() => window.innerWidth > 768 && setShowTeamsDropdown(true)}
+            onMouseLeave={() => window.innerWidth > 768 && setShowTeamsDropdown(false)}
           >
             <button 
               className={`nav-link dropdown-trigger ${(currentView === 'teams' || currentView.startsWith('team-')) ? 'active' : ''}`}
-              onClick={() => navigateWithBreadcrumb('teams', 'Teams')}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  toggleMobileDropdown('teams');
+                } else {
+                  navigateWithBreadcrumb('teams', 'Teams');
+                }
+              }}
             >
               👥 Teams <span className="dropdown-arrow">▼</span>
             </button>
