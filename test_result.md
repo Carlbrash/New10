@@ -1109,13 +1109,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin Financial Management - POST /api/admin/financial/manual-adjustment"
-    - "Admin Users - GET /api/admin/users"
+    - "Advanced Analytics Dashboard API - GET /api/admin/analytics/advanced-dashboard"
+    - "Engagement Metrics API - GET /api/admin/analytics/engagement-metrics"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "main"
+    message: "✅ ADVANCED ANALYTICS IMPLEMENTED: I've successfully implemented comprehensive Advanced Analytics for WoBeRa with Enhanced Dashboard and Charts. Backend includes 2 new endpoints for advanced dashboard analytics and engagement metrics. Frontend features Chart.js integration with KPI cards, line charts for registration trends, bar charts for tournament participation, pie charts for revenue distribution, and doughnut charts for geographic data. The implementation includes user engagement metrics, retention analytics, financial performance indicators, and affiliate conversion funnels. All components are responsive and follow the WoBeRa design theme. Ready for backend testing."
   - agent: "testing"
     message: "I've completed comprehensive testing of the Affiliate System backend. All endpoints are working correctly with proper authentication, data validation, and business logic. The system correctly handles referral code validation, affiliate application, stats retrieval, profile management, commission tracking, referral listing, admin affiliate management, and user registration with referral codes. All tests passed successfully."
   - agent: "main"
