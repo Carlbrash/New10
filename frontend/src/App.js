@@ -5995,62 +5995,111 @@ function App() {
 
   const renderTeams = () => {
     return (
-      <div className="teams-page">
-        <div className="teams-header">
+      <motion.div 
+        className="teams-page"
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+        transition={pageTransition}
+      >
+        <motion.div 
+          className="teams-header"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
           <h2>🏆 {t.teams}</h2>
           
           {/* Team Invitations Banner */}
-          {teamInvitations.length > 0 && (
-            <div className="team-invitations-banner">
-              <div className="invitations-alert">
-                <h3>📨 Team Invitations ({teamInvitations.length})</h3>
-                <p>You have pending team invitations!</p>
-                <div className="invitations-list">
-                  {teamInvitations.map(invitation => (
-                    <div key={invitation.id} className="invitation-item">
-                      <div className="invitation-info">
-                        <strong>{invitation.team_details?.name}</strong>
-                        <span>from {invitation.captain?.full_name}</span>
-                        <small>{invitation.team_details?.city}, {invitation.team_details?.country}</small>
-                      </div>
-                      <div className="invitation-actions">
-                        <button 
-                          className="btn btn-primary btn-small"
-                          onClick={() => acceptTeamInvitation(invitation.id)}
-                          disabled={teamLoading}
-                        >
-                          ✅ Accept
-                        </button>
-                        <button 
-                          className="btn btn-secondary btn-small"
-                          onClick={() => declineTeamInvitation(invitation.id)}
-                          disabled={teamLoading}
-                        >
-                          ❌ Decline
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+          <AnimatePresence>
+            {teamInvitations.length > 0 && (
+              <motion.div 
+                className="team-invitations-banner"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="invitations-alert">
+                  <h3>📨 Team Invitations ({teamInvitations.length})</h3>
+                  <p>You have pending team invitations!</p>
+                  <motion.div 
+                    className="invitations-list"
+                    variants={staggerVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {teamInvitations.map((invitation, index) => (
+                      <motion.div 
+                        key={invitation.id} 
+                        className="invitation-item"
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <div className="invitation-info">
+                          <strong>{invitation.team_details?.name}</strong>
+                          <span>from {invitation.captain?.full_name}</span>
+                          <small>{invitation.team_details?.city}, {invitation.team_details?.country}</small>
+                        </div>
+                        <div className="invitation-actions">
+                          <motion.button 
+                            className="btn btn-primary btn-small"
+                            onClick={() => acceptTeamInvitation(invitation.id)}
+                            disabled={teamLoading}
+                            variants={buttonVariants}
+                            whileHover="hover"
+                            whileTap="tap"
+                          >
+                            ✅ Accept
+                          </motion.button>
+                          <motion.button 
+                            className="btn btn-secondary btn-small"
+                            onClick={() => declineTeamInvitation(invitation.id)}
+                            disabled={teamLoading}
+                            variants={buttonVariants}
+                            whileHover="hover"
+                            whileTap="tap"
+                          >
+                            ❌ Decline
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </div>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Create Team Button */}
           {user && (
-            <div className="teams-actions">
-              <button 
+            <motion.div 
+              className="teams-actions"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <motion.button 
                 className="btn btn-primary"
                 onClick={() => setShowCreateTeamModal(true)}
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
               >
                 ➕ Create Team
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Teams List */}
-        <div className="teams-grid">
+        <motion.div 
+          className="teams-grid"
+          variants={staggerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {/* Show loading skeletons */}
           {teamLoading && teams.length === 0 ? (
             <>
@@ -6059,13 +6108,26 @@ function App() {
               ))}
             </>
           ) : teams.length === 0 ? (
-            <div className="no-teams">
+            <motion.div 
+              className="no-teams"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
               <h3>No teams found</h3>
               <p>Be the first to create a team!</p>
-            </div>
+            </motion.div>
           ) : (
-            teams.map(team => (
-              <div key={team.id} className="team-card">
+            teams.map((team, index) => (
+              <motion.div 
+                key={team.id} 
+                className="team-card"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                transition={{ delay: index * 0.1 }}
+              >
                 <div className="team-header">
                   <div className="team-logo">
                     {team.logo_url ? (
@@ -6095,46 +6157,56 @@ function App() {
                 </div>
 
                 <div className="team-colors">
-                  <div 
+                  <motion.div 
                     className="color-primary" 
                     style={{backgroundColor: team.colors?.primary}}
                     title="Primary Color"
-                  ></div>
+                    whileHover={{ scale: 1.2, rotate: 10 }}
+                    transition={{ duration: 0.2 }}
+                  ></motion.div>
                   {team.colors?.secondary && (
-                    <div 
+                    <motion.div 
                       className="color-secondary" 
                       style={{backgroundColor: team.colors.secondary}}
                       title="Secondary Color"
-                    ></div>
+                      whileHover={{ scale: 1.2, rotate: -10 }}
+                      transition={{ duration: 0.2 }}
+                    ></motion.div>
                   )}
                 </div>
 
                 <div className="team-actions">
-                  <button 
+                  <motion.button 
                     className="btn btn-outline"
                     onClick={() => setCurrentView(`team-${team.id}`)}
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
                   >
                     👁️ View Details
-                  </button>
+                  </motion.button>
                   
                   {/* Captain actions */}
                   {user && user.id === team.captain_id && (
-                    <button 
+                    <motion.button 
                       className="btn btn-secondary"
                       onClick={() => {
                         setSelectedTeamForInvite(team);
                         setShowTeamInviteModal(true);
                       }}
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
                     >
                       📧 Invite Player
-                    </button>
+                    </motion.button>
                   )}
                 </div>
-              </div>
+              </motion.div>
             ))
           )}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
   };
 
