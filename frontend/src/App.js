@@ -654,6 +654,14 @@ function App() {
   const [showRankingsDropdown, setShowRankingsDropdown] = useState(false);
   const [showTournamentsDropdown, setShowTournamentsDropdown] = useState(false);
   const [showTeamsDropdown, setShowTeamsDropdown] = useState(false);
+  const [showStandingsDropdown, setShowStandingsDropdown] = useState(false);
+  
+  // National League States
+  const [nationalLeagues, setNationalLeagues] = useState([]);
+  const [selectedLeague, setSelectedLeague] = useState(null);
+  const [leagueStandings, setLeagueStandings] = useState([]);
+  const [teamsWithoutLeague, setTeamsWithoutLeague] = useState([]);
+  const [standingsLoading, setStandingsLoading] = useState(false);
 
   // Enhanced Loading Component
   const EnhancedLoader = ({ message = "Loading...", size = "medium" }) => (
