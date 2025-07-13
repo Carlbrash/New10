@@ -16,6 +16,234 @@ body {
 }
 
 /* =============================================================================
+   ENHANCED SPACING SYSTEM
+============================================================================= */
+
+/* Container Spacing */
+.teams-page,
+.tournaments-page,
+.dashboard-page,
+.admin-page {
+  padding: var(--space-8) var(--space-6);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Section Spacing */
+.teams-header,
+.tournaments-header,
+.page-header {
+  margin-bottom: var(--space-12);
+  text-align: center;
+}
+
+.teams-actions,
+.page-actions {
+  margin-top: var(--space-6);
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+/* Grid Spacing */
+.teams-grid,
+.tournaments-grid,
+.stats-grid {
+  display: grid;
+  gap: var(--space-6);
+  margin-bottom: var(--space-10);
+}
+
+.teams-grid {
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.tournaments-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Card Internal Spacing */
+.team-card,
+.tournament-card,
+.stat-card {
+  padding: var(--space-6);
+  border-radius: 20px;
+  margin-bottom: 0; /* Remove bottom margin, use grid gap instead */
+}
+
+.team-header,
+.tournament-header {
+  margin-bottom: var(--space-5);
+}
+
+.team-stats,
+.tournament-stats {
+  margin: var(--space-5) 0;
+  padding: var(--space-4);
+  gap: var(--space-4);
+}
+
+.team-colors {
+  margin: var(--space-4) 0;
+  gap: var(--space-3);
+}
+
+.team-actions,
+.tournament-actions {
+  margin-top: var(--space-5);
+  gap: var(--space-3);
+}
+
+/* Form Spacing */
+.form-grid {
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.form-group {
+  margin-bottom: var(--space-5);
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-input {
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.modal-actions {
+  margin-top: var(--space-8);
+  gap: var(--space-4);
+  padding-top: var(--space-6);
+}
+
+/* Modal Spacing */
+.modal {
+  margin: var(--space-4);
+}
+
+.modal-header {
+  padding: var(--space-6) var(--space-6) var(--space-4) var(--space-6);
+}
+
+.modal-content {
+  padding: 0 var(--space-6) var(--space-6) var(--space-6);
+}
+
+/* Navigation Spacing */
+.navbar {
+  padding: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-2);
+}
+
+.navbar-menu {
+  gap: var(--space-6);
+}
+
+.user-menu {
+  gap: var(--space-4);
+}
+
+/* Banner Spacing */
+.team-invitations-banner {
+  margin-bottom: var(--space-8);
+  padding: var(--space-6);
+  border-radius: 15px;
+}
+
+.invitations-list {
+  margin-top: var(--space-4);
+  gap: var(--space-3);
+}
+
+.invitation-item {
+  padding: var(--space-4);
+  gap: var(--space-4);
+}
+
+.invitation-actions {
+  gap: var(--space-2);
+}
+
+/* Toast Spacing */
+.toast-container {
+  top: var(--space-5);
+  right: var(--space-5);
+  gap: var(--space-3);
+}
+
+.toast-content {
+  padding: var(--space-4);
+  gap: var(--space-3);
+}
+
+/* Mobile Responsive Spacing */
+@media (max-width: 768px) {
+  .teams-page,
+  .tournaments-page,
+  .dashboard-page,
+  .admin-page {
+    padding: var(--space-4);
+  }
+  
+  .teams-header,
+  .tournaments-header,
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+  
+  .teams-grid,
+  .tournaments-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .team-card,
+  .tournament-card {
+    padding: var(--space-4);
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .modal {
+    margin: var(--space-2);
+  }
+  
+  .modal-header,
+  .modal-content {
+    padding: var(--space-4);
+  }
+  
+  .navbar {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .navbar-menu {
+    gap: var(--space-3);
+  }
+  
+  .team-invitations-banner {
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+  
+  .toast-container {
+    top: var(--space-3);
+    right: var(--space-3);
+    left: var(--space-3);
+  }
+}
+
+/* =============================================================================
    TOURNAMENT BRACKET STYLES
    ============================================================================= */
 
