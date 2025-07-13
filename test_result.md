@@ -584,33 +584,30 @@ agent_communication:
   - agent: "testing"
     message: "I've completed additional testing of the Tournament Bracket System. The bracket generation endpoint correctly validates that at least 2 participants are required to generate a bracket. The endpoint returns a 400 error with appropriate message when attempting to generate a bracket for a tournament with fewer than 2 participants. This is the expected behavior to ensure fair tournament brackets."
 
-user_problem_statement: "Test the fixed manual adjustment endpoint with username functionality.
+user_problem_statement: "Implement Advanced Analytics with Enhanced Dashboard and Charts
 
-Please test both scenarios:
-1. Test with username: 
-   - Login as admin (admin/Kiki1999@)
-   - POST /api/admin/financial/manual-adjustment with payload:
-     ```json
-     {
-       \"user_id\": \"testuser\",
-       \"amount\": 25.50,
-       \"reason\": \"Testing username functionality\", 
-       \"admin_notes\": \"Testing with username instead of user ID\"
-     }
-     ```
+The user requested to implement Advanced Analytics focusing on:
 
-2. Test with User ID:
-   - POST /api/admin/financial/manual-adjustment with payload:
-     ```json  
-     {
-       \"user_id\": \"0ac28113-7e6c-4939-a4ff-888bd399339b\",
-       \"amount\": 15.75,
-       \"reason\": \"Testing user ID functionality\",
-       \"admin_notes\": \"Testing with actual user ID\"
-     }
-     ```
+1. **Enhanced Dashboard with Charts:**
+   - User registration trends (line charts)
+   - Tournament participation analytics (bar charts)
+   - Revenue/Financial analytics (pie charts)
+   - Geographic distribution (maps/charts)
+   - Performance metrics (KPI cards)
 
-This should verify that both the username lookup and user ID lookup work correctly after the fix to log_admin_action parameters."
+2. **Advanced Metrics:**
+   - User engagement metrics (daily/weekly/monthly active users)
+   - Tournament success rates and patterns
+   - Affiliate conversion funnels
+   - Financial performance indicators
+   - Retention analytics
+
+Implementation includes:
+- New backend endpoints: /api/admin/analytics/advanced-dashboard and /api/admin/analytics/engagement-metrics
+- Chart.js integration for data visualization
+- Comprehensive analytics dashboard with KPIs, charts, and metrics
+- Interactive visualizations with proper loading states
+- Responsive design for all device sizes"
 
 backend:
   - task: "Check referral code validation: GET /api/register/check-referral/DEMO2024"
