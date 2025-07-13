@@ -1976,13 +1976,6 @@ function App() {
 
   const renderTeamDetails = () => {
     const teamId = currentView.replace('team-', '');
-    
-    // Fetch team details when view is opened
-    useEffect(() => {
-      if (currentView.startsWith('team-')) {
-        fetchTeamDetails(teamId);
-      }
-    }, [currentView]);
 
     if (teamLoading || !selectedTeamDetails) {
       return (
