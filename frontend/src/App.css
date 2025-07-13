@@ -3816,6 +3816,273 @@ body {
 }
 
 /* =============================================================================
+   ENHANCED ANIMATIONS & MICRO-INTERACTIONS
+============================================================================= */
+
+/* Button Enhancements */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transition: all 0.4s ease;
+  transform: translate(-50%, -50%);
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Enhanced Input Animations */
+.form-input {
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.form-input:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.form-input:hover {
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+/* Card Glow Effects */
+.team-card,
+.tournament-card,
+.invitation-item {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.team-card::before,
+.tournament-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+  border-radius: 22px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.team-card:hover::before,
+.tournament-card:hover::before {
+  opacity: 1;
+}
+
+/* Logo Hover Effects */
+.team-logo,
+.default-logo {
+  transition: all 0.3s ease;
+}
+
+.team-logo:hover,
+.default-logo:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+}
+
+/* Toast Enhanced Animations */
+.toast {
+  transform: translateX(400px);
+  animation: slideInToast 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.toast.removing {
+  animation: slideOutToast 0.3s ease-in forwards;
+}
+
+@keyframes slideInToast {
+  0% {
+    transform: translateX(400px) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-10px) scale(1.02);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToast {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(400px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Navigation Enhancements */
+.navbar a,
+.nav-dot {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.navbar a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #ffd700;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.navbar a:hover::after,
+.navbar a.active::after {
+  width: 100%;
+}
+
+.navbar a:hover {
+  color: #ffd700;
+  transform: translateY(-2px);
+}
+
+/* Loading Skeleton Enhanced */
+.skeleton {
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 25%, 
+    rgba(255, 215, 0, 0.2) 50%, 
+    rgba(255, 255, 255, 0.1) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerGlow 1.8s infinite;
+}
+
+@keyframes shimmerGlow {
+  0% {
+    background-position: -200% 0;
+  }
+  50% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Stats Counter Animation */
+.stat-value {
+  transition: all 0.3s ease;
+}
+
+.stat:hover .stat-value {
+  color: #ffd700;
+  transform: scale(1.1);
+}
+
+/* Modal Backdrop Enhanced */
+.modal-overlay {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Form Group Enhanced */
+.form-group {
+  position: relative;
+}
+
+.form-group label {
+  transition: all 0.3s ease;
+  color: #94a3b8;
+}
+
+.form-group:focus-within label {
+  color: #ffd700;
+  transform: translateY(-2px);
+}
+
+/* Color Input Special Effects */
+.color-input {
+  cursor: pointer;
+  border-radius: 50% !important;
+  transition: all 0.3s ease;
+}
+
+.color-input:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+/* Success/Error State Animations */
+.form-input.success {
+  border-color: #10b981;
+  animation: successPulse 0.5s ease;
+}
+
+.form-input.error {
+  border-color: #ef4444;
+  animation: errorShake 0.5s ease;
+}
+
+@keyframes successPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Mobile Touch Feedback */
+@media (max-width: 768px) {
+  .btn:active {
+    transform: scale(0.95);
+    background: rgba(255, 215, 0, 0.1);
+  }
+  
+  .team-card:active,
+  .tournament-card:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Loading Dots Animation */
+.loading-dots::after {
+  content: '';
+  animation: loadingDots 1.5s infinite;
+}
+
+@keyframes loadingDots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* =============================================================================
    LOADING SKELETONS SYSTEM
 ============================================================================= */
 
