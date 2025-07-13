@@ -587,6 +587,37 @@ function App() {
   });
   const [inviteUsername, setInviteUsername] = useState('');
   const [teamLoading, setTeamLoading] = useState(false);
+  
+  // Toast Notifications System
+  const [toasts, setToasts] = useState([]);
+  const [toastId, setToastId] = useState(0);
+
+  // Add toast notification
+  const showToast = (message, type = 'info', duration = 4000) => {
+    const id = toastId + 1;
+    setToastId(id);
+    
+    const newToast = {
+      id,
+      message,
+      type, // 'success', 'error', 'warning', 'info'
+      duration,
+      timestamp: Date.now()
+    };
+    
+    setToasts(prev => [...prev, newToast]);
+    
+    // Auto remove after duration
+    setTimeout(() => {
+      removeToast(id);
+    }, duration);
+  };
+
+  // Remove toast
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+
   // Rankings search states
   const [rankingSearch, setRankingSearch] = useState('');
   const [rankingSearchResult, setRankingSearchResult] = useState(null);
