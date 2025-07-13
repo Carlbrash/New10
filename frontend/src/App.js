@@ -8577,13 +8577,6 @@ function App() {
 
           {token ? (
             <>
-              <button 
-                className={`nav-link ${currentView === 'dashboard' ? 'active' : ''}`}
-                onClick={() => setCurrentView('dashboard')}
-              >
-                {t.dashboard}
-              </button>
-              
               {/* Admin Panel - only for admin users */}
               {isAdmin && (
                 <button 
