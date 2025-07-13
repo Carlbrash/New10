@@ -4022,7 +4022,20 @@ function App() {
           </div>
         ) : (
           <div className="tournaments-grid">
-            {tournaments.map((tournament) => (
+            {/* Loading Skeletons */}
+            {tournamentLoading && tournaments.length === 0 ? (
+              <>
+                {[...Array(4)].map((_, index) => (
+                  <TournamentCardSkeleton key={`tournament-skeleton-${index}`} />
+                ))}
+              </>
+            ) : tournaments.length === 0 ? (
+              <div className="no-tournaments">
+                <h3>No tournaments available</h3>
+                <p>Check back later for new tournaments!</p>
+              </div>
+            ) : (
+              tournaments.map((tournament) => (
               <div key={tournament.id} className="tournament-card">
                 <div className="tournament-card-header">
                   <h3 className="tournament-name">{tournament.name}</h3>
