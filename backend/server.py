@@ -4022,6 +4022,305 @@ async def upload_team_logo(team_id: str, logo_data: dict, user_id: str = Depends
         raise HTTPException(status_code=500, detail=f"Error uploading team logo: {str(e)}")
 
 # =============================================================================
+# ADMIN TEAM MANAGEMENT API ENDPOINTS
+# =============================================================================
+
+@app.get("/api/admin/teams")
+async def get_all_teams_admin(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all teams for admin management with detailed information"""
+    try:
+        teams = list(teams_collection.find({}))
+        
+        # Add detailed information for each team
+        for team in teams:
+            if "_id" in team:
+                team["_id"] = str(team["_id"])
+            
+            # Get captain info
+            captain = users_collection.find_one({"id": team["captain_id"]})
+            if captain:
+                team["captain_name"] = captain["full_name"]
+                team["captain_username"] = captain["username"]
+                team["captain_email"] = captain["email"]
+            
+            # Get member count and details
+            members = list(team_members_collection.find({
+                "team_id": team["id"], 
+                "status": "active"
+            }))
+            team["current_player_count"] = len(members)
+            
+            # Get member details
+            team_member_details = []
+            for member in members:
+                user = users_collection.find_one({"id": member["user_id"]})
+                if user:
+                    team_member_details.append({
+                        "id": user["id"],
+                        "username": user["username"],
+                        "full_name": user["full_name"],
+                        "email": user["email"],
+                        "country": user["country"],
+                        "joined_at": member["joined_at"]
+                    })
+            team["members"] = team_member_details
+            
+            # Get pending invitations count
+            pending_invitations = list(team_invitations_collection.find({
+                "team_id": team["id"],
+                "status": InvitationStatus.PENDING,
+                "expires_at": {"$gt": datetime.utcnow()}
+            }))
+            team["pending_invitations_count"] = len(pending_invitations)
+            
+            # Add verification status
+            team["verification_status"] = team.get("verification_status", "unverified")
+            team["created_at"] = team.get("created_at", datetime.utcnow())
+        
+        return {"teams": teams}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching admin teams: {str(e)}")
+
+@app.put("/api/admin/teams/{team_id}/verification")
+async def update_team_verification(team_id: str, verification_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Update team verification status (Admin only)"""
+    try:
+        # Verify team exists
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        verification_status = verification_data.get("verification_status")
+        admin_notes = verification_data.get("admin_notes", "")
+        
+        if verification_status not in ["verified", "unverified", "pending", "rejected"]:
+            raise HTTPException(status_code=400, detail="Invalid verification status")
+        
+        # Update team verification
+        teams_collection.update_one(
+            {"id": team_id},
+            {"$set": {
+                "verification_status": verification_status,
+                "admin_notes": admin_notes,
+                "verified_at": datetime.utcnow() if verification_status == "verified" else None,
+                "verified_by": admin_id if verification_status == "verified" else None,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        
+        # Log admin action
+        log_admin_action(
+            admin_id, 
+            f"Updated team verification status",
+            f"Team: {team['name']} -> Status: {verification_status}",
+            target_user_id=team["captain_id"]
+        )
+        
+        return {
+            "message": f"Team verification status updated to {verification_status}",
+            "team_id": team_id,
+            "verification_status": verification_status
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating team verification: {str(e)}")
+
+@app.put("/api/admin/teams/{team_id}/status")
+async def update_team_status(team_id: str, status_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Update team status (Admin only)"""
+    try:
+        # Verify team exists
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        new_status = status_data.get("status")
+        admin_reason = status_data.get("reason", "")
+        
+        if new_status not in ["active", "suspended", "disbanded"]:
+            raise HTTPException(status_code=400, detail="Invalid team status")
+        
+        # Update team status
+        teams_collection.update_one(
+            {"id": team_id},
+            {"$set": {
+                "status": new_status,
+                "admin_reason": admin_reason,
+                "status_updated_at": datetime.utcnow(),
+                "status_updated_by": admin_id,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        
+        # If team is disbanded, also update member statuses
+        if new_status == "disbanded":
+            team_members_collection.update_many(
+                {"team_id": team_id},
+                {"$set": {"status": "inactive", "left_at": datetime.utcnow()}}
+            )
+        
+        # Log admin action
+        log_admin_action(
+            admin_id, 
+            f"Updated team status",
+            f"Team: {team['name']} -> Status: {new_status}. Reason: {admin_reason}",
+            target_user_id=team["captain_id"]
+        )
+        
+        return {
+            "message": f"Team status updated to {new_status}",
+            "team_id": team_id,
+            "status": new_status
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating team status: {str(e)}")
+
+@app.delete("/api/admin/teams/{team_id}")
+async def delete_team_admin(team_id: str, admin_id: str = Depends(verify_admin_token(AdminRole.SUPER_ADMIN))):
+    """Delete team (Super Admin only)"""
+    try:
+        # Verify team exists
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        # Remove all team members
+        team_members_collection.delete_many({"team_id": team_id})
+        
+        # Cancel all pending invitations
+        team_invitations_collection.update_many(
+            {"team_id": team_id, "status": InvitationStatus.PENDING},
+            {"$set": {"status": InvitationStatus.EXPIRED}}
+        )
+        
+        # Delete the team
+        teams_collection.delete_one({"id": team_id})
+        
+        # Log admin action
+        log_admin_action(
+            admin_id, 
+            f"Deleted team",
+            f"Team: {team['name']} (ID: {team_id})",
+            target_user_id=team["captain_id"]
+        )
+        
+        return {
+            "message": f"Team '{team['name']}' has been permanently deleted",
+            "team_id": team_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting team: {str(e)}")
+
+@app.post("/api/admin/teams/bulk-action")
+async def bulk_team_action(bulk_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Perform bulk actions on multiple teams (Admin only)"""
+    try:
+        team_ids = bulk_data.get("team_ids", [])
+        action = bulk_data.get("action")
+        action_data = bulk_data.get("action_data", {})
+        
+        if not team_ids:
+            raise HTTPException(status_code=400, detail="No teams selected")
+        
+        if action not in ["verify", "unverify", "suspend", "activate", "delete"]:
+            raise HTTPException(status_code=400, detail="Invalid bulk action")
+        
+        successful_actions = []
+        failed_actions = []
+        
+        for team_id in team_ids:
+            try:
+                team = teams_collection.find_one({"id": team_id})
+                if not team:
+                    failed_actions.append({"team_id": team_id, "reason": "Team not found"})
+                    continue
+                
+                if action == "verify":
+                    teams_collection.update_one(
+                        {"id": team_id},
+                        {"$set": {
+                            "verification_status": "verified",
+                            "verified_at": datetime.utcnow(),
+                            "verified_by": admin_id,
+                            "updated_at": datetime.utcnow()
+                        }}
+                    )
+                elif action == "unverify":
+                    teams_collection.update_one(
+                        {"id": team_id},
+                        {"$set": {
+                            "verification_status": "unverified",
+                            "verified_at": None,
+                            "verified_by": None,
+                            "updated_at": datetime.utcnow()
+                        }}
+                    )
+                elif action == "suspend":
+                    teams_collection.update_one(
+                        {"id": team_id},
+                        {"$set": {
+                            "status": "suspended",
+                            "admin_reason": action_data.get("reason", "Bulk suspension"),
+                            "status_updated_at": datetime.utcnow(),
+                            "status_updated_by": admin_id,
+                            "updated_at": datetime.utcnow()
+                        }}
+                    )
+                elif action == "activate":
+                    teams_collection.update_one(
+                        {"id": team_id},
+                        {"$set": {
+                            "status": "active",
+                            "admin_reason": action_data.get("reason", "Bulk activation"),
+                            "status_updated_at": datetime.utcnow(),
+                            "status_updated_by": admin_id,
+                            "updated_at": datetime.utcnow()
+                        }}
+                    )
+                elif action == "delete" and admin_id in ["super_admin", "god"]:  # Extra security for delete
+                    team_members_collection.delete_many({"team_id": team_id})
+                    team_invitations_collection.update_many(
+                        {"team_id": team_id, "status": InvitationStatus.PENDING},
+                        {"$set": {"status": InvitationStatus.EXPIRED}}
+                    )
+                    teams_collection.delete_one({"id": team_id})
+                
+                successful_actions.append({"team_id": team_id, "team_name": team["name"]})
+                
+                # Log admin action
+                log_admin_action(
+                    admin_id, 
+                    f"Bulk {action}",
+                    f"Team: {team['name']} (ID: {team_id})",
+                    target_user_id=team["captain_id"]
+                )
+                
+            except Exception as e:
+                failed_actions.append({"team_id": team_id, "reason": str(e)})
+        
+        return {
+            "message": f"Bulk {action} completed",
+            "successful_actions": successful_actions,
+            "failed_actions": failed_actions,
+            "total_successful": len(successful_actions),
+            "total_failed": len(failed_actions)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error performing bulk action: {str(e)}")
+
+# =============================================================================
 # BULK PAYOUT API ENDPOINTS
 # =============================================================================
 
