@@ -4724,63 +4724,402 @@ function App() {
         <div className="admin-content">
           {adminLoading && <div className="loading">Loading admin data...</div>}
           
-          {/* Analytics Tab */}
+          {/* Advanced Analytics Tab */}
           {adminView === 'analytics' && (
             <div className="admin-section">
               <h3>📊 {t.analytics}</h3>
               
-              <div className="analytics-dashboard">
-                {/* Overview Cards */}
-                <div className="analytics-overview">
-                  <div className="stats-grid">
-                    <div className="stat-card">
-                      <h4>👥 Total Users</h4>
-                      <div className="stat-number">{analyticsData.overview?.total_users || 0}</div>
-                    </div>
-                    <div className="stat-card">
-                      <h4>✅ Active Users</h4>
-                      <div className="stat-number">{analyticsData.overview?.active_users || 0}</div>
-                    </div>
-                    <div className="stat-card">
-                      <h4>🚫 Blocked Users</h4>
-                      <div className="stat-number">{analyticsData.overview?.blocked_users || 0}</div>
-                    </div>
-                    <div className="stat-card">
-                      <h4>🏆 Competitions</h4>
-                      <div className="stat-number">{analyticsData.overview?.total_competitions || 0}</div>
-                    </div>
-                  </div>
+              {analyticsLoading && (
+                <div className="analytics-loading">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="loading-spinner"
+                  >
+                    Loading advanced analytics...
+                  </motion.div>
                 </div>
+              )}
 
-                {/* User Countries Distribution */}
+              <div className="advanced-analytics-dashboard">
+                {/* Performance KPIs */}
                 <div className="analytics-section">
-                  <h4>🌍 Users by Country</h4>
-                  <div className="country-stats">
-                    {analyticsData.user_countries?.slice(0, 10).map((country, index) => (
-                      <div key={country._id} className="country-stat">
-                        <span className="country-flag">{countryFlags[country._id] || '🏳️'}</span>
-                        <span className="country-name">{country._id}</span>
-                        <span className="country-count">{country.count} users</span>
+                  <h4>🎯 Performance KPIs</h4>
+                  <div className="kpi-grid">
+                    <motion.div 
+                      className="kpi-card"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <div className="kpi-icon">👥</div>
+                      <div className="kpi-value">{advancedDashboard.performance_kpis?.total_users || 0}</div>
+                      <div className="kpi-label">Total Users</div>
+                      <div className="kpi-trend positive">
+                        +{advancedDashboard.performance_kpis?.active_users_last_30_days || 0} this month
                       </div>
-                    ))}
+                    </motion.div>
+
+                    <motion.div 
+                      className="kpi-card"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <div className="kpi-icon">📈</div>
+                      <div className="kpi-value">{Math.round(advancedDashboard.performance_kpis?.user_growth_rate || 0)}%</div>
+                      <div className="kpi-label">User Growth Rate</div>
+                      <div className="kpi-trend positive">Monthly growth</div>
+                    </motion.div>
+
+                    <motion.div 
+                      className="kpi-card"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <div className="kpi-icon">💰</div>
+                      <div className="kpi-value">€{Math.round(advancedDashboard.performance_kpis?.total_revenue || 0)}</div>
+                      <div className="kpi-label">Total Revenue</div>
+                      <div className="kpi-trend positive">
+                        €{Math.round(advancedDashboard.performance_kpis?.avg_revenue_per_tournament || 0)}/tournament
+                      </div>
+                    </motion.div>
+
+                    <motion.div 
+                      className="kpi-card"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <div className="kpi-icon">🏆</div>
+                      <div className="kpi-value">{advancedDashboard.performance_kpis?.active_tournaments || 0}</div>
+                      <div className="kpi-label">Active Tournaments</div>
+                      <div className="kpi-trend">
+                        {Math.round(advancedDashboard.performance_kpis?.tournament_completion_rate || 0)}% completion rate
+                      </div>
+                    </motion.div>
                   </div>
                 </div>
 
-                {/* Top Users */}
+                {/* User Registration Trends Chart */}
                 <div className="analytics-section">
-                  <h4>🏅 Top Users by Points</h4>
-                  <div className="top-users-list">
-                    {userAnalytics.top_users?.slice(0, 5).map((user, index) => (
-                      <div key={user.username} className="top-user-item">
-                        <span className="user-rank">#{index + 1}</span>
-                        <span className="user-name">{user.full_name}</span>
-                        <span className="user-country">{countryFlags[user.country] || '🏳️'}</span>
-                        <span className="user-points">{user.score ? Math.round(user.score) : 0} pts</span>
-                      </div>
-                    ))}
+                  <h4>📈 User Registration Trends</h4>
+                  <div className="chart-container">
+                    <Line
+                      data={{
+                        labels: advancedDashboard.registration_trends?.map(item => 
+                          `${item._id.year}-${String(item._id.month).padStart(2, '0')}-${String(item._id.day).padStart(2, '0')}`
+                        ) || [],
+                        datasets: [
+                          {
+                            label: 'Daily Registrations',
+                            data: advancedDashboard.registration_trends?.map(item => item.count) || [],
+                            borderColor: 'rgb(255, 215, 0)',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                          }
+                        ]
+                      }}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          title: {
+                            display: true,
+                            text: 'User Registration Trends (Last 12 Months)'
+                          },
+                          legend: {
+                            display: true,
+                            position: 'top'
+                          }
+                        },
+                        scales: {
+                          y: {
+                            beginAtZero: true,
+                            grid: {
+                              color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                          },
+                          x: {
+                            grid: {
+                              color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                          }
+                        }
+                      }}
+                    />
                   </div>
                 </div>
 
+                {/* Tournament Participation Chart */}
+                <div className="analytics-section">
+                  <h4>🏆 Tournament Participation Analytics</h4>
+                  <div className="chart-container">
+                    <Bar
+                      data={{
+                        labels: advancedDashboard.tournament_participation?.map(item => 
+                          item.tournament_name || 'Unknown'
+                        ) || [],
+                        datasets: [
+                          {
+                            label: 'Participants',
+                            data: advancedDashboard.tournament_participation?.map(item => item.participants) || [],
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                          }
+                        ]
+                      }}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          title: {
+                            display: true,
+                            text: 'Top 10 Tournaments by Participation'
+                          },
+                          legend: {
+                            display: true,
+                            position: 'top'
+                          }
+                        },
+                        scales: {
+                          y: {
+                            beginAtZero: true,
+                            grid: {
+                              color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                          },
+                          x: {
+                            grid: {
+                              color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Revenue Analytics Chart */}
+                <div className="analytics-section">
+                  <h4>💰 Revenue Analytics by Category</h4>
+                  <div className="chart-container">
+                    <Pie
+                      data={{
+                        labels: advancedDashboard.revenue_by_category?.map(item => 
+                          item._id ? item._id.toUpperCase() : 'Unknown'
+                        ) || [],
+                        datasets: [
+                          {
+                            data: advancedDashboard.revenue_by_category?.map(item => item.total_revenue) || [],
+                            backgroundColor: [
+                              '#FF6384',
+                              '#36A2EB',
+                              '#FFCE56',
+                              '#4BC0C0',
+                              '#9966FF',
+                              '#FF9F40'
+                            ],
+                            hoverBackgroundColor: [
+                              '#FF6384',
+                              '#36A2EB',
+                              '#FFCE56',
+                              '#4BC0C0',
+                              '#9966FF',
+                              '#FF9F40'
+                            ]
+                          }
+                        ]
+                      }}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          title: {
+                            display: true,
+                            text: 'Revenue Distribution by Tournament Category'
+                          },
+                          legend: {
+                            display: true,
+                            position: 'right'
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Geographic Distribution */}
+                <div className="analytics-section">
+                  <h4>🌍 Geographic Distribution</h4>
+                  <div className="chart-container">
+                    <Doughnut
+                      data={{
+                        labels: advancedDashboard.geographic_distribution?.slice(0, 10).map(item => 
+                          item._id || 'Unknown'
+                        ) || [],
+                        datasets: [
+                          {
+                            data: advancedDashboard.geographic_distribution?.slice(0, 10).map(item => item.user_count) || [],
+                            backgroundColor: [
+                              '#FF6384',
+                              '#36A2EB',
+                              '#FFCE56',
+                              '#4BC0C0',
+                              '#9966FF',
+                              '#FF9F40',
+                              '#FF6384',
+                              '#36A2EB',
+                              '#FFCE56',
+                              '#4BC0C0'
+                            ]
+                          }
+                        ]
+                      }}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          title: {
+                            display: true,
+                            text: 'Top 10 Countries by User Count'
+                          },
+                          legend: {
+                            display: true,
+                            position: 'right'
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Engagement Metrics Section */}
+                <div className="analytics-section">
+                  <h4>📊 User Engagement Metrics</h4>
+                  
+                  {/* Daily Active Users */}
+                  <div className="engagement-subsection">
+                    <h5>Daily Active Users (Last 30 Days)</h5>
+                    <div className="chart-container">
+                      <Line
+                        data={{
+                          labels: engagementMetrics.daily_active_users?.map(item => item.date) || [],
+                          datasets: [
+                            {
+                              label: 'Active Users',
+                              data: engagementMetrics.daily_active_users?.map(item => item.active_users) || [],
+                              borderColor: 'rgb(75, 192, 192)',
+                              backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                              fill: true,
+                              tension: 0.4
+                            }
+                          ]
+                        }}
+                        options={{
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: true,
+                              position: 'top'
+                            }
+                          },
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                              }
+                            },
+                            x: {
+                              grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                              }
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Retention Analytics */}
+                  <div className="engagement-subsection">
+                    <h5>Retention Analytics</h5>
+                    <div className="retention-stats">
+                      <div className="retention-card">
+                        <div className="retention-value">
+                          {Math.round(engagementMetrics.retention_analytics?.retention_rate || 0)}%
+                        </div>
+                        <div className="retention-label">Retention Rate</div>
+                      </div>
+                      <div className="retention-card">
+                        <div className="retention-value">
+                          {Math.round(engagementMetrics.retention_analytics?.churn_rate || 0)}%
+                        </div>
+                        <div className="retention-label">Churn Rate</div>
+                      </div>
+                      <div className="retention-card">
+                        <div className="retention-value">
+                          {engagementMetrics.retention_analytics?.retained_users || 0}
+                        </div>
+                        <div className="retention-label">Retained Users</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Financial Performance */}
+                  <div className="engagement-subsection">
+                    <h5>Financial Performance Indicators</h5>
+                    <div className="financial-stats">
+                      <div className="financial-card">
+                        <div className="financial-value">
+                          €{Math.round(engagementMetrics.financial_performance?.total_entry_fees || 0)}
+                        </div>
+                        <div className="financial-label">Total Entry Fees</div>
+                      </div>
+                      <div className="financial-card">
+                        <div className="financial-value">
+                          €{Math.round(engagementMetrics.financial_performance?.platform_revenue || 0)}
+                        </div>
+                        <div className="financial-label">Platform Revenue</div>
+                      </div>
+                      <div className="financial-card">
+                        <div className="financial-value">
+                          {Math.round(engagementMetrics.financial_performance?.profit_margin || 0)}%
+                        </div>
+                        <div className="financial-label">Profit Margin</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Affiliate Conversion Funnel */}
+                  <div className="engagement-subsection">
+                    <h5>Affiliate Conversion Funnel</h5>
+                    <div className="funnel-stats">
+                      <div className="funnel-step">
+                        <div className="funnel-number">{engagementMetrics.affiliate_conversion_funnel?.total_referrals || 0}</div>
+                        <div className="funnel-label">Total Referrals</div>
+                      </div>
+                      <div className="funnel-arrow">→</div>
+                      <div className="funnel-step">
+                        <div className="funnel-number">{engagementMetrics.affiliate_conversion_funnel?.active_referrals || 0}</div>
+                        <div className="funnel-label">Active Referrals</div>
+                        <div className="funnel-rate">
+                          {Math.round(engagementMetrics.affiliate_conversion_funnel?.referral_to_active_rate || 0)}%
+                        </div>
+                      </div>
+                      <div className="funnel-arrow">→</div>
+                      <div className="funnel-step">
+                        <div className="funnel-number">{engagementMetrics.affiliate_conversion_funnel?.referral_tournament_participation || 0}</div>
+                        <div className="funnel-label">Tournament Participants</div>
+                        <div className="funnel-rate">
+                          {Math.round(engagementMetrics.affiliate_conversion_funnel?.referral_to_tournament_rate || 0)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Analytics Actions */}
                 <div className="analytics-actions">
                   <button 
                     className="btn btn-primary"
@@ -4788,9 +5127,12 @@ function App() {
                       fetchAnalyticsOverview();
                       fetchUserAnalytics();
                       fetchCompetitionAnalytics();
+                      fetchAdvancedDashboard();
+                      fetchEngagementMetrics();
                     }}
+                    disabled={analyticsLoading}
                   >
-                    🔄 Refresh Analytics
+                    {analyticsLoading ? '⏳ Loading...' : '🔄 Refresh All Analytics'}
                   </button>
                 </div>
               </div>
