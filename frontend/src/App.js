@@ -1960,7 +1960,7 @@ function App() {
     console.log('📝 Form data:', teamFormData);
     
     if (!teamFormData.name || !teamFormData.city || !teamFormData.country || !teamFormData.email) {
-      alert('Please fill in all required fields');
+      showToast('Please fill in all required fields', 'warning');
       return;
     }
     
@@ -1985,7 +1985,7 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         console.log('✅ Success data:', data);
-        alert(`Team "${data.team_name}" created successfully!`);
+        showToast(`Team "${data.team_name}" created successfully! 🏆`, 'success');
         setShowCreateTeamModal(false);
         setTeamFormData({
           name: '',
@@ -2005,15 +2005,15 @@ function App() {
         try {
           const error = JSON.parse(errorText);
           console.log('❌ Error object:', error);
-          alert(`Error: ${error.detail || 'Failed to create team'}`);
+          showToast(error.detail || 'Failed to create team', 'error');
         } catch (e) {
           console.log('❌ Could not parse error as JSON');
-          alert(`Error: ${errorText || 'Failed to create team'}`);
+          showToast(errorText || 'Failed to create team', 'error');
         }
       }
     } catch (error) {
       console.error('💥 Network/other error:', error);
-      alert(`Network error: ${error.message}`);
+      showToast(`Network error: ${error.message}`, 'error');
     } finally {
       setTeamLoading(false);
     }
