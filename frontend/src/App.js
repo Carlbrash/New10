@@ -2021,7 +2021,7 @@ function App() {
 
   const invitePlayerToTeam = async (teamId) => {
     if (!inviteUsername.trim()) {
-      alert('Please enter a username');
+      showToast('Please enter a username', 'warning');
       return;
     }
     
@@ -2038,17 +2038,17 @@ function App() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(data.message);
+        showToast(data.message, 'success');
         setShowTeamInviteModal(false);
         setInviteUsername('');
         setSelectedTeamForInvite(null);
       } else {
         const error = await response.json();
-        alert(error.detail || 'Failed to send invitation');
+        showToast(error.detail || 'Failed to send invitation', 'error');
       }
     } catch (error) {
       console.error('Error sending invitation:', error);
-      alert('Failed to send invitation');
+      showToast('Failed to send invitation', 'error');
     } finally {
       setTeamLoading(false);
     }
@@ -2064,17 +2064,17 @@ function App() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(data.message);
+        showToast(data.message, 'success');
         fetchTeamInvitations(); // Refresh invitations
         fetchProfile(); // Update user profile
         fetchTeams(); // Refresh teams
       } else {
         const error = await response.json();
-        alert(error.detail || 'Failed to accept invitation');
+        showToast(error.detail || 'Failed to accept invitation', 'error');
       }
     } catch (error) {
       console.error('Error accepting invitation:', error);
-      alert('Failed to accept invitation');
+      showToast('Failed to accept invitation', 'error');
     } finally {
       setTeamLoading(false);
     }
@@ -2089,15 +2089,15 @@ function App() {
       });
 
       if (response.ok) {
-        alert('Invitation declined');
+        showToast('Invitation declined', 'info');
         fetchTeamInvitations(); // Refresh invitations
       } else {
         const error = await response.json();
-        alert(error.detail || 'Failed to decline invitation');
+        showToast(error.detail || 'Failed to decline invitation', 'error');
       }
     } catch (error) {
       console.error('Error declining invitation:', error);
-      alert('Failed to decline invitation');
+      showToast('Failed to decline invitation', 'error');
     } finally {
       setTeamLoading(false);
     }
