@@ -2596,13 +2596,22 @@ function App() {
   };
 
   const updateTeam = async () => {
-    if (!selectedTeamForEdit) return;
+    console.log('🔄 UPDATE TEAM CALLED');
+    console.log('📝 Edit form data:', editTeamFormData);
+    console.log('👥 Selected team:', selectedTeamForEdit);
+    
+    if (!selectedTeamForEdit) {
+      console.log('❌ No selected team for edit');
+      return;
+    }
     
     if (!editTeamFormData.name || !editTeamFormData.city || !editTeamFormData.country || !editTeamFormData.email) {
+      console.log('❌ Missing required fields');
       showToast('Please fill in all required fields', 'warning');
       return;
     }
     
+    console.log('🚀 Sending update request...');
     setTeamLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/teams/${selectedTeamForEdit.id}`, {
@@ -2614,8 +2623,12 @@ function App() {
         body: JSON.stringify(editTeamFormData)
       });
 
+      console.log('📨 Response status:', response.status);
+      console.log('📨 Response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Success data:', data);
         showToast(data.message, 'success');
         setShowEditTeamModal(false);
         setSelectedTeamForEdit(null);
@@ -2624,10 +2637,11 @@ function App() {
         fetchTeams(); // Refresh teams list
       } else {
         const error = await response.json();
+        console.log('❌ Error response:', error);
         showToast(error.detail || 'Failed to update team', 'error');
       }
     } catch (error) {
-      console.error('Error updating team:', error);
+      console.error('💥 Network/other error:', error);
       showToast('Failed to update team', 'error');
     } finally {
       setTeamLoading(false);
