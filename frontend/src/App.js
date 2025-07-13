@@ -8706,10 +8706,36 @@ function App() {
 
       <main 
         className="main-content"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onTouchStart={handleSwipeStart}
+        onTouchEnd={handleSwipeEnd}
       >
+        {/* Breadcrumb Navigation */}
+        {breadcrumbPath.length > 1 && (
+          <nav className="breadcrumb">
+            {breadcrumbPath.map((item, index) => (
+              <span key={index}>
+                {index < breadcrumbPath.length - 1 ? (
+                  <>
+                    <a 
+                      href="#" 
+                      className="breadcrumb-item"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigateWithBreadcrumb(item.view, item.label);
+                      }}
+                    >
+                      {item.label}
+                    </a>
+                    <span className="breadcrumb-separator">›</span>
+                  </>
+                ) : (
+                  <span className="breadcrumb-item active">{item.label}</span>
+                )}
+              </span>
+            ))}
+          </nav>
+        )}
+        
         {currentView === 'home' && renderHome()}
         {currentView === 'login' && renderLogin()}
         {currentView === 'register' && renderRegister()}
