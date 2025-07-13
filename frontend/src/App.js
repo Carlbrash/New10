@@ -8775,7 +8775,7 @@ function App() {
                     <motion.button 
                       type="submit"
                       className="btn btn-primary"
-                      disabled={teamLoading || !editTeamFormData.name.trim() || !editTeamFormData.city.trim() || !editTeamFormData.country.trim() || !editTeamFormData.email.trim()}
+                      disabled={teamLoading}
                       variants={buttonVariants}
                       whileHover="hover"
                       whileTap="tap"
