@@ -1670,6 +1670,8 @@ function App() {
       fetchAnalyticsOverview();
       fetchUserAnalytics();
       fetchCompetitionAnalytics();
+      fetchAdvancedDashboard();
+      fetchEngagementMetrics();
     } else if (adminView === 'content' && token && isAdmin) {
       fetchContentPages();
       fetchMenuItems();
