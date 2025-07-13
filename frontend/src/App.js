@@ -649,6 +649,25 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
+
+  // Enhanced Loading Component
+  const EnhancedLoader = ({ message = "Loading...", size = "medium" }) => (
+    <motion.div 
+      className={`loading-spinner ${size}`}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="spinner"></div>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        {message}
+      </motion.p>
+    </motion.div>
+  );
   
   // Toast Notifications System
   const [toasts, setToasts] = useState([]);
