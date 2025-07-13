@@ -2137,12 +2137,124 @@ function App() {
     }
   }, [currentView]);
 
-  // Load admin teams when switching to team management tab
-  useEffect(() => {
-    if (adminView === 'team-management' && token && isAdmin) {
-      fetchAdminTeams();
+  // =============================================================================
+  // NATIONAL LEAGUE SYSTEM FUNCTIONS
+  // =============================================================================
+
+  const fetchNationalLeagues = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/national-leagues`);
+      if (response.ok) {
+        const data = await response.json();
+        setNationalLeagues(data.countries);
+      } else {
+        showToast('Failed to fetch national leagues', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching national leagues:', error);
+      showToast('Failed to fetch national leagues', 'error');
     }
-  }, [adminView, token, isAdmin]);
+  };
+
+  const fetchLeagueStandings = async (country, leagueType) => {
+    setStandingsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/national-leagues/${country}/${leagueType}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedLeague(data);
+        setLeagueStandings(data.standings || []);
+      } else {
+        showToast('Failed to fetch league standings', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching league standings:', error);
+      showToast('Failed to fetch league standings', 'error');
+    } finally {
+      setStandingsLoading(false);
+    }
+  };
+
+  const assignTeamToLeague = async (teamId, country, leagueType) => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/assign-team-to-league`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          team_id: teamId,
+          country: country,
+          league_type: leagueType
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(data.message, 'success');
+        fetchTeamsWithoutLeague(); // Refresh list
+        fetchNationalLeagues(); // Refresh leagues
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to assign team to league', 'error');
+      }
+    } catch (error) {
+      console.error('Error assigning team to league:', error);
+      showToast('Failed to assign team to league', 'error');
+    }
+  };
+
+  const fetchTeamsWithoutLeague = async () => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams-without-league`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTeamsWithoutLeague(data.teams);
+      } else {
+        showToast('Failed to fetch teams without league', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching teams without league:', error);
+      showToast('Failed to fetch teams without league', 'error');
+    }
+  };
+
+  const initializeCountryLeagues = async (country) => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/initialize-country-leagues`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ country })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(data.message, 'success');
+        fetchNationalLeagues(); // Refresh leagues
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to initialize country leagues', 'error');
+      }
+    } catch (error) {
+      console.error('Error initializing country leagues:', error);
+      showToast('Failed to initialize country leagues', 'error');
+    }
+  };
+
+  // Load national leagues when switching to team management tab
 
   // =============================================================================
   // TOURNAMENT FUNCTIONS
