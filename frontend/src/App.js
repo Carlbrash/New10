@@ -9407,6 +9407,51 @@ function App() {
           </div>
         ))}
       </div>
+      
+      {/* Floating Action Menu */}
+      {user && (
+        <div className="floating-action-menu">
+          <div className={`fab-menu ${showFloatingMenu ? 'active' : ''}`}>
+            <a href="#" className="fab-menu-item" onClick={(e) => {
+              e.preventDefault();
+              navigateWithBreadcrumb('teams', 'Teams');
+              setShowFloatingMenu(false);
+            }}>
+              👥 Teams
+            </a>
+            <a href="#" className="fab-menu-item" onClick={(e) => {
+              e.preventDefault();
+              navigateWithBreadcrumb('tournament', 'Tournaments');
+              setShowFloatingMenu(false);
+            }}>
+              🏆 Tournaments
+            </a>
+            <a href="#" className="fab-menu-item" onClick={(e) => {
+              e.preventDefault();
+              navigateWithBreadcrumb('wallet', 'Wallet');
+              setShowFloatingMenu(false);
+            }}>
+              💰 Wallet
+            </a>
+            {isAdmin && (
+              <a href="#" className="fab-menu-item" onClick={(e) => {
+                e.preventDefault();
+                navigateWithBreadcrumb('admin', 'Admin Panel');
+                setShowFloatingMenu(false);
+              }}>
+                ⚙️ Admin
+              </a>
+            )}
+          </div>
+          <button 
+            className="fab-main"
+            onClick={toggleFloatingMenu}
+            aria-label="Quick Actions"
+          >
+            {showFloatingMenu ? '✕' : '⚡'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
