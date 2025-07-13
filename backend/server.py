@@ -1803,6 +1803,234 @@ async def get_competition_analytics(admin_id: str = Depends(verify_admin_token(A
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching competition analytics: {str(e)}")
 
+@app.get("/api/admin/analytics/advanced-dashboard")
+async def get_advanced_dashboard_analytics(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get advanced dashboard analytics for charts and KPIs"""
+    try:
+        # User Registration Trends (last 12 months)
+        twelve_months_ago = datetime.utcnow() - timedelta(days=365)
+        registration_trends = list(users_collection.aggregate([
+            {"$match": {"created_at": {"$gte": twelve_months_ago}}},
+            {"$group": {
+                "_id": {
+                    "year": {"$year": "$created_at"},
+                    "month": {"$month": "$created_at"},
+                    "day": {"$dayOfMonth": "$created_at"}
+                },
+                "count": {"$sum": 1}
+            }},
+            {"$sort": {"_id.year": 1, "_id.month": 1, "_id.day": 1}}
+        ]))
+        
+        # Tournament Participation Analytics
+        tournament_participation = list(tournament_participants_collection.aggregate([
+            {"$group": {
+                "_id": "$tournament_id",
+                "participants": {"$sum": 1}
+            }},
+            {"$sort": {"participants": -1}},
+            {"$limit": 10}
+        ]))
+        
+        # Enhance with tournament details
+        for tp in tournament_participation:
+            tournament = tournaments_collection.find_one({"id": tp["_id"]})
+            if tournament:
+                tp["tournament_name"] = tournament.get("name", "Unknown")
+                tp["entry_fee"] = tournament.get("entry_fee", 0)
+        
+        # Revenue Analytics by Tournament Categories
+        revenue_by_category = list(tournaments_collection.aggregate([
+            {"$group": {
+                "_id": "$entry_fee_category",
+                "total_revenue": {"$sum": {"$multiply": ["$entry_fee", "$current_participants"]}},
+                "tournament_count": {"$sum": 1},
+                "avg_participants": {"$avg": "$current_participants"}
+            }},
+            {"$sort": {"total_revenue": -1}}
+        ]))
+        
+        # Geographic Distribution (Enhanced)
+        geographic_data = list(users_collection.aggregate([
+            {"$group": {
+                "_id": "$country",
+                "user_count": {"$sum": 1},
+                "total_bets": {"$sum": "$total_bets"},
+                "total_winnings": {"$sum": "$total_winnings"},
+                "avg_score": {"$avg": "$score"}
+            }},
+            {"$sort": {"user_count": -1}}
+        ]))
+        
+        # Performance KPIs
+        total_users = users_collection.count_documents({})
+        active_users_last_30_days = users_collection.count_documents({
+            "created_at": {"$gte": datetime.utcnow() - timedelta(days=30)}
+        })
+        
+        total_tournaments = tournaments_collection.count_documents({})
+        active_tournaments = tournaments_collection.count_documents({"status": "open"})
+        
+        total_revenue = sum([item["total_revenue"] for item in revenue_by_category])
+        
+        # Affiliate metrics
+        total_affiliates = affiliates_collection.count_documents({})
+        active_affiliates = affiliates_collection.count_documents({"status": "active"})
+        total_commissions = sum([c["amount"] for c in commissions_collection.find({})])
+        
+        performance_kpis = {
+            "total_users": total_users,
+            "active_users_last_30_days": active_users_last_30_days,
+            "user_growth_rate": (active_users_last_30_days / max(total_users, 1)) * 100,
+            "total_tournaments": total_tournaments,
+            "active_tournaments": active_tournaments,
+            "tournament_completion_rate": ((total_tournaments - active_tournaments) / max(total_tournaments, 1)) * 100,
+            "total_revenue": total_revenue,
+            "avg_revenue_per_tournament": total_revenue / max(total_tournaments, 1),
+            "total_affiliates": total_affiliates,
+            "active_affiliates": active_affiliates,
+            "affiliate_conversion_rate": (active_affiliates / max(total_affiliates, 1)) * 100,
+            "total_commissions": total_commissions
+        }
+        
+        return {
+            "registration_trends": registration_trends,
+            "tournament_participation": tournament_participation,
+            "revenue_by_category": revenue_by_category,
+            "geographic_distribution": geographic_data,
+            "performance_kpis": performance_kpis
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching advanced dashboard analytics: {str(e)}")
+
+@app.get("/api/admin/analytics/engagement-metrics")
+async def get_engagement_metrics(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get user engagement metrics"""
+    try:
+        # Daily Active Users (last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        daily_active_users = []
+        
+        for i in range(30):
+            day_start = thirty_days_ago + timedelta(days=i)
+            day_end = day_start + timedelta(days=1)
+            
+            # Count users who joined tournaments on that day
+            active_count = tournament_participants_collection.count_documents({
+                "registered_at": {"$gte": day_start, "$lt": day_end}
+            })
+            
+            daily_active_users.append({
+                "date": day_start.strftime("%Y-%m-%d"),
+                "active_users": active_count
+            })
+        
+        # Tournament Success Rates
+        tournament_success_rates = []
+        tournaments = list(tournaments_collection.find({"status": {"$in": ["completed", "ongoing"]}}))
+        
+        for tournament in tournaments:
+            participants = tournament_participants_collection.count_documents({
+                "tournament_id": tournament["id"]
+            })
+            
+            completion_rate = (participants / max(tournament.get("max_participants", 1), 1)) * 100
+            
+            tournament_success_rates.append({
+                "tournament_id": tournament["id"],
+                "tournament_name": tournament.get("name", "Unknown"),
+                "completion_rate": completion_rate,
+                "participants": participants,
+                "max_participants": tournament.get("max_participants", 0)
+            })
+        
+        # Affiliate Conversion Funnel
+        total_referrals = referrals_collection.count_documents({})
+        active_referrals = referrals_collection.count_documents({"is_active": True})
+        
+        # Users who joined tournaments after referral
+        referral_tournament_participation = 0
+        referrals = list(referrals_collection.find({}))
+        
+        for referral in referrals:
+            participant_count = tournament_participants_collection.count_documents({
+                "user_id": referral["referred_user_id"]
+            })
+            if participant_count > 0:
+                referral_tournament_participation += 1
+        
+        affiliate_funnel = {
+            "total_referrals": total_referrals,
+            "active_referrals": active_referrals,
+            "referral_to_active_rate": (active_referrals / max(total_referrals, 1)) * 100,
+            "referral_tournament_participation": referral_tournament_participation,
+            "referral_to_tournament_rate": (referral_tournament_participation / max(total_referrals, 1)) * 100
+        }
+        
+        # Financial Performance Indicators
+        total_entry_fees = 0
+        total_prize_pools = 0
+        tournaments_with_revenue = list(tournaments_collection.find({}))
+        
+        for tournament in tournaments_with_revenue:
+            entry_fee = tournament.get("entry_fee", 0)
+            participants = tournament.get("current_participants", 0)
+            total_entry_fees += entry_fee * participants
+            total_prize_pools += tournament.get("total_prize_pool", 0)
+        
+        platform_revenue = total_entry_fees - total_prize_pools
+        
+        financial_indicators = {
+            "total_entry_fees": total_entry_fees,
+            "total_prize_pools": total_prize_pools,
+            "platform_revenue": platform_revenue,
+            "profit_margin": (platform_revenue / max(total_entry_fees, 1)) * 100,
+            "avg_tournament_revenue": total_entry_fees / max(len(tournaments_with_revenue), 1)
+        }
+        
+        # User Retention Analytics
+        # Calculate retention based on tournament participation over time
+        current_month = datetime.utcnow().replace(day=1)
+        last_month = current_month - timedelta(days=30)
+        
+        current_month_users = set()
+        last_month_users = set()
+        
+        # Get users who participated in tournaments this month
+        current_participants = list(tournament_participants_collection.find({
+            "registered_at": {"$gte": current_month}
+        }))
+        for p in current_participants:
+            current_month_users.add(p["user_id"])
+        
+        # Get users who participated in tournaments last month
+        last_participants = list(tournament_participants_collection.find({
+            "registered_at": {"$gte": last_month, "$lt": current_month}
+        }))
+        for p in last_participants:
+            last_month_users.add(p["user_id"])
+        
+        retained_users = current_month_users.intersection(last_month_users)
+        retention_rate = (len(retained_users) / max(len(last_month_users), 1)) * 100
+        
+        retention_analytics = {
+            "current_month_active": len(current_month_users),
+            "last_month_active": len(last_month_users),
+            "retained_users": len(retained_users),
+            "retention_rate": retention_rate,
+            "churn_rate": 100 - retention_rate
+        }
+        
+        return {
+            "daily_active_users": daily_active_users,
+            "tournament_success_rates": tournament_success_rates,
+            "affiliate_conversion_funnel": affiliate_funnel,
+            "financial_performance": financial_indicators,
+            "retention_analytics": retention_analytics
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching engagement metrics: {str(e)}")
+
 @app.get("/api/admin/content/pages")
 async def get_content_pages(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
     """Get all content pages for management"""
