@@ -5726,6 +5726,231 @@ function App() {
             </div>
           )}
 
+          {/* Team Management Tab */}
+          {adminView === 'team-management' && (
+            <div className="admin-section">
+              <h3>👥 Team Management</h3>
+              
+              {/* Team Management Controls */}
+              <div className="admin-controls">
+                <div className="search-filter-container">
+                  <div className="search-container">
+                    <input
+                      type="text"
+                      placeholder="🔍 Search teams by name, captain, city..."
+                      value={teamSearchTerm}
+                      onChange={(e) => handleTeamSearch(e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                  
+                  <div className="filter-container">
+                    <select
+                      value={teamStatusFilter}
+                      onChange={(e) => handleTeamStatusFilter(e.target.value)}
+                      className="form-input"
+                    >
+                      <option value="all">All Teams</option>
+                      <option value="verified">✅ Verified</option>
+                      <option value="unverified">❌ Unverified</option>
+                      <option value="pending">⏳ Pending</option>
+                      <option value="suspended">🚫 Suspended</option>
+                    </select>
+                  </div>
+                  
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={fetchAdminTeams}
+                    disabled={adminTeamLoading}
+                  >
+                    {adminTeamLoading ? '⏳ Loading...' : '🔄 Refresh'}
+                  </button>
+                </div>
+                
+                {/* Bulk Actions */}
+                {selectedTeamsForBulk.length > 0 && (
+                  <div className="bulk-actions">
+                    <span className="bulk-selected">
+                      {selectedTeamsForBulk.length} teams selected
+                    </span>
+                    <div className="bulk-buttons">
+                      <button 
+                        className="btn btn-success btn-small"
+                        onClick={() => performBulkTeamAction('verify')}
+                      >
+                        ✅ Verify
+                      </button>
+                      <button 
+                        className="btn btn-warning btn-small"
+                        onClick={() => performBulkTeamAction('unverify')}
+                      >
+                        ❌ Unverify
+                      </button>
+                      <button 
+                        className="btn btn-danger btn-small"
+                        onClick={() => performBulkTeamAction('suspend', { reason: 'Bulk suspension' })}
+                      >
+                        🚫 Suspend
+                      </button>
+                      <button 
+                        className="btn btn-primary btn-small"
+                        onClick={() => performBulkTeamAction('activate', { reason: 'Bulk activation' })}
+                      >
+                        ✅ Activate
+                      </button>
+                      {isGod && (
+                        <button 
+                          className="btn btn-danger btn-small"
+                          onClick={() => performBulkTeamAction('delete')}
+                        >
+                          🗑️ Delete
+                        </button>
+                      )}
+                      <button 
+                        className="btn btn-secondary btn-small"
+                        onClick={() => setSelectedTeamsForBulk([])}
+                      >
+                        Clear Selection
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Teams List */}
+              {adminTeamLoading ? (
+                <div className="loading">Loading teams...</div>
+              ) : (
+                <div className="admin-teams-grid">
+                  {filteredTeams.length === 0 ? (
+                    <div className="no-data">
+                      <h4>No teams found</h4>
+                      <p>No teams match your search criteria.</p>
+                    </div>
+                  ) : (
+                    filteredTeams.map((team, index) => (
+                      <div key={team.id} className="admin-team-card">
+                        <div className="team-card-header">
+                          <div className="team-selection">
+                            <input
+                              type="checkbox"
+                              checked={selectedTeamsForBulk.includes(team.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedTeamsForBulk([...selectedTeamsForBulk, team.id]);
+                                } else {
+                                  setSelectedTeamsForBulk(selectedTeamsForBulk.filter(id => id !== team.id));
+                                }
+                              }}
+                            />
+                          </div>
+                          <div className="team-basic-info">
+                            <h4>{team.name}</h4>
+                            <div className="team-badges">
+                              <span className={`verification-badge ${team.verification_status}`}>
+                                {team.verification_status === 'verified' && '✅ Verified'}
+                                {team.verification_status === 'unverified' && '❌ Unverified'}
+                                {team.verification_status === 'pending' && '⏳ Pending'}
+                                {team.verification_status === 'rejected' && '🚫 Rejected'}
+                              </span>
+                              <span className={`status-badge ${team.status || 'active'}`}>
+                                {team.status === 'suspended' && '🚫 Suspended'}
+                                {team.status === 'disbanded' && '💀 Disbanded'}
+                                {(team.status === 'active' || !team.status) && '✅ Active'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="team-details">
+                          <div className="team-info-row">
+                            <strong>Captain:</strong> {team.captain_name} (@{team.captain_username})
+                          </div>
+                          <div className="team-info-row">
+                            <strong>Location:</strong> {team.city}, {team.country}
+                          </div>
+                          <div className="team-info-row">
+                            <strong>Members:</strong> {team.current_player_count}/20
+                          </div>
+                          <div className="team-info-row">
+                            <strong>Pending Invitations:</strong> {team.pending_invitations_count}
+                          </div>
+                          <div className="team-info-row">
+                            <strong>Created:</strong> {new Date(team.created_at).toLocaleDateString()}
+                          </div>
+                          {team.email && (
+                            <div className="team-info-row">
+                              <strong>Email:</strong> {team.email}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="team-admin-actions">
+                          <div className="verification-actions">
+                            {team.verification_status !== 'verified' && (
+                              <button 
+                                className="btn btn-success btn-small"
+                                onClick={() => updateTeamVerification(team.id, 'verified', 'Admin verified')}
+                              >
+                                ✅ Verify
+                              </button>
+                            )}
+                            {team.verification_status === 'verified' && (
+                              <button 
+                                className="btn btn-warning btn-small"
+                                onClick={() => updateTeamVerification(team.id, 'unverified', 'Admin unverified')}
+                              >
+                                ❌ Unverify
+                              </button>
+                            )}
+                          </div>
+                          
+                          <div className="status-actions">
+                            {team.status !== 'suspended' && (
+                              <button 
+                                className="btn btn-danger btn-small"
+                                onClick={() => updateTeamStatus(team.id, 'suspended', 'Admin suspension')}
+                              >
+                                🚫 Suspend
+                              </button>
+                            )}
+                            {team.status === 'suspended' && (
+                              <button 
+                                className="btn btn-primary btn-small"
+                                onClick={() => updateTeamStatus(team.id, 'active', 'Admin activation')}
+                              >
+                                ✅ Activate
+                              </button>
+                            )}
+                          </div>
+                          
+                          <button 
+                            className="btn btn-outline btn-small"
+                            onClick={() => {
+                              setSelectedTeamForAdmin(team);
+                              setCurrentView(`team-${team.id}`);
+                            }}
+                          >
+                            👁️ View Details
+                          </button>
+                          
+                          {isGod && (
+                            <button 
+                              className="btn btn-danger btn-small"
+                              onClick={() => deleteTeamAdmin(team.id, team.name)}
+                            >
+                              🗑️ Delete
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Content Management Tab */}
           {adminView === 'content' && (
             <div className="admin-section">
