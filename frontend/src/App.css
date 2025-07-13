@@ -1421,6 +1421,8 @@ body {
 .modal-content {
   padding: 30px !important;
   color: #ffffff !important;
+  min-height: fit-content !important;
+  padding-bottom: 40px !important;
 }
 
 .modal-actions {
