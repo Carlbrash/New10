@@ -1957,6 +1957,13 @@ function App() {
     }
   }, [adminView, token, isAdmin]);
 
+  // Load admin teams when switching to team management tab
+  useEffect(() => {
+    if (adminView === 'team-management' && token && isAdmin) {
+      fetchAdminTeams();
+    }
+  }, [adminView, token, isAdmin]);
+
   // =============================================================================
   // TOURNAMENT FUNCTIONS
   // =============================================================================
