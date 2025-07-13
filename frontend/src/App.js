@@ -2141,10 +2141,7 @@ function App() {
           transition={pageTransition}
         >
           <div className="container">
-            <div className="loading-spinner">
-              <div className="spinner"></div>
-              <p>Loading team details...</p>
-            </div>
+            <EnhancedLoader message="Loading team details..." size="large" />
           </div>
         </motion.div>
       );
