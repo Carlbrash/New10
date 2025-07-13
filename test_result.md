@@ -1176,6 +1176,80 @@ agent_communication:
     message: "I've completed testing of the Team System backend endpoints. All endpoints are working correctly with proper authentication, data validation, and business logic. The GET /api/teams endpoint returns a list of teams with proper details. The POST /api/teams endpoint correctly validates that a user can only be a member of one team. The GET /api/teams/{team_id} endpoint returns detailed team information including members. The POST /api/teams/{team_id}/invite endpoint correctly validates that a user can only be invited if they're not already in a team. The GET /api/teams/my-invitations endpoint works correctly for users with pending invitations. All tests passed successfully with expected behavior."
   - agent: "testing"
     message: "✅ TEAM EDIT FUNCTIONALITY TESTING COMPLETED: I've completed comprehensive testing of the new Team Edit functionality backend. Both endpoints are working correctly: 1) PUT /api/teams/{team_id} successfully allows team captains to update team information (name, city, country, phone, email, colors) and properly restricts admin users and non-captain users with 403 errors, 2) POST /api/teams/{team_id}/upload-logo successfully handles base64 image uploads with proper format validation and captain-only restrictions. All validation scenarios work correctly - missing fields return 400 errors, invalid team IDs return 404 errors, and invalid image formats return 400 errors. All authorization checks work as expected. All tests passed successfully."
+  - agent: "testing"
+    message: "✅ ADMIN TEAM MANAGEMENT TESTING COMPLETED: I've completed comprehensive testing of the new Admin Team Management functionality. All endpoints are working correctly: 1) GET /api/admin/teams successfully returns all teams with detailed information including captain details, member count, and verification status, 2) PUT /api/admin/teams/{team_id}/verification correctly updates team verification status with proper validation and admin notes, 3) PUT /api/admin/teams/{team_id}/status successfully updates team status with proper validation and reason tracking, 4) POST /api/admin/teams/bulk-action correctly handles bulk operations (verify, suspend, activate) with proper validation, 5) DELETE /api/admin/teams/{team_id} correctly restricts deletion to super admin only (God user) and prevents regular admin access with 403 error. All authorization tests passed - endpoints correctly reject unauthorized access (403 error) and prevent regular users from accessing admin endpoints. All tests passed successfully."
+
+  - task: "Admin Team Management - GET /api/admin/teams"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /api/admin/teams endpoint is working correctly. Returns all teams with detailed information including captain details (name, username, email), current member count, member details, pending invitations count, verification status, and creation date. Proper admin authentication required."
+
+  - task: "Admin Team Management - PUT /api/admin/teams/{team_id}/verification"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PUT /api/admin/teams/{team_id}/verification endpoint is working correctly. Successfully updates team verification status (verified, unverified, pending, rejected) with admin notes. Properly validates verification status and returns 400 error for invalid statuses. Updates are correctly reflected in the database."
+
+  - task: "Admin Team Management - PUT /api/admin/teams/{team_id}/status"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PUT /api/admin/teams/{team_id}/status endpoint is working correctly. Successfully updates team status (active, suspended, disbanded) with admin reason tracking. Properly validates status values and returns 400 error for invalid statuses. When team is disbanded, correctly updates member statuses to inactive."
+
+  - task: "Admin Team Management - POST /api/admin/teams/bulk-action"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/admin/teams/bulk-action endpoint is working correctly. Successfully handles bulk operations (verify, unverify, suspend, activate) on multiple teams. Properly validates team_ids array (rejects empty arrays) and action types (rejects invalid actions). Returns detailed success/failure counts and logs admin actions."
+
+  - task: "Admin Team Management - DELETE /api/admin/teams/{team_id}"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "DELETE /api/admin/teams/{team_id} endpoint is working correctly. Properly restricts deletion to super admin only (God user) and prevents regular admin access with 403 error. Successfully deletes teams, removes all team members, cancels pending invitations, and logs admin actions. Correctly handles non-existent teams with 404 error."
+
+  - task: "Admin Team Management - Authorization and Security"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Admin Team Management authorization is working correctly. All endpoints properly reject unauthorized access (403 error for no auth) and prevent regular users from accessing admin endpoints (403 error for user tokens). Only admin and super admin users can access team management endpoints, with delete operations restricted to super admin only."
 
 frontend:
   - task: "Advanced Analytics Dashboard UI"
