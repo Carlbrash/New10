@@ -4361,6 +4361,301 @@ async def bulk_team_action(bulk_data: dict, admin_id: str = Depends(verify_admin
         raise HTTPException(status_code=500, detail=f"Error performing bulk action: {str(e)}")
 
 # =============================================================================
+# NATIONAL LEAGUE SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.get("/api/national-leagues")
+async def get_national_leagues():
+    """Get all national leagues organized by country"""
+    try:
+        leagues = list(national_leagues_collection.find({}))
+        
+        # Organize by country
+        countries = {}
+        for league in leagues:
+            if "_id" in league:
+                league["_id"] = str(league["_id"])
+            
+            country = league["country"]
+            if country not in countries:
+                countries[country] = {
+                    "country": country,
+                    "premier": None,
+                    "league_2": None
+                }
+            
+            if league["league_type"] == "premier":
+                countries[country]["premier"] = league
+            else:
+                countries[country]["league_2"] = league
+        
+        return {"countries": list(countries.values())}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching national leagues: {str(e)}")
+
+@app.get("/api/national-leagues/{country}/{league_type}")
+async def get_league_standings(country: str, league_type: str):
+    """Get standings for a specific national league"""
+    try:
+        if league_type not in ["premier", "league_2"]:
+            raise HTTPException(status_code=400, detail="Invalid league type")
+        
+        # Find the league
+        league = national_leagues_collection.find_one({
+            "country": country,
+            "league_type": league_type
+        })
+        
+        if not league:
+            raise HTTPException(status_code=404, detail="League not found")
+        
+        if "_id" in league:
+            league["_id"] = str(league["_id"])
+        
+        # Get team standings for this league
+        standings = list(team_standings_collection.find({
+            "league_id": league["id"]
+        }).sort("position", 1))
+        
+        for standing in standings:
+            if "_id" in standing:
+                standing["_id"] = str(standing["_id"])
+        
+        league["standings"] = standings
+        
+        return league
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching league standings: {str(e)}")
+
+@app.post("/api/admin/assign-team-to-league")
+async def assign_team_to_league(assignment_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Assign a team to a national league (Admin only)"""
+    try:
+        team_id = assignment_data.get("team_id")
+        country = assignment_data.get("country")
+        league_type = assignment_data.get("league_type")
+        
+        if not team_id or not country or not league_type:
+            raise HTTPException(status_code=400, detail="Missing required fields")
+        
+        if league_type not in ["premier", "league_2"]:
+            raise HTTPException(status_code=400, detail="Invalid league type")
+        
+        # Verify team exists
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        # Check if team country matches assignment country
+        if team["country"].lower() != country.lower():
+            raise HTTPException(status_code=400, detail="Team country must match league country")
+        
+        # Find or create the national league
+        league_name = f"{country} {league_type.replace('_', ' ').title()}"
+        league = national_leagues_collection.find_one({
+            "country": country,
+            "league_type": league_type
+        })
+        
+        if not league:
+            # Create new league
+            league_id = str(uuid.uuid4())
+            new_league = {
+                "id": league_id,
+                "country": country,
+                "league_type": league_type,
+                "name": league_name,
+                "season": "2024-2025",
+                "teams": [team_id],
+                "standings": [],
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            national_leagues_collection.insert_one(new_league)
+        else:
+            league_id = league["id"]
+            # Add team to existing league if not already there
+            if team_id not in league.get("teams", []):
+                national_leagues_collection.update_one(
+                    {"id": league_id},
+                    {
+                        "$push": {"teams": team_id},
+                        "$set": {"updated_at": datetime.utcnow()}
+                    }
+                )
+        
+        # Remove team from any other league assignment
+        league_assignments_collection.delete_many({"team_id": team_id})
+        
+        # Create new assignment record
+        assignment = {
+            "id": str(uuid.uuid4()),
+            "team_id": team_id,
+            "league_id": league_id,
+            "country": country,
+            "league_type": league_type,
+            "assigned_by": admin_id,
+            "assigned_at": datetime.utcnow()
+        }
+        league_assignments_collection.insert_one(assignment)
+        
+        # Create initial team standing
+        team_standings_collection.delete_many({"team_id": team_id})  # Remove old standings
+        initial_standing = {
+            "id": str(uuid.uuid4()),
+            "team_id": team_id,
+            "team_name": team["name"],
+            "league_id": league_id,
+            "matches_played": 0,
+            "wins": 0,
+            "draws": 0,
+            "losses": 0,
+            "goals_for": 0,
+            "goals_against": 0,
+            "goal_difference": 0,
+            "points": 0,
+            "position": 0,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        team_standings_collection.insert_one(initial_standing)
+        
+        # Update team with league assignment
+        teams_collection.update_one(
+            {"id": team_id},
+            {
+                "$set": {
+                    "league_id": league_id,
+                    "league_country": country,
+                    "league_type": league_type,
+                    "league_name": league_name,
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        # Log admin action
+        log_admin_action(
+            admin_id,
+            "Assigned team to league",
+            f"Team: {team['name']} → {league_name}",
+            target_user_id=team["captain_id"]
+        )
+        
+        return {
+            "message": f"Team '{team['name']}' assigned to {league_name}",
+            "team_id": team_id,
+            "league_name": league_name,
+            "league_id": league_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error assigning team to league: {str(e)}")
+
+@app.get("/api/admin/teams-without-league")
+async def get_teams_without_league(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all teams that haven't been assigned to a league (Admin only)"""
+    try:
+        # Get all teams that don't have a league assignment
+        teams_without_league = list(teams_collection.find({
+            "$or": [
+                {"league_id": {"$exists": False}},
+                {"league_id": None},
+                {"league_id": ""}
+            ]
+        }))
+        
+        for team in teams_without_league:
+            if "_id" in team:
+                team["_id"] = str(team["_id"])
+        
+        return {"teams": teams_without_league}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching teams without league: {str(e)}")
+
+@app.post("/api/admin/initialize-country-leagues")
+async def initialize_country_leagues(country_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Initialize Premier and League 2 for a country (Admin only)"""
+    try:
+        country = country_data.get("country")
+        if not country:
+            raise HTTPException(status_code=400, detail="Country is required")
+        
+        leagues_created = []
+        
+        # Create Premier League
+        premier_id = str(uuid.uuid4())
+        premier_league = {
+            "id": premier_id,
+            "country": country,
+            "league_type": "premier",
+            "name": f"{country} Premier",
+            "season": "2024-2025",
+            "teams": [],
+            "standings": [],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Create League 2
+        league2_id = str(uuid.uuid4())
+        league2 = {
+            "id": league2_id,
+            "country": country,
+            "league_type": "league_2",
+            "name": f"{country} League 2",
+            "season": "2024-2025",
+            "teams": [],
+            "standings": [],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Check if leagues already exist
+        existing_premier = national_leagues_collection.find_one({
+            "country": country,
+            "league_type": "premier"
+        })
+        
+        existing_league2 = national_leagues_collection.find_one({
+            "country": country,
+            "league_type": "league_2"
+        })
+        
+        if not existing_premier:
+            national_leagues_collection.insert_one(premier_league)
+            leagues_created.append(f"{country} Premier")
+        
+        if not existing_league2:
+            national_leagues_collection.insert_one(league2)
+            leagues_created.append(f"{country} League 2")
+        
+        # Log admin action
+        log_admin_action(
+            admin_id,
+            "Initialized country leagues",
+            f"Country: {country}, Leagues: {', '.join(leagues_created)}"
+        )
+        
+        return {
+            "message": f"Leagues initialized for {country}",
+            "leagues_created": leagues_created,
+            "country": country
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error initializing country leagues: {str(e)}")
+
+# =============================================================================
 # BULK PAYOUT API ENDPOINTS
 # =============================================================================
 
