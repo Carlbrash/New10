@@ -8716,6 +8716,68 @@ function App() {
                 )}
               </div>
             )}
+          </div>
+          
+          {/* Standings (Βαθμολογίες) Dropdown */}
+          <div 
+            className={`nav-dropdown ${showStandingsDropdown ? 'mobile-open' : ''}`}
+            onMouseEnter={() => window.innerWidth > 768 && setShowStandingsDropdown(true)}
+            onMouseLeave={() => window.innerWidth > 768 && setShowStandingsDropdown(false)}
+          >
+            <button 
+              className={`nav-link dropdown-trigger ${currentView === 'standings' ? 'active' : ''}`}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  toggleMobileDropdown('standings');
+                } else {
+                  navigateWithBreadcrumb('standings', 'Standings');
+                }
+              }}
+            >
+              📊 Βαθμολογίες <span className="dropdown-arrow">▼</span>
+            </button>
+            
+            {showStandingsDropdown && (
+              <div className="dropdown-menu standings-dropdown">
+                {nationalLeagues.length === 0 ? (
+                  <div className="dropdown-item-loading">
+                    <div className="loading-dots">Loading countries...</div>
+                  </div>
+                ) : (
+                  nationalLeagues.map((country) => (
+                    <div key={country.country} className="dropdown-country">
+                      <div className="dropdown-country-header">
+                        🏴 {country.country}
+                      </div>
+                      {country.premier && (
+                        <button 
+                          className="dropdown-item dropdown-sub-item"
+                          onClick={() => {
+                            fetchLeagueStandings(country.country, 'premier');
+                            navigateWithBreadcrumb('standings', `${country.country} Premier`);
+                            setShowStandingsDropdown(false);
+                          }}
+                        >
+                          🥇 {country.country} Premier
+                        </button>
+                      )}
+                      {country.league_2 && (
+                        <button 
+                          className="dropdown-item dropdown-sub-item"
+                          onClick={() => {
+                            fetchLeagueStandings(country.country, 'league_2');
+                            navigateWithBreadcrumb('standings', `${country.country} League 2`);
+                            setShowStandingsDropdown(false);
+                          }}
+                        >
+                          🥈 {country.country} League 2
+                        </button>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           
           {/* Teams Dropdown */}
           <div 
