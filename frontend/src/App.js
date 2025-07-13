@@ -4145,16 +4145,9 @@ function App() {
                   )}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-        
-        {tournaments.length === 0 && !tournamentLoading && (
-          <div className="no-tournaments">
-            <h3>No tournaments found</h3>
-            <p>Try adjusting your filters or check back later for new tournaments.</p>
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
     );
   };
