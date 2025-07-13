@@ -475,12 +475,12 @@ class AdminTeamManagementTester(unittest.TestCase):
         """Test authorization for admin team management endpoints"""
         print("\n🔍 Testing authorization for admin team management endpoints...")
         
-        # Test without authentication (should fail with 401)
+        # Test without authentication (should fail with 403)
         print("  Testing endpoints without authentication...")
         
         # GET /api/admin/teams without auth
         response = requests.get(f"{self.base_url}/api/admin/teams")
-        self.assertEqual(response.status_code, 401, "Expected 401 error when accessing admin teams without auth")
+        self.assertEqual(response.status_code, 403, "Expected 403 error when accessing admin teams without auth")
         
         # PUT verification without auth
         if AdminTeamManagementTester.test_team_id:
@@ -489,7 +489,7 @@ class AdminTeamManagementTester(unittest.TestCase):
                 f"{self.base_url}/api/admin/teams/{AdminTeamManagementTester.test_team_id}/verification",
                 json=verification_data
             )
-            self.assertEqual(response.status_code, 401, "Expected 401 error when updating verification without auth")
+            self.assertEqual(response.status_code, 403, "Expected 403 error when updating verification without auth")
         
         # Bulk action without auth
         bulk_data = {"team_ids": ["test"], "action": "verify", "action_data": {}}
@@ -497,7 +497,7 @@ class AdminTeamManagementTester(unittest.TestCase):
             f"{self.base_url}/api/admin/teams/bulk-action",
             json=bulk_data
         )
-        self.assertEqual(response.status_code, 401, "Expected 401 error when performing bulk action without auth")
+        self.assertEqual(response.status_code, 403, "Expected 403 error when performing bulk action without auth")
         
         print("  ✅ Correctly rejected requests without authentication")
         
