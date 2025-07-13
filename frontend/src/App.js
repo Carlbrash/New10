@@ -7731,63 +7731,103 @@ function App() {
       </AnimatePresence>
       
       {/* Team Invitation Modal */}
-      {showTeamInviteModal && selectedTeamForInvite && (
-        <div className="modal-overlay" onClick={() => setShowTeamInviteModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>📧 Invite Player to {selectedTeamForInvite.name}</h3>
-              <button 
-                className="modal-close"
-                onClick={() => setShowTeamInviteModal(false)}
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="modal-content">
-              <form onSubmit={(e) => { e.preventDefault(); invitePlayerToTeam(selectedTeamForInvite.id); }}>
-                <div className="form-group">
-                  <label>Player Username</label>
-                  <input
-                    type="text"
-                    value={inviteUsername}
-                    onChange={(e) => setInviteUsername(e.target.value)}
-                    placeholder="Enter username to invite"
-                    className="form-input"
-                    required
-                  />
-                  <p className="form-help">
-                    Enter the exact username of the player you want to invite
-                  </p>
-                </div>
-                
-                <div className="team-info-preview">
-                  <h4>Team: {selectedTeamForInvite.name}</h4>
-                  <p>Players: {selectedTeamForInvite.current_player_count}/20</p>
-                  <p>Status: {selectedTeamForInvite.status}</p>
-                </div>
-                
-                <div className="modal-actions">
-                  <button 
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowTeamInviteModal(false)}
+      <AnimatePresence>
+        {showTeamInviteModal && selectedTeamForInvite && (
+          <motion.div 
+            className="modal-overlay" 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setShowTeamInviteModal(false)}
+          >
+            <motion.div 
+              className="modal" 
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="modal-header">
+                <h3>📧 Invite Player to {selectedTeamForInvite.name}</h3>
+                <motion.button 
+                  className="modal-close"
+                  onClick={() => setShowTeamInviteModal(false)}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  ✕
+                </motion.button>
+              </div>
+              
+              <div className="modal-content">
+                <form onSubmit={(e) => { e.preventDefault(); invitePlayerToTeam(selectedTeamForInvite.id); }}>
+                  <motion.div 
+                    className="form-group"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
                   >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={teamLoading || !inviteUsername.trim()}
+                    <label>Player Username</label>
+                    <input
+                      type="text"
+                      value={inviteUsername}
+                      onChange={(e) => setInviteUsername(e.target.value)}
+                      placeholder="Enter username to invite"
+                      className="form-input"
+                      required
+                    />
+                    <p className="form-help">
+                      Enter the exact username of the player you want to invite
+                    </p>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="team-info-preview"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
                   >
-                    {teamLoading ? '⏳ Sending...' : '📧 Send Invitation'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+                    <h4>Team: {selectedTeamForInvite.name}</h4>
+                    <p>Players: {selectedTeamForInvite.current_player_count}/20</p>
+                    <p>Status: {selectedTeamForInvite.status}</p>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="modal-actions"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <motion.button 
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowTeamInviteModal(false)}
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button 
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={teamLoading || !inviteUsername.trim()}
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                    >
+                      {teamLoading ? '⏳ Sending...' : '📧 Send Invitation'}
+                    </motion.button>
+                  </motion.div>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Toast Notifications Container */}
       <div className="toast-container">
