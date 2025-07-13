@@ -11216,22 +11216,22 @@ h1, h2, h3, h4, h5, h6 {
   color: #ffd700;
 }
 
-/* Smooth Logo Animation */
+/* Smooth Logo Animation - Fixed for better readability */
 .navbar-brand h1 {
-  background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientShift 3s ease-in-out infinite;
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+.navbar-brand h1:hover {
+  color: #ffed4e;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.navbar-brand .brand-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Navigation Accessibility Improvements */
