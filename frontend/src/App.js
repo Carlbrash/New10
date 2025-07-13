@@ -9105,6 +9105,7 @@ function App() {
         {currentView === 'tournament' && renderTournament()}
         {currentView === 'teams' && renderTeams()}
         {currentView.startsWith('team-') && renderTeamDetails()}
+        {currentView === 'standings' && renderStandings()}
         {currentView === 'affiliate' && user && renderAffiliate()}
         {currentView === 'wallet' && user && renderWallet()}
         {currentView === 'admin' && isAdmin && renderAdminPanel()}
