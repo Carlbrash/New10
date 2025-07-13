@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
 import DownloadBackup from './DownloadBackup';
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://67792974-48a1-4e2d-b2d0-93fe13b22f8f.preview.emergentagent.com';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://9fc18cff-1249-43ae-83c1-4c2499a8c5c3.preview.emergentagent.com';
 
 // Language translations
 const translations = {
