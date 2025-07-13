@@ -8150,6 +8150,7 @@ function App() {
         {currentView === 'worldmap' && renderWorldMap()}
         {currentView === 'tournament' && renderTournament()}
         {currentView === 'teams' && renderTeams()}
+        {currentView.startsWith('team-') && renderTeamDetails()}
         {currentView === 'affiliate' && user && renderAffiliate()}
         {currentView === 'wallet' && user && renderWallet()}
         {currentView === 'admin' && isAdmin && renderAdminPanel()}
