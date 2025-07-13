@@ -7480,6 +7480,145 @@ function App() {
   };
 
   // =============================================================================
+  // STANDINGS RENDER FUNCTION
+  // =============================================================================
+
+  const renderStandings = () => {
+    return (
+      <motion.div 
+        className="standings-page"
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+        transition={pageTransition}
+      >
+        <div className="container">
+          <motion.div className="standings-header">
+            <h2>📊 National League Standings</h2>
+            <p>Select a country and league to view standings</p>
+          </motion.div>
+
+          {/* Country Selection Grid */}
+          <motion.div className="countries-grid">
+            {nationalLeagues.length === 0 ? (
+              <EnhancedLoader message="Loading countries..." size="medium" />
+            ) : (
+              nationalLeagues.map((country, index) => (
+                <motion.div 
+                  key={country.country} 
+                  className="country-card"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="country-header">
+                    <h3>🏴 {country.country}</h3>
+                  </div>
+                  
+                  <div className="leagues-list">
+                    {country.premier && (
+                      <motion.button 
+                        className="league-button premier"
+                        onClick={() => {
+                          fetchLeagueStandings(country.country, 'premier');
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <span className="league-icon">🥇</span>
+                        <span className="league-name">{country.country} Premier</span>
+                        <span className="team-count">{country.premier.teams?.length || 0} teams</span>
+                      </motion.button>
+                    )}
+                    
+                    {country.league_2 && (
+                      <motion.button 
+                        className="league-button league2"
+                        onClick={() => {
+                          fetchLeagueStandings(country.country, 'league_2');
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <span className="league-icon">🥈</span>
+                        <span className="league-name">{country.country} League 2</span>
+                        <span className="team-count">{country.league_2.teams?.length || 0} teams</span>
+                      </motion.button>
+                    )}
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </motion.div>
+
+          {/* Selected League Standings */}
+          {selectedLeague && (
+            <motion.div 
+              className="league-standings"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="standings-header">
+                <h3>{selectedLeague.name} - Standings</h3>
+                <p className="season-info">Season: {selectedLeague.season}</p>
+              </div>
+              
+              {standingsLoading ? (
+                <EnhancedLoader message="Loading standings..." size="medium" />
+              ) : leagueStandings.length === 0 ? (
+                <div className="no-standings">
+                  <h4>No teams in this league yet</h4>
+                  <p>Teams will appear here once they are assigned by administrators.</p>
+                </div>
+              ) : (
+                <div className="standings-table">
+                  <div className="table-header">
+                    <div className="col-pos">Pos</div>
+                    <div className="col-team">Team</div>
+                    <div className="col-played">P</div>
+                    <div className="col-won">W</div>
+                    <div className="col-drawn">D</div>
+                    <div className="col-lost">L</div>
+                    <div className="col-gf">GF</div>
+                    <div className="col-ga">GA</div>
+                    <div className="col-gd">GD</div>
+                    <div className="col-points">Pts</div>
+                  </div>
+                  
+                  {leagueStandings.map((standing, index) => (
+                    <motion.div 
+                      key={standing.team_id} 
+                      className={`table-row ${index < 3 ? 'promotion' : index >= leagueStandings.length - 3 ? 'relegation' : ''}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <div className="col-pos">{index + 1}</div>
+                      <div className="col-team">
+                        <span className="team-name">{standing.team_name}</span>
+                      </div>
+                      <div className="col-played">{standing.matches_played}</div>
+                      <div className="col-won">{standing.wins}</div>
+                      <div className="col-drawn">{standing.draws}</div>
+                      <div className="col-lost">{standing.losses}</div>
+                      <div className="col-gf">{standing.goals_for}</div>
+                      <div className="col-ga">{standing.goals_against}</div>
+                      <div className="col-gd">{standing.goal_difference}</div>
+                      <div className="col-points">{standing.points}</div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
+
+  // =============================================================================
   // TEAM SYSTEM RENDER FUNCTIONS
   // =============================================================================
 
