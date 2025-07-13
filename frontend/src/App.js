@@ -1974,6 +1974,192 @@ function App() {
     setTournamentLoading(false);
   };
 
+  const renderTeamDetails = () => {
+    const teamId = currentView.replace('team-', '');
+    
+    // Fetch team details when view is opened
+    useEffect(() => {
+      if (currentView.startsWith('team-')) {
+        fetchTeamDetails(teamId);
+      }
+    }, [currentView]);
+
+    if (teamLoading || !selectedTeamDetails) {
+      return (
+        <motion.div 
+          className="team-details-page"
+          initial="initial"
+          animate="in"
+          exit="out"
+          variants={pageVariants}
+          transition={pageTransition}
+        >
+          <div className="container">
+            <div className="loading-spinner">
+              <div className="spinner"></div>
+              <p>Loading team details...</p>
+            </div>
+          </div>
+        </motion.div>
+      );
+    }
+
+    const team = selectedTeamDetails;
+
+    return (
+      <motion.div 
+        className="team-details-page"
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+        transition={pageTransition}
+      >
+        <div className="container">
+          <motion.div className="team-details-header">
+            <motion.button 
+              className="btn btn-secondary"
+              onClick={() => setCurrentView('teams')}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+            >
+              ← Back to Teams
+            </motion.button>
+            <h2>{team.name}</h2>
+          </motion.div>
+
+          <motion.div className="team-details-content">
+            {/* Team Information */}
+            <motion.div className="team-info-section">
+              <div className="team-logo-large">
+                {team.logo_url ? (
+                  <img src={team.logo_url} alt={`${team.name} logo`} />
+                ) : (
+                  <div className="default-logo-large" style={{backgroundColor: team.colors?.primary || '#FF0000'}}>
+                    {team.name.charAt(0)}
+                  </div>
+                )}
+              </div>
+              
+              <div className="team-info-details">
+                <h3>{team.name}</h3>
+                <p>📍 {team.city}, {team.country}</p>
+                <p>👑 Captain: {team.captain_name}</p>
+                <p>📧 Email: {team.email}</p>
+                {team.phone && <p>📱 Phone: {team.phone}</p>}
+                <p>👥 Players: {team.current_player_count}/20</p>
+                <p>📊 Status: {team.status}</p>
+                
+                <div className="team-colors-display">
+                  <div className="color-display">
+                    <div 
+                      className="color-swatch" 
+                      style={{backgroundColor: team.colors?.primary}}
+                    ></div>
+                    <span>Primary</span>
+                  </div>
+                  {team.colors?.secondary && (
+                    <div className="color-display">
+                      <div 
+                        className="color-swatch" 
+                        style={{backgroundColor: team.colors.secondary}}
+                      ></div>
+                      <span>Secondary</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Team Members */}
+            <motion.div className="team-members-section">
+              <h3>Team Members</h3>
+              <div className="members-grid">
+                {team.members && team.members.map((member, index) => (
+                  <motion.div 
+                    key={member.id} 
+                    className="member-card"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <div className="member-avatar">
+                      {member.avatar_url ? (
+                        <img src={member.avatar_url} alt={member.username} />
+                      ) : (
+                        <div className="default-avatar">
+                          {member.username.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="member-info">
+                      <h4>{member.full_name}</h4>
+                      <p>@{member.username}</p>
+                      <p>{member.country}</p>
+                      {member.id === team.captain_id && (
+                        <span className="captain-badge">👑 Captain</span>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Captain Actions & Invitation Stats */}
+            {user && user.id === team.captain_id && (
+              <motion.div className="captain-section">
+                <h3>Captain Actions</h3>
+                <div className="captain-actions">
+                  <motion.button 
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      setSelectedTeamForInvite(team);
+                      setShowTeamInviteModal(true);
+                    }}
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    📧 Invite Player
+                  </motion.button>
+                  <motion.button 
+                    className="btn btn-primary"
+                    onClick={() => openEditTeamModal(team)}
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    ✏️ Edit Team
+                  </motion.button>
+                </div>
+
+                {/* Invitation Statistics */}
+                <div className="invitation-stats">
+                  <h4>Invitation Statistics</h4>
+                  <div className="stats-grid">
+                    <div className="stat-item">
+                      <span className="stat-number">{team.pending_invitations_count || 0}</span>
+                      <span className="stat-label">Pending Invitations</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-number">{team.current_player_count - 1}</span>
+                      <span className="stat-label">Accepted Members</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-number">{20 - team.current_player_count}</span>
+                      <span className="stat-label">Available Spots</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
+      </motion.div>
+    );
+  };
+
   // Get tournament details
   const fetchTournamentDetails = async (tournamentId) => {
     setTournamentLoading(true);
