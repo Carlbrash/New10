@@ -618,6 +618,93 @@ function App() {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
 
+  // =============================================================================
+  // SKELETON LOADING COMPONENTS
+  // =============================================================================
+
+  const TeamCardSkeleton = () => (
+    <div className="team-card-skeleton">
+      <div className="team-header-skeleton">
+        <div className="team-logo-skeleton skeleton"></div>
+        <div className="team-info-skeleton">
+          <div className="team-name-skeleton skeleton"></div>
+          <div className="team-details-skeleton skeleton"></div>
+          <div className="team-details-skeleton skeleton"></div>
+        </div>
+      </div>
+      
+      <div className="team-stats-skeleton">
+        <div className="stat-skeleton">
+          <div className="stat-value-skeleton skeleton"></div>
+          <div className="stat-label-skeleton skeleton"></div>
+        </div>
+        <div className="stat-skeleton">
+          <div className="stat-value-skeleton skeleton"></div>
+          <div className="stat-label-skeleton skeleton"></div>
+        </div>
+      </div>
+
+      <div className="team-colors-skeleton">
+        <div className="color-skeleton skeleton"></div>
+        <div className="color-skeleton skeleton"></div>
+      </div>
+
+      <div className="team-actions-skeleton">
+        <div className="action-btn-skeleton skeleton"></div>
+        <div className="action-btn-skeleton skeleton"></div>
+      </div>
+    </div>
+  );
+
+  const TournamentCardSkeleton = () => (
+    <div className="tournament-card-skeleton">
+      <div className="tournament-header-skeleton">
+        <div className="tournament-title-skeleton skeleton"></div>
+        <div className="tournament-meta-skeleton skeleton"></div>
+        <div className="tournament-meta-skeleton skeleton"></div>
+      </div>
+      
+      <div className="tournament-stats-skeleton">
+        <div className="tournament-stat-skeleton skeleton"></div>
+        <div className="tournament-stat-skeleton skeleton"></div>
+        <div className="tournament-stat-skeleton skeleton"></div>
+      </div>
+
+      <div className="tournament-actions-skeleton">
+        <div className="tournament-btn-skeleton skeleton"></div>
+      </div>
+    </div>
+  );
+
+  const UserProfileSkeleton = () => (
+    <div className="user-profile-skeleton">
+      <div className="user-avatar-skeleton skeleton"></div>
+      <div className="user-info-skeleton">
+        <div className="user-name-skeleton skeleton"></div>
+        <div className="user-details-skeleton skeleton"></div>
+      </div>
+    </div>
+  );
+
+  const StatsCardSkeleton = () => (
+    <div className="stat-card-skeleton">
+      <div className="stat-icon-skeleton skeleton"></div>
+      <div className="stat-number-skeleton skeleton"></div>
+      <div className="stat-label-skeleton skeleton"></div>
+    </div>
+  );
+
+  const ListItemSkeleton = () => (
+    <div className="list-item-skeleton">
+      <div className="list-icon-skeleton skeleton"></div>
+      <div className="list-content-skeleton">
+        <div className="list-title-skeleton skeleton"></div>
+        <div className="list-subtitle-skeleton skeleton"></div>
+      </div>
+      <div className="list-action-skeleton skeleton"></div>
+    </div>
+  );
+
   // Rankings search states
   const [rankingSearch, setRankingSearch] = useState('');
   const [rankingSearchResult, setRankingSearchResult] = useState(null);
