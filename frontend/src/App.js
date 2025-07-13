@@ -2070,6 +2070,37 @@ function App() {
     setShowFloatingMenu(!showFloatingMenu);
   };
 
+  // Mobile dropdown handlers
+  const toggleMobileDropdown = (dropdownType) => {
+    if (dropdownType === 'rankings') {
+      setShowRankingsDropdown(!showRankingsDropdown);
+      setShowTournamentsDropdown(false);
+      setShowTeamsDropdown(false);
+    } else if (dropdownType === 'tournaments') {
+      setShowTournamentsDropdown(!showTournamentsDropdown);
+      setShowRankingsDropdown(false);
+      setShowTeamsDropdown(false);
+    } else if (dropdownType === 'teams') {
+      setShowTeamsDropdown(!showTeamsDropdown);
+      setShowRankingsDropdown(false);
+      setShowTournamentsDropdown(false);
+    }
+  };
+
+  // Close all dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.nav-dropdown')) {
+        setShowRankingsDropdown(false);
+        setShowTournamentsDropdown(false);
+        setShowTeamsDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   // Initialize breadcrumb on app load
   useEffect(() => {
     if (currentView === 'home') {
