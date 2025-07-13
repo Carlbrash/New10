@@ -2000,12 +2000,12 @@ function App() {
     }
   };
 
-  const handleTouchStart = (e) => {
+  const handleSwipeStart = (e) => {
     setTouchStartX(e.touches[0].clientX);
     setTouchStartY(e.touches[0].clientY);
   };
 
-  const handleTouchEnd = (e) => {
+  const handleSwipeEnd = (e) => {
     if (!touchStartX || !touchStartY) return;
     
     const touchEndX = e.changedTouches[0].clientX;
