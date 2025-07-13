@@ -913,6 +913,23 @@ function App() {
     prize_stats: {}
   });
   
+  // Advanced Analytics States
+  const [advancedDashboard, setAdvancedDashboard] = useState({
+    registration_trends: [],
+    tournament_participation: [],
+    revenue_by_category: [],
+    geographic_distribution: [],
+    performance_kpis: {}
+  });
+  const [engagementMetrics, setEngagementMetrics] = useState({
+    daily_active_users: [],
+    tournament_success_rates: [],
+    affiliate_conversion_funnel: {},
+    financial_performance: {},
+    retention_analytics: {}
+  });
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  
   // Content Management States
   const [contentPages, setContentPages] = useState([]);
   const [selectedPage, setSelectedPage] = useState(null);
