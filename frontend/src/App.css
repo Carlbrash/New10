@@ -10166,3 +10166,230 @@ h1, h2, h3, h4, h5, h6 {
     height: 50px;
   }
 }
+
+/* Admin Team Management Styles */
+.search-filter-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search-container {
+  flex: 2;
+  min-width: 300px;
+}
+
+.filter-container {
+  flex: 1;
+  min-width: 200px;
+}
+
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.bulk-selected {
+  font-weight: bold;
+  color: #ffd700;
+  font-size: 1rem;
+}
+
+.bulk-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.admin-team-card {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.admin-team-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.team-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.team-selection input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 5px;
+}
+
+.team-basic-info h4 {
+  margin: 0 0 10px 0;
+  color: #ffd700;
+  font-size: 1.3rem;
+}
+
+.team-badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.verification-badge,
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.verification-badge.verified {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.verification-badge.unverified {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.verification-badge.pending {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.status-badge.active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-badge.suspended {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-badge.disbanded {
+  background: rgba(107, 114, 128, 0.2);
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.team-details {
+  margin-bottom: 20px;
+}
+
+.team-info-row {
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.team-info-row strong {
+  color: #ffd700;
+  display: inline-block;
+  min-width: 120px;
+}
+
+.team-admin-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 15px;
+}
+
+.verification-actions,
+.status-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Admin Team Management Responsive */
+@media (max-width: 768px) {
+  .search-filter-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-container,
+  .filter-container {
+    min-width: auto;
+  }
+  
+  .bulk-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .bulk-buttons {
+    justify-content: center;
+  }
+  
+  .admin-teams-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .team-card-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .team-admin-actions {
+    flex-direction: column;
+  }
+  
+  .verification-actions,
+  .status-actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-team-card {
+    padding: 15px;
+  }
+  
+  .team-basic-info h4 {
+    font-size: 1.1rem;
+  }
+  
+  .team-badges {
+    justify-content: center;
+  }
+  
+  .team-info-row {
+    text-align: center;
+  }
+  
+  .team-info-row strong {
+    display: block;
+    min-width: auto;
+    margin-bottom: 2px;
+  }
+}
