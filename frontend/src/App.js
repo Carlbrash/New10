@@ -6696,18 +6696,29 @@ function App() {
                   
                   {/* Captain actions */}
                   {user && user.id === team.captain_id && (
-                    <motion.button 
-                      className="btn btn-secondary"
-                      onClick={() => {
-                        setSelectedTeamForInvite(team);
-                        setShowTeamInviteModal(true);
-                      }}
-                      variants={buttonVariants}
-                      whileHover="hover"
-                      whileTap="tap"
-                    >
-                      📧 Invite Player
-                    </motion.button>
+                    <>
+                      <motion.button 
+                        className="btn btn-secondary"
+                        onClick={() => {
+                          setSelectedTeamForInvite(team);
+                          setShowTeamInviteModal(true);
+                        }}
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                      >
+                        📧 Invite Player
+                      </motion.button>
+                      <motion.button 
+                        className="btn btn-primary"
+                        onClick={() => openEditTeamModal(team)}
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                      >
+                        ✏️ Edit Team
+                      </motion.button>
+                    </>
                   )}
                 </div>
               </motion.div>
