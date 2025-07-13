@@ -2146,7 +2146,7 @@ function App() {
           <motion.div className="team-details-header">
             <motion.button 
               className="btn btn-secondary"
-              onClick={() => setCurrentView('teams')}
+              onClick={() => navigateWithBreadcrumb('teams', 'Teams')}
               variants={buttonVariants}
               whileHover="hover"
               whileTap="tap"
