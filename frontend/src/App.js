@@ -649,6 +649,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
+  
+  // Dropdown Menu States
+  const [showRankingsDropdown, setShowRankingsDropdown] = useState(false);
+  const [showTournamentsDropdown, setShowTournamentsDropdown] = useState(false);
+  const [showTeamsDropdown, setShowTeamsDropdown] = useState(false);
 
   // Enhanced Loading Component
   const EnhancedLoader = ({ message = "Loading...", size = "medium" }) => (
