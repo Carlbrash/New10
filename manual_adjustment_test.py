@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class ManualAdjustmentTest(unittest.TestCase):
-    base_url = "https://9fc18cff-1249-43ae-83c1-4c2499a8c5c3.preview.emergentagent.com"
+    base_url = "https://e8b5980c-14f5-44c7-aa5e-af3ed4509932.preview.emergentagent.com"
     
     # Admin credentials
     admin_credentials = {
