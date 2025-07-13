@@ -3583,9 +3583,10 @@ function App() {
         {showTop100Rankings && (
           <div className="top-players-grid">
             {top100Loading ? (
-              <div className="loading-message">
-                <div className="loading-spinner">⏳</div>
-                <p>Loading Top 100 Players...</p>
+              <div className="list-skeleton">
+                {[...Array(10)].map((_, index) => (
+                  <ListItemSkeleton key={`rankings-skeleton-${index}`} />
+                ))}
               </div>
             ) : top100Users.length > 0 ? (
               /* Split into groups of 10 */
