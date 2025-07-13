@@ -141,6 +141,30 @@ Please test the following Team System endpoints:
 This will test the core team creation, invitation, and acceptance flow."
 
 backend:
+  - task: "Team Edit API - PUT /api/teams/{team_id}"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PUT /api/teams/{team_id} endpoint is working correctly. Successfully tested team information updates as captain with all required fields (name, city, country, phone, email, colors). The endpoint correctly validates that only team captains can update team information and properly restricts admin users and non-captain users with 403 errors. All field validations work correctly and the endpoint returns proper success responses with updated field information."
+
+  - task: "Team Logo Upload API - POST /api/teams/{team_id}/upload-logo"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "POST /api/teams/{team_id}/upload-logo endpoint is working correctly. Successfully tested base64 image upload functionality with proper format validation (data:image/ prefix required). The endpoint correctly restricts access to team captains only and properly rejects non-captain users with 403 errors. Validation scenarios work correctly - missing logo_base64 field returns 400 error, invalid image format returns 400 error, and invalid team IDs return 404 errors."
+
   - task: "Advanced Analytics Dashboard API - GET /api/admin/analytics/advanced-dashboard"
     implemented: true
     working: true
