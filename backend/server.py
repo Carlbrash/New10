@@ -369,6 +369,15 @@ class TeamCreate(BaseModel):
     phone: str
     email: str
 
+class TeamUpdate(BaseModel):
+    name: Optional[str] = None
+    logo_url: Optional[str] = None
+    colors: Optional[TeamColors] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+
 class TeamInvite(BaseModel):
     username: str
 
