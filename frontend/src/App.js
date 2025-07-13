@@ -4020,26 +4020,21 @@ function App() {
           </div>
         </div>
         
-        {tournamentLoading ? (
-          <div className="loading-container">
-            <div className="loading">Loading tournaments...</div>
-          </div>
-        ) : (
-          <div className="tournaments-grid">
-            {/* Loading Skeletons */}
-            {tournamentLoading && tournaments.length === 0 ? (
-              <>
-                {[...Array(4)].map((_, index) => (
-                  <TournamentCardSkeleton key={`tournament-skeleton-${index}`} />
-                ))}
-              </>
-            ) : tournaments.length === 0 ? (
-              <div className="no-tournaments">
-                <h3>No tournaments available</h3>
-                <p>Check back later for new tournaments!</p>
-              </div>
-            ) : (
-              tournaments.map((tournament) => (
+        <div className="tournaments-grid">
+          {/* Loading Skeletons */}
+          {tournamentLoading && tournaments.length === 0 ? (
+            <>
+              {[...Array(4)].map((_, index) => (
+                <TournamentCardSkeleton key={`tournament-skeleton-${index}`} />
+              ))}
+            </>
+          ) : tournaments.length === 0 ? (
+            <div className="no-tournaments">
+              <h3>No tournaments available</h3>
+              <p>Check back later for new tournaments!</p>
+            </div>
+          ) : (
+            tournaments.map(tournament => (
               <div key={tournament.id} className="tournament-card">
                 <div className="tournament-card-header">
                   <h3 className="tournament-name">{tournament.name}</h3>
