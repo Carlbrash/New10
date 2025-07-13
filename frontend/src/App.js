@@ -7497,6 +7497,44 @@ function App() {
           </div>
         </div>
       )}
+      
+      {/* Toast Notifications Container */}
+      <div className="toast-container">
+        {toasts.map(toast => (
+          <div 
+            key={toast.id}
+            className={`toast toast-${toast.type}`}
+            onClick={() => removeToast(toast.id)}
+          >
+            <div className="toast-content">
+              <div className="toast-icon">
+                {toast.type === 'success' && '✅'}
+                {toast.type === 'error' && '❌'}
+                {toast.type === 'warning' && '⚠️'}
+                {toast.type === 'info' && 'ℹ️'}
+              </div>
+              <div className="toast-message">{toast.message}</div>
+              <button 
+                className="toast-close"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeToast(toast.id);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="toast-progress">
+              <div 
+                className="toast-progress-bar"
+                style={{
+                  animation: `shrink ${toast.duration}ms linear forwards`
+                }}
+              ></div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
