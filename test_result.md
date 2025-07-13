@@ -141,6 +141,29 @@ Please test the following Team System endpoints:
 This will test the core team creation, invitation, and acceptance flow."
 
 backend:
+  - task: "Advanced Analytics Dashboard API - GET /api/admin/analytics/advanced-dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented advanced dashboard analytics endpoint with registration trends, tournament participation, revenue by category, geographic distribution, and performance KPIs. Includes comprehensive data aggregation and calculations."
+
+  - task: "Engagement Metrics API - GET /api/admin/analytics/engagement-metrics"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented engagement metrics endpoint with daily active users, tournament success rates, affiliate conversion funnel, financial performance indicators, and retention analytics. Includes complex calculations for user engagement tracking."
   - task: "Check referral code validation: GET /api/register/check-referral/DEMO2024"
     implemented: true
     working: true
