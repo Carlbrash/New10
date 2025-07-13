@@ -11289,3 +11289,299 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.7rem;
   }
 }
+
+/* Standings Dropdown Styles */
+.standings-dropdown {
+  min-width: 250px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.dropdown-country {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-country:last-child {
+  border-bottom: none;
+}
+
+.dropdown-country-header {
+  padding: 10px 16px;
+  background: rgba(255, 215, 0, 0.1);
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.dropdown-sub-item {
+  padding-left: 30px;
+  font-size: 0.85rem;
+}
+
+.dropdown-item-loading {
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-dots {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Standings Page Styles */
+.standings-page {
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.standings-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.standings-header h2 {
+  color: #ffd700;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.standings-header p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+}
+
+.countries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.country-card {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.country-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.country-header h3 {
+  color: #ffd700;
+  margin: 0 0 20px 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.leagues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.league-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.league-button:hover {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.3);
+  transform: translateX(5px);
+}
+
+.league-button.premier {
+  border-left: 4px solid #ffd700;
+}
+
+.league-button.league2 {
+  border-left: 4px solid #c0c0c0;
+}
+
+.league-icon {
+  font-size: 1.2rem;
+}
+
+.league-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.team-count {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+/* League Standings Table */
+.league-standings {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.standings-header h3 {
+  color: #ffd700;
+  margin: 0 0 10px 0;
+  font-size: 1.8rem;
+}
+
+.season-info {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 25px 0;
+}
+
+.standings-table {
+  overflow-x: auto;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 40px 40px 40px 40px 50px 50px 50px 60px;
+  gap: 10px;
+  padding: 12px 15px;
+  align-items: center;
+}
+
+.table-header {
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 8px;
+  font-weight: bold;
+  color: #ffd700;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.table-row {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 3px;
+  transition: all 0.2s ease;
+}
+
+.table-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.table-row.promotion {
+  border-left: 4px solid #22c55e;
+}
+
+.table-row.relegation {
+  border-left: 4px solid #ef4444;
+}
+
+.col-pos {
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.col-team {
+  text-align: left;
+}
+
+.team-name {
+  font-weight: 600;
+}
+
+.col-played,
+.col-won,
+.col-drawn,
+.col-lost,
+.col-gf,
+.col-ga,
+.col-gd,
+.col-points {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.col-points {
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.no-standings {
+  text-align: center;
+  padding: 40px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.no-standings h4 {
+  color: #ffd700;
+  margin-bottom: 10px;
+}
+
+/* Standings Responsive */
+@media (max-width: 768px) {
+  .countries-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .country-card {
+    padding: 20px;
+  }
+  
+  .league-button {
+    padding: 12px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  
+  .standings-dropdown {
+    min-width: 200px;
+  }
+  
+  .table-header,
+  .table-row {
+    grid-template-columns: 30px 1fr 30px 30px 30px 30px 35px 35px 35px 40px;
+    gap: 5px;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .league-standings {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .standings-header h2 {
+    font-size: 2rem;
+  }
+  
+  .league-button {
+    padding: 10px;
+  }
+  
+  .table-header,
+  .table-row {
+    grid-template-columns: 25px 1fr 25px 25px 25px 25px 30px 30px 30px 35px;
+    gap: 3px;
+    padding: 6px 8px;
+    font-size: 0.7rem;
+  }
+}
