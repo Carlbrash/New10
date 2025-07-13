@@ -143,27 +143,33 @@ This will test the core team creation, invitation, and acceptance flow."
 backend:
   - task: "Advanced Analytics Dashboard API - GET /api/admin/analytics/advanced-dashboard"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented advanced dashboard analytics endpoint with registration trends, tournament participation, revenue by category, geographic distribution, and performance KPIs. Includes comprehensive data aggregation and calculations."
+      - working: true
+        agent: "testing"
+        comment: "Advanced dashboard analytics endpoint is working correctly. Returns comprehensive analytics data including registration_trends (1 data points), tournament_participation (2 tournaments), revenue_by_category (5 categories), geographic_distribution (10 countries), and performance_kpis with all required metrics. All data structures are properly formatted and contain expected fields."
 
   - task: "Engagement Metrics API - GET /api/admin/analytics/engagement-metrics"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented engagement metrics endpoint with daily active users, tournament success rates, affiliate conversion funnel, financial performance indicators, and retention analytics. Includes complex calculations for user engagement tracking."
+      - working: true
+        agent: "testing"
+        comment: "Engagement metrics endpoint is working correctly. Returns comprehensive engagement analytics including daily_active_users (30 days of data), tournament_success_rates, affiliate_conversion_funnel (100% referral to active rate), financial_performance (€55 total revenue, 100% profit margin), and retention_analytics (2 current month active users). All required data structures and calculations are working properly."
   - task: "Check referral code validation: GET /api/register/check-referral/DEMO2024"
     implemented: true
     working: true
