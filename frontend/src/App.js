@@ -7546,156 +7546,189 @@ function App() {
       )}
       
       {/* Team Creation Modal */}
-      {showCreateTeamModal && (
-        <div className="modal-overlay" onClick={(e) => {
-          // Only close if clicking the overlay itself, not its children
-          if (e.target === e.currentTarget) {
-            setShowCreateTeamModal(false);
-          }
-        }}>
-          <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>🏆 Create New Team</h3>
-              <button 
-                className="modal-close"
-                onClick={() => setShowCreateTeamModal(false)}
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="modal-content">
-              <form onSubmit={(e) => { 
-                e.preventDefault(); 
-                console.log('FORM SUBMITTED - calling createTeam');
-                createTeam(); 
-              }}>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label>Team Name *</label>
-                    <input
-                      type="text"
-                      value={teamFormData.name}
-                      onChange={(e) => setTeamFormData({...teamFormData, name: e.target.value})}
-                      placeholder="Enter team name"
-                      className="form-input"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Logo URL</label>
-                    <input
-                      type="url"
-                      value={teamFormData.logo_url}
-                      onChange={(e) => setTeamFormData({...teamFormData, logo_url: e.target.value})}
-                      placeholder="https://example.com/logo.png"
-                      className="form-input"
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Primary Color *</label>
-                    <input
-                      type="color"
-                      value={teamFormData.colors.primary}
-                      onChange={(e) => setTeamFormData({
-                        ...teamFormData, 
-                        colors: {...teamFormData.colors, primary: e.target.value}
-                      })}
-                      className="form-input color-input"
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Secondary Color</label>
-                    <input
-                      type="color"
-                      value={teamFormData.colors.secondary}
-                      onChange={(e) => setTeamFormData({
-                        ...teamFormData, 
-                        colors: {...teamFormData.colors, secondary: e.target.value}
-                      })}
-                      className="form-input color-input"
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>City *</label>
-                    <input
-                      type="text"
-                      value={teamFormData.city}
-                      onChange={(e) => setTeamFormData({...teamFormData, city: e.target.value})}
-                      placeholder="Enter city"
-                      className="form-input"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Country *</label>
-                    <input
-                      type="text"
-                      value={teamFormData.country}
-                      onChange={(e) => setTeamFormData({...teamFormData, country: e.target.value})}
-                      placeholder="Enter country"
-                      className="form-input"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Phone</label>
-                    <input
-                      type="tel"
-                      value={teamFormData.phone}
-                      onChange={(e) => setTeamFormData({...teamFormData, phone: e.target.value})}
-                      placeholder="+30 123 456 7890"
-                      className="form-input"
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Email *</label>
-                    <input
-                      type="email"
-                      value={teamFormData.email}
-                      onChange={(e) => setTeamFormData({...teamFormData, email: e.target.value})}
-                      placeholder="team@example.com"
-                      className="form-input"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="modal-actions">
-                  <button 
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      console.log('CANCEL CLICKED');
-                      setShowCreateTeamModal(false);
-                    }}
+      <AnimatePresence>
+        {showCreateTeamModal && (
+          <motion.div 
+            className="modal-overlay" 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowCreateTeamModal(false);
+              }
+            }}
+          >
+            <motion.div 
+              className="modal modal-large" 
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="modal-header">
+                <h3>🏆 Create New Team</h3>
+                <motion.button 
+                  className="modal-close"
+                  onClick={() => setShowCreateTeamModal(false)}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  ✕
+                </motion.button>
+              </div>
+              
+              <div className="modal-content">
+                <form onSubmit={(e) => { 
+                  e.preventDefault(); 
+                  console.log('FORM SUBMITTED - calling createTeam');
+                  createTeam(); 
+                }}>
+                  <motion.div 
+                    className="form-grid"
+                    variants={staggerVariants}
+                    initial="hidden"
+                    animate="visible"
                   >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={teamLoading}
-                    onClick={(e) => {
-                      console.log('CREATE TEAM BUTTON CLICKED');
-                      // Let the form submit handle this
-                    }}
+                    <motion.div className="form-group" variants={itemVariants}>
+                      <label>Team Name *</label>
+                      <input
+                        type="text"
+                        value={teamFormData.name}
+                        onChange={(e) => setTeamFormData({...teamFormData, name: e.target.value})}
+                        placeholder="Enter team name"
+                        className="form-input"
+                        required
+                      />
+                    </motion.div>
+                    
+                    <motion.div className="form-group" variants={itemVariants}>
+                      <label>Logo URL</label>
+                      <input
+                        type="url"
+                        value={teamFormData.logo_url}
+                        onChange={(e) => setTeamFormData({...teamFormData, logo_url: e.target.value})}
+                        placeholder="https://example.com/logo.png"
+                        className="form-input"
+                      />
+                    </motion.div>
+                    
+                    <motion.div className="form-group" variants={itemVariants}>
+                      <label>Primary Color *</label>
+                      <input
+                        type="color"
+                        value={teamFormData.colors.primary}
+                        onChange={(e) => setTeamFormData({
+                          ...teamFormData, 
+                          colors: {...teamFormData.colors, primary: e.target.value}
+                        })}
+                        className="form-input color-input"
+                      />
+                    </motion.div>
+                    
+                    <motion.div className="form-group" variants={itemVariants}>
+                      <label>Secondary Color</label>
+                      <input
+                        type="color"
+                        value={teamFormData.colors.secondary}
+                        onChange={(e) => setTeamFormData({
+                          ...teamFormData, 
+                          colors: {...teamFormData.colors, secondary: e.target.value}
+                        })}
+                        className="form-input color-input"
+                      />
+                    </motion.div>
+                    
+                    <motion.div className="form-group" variants={itemVariants}>
+                      <label>City *</label>
+                      <input
+                        type="text"
+                        value={teamFormData.city}
+                        onChange={(e) => setTeamFormData({...teamFormData, city: e.target.value})}
+                        placeholder="Enter city"
+                        className="form-input"
+                        required
+                      />
+                    </motion.div>
+                    
+                    <motion.div className="form-group" variants={itemVariants}>
+                      <label>Country *</label>
+                      <input
+                        type="text"
+                        value={teamFormData.country}
+                        onChange={(e) => setTeamFormData({...teamFormData, country: e.target.value})}
+                        placeholder="Enter country"
+                        className="form-input"
+                        required
+                      />
+                    </motion.div>
+                    
+                    <motion.div className="form-group" variants={itemVariants}>
+                      <label>Phone</label>
+                      <input
+                        type="tel"
+                        value={teamFormData.phone}
+                        onChange={(e) => setTeamFormData({...teamFormData, phone: e.target.value})}
+                        placeholder="+30 123 456 7890"
+                        className="form-input"
+                      />
+                    </motion.div>
+                    
+                    <motion.div className="form-group" variants={itemVariants}>
+                      <label>Email *</label>
+                      <input
+                        type="email"
+                        value={teamFormData.email}
+                        onChange={(e) => setTeamFormData({...teamFormData, email: e.target.value})}
+                        placeholder="team@example.com"
+                        className="form-input"
+                        required
+                      />
+                    </motion.div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="modal-actions"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
                   >
-                    {teamLoading ? '⏳ Creating...' : '🏆 Create Team'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+                    <motion.button 
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        console.log('CANCEL CLICKED');
+                        setShowCreateTeamModal(false);
+                      }}
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button 
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={teamLoading}
+                      onClick={(e) => {
+                        console.log('CREATE TEAM BUTTON CLICKED');
+                      }}
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                    >
+                      {teamLoading ? '⏳ Creating...' : '🏆 Create Team'}
+                    </motion.button>
+                  </motion.div>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Team Invitation Modal */}
       {showTeamInviteModal && selectedTeamForInvite && (
