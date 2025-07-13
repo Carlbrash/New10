@@ -630,6 +630,8 @@ function App() {
   const [teamLoading, setTeamLoading] = useState(false);
   const [logoUpload, setLogoUpload] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
+  const [selectedTeamDetails, setSelectedTeamDetails] = useState(null);
+  const [teamInvitationStats, setTeamInvitationStats] = useState(null);
   
   // Toast Notifications System
   const [toasts, setToasts] = useState([]);
