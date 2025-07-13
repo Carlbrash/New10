@@ -8348,6 +8348,216 @@ function App() {
         )}
       </AnimatePresence>
       
+      {/* Edit Team Modal */}
+      <AnimatePresence>
+        {showEditTeamModal && selectedTeamForEdit && (
+          <motion.div 
+            className="modal-overlay" 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setShowEditTeamModal(false)}
+          >
+            <motion.div 
+              className="modal" 
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="modal-header">
+                <h3>✏️ Edit Team: {selectedTeamForEdit.name}</h3>
+                <motion.button 
+                  className="modal-close"
+                  onClick={() => setShowEditTeamModal(false)}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  ✕
+                </motion.button>
+              </div>
+              
+              <div className="modal-content">
+                <form onSubmit={(e) => { e.preventDefault(); updateTeam(); }}>
+                  <motion.div 
+                    className="form-group"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <label htmlFor="edit-team-name">Team Name *</label>
+                    <input
+                      id="edit-team-name"
+                      type="text"
+                      value={editTeamFormData.name}
+                      onChange={(e) => setEditTeamFormData({...editTeamFormData, name: e.target.value})}
+                      placeholder="Enter team name"
+                      className="form-input"
+                      required
+                    />
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="form-group"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                  >
+                    <label htmlFor="edit-team-logo">Team Logo</label>
+                    <div className="logo-upload-container">
+                      <input
+                        id="edit-team-logo"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="form-input file-input"
+                      />
+                      {logoPreview && (
+                        <div className="logo-preview">
+                          <img src={logoPreview} alt="Logo Preview" />
+                        </div>
+                      )}
+                    </div>
+                    <p className="form-help">
+                      Upload a logo for your team (max 5MB)
+                    </p>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="form-row"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <div className="form-group">
+                      <label htmlFor="edit-team-primary-color">Primary Color *</label>
+                      <input
+                        id="edit-team-primary-color"
+                        type="color"
+                        value={editTeamFormData.colors.primary}
+                        onChange={(e) => setEditTeamFormData({
+                          ...editTeamFormData, 
+                          colors: { ...editTeamFormData.colors, primary: e.target.value }
+                        })}
+                        className="form-input color-input"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="edit-team-secondary-color">Secondary Color</label>
+                      <input
+                        id="edit-team-secondary-color"
+                        type="color"
+                        value={editTeamFormData.colors.secondary}
+                        onChange={(e) => setEditTeamFormData({
+                          ...editTeamFormData, 
+                          colors: { ...editTeamFormData.colors, secondary: e.target.value }
+                        })}
+                        className="form-input color-input"
+                      />
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="form-row"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                  >
+                    <div className="form-group">
+                      <label htmlFor="edit-team-city">City *</label>
+                      <input
+                        id="edit-team-city"
+                        type="text"
+                        value={editTeamFormData.city}
+                        onChange={(e) => setEditTeamFormData({...editTeamFormData, city: e.target.value})}
+                        placeholder="Enter city"
+                        className="form-input"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="edit-team-country">Country *</label>
+                      <input
+                        id="edit-team-country"
+                        type="text"
+                        value={editTeamFormData.country}
+                        onChange={(e) => setEditTeamFormData({...editTeamFormData, country: e.target.value})}
+                        placeholder="Enter country"
+                        className="form-input"
+                        required
+                      />
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="form-row"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <div className="form-group">
+                      <label htmlFor="edit-team-phone">Phone</label>
+                      <input
+                        id="edit-team-phone"
+                        type="tel"
+                        value={editTeamFormData.phone}
+                        onChange={(e) => setEditTeamFormData({...editTeamFormData, phone: e.target.value})}
+                        placeholder="Enter phone number"
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="edit-team-email">Email *</label>
+                      <input
+                        id="edit-team-email"
+                        type="email"
+                        value={editTeamFormData.email}
+                        onChange={(e) => setEditTeamFormData({...editTeamFormData, email: e.target.value})}
+                        placeholder="Enter email address"
+                        className="form-input"
+                        required
+                      />
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="form-actions"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35 }}
+                  >
+                    <motion.button 
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowEditTeamModal(false)}
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button 
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={teamLoading || !editTeamFormData.name.trim() || !editTeamFormData.city.trim() || !editTeamFormData.country.trim() || !editTeamFormData.email.trim()}
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                    >
+                      {teamLoading ? '⏳ Updating...' : '✏️ Update Team'}
+                    </motion.button>
+                  </motion.div>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
       {/* Toast Notifications Container */}
       <div className="toast-container">
         {toasts.map(toast => (
