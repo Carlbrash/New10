@@ -1169,6 +1169,265 @@ def run_tests():
     print("=" * 50)
     runner.run(wallet_test_suite)
 
+class AdvancedAnalyticsTester(unittest.TestCase):
+    base_url = "https://9fc18cff-1249-43ae-83c1-4c2499a8c5c3.preview.emergentagent.com"
+    
+    # Admin credentials for admin endpoints
+    admin_credentials = {
+        "username": "admin",
+        "password": "Kiki1999@"
+    }
+    
+    admin_token = None
+    
+    def test_01_admin_login(self):
+        """Login as admin to get token for advanced analytics endpoints"""
+        print("\n🔍 Testing admin login for advanced analytics testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.admin_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        AdvancedAnalyticsTester.admin_token = data["token"]
+        print(f"✅ Admin login successful - Token obtained for advanced analytics testing")
+    
+    def test_02_advanced_dashboard_analytics(self):
+        """Test GET /api/admin/analytics/advanced-dashboard endpoint"""
+        print("\n🔍 Testing GET /api/admin/analytics/advanced-dashboard endpoint...")
+        
+        # Skip if admin login failed
+        if not AdvancedAnalyticsTester.admin_token:
+            self.skipTest("Admin token not available, skipping advanced dashboard analytics test")
+        
+        headers = {"Authorization": f"Bearer {AdvancedAnalyticsTester.admin_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/admin/analytics/advanced-dashboard",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get advanced dashboard analytics: {response.text}")
+        data = response.json()
+        
+        # Verify required data structure
+        self.assertIn("registration_trends", data)
+        self.assertIn("tournament_participation", data)
+        self.assertIn("revenue_by_category", data)
+        self.assertIn("geographic_distribution", data)
+        self.assertIn("performance_kpis", data)
+        
+        # Verify registration trends structure
+        registration_trends = data["registration_trends"]
+        self.assertIsInstance(registration_trends, list)
+        print(f"  Registration trends: {len(registration_trends)} data points")
+        
+        # Verify tournament participation structure
+        tournament_participation = data["tournament_participation"]
+        self.assertIsInstance(tournament_participation, list)
+        print(f"  Tournament participation: {len(tournament_participation)} tournaments")
+        
+        # Verify each tournament participation entry has required fields
+        for tp in tournament_participation:
+            self.assertIn("_id", tp)
+            self.assertIn("participants", tp)
+            self.assertIn("tournament_name", tp)
+            self.assertIn("entry_fee", tp)
+        
+        # Verify revenue by category structure
+        revenue_by_category = data["revenue_by_category"]
+        self.assertIsInstance(revenue_by_category, list)
+        print(f"  Revenue by category: {len(revenue_by_category)} categories")
+        
+        # Verify each revenue category has required fields
+        for category in revenue_by_category:
+            self.assertIn("_id", category)
+            self.assertIn("total_revenue", category)
+            self.assertIn("tournament_count", category)
+            self.assertIn("avg_participants", category)
+        
+        # Verify geographic distribution structure
+        geographic_distribution = data["geographic_distribution"]
+        self.assertIsInstance(geographic_distribution, list)
+        print(f"  Geographic distribution: {len(geographic_distribution)} countries")
+        
+        # Verify each geographic entry has required fields
+        for geo in geographic_distribution:
+            self.assertIn("_id", geo)
+            self.assertIn("user_count", geo)
+            self.assertIn("total_bets", geo)
+            self.assertIn("total_winnings", geo)
+            self.assertIn("avg_score", geo)
+        
+        # Verify performance KPIs structure
+        performance_kpis = data["performance_kpis"]
+        self.assertIsInstance(performance_kpis, dict)
+        
+        # Check required KPI fields
+        required_kpis = [
+            "total_users", "active_users_last_30_days", "user_growth_rate",
+            "total_tournaments", "active_tournaments", "tournament_completion_rate",
+            "total_revenue", "avg_revenue_per_tournament",
+            "total_affiliates", "active_affiliates", "affiliate_conversion_rate",
+            "total_commissions"
+        ]
+        
+        for kpi in required_kpis:
+            self.assertIn(kpi, performance_kpis, f"Missing KPI: {kpi}")
+        
+        print(f"  Performance KPIs:")
+        print(f"    Total Users: {performance_kpis['total_users']}")
+        print(f"    Active Users (30d): {performance_kpis['active_users_last_30_days']}")
+        print(f"    Total Tournaments: {performance_kpis['total_tournaments']}")
+        print(f"    Total Revenue: €{performance_kpis['total_revenue']}")
+        print(f"    Total Affiliates: {performance_kpis['total_affiliates']}")
+        
+        print("✅ GET /api/admin/analytics/advanced-dashboard endpoint test passed")
+    
+    def test_03_engagement_metrics(self):
+        """Test GET /api/admin/analytics/engagement-metrics endpoint"""
+        print("\n🔍 Testing GET /api/admin/analytics/engagement-metrics endpoint...")
+        
+        # Skip if admin login failed
+        if not AdvancedAnalyticsTester.admin_token:
+            self.skipTest("Admin token not available, skipping engagement metrics test")
+        
+        headers = {"Authorization": f"Bearer {AdvancedAnalyticsTester.admin_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/admin/analytics/engagement-metrics",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to get engagement metrics: {response.text}")
+        data = response.json()
+        
+        # Verify required data structure
+        self.assertIn("daily_active_users", data)
+        self.assertIn("tournament_success_rates", data)
+        self.assertIn("affiliate_conversion_funnel", data)
+        self.assertIn("financial_performance", data)
+        self.assertIn("retention_analytics", data)
+        
+        # Verify daily active users structure (last 30 days)
+        daily_active_users = data["daily_active_users"]
+        self.assertIsInstance(daily_active_users, list)
+        self.assertEqual(len(daily_active_users), 30, "Expected 30 days of daily active user data")
+        print(f"  Daily active users: {len(daily_active_users)} days of data")
+        
+        # Verify each daily entry has required fields
+        for day in daily_active_users:
+            self.assertIn("date", day)
+            self.assertIn("active_users", day)
+        
+        # Verify tournament success rates structure
+        tournament_success_rates = data["tournament_success_rates"]
+        self.assertIsInstance(tournament_success_rates, list)
+        print(f"  Tournament success rates: {len(tournament_success_rates)} tournaments")
+        
+        # Verify each tournament success rate has required fields
+        for tsr in tournament_success_rates:
+            self.assertIn("tournament_id", tsr)
+            self.assertIn("tournament_name", tsr)
+            self.assertIn("completion_rate", tsr)
+            self.assertIn("participants", tsr)
+            self.assertIn("max_participants", tsr)
+        
+        # Verify affiliate conversion funnel structure
+        affiliate_funnel = data["affiliate_conversion_funnel"]
+        self.assertIsInstance(affiliate_funnel, dict)
+        
+        required_funnel_fields = [
+            "total_referrals", "active_referrals", "referral_to_active_rate",
+            "referral_tournament_participation", "referral_to_tournament_rate"
+        ]
+        
+        for field in required_funnel_fields:
+            self.assertIn(field, affiliate_funnel, f"Missing affiliate funnel field: {field}")
+        
+        print(f"  Affiliate conversion funnel:")
+        print(f"    Total Referrals: {affiliate_funnel['total_referrals']}")
+        print(f"    Active Referrals: {affiliate_funnel['active_referrals']}")
+        print(f"    Referral to Active Rate: {affiliate_funnel['referral_to_active_rate']:.2f}%")
+        
+        # Verify financial performance structure
+        financial_performance = data["financial_performance"]
+        self.assertIsInstance(financial_performance, dict)
+        
+        required_financial_fields = [
+            "total_entry_fees", "total_prize_pools", "platform_revenue",
+            "profit_margin", "avg_tournament_revenue"
+        ]
+        
+        for field in required_financial_fields:
+            self.assertIn(field, financial_performance, f"Missing financial performance field: {field}")
+        
+        print(f"  Financial performance:")
+        print(f"    Total Entry Fees: €{financial_performance['total_entry_fees']}")
+        print(f"    Platform Revenue: €{financial_performance['platform_revenue']}")
+        print(f"    Profit Margin: {financial_performance['profit_margin']:.2f}%")
+        
+        # Verify retention analytics structure
+        retention_analytics = data["retention_analytics"]
+        self.assertIsInstance(retention_analytics, dict)
+        
+        required_retention_fields = [
+            "current_month_active", "last_month_active", "retained_users",
+            "retention_rate", "churn_rate"
+        ]
+        
+        for field in required_retention_fields:
+            self.assertIn(field, retention_analytics, f"Missing retention analytics field: {field}")
+        
+        print(f"  Retention analytics:")
+        print(f"    Current Month Active: {retention_analytics['current_month_active']}")
+        print(f"    Last Month Active: {retention_analytics['last_month_active']}")
+        print(f"    Retention Rate: {retention_analytics['retention_rate']:.2f}%")
+        print(f"    Churn Rate: {retention_analytics['churn_rate']:.2f}%")
+        
+        print("✅ GET /api/admin/analytics/engagement-metrics endpoint test passed")
+    
+    def test_04_verify_existing_analytics_endpoints(self):
+        """Verify that existing analytics endpoints still work"""
+        print("\n🔍 Testing existing analytics endpoints for compatibility...")
+        
+        # Skip if admin login failed
+        if not AdvancedAnalyticsTester.admin_token:
+            self.skipTest("Admin token not available, skipping existing analytics endpoints test")
+        
+        headers = {"Authorization": f"Bearer {AdvancedAnalyticsTester.admin_token}"}
+        
+        # Test analytics overview endpoint
+        response = requests.get(
+            f"{self.base_url}/api/admin/analytics/overview",
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200, f"Analytics overview endpoint failed: {response.text}")
+        overview_data = response.json()
+        self.assertIn("overview", overview_data)
+        print("  ✅ Analytics overview endpoint working")
+        
+        # Test analytics users endpoint
+        response = requests.get(
+            f"{self.base_url}/api/admin/analytics/users",
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200, f"Analytics users endpoint failed: {response.text}")
+        users_data = response.json()
+        self.assertIn("registration_timeline", users_data)
+        print("  ✅ Analytics users endpoint working")
+        
+        # Test analytics competitions endpoint
+        response = requests.get(
+            f"{self.base_url}/api/admin/analytics/competitions",
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200, f"Analytics competitions endpoint failed: {response.text}")
+        competitions_data = response.json()
+        self.assertIn("competition_status", competitions_data)
+        print("  ✅ Analytics competitions endpoint working")
+        
+        print("✅ Existing analytics endpoints compatibility test passed")
+
 class TournamentSystemTester(unittest.TestCase):
     base_url = "https://9fc18cff-1249-43ae-83c1-4c2499a8c5c3.preview.emergentagent.com"
     
