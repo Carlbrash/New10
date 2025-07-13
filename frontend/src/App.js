@@ -2448,6 +2448,35 @@ function App() {
     }
   };
 
+  const fetchTeamDetails = async (teamId) => {
+    setTeamLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/teams/${teamId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedTeamDetails(data);
+        
+        // If user is captain, get invitation stats
+        if (user && user.id === data.captain_id) {
+          const invitationResponse = await fetch(`${API_BASE_URL}/api/teams/my-invitations`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (invitationResponse.ok) {
+            const invitationData = await invitationResponse.json();
+            setTeamInvitationStats(invitationData);
+          }
+        }
+      } else {
+        showToast('Failed to fetch team details', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching team details:', error);
+      showToast('Failed to fetch team details', 'error');
+    } finally {
+      setTeamLoading(false);
+    }
+  };
+
   // Load teams and invitations when user logs in
   useEffect(() => {
     if (token) {
