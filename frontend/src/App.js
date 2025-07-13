@@ -5225,6 +5225,13 @@ function App() {
               🏆 Tournament Management
             </button>
             
+            <button 
+              className={`admin-tab ${adminView === 'team-management' ? 'active' : ''}`}
+              onClick={() => setAdminView('team-management')}
+            >
+              👥 Team Management
+            </button>
+            
             {/* Financial Management - only for Admin and above */}
             {(isAdmin || isGod) && (
               <button 
