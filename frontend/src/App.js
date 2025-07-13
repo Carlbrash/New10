@@ -2697,6 +2697,193 @@ function App() {
   }, [currentView]);
 
   // =============================================================================
+  // ADMIN TEAM MANAGEMENT FUNCTIONS
+  // =============================================================================
+
+  const fetchAdminTeams = async () => {
+    if (!token || !isAdmin) return;
+    
+    setAdminTeamLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdminTeams(data.teams);
+        setFilteredTeams(data.teams);
+      } else {
+        showToast('Failed to fetch admin teams', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching admin teams:', error);
+      showToast('Failed to fetch admin teams', 'error');
+    } finally {
+      setAdminTeamLoading(false);
+    }
+  };
+
+  const handleTeamSearch = (searchTerm) => {
+    setTeamSearchTerm(searchTerm);
+    filterTeams(searchTerm, teamStatusFilter);
+  };
+
+  const handleTeamStatusFilter = (status) => {
+    setTeamStatusFilter(status);
+    filterTeams(teamSearchTerm, status);
+  };
+
+  const filterTeams = (searchTerm, statusFilter) => {
+    let filtered = adminTeams;
+    
+    // Filter by search term
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(team => 
+        team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        team.captain_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        team.captain_username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        team.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        team.country.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Filter by status
+    if (statusFilter !== 'all') {
+      if (statusFilter === 'verified') {
+        filtered = filtered.filter(team => team.verification_status === 'verified');
+      } else if (statusFilter === 'unverified') {
+        filtered = filtered.filter(team => team.verification_status === 'unverified');
+      } else if (statusFilter === 'pending') {
+        filtered = filtered.filter(team => team.verification_status === 'pending');
+      } else if (statusFilter === 'suspended') {
+        filtered = filtered.filter(team => team.status === 'suspended');
+      }
+    }
+    
+    setFilteredTeams(filtered);
+  };
+
+  const updateTeamVerification = async (teamId, verification_status, admin_notes = '') => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams/${teamId}/verification`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ verification_status, admin_notes })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(data.message, 'success');
+        fetchAdminTeams(); // Refresh list
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to update verification', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating verification:', error);
+      showToast('Failed to update verification', 'error');
+    }
+  };
+
+  const updateTeamStatus = async (teamId, status, reason = '') => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams/${teamId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status, reason })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(data.message, 'success');
+        fetchAdminTeams(); // Refresh list
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to update status', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+      showToast('Failed to update status', 'error');
+    }
+  };
+
+  const deleteTeamAdmin = async (teamId, teamName) => {
+    if (!token || !isGod) return;
+    
+    if (!confirm(`Are you sure you want to permanently delete team "${teamName}"? This action cannot be undone.`)) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams/${teamId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(data.message, 'success');
+        fetchAdminTeams(); // Refresh list
+        setSelectedTeamsForBulk(selectedTeamsForBulk.filter(id => id !== teamId));
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to delete team', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting team:', error);
+      showToast('Failed to delete team', 'error');
+    }
+  };
+
+  const performBulkTeamAction = async (action, actionData = {}) => {
+    if (!token || !isAdmin || selectedTeamsForBulk.length === 0) return;
+    
+    const teamCount = selectedTeamsForBulk.length;
+    if (!confirm(`Are you sure you want to ${action} ${teamCount} selected teams?`)) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/teams/bulk-action`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          team_ids: selectedTeamsForBulk,
+          action,
+          action_data: actionData
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(`${data.message}: ${data.total_successful} successful, ${data.total_failed} failed`, 'success');
+        fetchAdminTeams(); // Refresh list
+        setSelectedTeamsForBulk([]); // Clear selection
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to perform bulk action', 'error');
+      }
+    } catch (error) {
+      console.error('Error performing bulk action:', error);
+      showToast('Failed to perform bulk action', 'error');
+    }
+  };
+
+  // =============================================================================
   // AFFILIATE SYSTEM FUNCTIONS
   // =============================================================================
   
