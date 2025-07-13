@@ -3920,6 +3920,107 @@ async def decline_invitation(invitation_id: str, user_id: str = Depends(verify_t
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error declining invitation: {str(e)}")
 
+@app.put("/api/teams/{team_id}")
+async def update_team(team_id: str, team_data: TeamUpdate, user_id: str = Depends(verify_token)):
+    """Update team information (Captain only)"""
+    try:
+        # Verify team exists and user is the captain
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        if team["captain_id"] != user_id:
+            raise HTTPException(status_code=403, detail="Only team captain can update team information")
+        
+        # Prepare update data
+        update_data = {}
+        if team_data.name is not None:
+            # Check if new name is unique (if different from current)
+            if team_data.name != team["name"]:
+                existing_team = teams_collection.find_one({"name": team_data.name})
+                if existing_team:
+                    raise HTTPException(status_code=400, detail="Team name already exists")
+            update_data["name"] = team_data.name
+        
+        if team_data.logo_url is not None:
+            update_data["logo_url"] = team_data.logo_url
+        
+        if team_data.colors is not None:
+            update_data["colors"] = team_data.colors.dict()
+        
+        if team_data.city is not None:
+            update_data["city"] = team_data.city
+        
+        if team_data.country is not None:
+            update_data["country"] = team_data.country
+        
+        if team_data.phone is not None:
+            update_data["phone"] = team_data.phone
+        
+        if team_data.email is not None:
+            update_data["email"] = team_data.email
+        
+        # Update team
+        if update_data:
+            update_data["updated_at"] = datetime.utcnow()
+            teams_collection.update_one(
+                {"id": team_id},
+                {"$set": update_data}
+            )
+        
+        return {
+            "message": "Team updated successfully",
+            "team_id": team_id,
+            "updated_fields": list(update_data.keys())
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating team: {str(e)}")
+
+@app.post("/api/teams/{team_id}/upload-logo")
+async def upload_team_logo(team_id: str, logo_data: dict, user_id: str = Depends(verify_token)):
+    """Upload team logo (Captain only)"""
+    try:
+        # Verify team exists and user is the captain
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        if team["captain_id"] != user_id:
+            raise HTTPException(status_code=403, detail="Only team captain can upload team logo")
+        
+        # Validate base64 image data
+        if "logo_base64" not in logo_data:
+            raise HTTPException(status_code=400, detail="Logo data is required")
+        
+        logo_base64 = logo_data["logo_base64"]
+        
+        # Basic validation for base64 image
+        if not logo_base64.startswith("data:image/"):
+            raise HTTPException(status_code=400, detail="Invalid image format")
+        
+        # Update team logo
+        teams_collection.update_one(
+            {"id": team_id},
+            {"$set": {
+                "logo_url": logo_base64,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        
+        return {
+            "message": "Team logo uploaded successfully",
+            "team_id": team_id,
+            "logo_url": logo_base64
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error uploading team logo: {str(e)}")
+
 # =============================================================================
 # BULK PAYOUT API ENDPOINTS
 # =============================================================================
