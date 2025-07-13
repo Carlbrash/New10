@@ -1964,6 +1964,116 @@ function App() {
     }
   }, [adminView, token, isAdmin]);
 
+  // =============================================================================
+  // UI/UX ENHANCEMENT FUNCTIONS
+  // =============================================================================
+
+  const updateBreadcrumb = (path) => {
+    setBreadcrumbPath(path);
+  };
+
+  const navigateWithBreadcrumb = (view, label, additionalParams = {}) => {
+    setCurrentView(view);
+    
+    // Update breadcrumb based on navigation
+    const newPath = [...breadcrumbPath];
+    
+    if (view === 'home') {
+      updateBreadcrumb([{ label: 'Home', view: 'home' }]);
+    } else if (view === 'teams') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Teams', view: 'teams' }
+      ]);
+    } else if (view.startsWith('team-')) {
+      const teamId = view.replace('team-', '');
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Teams', view: 'teams' },
+        { label: label || 'Team Details', view: view }
+      ]);
+    } else if (view === 'admin') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Admin Panel', view: 'admin' }
+      ]);
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStartX || !touchStartY) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const deltaX = touchStartX - touchEndX;
+    const deltaY = touchStartY - touchEndY;
+    
+    // Only process horizontal swipes
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 100) {
+      if (deltaX > 0) {
+        // Swipe left - could implement next/forward navigation
+        handleSwipeLeft();
+      } else {
+        // Swipe right - could implement back navigation
+        handleSwipeRight();
+      }
+    }
+    
+    setTouchStartX(0);
+    setTouchStartY(0);
+  };
+
+  const handleSwipeLeft = () => {
+    // Implement forward navigation logic
+    console.log('Swipe left detected');
+  };
+
+  const handleSwipeRight = () => {
+    // Implement back navigation logic
+    if (breadcrumbPath.length > 1) {
+      const previousPath = breadcrumbPath[breadcrumbPath.length - 2];
+      navigateWithBreadcrumb(previousPath.view, previousPath.label);
+    }
+  };
+
+  const toggleFloatingMenu = () => {
+    setShowFloatingMenu(!showFloatingMenu);
+  };
+
+  // Initialize breadcrumb on app load
+  useEffect(() => {
+    if (currentView === 'home') {
+      updateBreadcrumb([{ label: 'Home', view: 'home' }]);
+    }
+  }, []);
+
+  // Update breadcrumb when currentView changes
+  useEffect(() => {
+    if (currentView === 'teams') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Teams', view: 'teams' }
+      ]);
+    } else if (currentView.startsWith('team-')) {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Teams', view: 'teams' },
+        { label: 'Team Details', view: currentView }
+      ]);
+    } else if (currentView === 'admin') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Admin Panel', view: 'admin' }
+      ]);
+    }
+  }, [currentView]);
+
   // Load admin teams when switching to team management tab
   useEffect(() => {
     if (adminView === 'team-management' && token && isAdmin) {
