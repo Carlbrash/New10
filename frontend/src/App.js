@@ -2365,6 +2365,87 @@ function App() {
     }
   };
 
+  // Edit Team Functions
+  const openEditTeamModal = (team) => {
+    setSelectedTeamForEdit(team);
+    setEditTeamFormData({
+      name: team.name,
+      logo_url: team.logo_url || '',
+      colors: { primary: team.colors?.primary || '#FF0000', secondary: team.colors?.secondary || '#FFFFFF' },
+      city: team.city,
+      country: team.country,
+      phone: team.phone,
+      email: team.email
+    });
+    setLogoPreview(team.logo_url || null);
+    setShowEditTeamModal(true);
+  };
+
+  const handleLogoUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        showToast('Please select a valid image file', 'error');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Image size must be less than 5MB', 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target.result;
+        setLogoUpload(base64);
+        setLogoPreview(base64);
+        setEditTeamFormData(prev => ({ ...prev, logo_url: base64 }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const updateTeam = async () => {
+    if (!selectedTeamForEdit) return;
+    
+    if (!editTeamFormData.name || !editTeamFormData.city || !editTeamFormData.country || !editTeamFormData.email) {
+      showToast('Please fill in all required fields', 'warning');
+      return;
+    }
+    
+    setTeamLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/teams/${selectedTeamForEdit.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editTeamFormData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(data.message, 'success');
+        setShowEditTeamModal(false);
+        setSelectedTeamForEdit(null);
+        setLogoUpload(null);
+        setLogoPreview(null);
+        fetchTeams(); // Refresh teams list
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to update team', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating team:', error);
+      showToast('Failed to update team', 'error');
+    } finally {
+      setTeamLoading(false);
+    }
+  };
+
   // Load teams and invitations when user logs in
   useEffect(() => {
     if (token) {
