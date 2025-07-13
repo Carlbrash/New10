@@ -7511,7 +7511,7 @@ function App() {
                         📧 Invite Player
                       </motion.button>
                       <motion.button 
-                        className="btn btn-primary"
+                        className="btn btn-primary btn-pulse"
                         onClick={() => openEditTeamModal(team)}
                         variants={buttonVariants}
                         whileHover="hover"
