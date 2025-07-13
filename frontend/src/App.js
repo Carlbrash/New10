@@ -8349,36 +8349,126 @@ function App() {
           <span className="brand-subtitle">World Betting Rank</span>
         </div>
         <div className="navbar-menu">
+          {/* Smart Home/Dashboard Button */}
           <button 
-            className={`nav-link ${currentView === 'home' ? 'active' : ''}`}
-            onClick={() => setCurrentView('home')}
+            className={`nav-link ${(currentView === 'home' || currentView === 'dashboard') ? 'active' : ''}`}
+            onClick={() => navigateWithBreadcrumb(user ? 'dashboard' : 'home', user ? 'Dashboard' : 'Home')}
           >
-            {t.home}
+            {user ? '🏠 Dashboard' : '🏠 Home'}
           </button>
-          <button 
-            className={`nav-link ${currentView === 'rankings' ? 'active' : ''}`}
-            onClick={() => setCurrentView('rankings')}
+          
+          {/* Rankings Dropdown */}
+          <div 
+            className="nav-dropdown"
+            onMouseEnter={() => setShowRankingsDropdown(true)}
+            onMouseLeave={() => setShowRankingsDropdown(false)}
           >
-            {t.rankings}
-          </button>
-          <button 
-            className={`nav-link ${currentView === 'worldmap' ? 'active' : ''}`}
-            onClick={() => setCurrentView('worldmap')}
+            <button 
+              className={`nav-link dropdown-trigger ${(currentView === 'rankings' || currentView === 'worldmap') ? 'active' : ''}`}
+              onClick={() => navigateWithBreadcrumb('rankings', 'Rankings')}
+            >
+              🏆 Rankings <span className="dropdown-arrow">▼</span>
+            </button>
+            
+            {showRankingsDropdown && (
+              <div className="dropdown-menu">
+                <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    navigateWithBreadcrumb('rankings', 'Leaderboard');
+                    setShowRankingsDropdown(false);
+                  }}
+                >
+                  🏅 Leaderboard
+                </button>
+                <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    navigateWithBreadcrumb('worldmap', 'World Map');
+                    setShowRankingsDropdown(false);
+                  }}
+                >
+                  🌍 World Map
+                </button>
+              </div>
+            )}
+          </div>
+          
+          {/* Tournaments Dropdown */}
+          <div 
+            className="nav-dropdown"
+            onMouseEnter={() => setShowTournamentsDropdown(true)}
+            onMouseLeave={() => setShowTournamentsDropdown(false)}
           >
-            {t.worldMap}
-          </button>
-          <button 
-            className={`nav-link ${currentView === 'tournament' ? 'active' : ''}`}
-            onClick={() => setCurrentView('tournament')}
+            <button 
+              className={`nav-link dropdown-trigger ${currentView === 'tournament' ? 'active' : ''}`}
+              onClick={() => navigateWithBreadcrumb('tournament', 'Tournaments')}
+            >
+              🏆 Tournaments <span className="dropdown-arrow">▼</span>
+            </button>
+            
+            {showTournamentsDropdown && (
+              <div className="dropdown-menu">
+                <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    navigateWithBreadcrumb('tournament', 'Active Tournaments');
+                    setShowTournamentsDropdown(false);
+                  }}
+                >
+                  🎯 Active Tournaments
+                </button>
+                <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    navigateWithBreadcrumb('tournament', 'Tournament Schedule');
+                    setShowTournamentsDropdown(false);
+                  }}
+                >
+                  📅 Schedule
+                </button>
+              </div>
+            )}
+          </div>
+          
+          {/* Teams Dropdown */}
+          <div 
+            className="nav-dropdown"
+            onMouseEnter={() => setShowTeamsDropdown(true)}
+            onMouseLeave={() => setShowTeamsDropdown(false)}
           >
-            {t.tournament}
-          </button>
-          <button 
-            className={`nav-link ${currentView === 'teams' ? 'active' : ''}`}
-            onClick={() => setCurrentView('teams')}
-          >
-            {t.teams}
-          </button>
+            <button 
+              className={`nav-link dropdown-trigger ${(currentView === 'teams' || currentView.startsWith('team-')) ? 'active' : ''}`}
+              onClick={() => navigateWithBreadcrumb('teams', 'Teams')}
+            >
+              👥 Teams <span className="dropdown-arrow">▼</span>
+            </button>
+            
+            {showTeamsDropdown && (
+              <div className="dropdown-menu">
+                <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    navigateWithBreadcrumb('teams', 'Browse Teams');
+                    setShowTeamsDropdown(false);
+                  }}
+                >
+                  👥 Browse Teams
+                </button>
+                {user && (
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('teams', 'My Teams');
+                      setShowTeamsDropdown(false);
+                    }}
+                  >
+                    ⭐ My Teams
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
           
           {/* Affiliate menu item - only show for logged in users */}
           {user && (
