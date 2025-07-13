@@ -1038,12 +1038,10 @@ function App() {
   const fetchAnalyticsOverview = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/analytics/overview`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
-      if (response.ok) {
-        const data = await response.json();
-        setAnalyticsData(data);
-      }
+      const data = await response.json();
+      setAnalyticsData(data);
     } catch (error) {
       console.error('Error fetching analytics overview:', error);
     }
@@ -1052,12 +1050,10 @@ function App() {
   const fetchUserAnalytics = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/analytics/users`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
-      if (response.ok) {
-        const data = await response.json();
-        setUserAnalytics(data);
-      }
+      const data = await response.json();
+      setUserAnalytics(data);
     } catch (error) {
       console.error('Error fetching user analytics:', error);
     }
@@ -1066,14 +1062,42 @@ function App() {
   const fetchCompetitionAnalytics = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/analytics/competitions`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
-      if (response.ok) {
-        const data = await response.json();
-        setCompetitionAnalytics(data);
-      }
+      const data = await response.json();
+      setCompetitionAnalytics(data);
     } catch (error) {
       console.error('Error fetching competition analytics:', error);
+    }
+  };
+
+  const fetchAdvancedDashboard = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/admin/analytics/advanced-dashboard`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setAdvancedDashboard(data);
+    } catch (error) {
+      console.error('Error fetching advanced dashboard:', error);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
+  const fetchEngagementMetrics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/admin/analytics/engagement-metrics`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setEngagementMetrics(data);
+    } catch (error) {
+      console.error('Error fetching engagement metrics:', error);
+    } finally {
+      setAnalyticsLoading(false);
     }
   };
 
