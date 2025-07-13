@@ -2263,6 +2263,23 @@ function App() {
   };
 
   // Load national leagues when switching to team management tab
+  useEffect(() => {
+    if (adminView === 'team-management' && token && isAdmin) {
+      fetchAdminTeams();
+    }
+  }, [adminView, token, isAdmin]);
+
+  // Load national leagues on app start
+  useEffect(() => {
+    fetchNationalLeagues();
+  }, []);
+
+  // Load teams without league for admin
+  useEffect(() => {
+    if (adminView === 'team-management' && token && isAdmin) {
+      fetchTeamsWithoutLeague();
+    }
+  }, [adminView, token, isAdmin]);
 
   // =============================================================================
   // TOURNAMENT FUNCTIONS
