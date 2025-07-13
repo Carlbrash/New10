@@ -5959,7 +5959,14 @@ function App() {
 
         {/* Teams List */}
         <div className="teams-grid">
-          {teams.length === 0 ? (
+          {/* Show loading skeletons */}
+          {teamLoading && teams.length === 0 ? (
+            <>
+              {[...Array(6)].map((_, index) => (
+                <TeamCardSkeleton key={`skeleton-${index}`} />
+              ))}
+            </>
+          ) : teams.length === 0 ? (
             <div className="no-teams">
               <h3>No teams found</h3>
               <p>Be the first to create a team!</p>
