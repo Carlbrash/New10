@@ -2678,6 +2678,14 @@ function App() {
     }
   }, [token]);
 
+  // Fetch team details when navigating to team details view
+  useEffect(() => {
+    if (currentView.startsWith('team-')) {
+      const teamId = currentView.replace('team-', '');
+      fetchTeamDetails(teamId);
+    }
+  }, [currentView]);
+
   // =============================================================================
   // AFFILIATE SYSTEM FUNCTIONS
   // =============================================================================
