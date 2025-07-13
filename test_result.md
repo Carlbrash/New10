@@ -1114,9 +1114,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Advanced Analytics Dashboard API - GET /api/admin/analytics/advanced-dashboard"
-    - "Engagement Metrics API - GET /api/admin/analytics/engagement-metrics"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
