@@ -1,6 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+  TimeScale,
+} from 'chart.js';
+import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
+import 'chartjs-adapter-date-fns';
 import './App.css';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+  TimeScale,
+);
 import DownloadBackup from './DownloadBackup';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://9fc18cff-1249-43ae-83c1-4c2499a8c5c3.preview.emergentagent.com';
