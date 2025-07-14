@@ -9180,7 +9180,7 @@ function App() {
                 }
               }}
             >
-              📊 Βαθμολογίες <span className="dropdown-arrow">▼</span>
+              📊 Standings <span className="dropdown-arrow">▼</span>
             </button>
             
             {showStandingsDropdown && (
