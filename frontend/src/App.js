@@ -9322,10 +9322,10 @@ function App() {
                   </div>
                 ) : (
                   <>
-                    {/* Αγωνιστικές Section */}
+                    {/* Fixtures Section */}
                     <div className="dropdown-section">
                       <div className="dropdown-section-header">
-                        ⚽ Αγωνιστικές
+                        ⚽ Fixtures
                       </div>
                       {nationalLeagues.map((country) => (
                         <div key={`fixtures-${country.country}`} className="dropdown-country">
