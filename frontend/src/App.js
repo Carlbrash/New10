@@ -2308,6 +2308,62 @@ function App() {
     }
   };
 
+  // =============================================================================
+  // FIXTURES FUNCTIONS
+  // =============================================================================
+
+  const fetchLeagueFixtures = async (country, leagueType) => {
+    setFixturesLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/league-fixtures/${country}/${leagueType}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedLeagueForFixtures(data.league);
+        setLeagueFixtures(data.matchdays || []);
+        setSelectedMatchday(1);
+      } else {
+        showToast('Failed to fetch league fixtures', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching league fixtures:', error);
+      showToast('Failed to fetch league fixtures', 'error');
+    } finally {
+      setFixturesLoading(false);
+    }
+  };
+
+  const generateLeagueFixtures = async (leagueId) => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/generate-league-fixtures`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ league_id: leagueId })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(data.message, 'success');
+        // Refresh fixtures if we're viewing this league
+        if (selectedLeagueForFixtures && selectedLeagueForFixtures.id === leagueId) {
+          const country = selectedLeagueForFixtures.country;
+          const leagueType = selectedLeagueForFixtures.league_type;
+          fetchLeagueFixtures(country, leagueType);
+        }
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to generate fixtures', 'error');
+      }
+    } catch (error) {
+      console.error('Error generating fixtures:', error);
+      showToast('Failed to generate fixtures', 'error');
+    }
+  };
+
   // Load national leagues when switching to team management tab
   useEffect(() => {
     if (adminView === 'team-management' && token && isAdmin) {
