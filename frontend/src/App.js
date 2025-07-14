@@ -665,6 +665,12 @@ function App() {
   const [countrySearchTerm, setCountrySearchTerm] = useState('');
   const [showAllCountries, setShowAllCountries] = useState(false);
   
+  // Fixtures States
+  const [leagueFixtures, setLeagueFixtures] = useState([]);
+  const [selectedMatchday, setSelectedMatchday] = useState(1);
+  const [fixturesLoading, setFixturesLoading] = useState(false);
+  const [selectedLeagueForFixtures, setSelectedLeagueForFixtures] = useState(null);
+  
   // Default countries that always show
   const defaultCountries = [
     { name: "Greece", flag: "🇬🇷" },
