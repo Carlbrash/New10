@@ -427,6 +427,30 @@ class TeamStanding(BaseModel):
     points: int = 0
     position: int = 0
 
+class MatchFixture(BaseModel):
+    id: str
+    league_id: str
+    matchday: int  # 1-38 for full season
+    home_team_id: str
+    away_team_id: str
+    home_team_name: str
+    away_team_name: str
+    match_date: Optional[datetime] = None
+    home_score: Optional[int] = None
+    away_score: Optional[int] = None
+    status: str = "scheduled"  # scheduled, played, postponed
+    created_at: datetime
+    updated_at: datetime
+
+class MatchdaySchedule(BaseModel):
+    matchday: int
+    league_id: str
+    league_name: str
+    matches: List[MatchFixture]
+    total_matches: int
+    played_matches: int
+    scheduled_date: Optional[datetime] = None
+
 class InvitationStatus(str, Enum):
     PENDING = "pending"
     ACCEPTED = "accepted"
