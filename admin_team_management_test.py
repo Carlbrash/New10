@@ -3,7 +3,7 @@ import unittest
 import uuid
 
 class AdminTeamManagementTester(unittest.TestCase):
-    base_url = "https://e8b5980c-14f5-44c7-aa5e-af3ed4509932.preview.emergentagent.com"
+    base_url = "https://9984d77a-659e-4322-b6c5-5fd85692930e.preview.emergentagent.com"
     
     # Admin credentials for admin endpoints
     admin_credentials = {
