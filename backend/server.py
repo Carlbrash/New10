@@ -4760,6 +4760,201 @@ async def initialize_default_countries(admin_id: str = Depends(verify_admin_toke
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error initializing default countries: {str(e)}")
 
+@app.get("/api/league-fixtures/{country}/{league_type}")
+async def get_league_fixtures(country: str, league_type: str):
+    """Get fixtures/schedule for a specific league"""
+    try:
+        if league_type not in ["premier", "league_2"]:
+            raise HTTPException(status_code=400, detail="Invalid league type")
+        
+        # Find the league
+        league = national_leagues_collection.find_one({
+            "country": country,
+            "league_type": league_type
+        })
+        
+        if not league:
+            raise HTTPException(status_code=404, detail="League not found")
+        
+        # Get all fixtures for this league, grouped by matchday
+        fixtures = list(match_fixtures_collection.find({
+            "league_id": league["id"]
+        }).sort("matchday", 1))
+        
+        # Group fixtures by matchday
+        matchdays = {}
+        for fixture in fixtures:
+            if "_id" in fixture:
+                fixture["_id"] = str(fixture["_id"])
+            
+            matchday = fixture["matchday"]
+            if matchday not in matchdays:
+                matchdays[matchday] = {
+                    "matchday": matchday,
+                    "league_id": league["id"],
+                    "league_name": league["name"],
+                    "matches": [],
+                    "total_matches": 0,
+                    "played_matches": 0
+                }
+            
+            matchdays[matchday]["matches"].append(fixture)
+            matchdays[matchday]["total_matches"] += 1
+            if fixture["status"] == "played":
+                matchdays[matchday]["played_matches"] += 1
+        
+        # Convert to list and sort
+        matchday_list = list(matchdays.values())
+        matchday_list.sort(key=lambda x: x["matchday"])
+        
+        return {
+            "league": league,
+            "matchdays": matchday_list,
+            "total_matchdays": len(matchday_list)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching league fixtures: {str(e)}")
+
+@app.post("/api/admin/generate-league-fixtures")
+async def generate_league_fixtures(fixture_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Generate fixtures for a league using round-robin algorithm (Admin only)"""
+    try:
+        league_id = fixture_data.get("league_id")
+        if not league_id:
+            raise HTTPException(status_code=400, detail="League ID is required")
+        
+        # Find the league
+        league = national_leagues_collection.find_one({"id": league_id})
+        if not league:
+            raise HTTPException(status_code=404, detail="League not found")
+        
+        # Get teams in this league
+        team_ids = league.get("teams", [])
+        if len(team_ids) < 2:
+            raise HTTPException(status_code=400, detail="League must have at least 2 teams to generate fixtures")
+        
+        # Get team details
+        teams = []
+        for team_id in team_ids:
+            team = teams_collection.find_one({"id": team_id})
+            if team:
+                teams.append({
+                    "id": team["id"],
+                    "name": team["name"]
+                })
+        
+        if len(teams) != len(team_ids):
+            raise HTTPException(status_code=400, detail="Some teams in league were not found")
+        
+        # Clear existing fixtures for this league
+        match_fixtures_collection.delete_many({"league_id": league_id})
+        
+        # Generate round-robin fixtures
+        fixtures_generated = generate_round_robin_fixtures(teams, league_id, league["name"])
+        
+        # Insert fixtures into database
+        if fixtures_generated:
+            match_fixtures_collection.insert_many(fixtures_generated)
+        
+        # Log admin action
+        log_admin_action(
+            admin_id,
+            "Generated league fixtures",
+            f"League: {league['name']}, Teams: {len(teams)}, Fixtures: {len(fixtures_generated)}"
+        )
+        
+        return {
+            "message": f"Generated {len(fixtures_generated)} fixtures for {league['name']}",
+            "league_id": league_id,
+            "total_fixtures": len(fixtures_generated),
+            "total_matchdays": max([f["matchday"] for f in fixtures_generated]) if fixtures_generated else 0,
+            "teams_count": len(teams)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating league fixtures: {str(e)}")
+
+def generate_round_robin_fixtures(teams, league_id, league_name):
+    """Generate round-robin fixtures for teams"""
+    if len(teams) % 2 != 0:
+        # Add a "bye" team for odd number of teams
+        teams.append({"id": "bye", "name": "BYE"})
+    
+    num_teams = len(teams)
+    num_rounds = num_teams - 1
+    fixtures = []
+    
+    # First round (each team plays every other team once)
+    for round_num in range(num_rounds):
+        matchday = round_num + 1
+        
+        for i in range(num_teams // 2):
+            home_idx = i
+            away_idx = num_teams - 1 - i
+            
+            if round_num > 0:
+                # Rotate teams (except the first one which stays fixed)
+                if home_idx == 0:
+                    away_idx = (away_idx - round_num) % (num_teams - 1)
+                    if away_idx == 0:
+                        away_idx = num_teams - 1
+                else:
+                    home_idx = (home_idx - round_num) % (num_teams - 1)
+                    if home_idx == 0:
+                        home_idx = num_teams - 1
+                    away_idx = (away_idx - round_num) % (num_teams - 1)
+                    if away_idx == 0:
+                        away_idx = num_teams - 1
+            
+            home_team = teams[home_idx]
+            away_team = teams[away_idx]
+            
+            # Skip matches involving BYE team
+            if home_team["id"] != "bye" and away_team["id"] != "bye":
+                fixture = {
+                    "id": str(uuid.uuid4()),
+                    "league_id": league_id,
+                    "matchday": matchday,
+                    "home_team_id": home_team["id"],
+                    "away_team_id": away_team["id"],
+                    "home_team_name": home_team["name"],
+                    "away_team_name": away_team["name"],
+                    "match_date": None,
+                    "home_score": None,
+                    "away_score": None,
+                    "status": "scheduled",
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                fixtures.append(fixture)
+    
+    # Second round (return fixtures - away teams become home teams)
+    first_round_fixtures = fixtures.copy()
+    for fixture in first_round_fixtures:
+        return_fixture = {
+            "id": str(uuid.uuid4()),
+            "league_id": league_id,
+            "matchday": fixture["matchday"] + num_rounds,
+            "home_team_id": fixture["away_team_id"],
+            "away_team_id": fixture["home_team_id"],
+            "home_team_name": fixture["away_team_name"],
+            "away_team_name": fixture["home_team_name"],
+            "match_date": None,
+            "home_score": None,
+            "away_score": None,
+            "status": "scheduled",
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        fixtures.append(return_fixture)
+    
+    return fixtures
+
 # =============================================================================
 # BULK PAYOUT API ENDPOINTS
 # =============================================================================
