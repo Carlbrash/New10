@@ -672,7 +672,9 @@ function App() {
     { name: "Germany", flag: "🇩🇪" },
     { name: "England", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
     { name: "Spain", flag: "🇪🇸" },
-    { name: "France", flag: "🇫🇷" }
+    { name: "France", flag: "🇫🇷" },
+    { name: "Turkey", flag: "🇹🇷" },
+    { name: "Austria", flag: "🇦🇹" }
   ];
 
   // Enhanced Loading Component
