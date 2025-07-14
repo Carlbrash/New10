@@ -3884,5 +3884,20 @@ if __name__ == "__main__":
             print("TESTING RANKINGS AND SEARCH FUNCTIONALITY")
             print("=" * 50)
             runner.run(rankings_search_suite)
+        elif sys.argv[1] == "national_leagues":
+            # Run only national league system tests
+            national_leagues_suite = unittest.TestSuite()
+            national_leagues_suite.addTest(NationalLeagueSystemTester('test_01_admin_login'))
+            national_leagues_suite.addTest(NationalLeagueSystemTester('test_02_initialize_default_countries'))
+            national_leagues_suite.addTest(NationalLeagueSystemTester('test_03_get_national_leagues'))
+            national_leagues_suite.addTest(NationalLeagueSystemTester('test_04_initialize_country_leagues'))
+            national_leagues_suite.addTest(NationalLeagueSystemTester('test_05_assign_team_to_league'))
+            national_leagues_suite.addTest(NationalLeagueSystemTester('test_06_generate_league_fixtures'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING NATIONAL LEAGUE SYSTEM")
+            print("=" * 50)
+            runner.run(national_leagues_suite)
     else:
         run_tests()
