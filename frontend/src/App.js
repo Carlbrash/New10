@@ -7735,6 +7735,21 @@ function App() {
       >
         <div className="container">
           <motion.div className="fixtures-header">
+            <motion.button 
+              className="btn btn-secondary"
+              onClick={() => {
+                setSelectedLeagueForFixtures(null);
+                setLeagueFixtures([]);
+                navigateWithBreadcrumb('fixtures', 'Fixtures');
+              }}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              style={{ marginBottom: '20px' }}
+            >
+              ← Back to Countries
+            </motion.button>
+            
             <h2>📅 {selectedLeagueForFixtures.name} - Fixtures</h2>
             <p className="season-info">Season: {selectedLeagueForFixtures.season}</p>
             
