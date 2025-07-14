@@ -2311,6 +2311,101 @@ function App() {
     }
   };
 
+  const createCustomLeague = async () => {
+    if (!token || !isAdmin || !newLeagueCountry.trim()) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/initialize-country-leagues`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ country: newLeagueCountry.trim() })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(`League created for ${newLeagueCountry}!`, 'success');
+        setNewLeagueCountry(''); // Clear input
+        fetchNationalLeagues(); // Refresh leagues
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to create league', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating custom league:', error);
+      showToast('Failed to create league', 'error');
+    }
+  };
+
+  const generateAllFixtures = async () => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      let successCount = 0;
+      let errorCount = 0;
+      
+      // Get all leagues with teams
+      for (const country of nationalLeagues) {
+        if (country.premier && country.premier.teams && country.premier.teams.length >= 2) {
+          try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/generate-league-fixtures`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ league_id: country.premier.id })
+            });
+            
+            if (response.ok) {
+              successCount++;
+            } else {
+              errorCount++;
+            }
+          } catch (error) {
+            errorCount++;
+          }
+        }
+        
+        if (country.league_2 && country.league_2.teams && country.league_2.teams.length >= 2) {
+          try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/generate-league-fixtures`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ league_id: country.league_2.id })
+            });
+            
+            if (response.ok) {
+              successCount++;
+            } else {
+              errorCount++;
+            }
+          } catch (error) {
+            errorCount++;
+          }
+        }
+      }
+      
+      if (successCount > 0) {
+        showToast(`Generated fixtures for ${successCount} league(s)!`, 'success');
+      }
+      if (errorCount > 0) {
+        showToast(`Failed to generate fixtures for ${errorCount} league(s)`, 'error');
+      }
+      if (successCount === 0 && errorCount === 0) {
+        showToast('No leagues with sufficient teams found', 'info');
+      }
+    } catch (error) {
+      console.error('Error generating fixtures:', error);
+      showToast('Failed to generate fixtures', 'error');
+    }
+  };
+
   // =============================================================================
   // FIXTURES FUNCTIONS
   // =============================================================================
