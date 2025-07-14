@@ -671,6 +671,9 @@ function App() {
   const [fixturesLoading, setFixturesLoading] = useState(false);
   const [selectedLeagueForFixtures, setSelectedLeagueForFixtures] = useState(null);
   
+  // Admin League Creation States
+  const [newLeagueCountry, setNewLeagueCountry] = useState('');
+  
   // Default countries that always show
   const defaultCountries = [
     { name: "Greece", flag: "🇬🇷" },
