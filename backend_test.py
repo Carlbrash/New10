@@ -644,6 +644,320 @@ class SiteMessagesTester(unittest.TestCase):
         self.assertTrue(found, "Created message not found in GET response")
         print("✅ Site message verification test passed")
 
+class NationalLeagueSystemTester(unittest.TestCase):
+    base_url = "https://9984d77a-659e-4322-b6c5-5fd85692930e.preview.emergentagent.com"
+    
+    # Admin credentials for admin endpoints
+    admin_credentials = {
+        "username": "admin",
+        "password": "Kiki1999@"
+    }
+    
+    admin_token = None
+    test_team_id = None
+    test_league_id = None
+    
+    def test_01_admin_login(self):
+        """Login as admin to get token for National League System endpoints"""
+        print("\n🔍 Testing admin login for National League System testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.admin_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        NationalLeagueSystemTester.admin_token = data["token"]
+        print(f"✅ Admin login successful - Token obtained for National League System testing")
+    
+    def test_02_initialize_default_countries(self):
+        """Test POST /api/admin/initialize-default-countries endpoint"""
+        print("\n🔍 Testing POST /api/admin/initialize-default-countries endpoint...")
+        
+        # Skip if admin login failed
+        if not NationalLeagueSystemTester.admin_token:
+            self.skipTest("Admin token not available, skipping initialize default countries test")
+        
+        headers = {"Authorization": f"Bearer {NationalLeagueSystemTester.admin_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/admin/initialize-default-countries",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to initialize default countries: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("message", data)
+        self.assertIn("results", data)
+        self.assertIn("total_countries", data)
+        
+        # Verify expected countries were processed
+        expected_countries = ["Greece", "Italy", "Germany", "England", "Spain", "France", "Turkey", "Austria"]
+        self.assertEqual(data["total_countries"], len(expected_countries))
+        
+        results = data["results"]
+        self.assertEqual(len(results), len(expected_countries))
+        
+        # Verify each country result
+        for result in results:
+            self.assertIn("country", result)
+            self.assertIn("leagues_created", result)
+            self.assertIn(result["country"], expected_countries)
+            
+            # Each country should have created Premier and League 2 (or already existed)
+            leagues_created = result["leagues_created"]
+            print(f"  {result['country']}: {len(leagues_created)} leagues created - {leagues_created}")
+        
+        print(f"✅ Successfully initialized {data['total_countries']} default countries")
+        print("✅ POST /api/admin/initialize-default-countries endpoint test passed")
+    
+    def test_03_get_national_leagues(self):
+        """Test GET /api/national-leagues endpoint"""
+        print("\n🔍 Testing GET /api/national-leagues endpoint...")
+        
+        response = requests.get(f"{self.base_url}/api/national-leagues")
+        self.assertEqual(response.status_code, 200, f"Failed to get national leagues: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("countries", data)
+        countries = data["countries"]
+        
+        # Should have at least the 8 default countries
+        self.assertGreaterEqual(len(countries), 8, f"Expected at least 8 countries, got {len(countries)}")
+        
+        # Verify each country structure
+        expected_countries = ["Greece", "Italy", "Germany", "England", "Spain", "France", "Turkey", "Austria"]
+        found_countries = []
+        
+        for country_data in countries:
+            self.assertIn("country", country_data)
+            self.assertIn("premier", country_data)
+            self.assertIn("league_2", country_data)
+            
+            country_name = country_data["country"]
+            found_countries.append(country_name)
+            
+            # Verify league structures
+            if country_data["premier"]:
+                premier = country_data["premier"]
+                self.assertIn("id", premier)
+                self.assertIn("name", premier)
+                self.assertIn("league_type", premier)
+                self.assertEqual(premier["league_type"], "premier")
+                self.assertEqual(premier["name"], f"{country_name} Premier")
+            
+            if country_data["league_2"]:
+                league_2 = country_data["league_2"]
+                self.assertIn("id", league_2)
+                self.assertIn("name", league_2)
+                self.assertIn("league_type", league_2)
+                self.assertEqual(league_2["league_type"], "league_2")
+                self.assertEqual(league_2["name"], f"{country_name} League 2")
+            
+            print(f"  {country_name}: Premier ({'✅' if country_data['premier'] else '❌'}), League 2 ({'✅' if country_data['league_2'] else '❌'})")
+        
+        # Verify all expected countries are present
+        for expected_country in expected_countries:
+            self.assertIn(expected_country, found_countries, f"Expected country {expected_country} not found")
+        
+        print(f"✅ Found {len(countries)} countries with national leagues")
+        print("✅ GET /api/national-leagues endpoint test passed")
+    
+    def test_04_initialize_country_leagues(self):
+        """Test POST /api/admin/initialize-country-leagues endpoint"""
+        print("\n🔍 Testing POST /api/admin/initialize-country-leagues endpoint...")
+        
+        # Skip if admin login failed
+        if not NationalLeagueSystemTester.admin_token:
+            self.skipTest("Admin token not available, skipping initialize country leagues test")
+        
+        # Test with a specific country (e.g., Greece)
+        test_country = "Greece"
+        country_data = {"country": test_country}
+        
+        headers = {"Authorization": f"Bearer {NationalLeagueSystemTester.admin_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/admin/initialize-country-leagues",
+            headers=headers,
+            json=country_data
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to initialize country leagues: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("message", data)
+        self.assertIn("leagues_created", data)
+        self.assertIn("country", data)
+        
+        self.assertEqual(data["country"], test_country)
+        
+        # Since leagues should already exist from previous test, leagues_created should be empty
+        leagues_created = data["leagues_created"]
+        print(f"  {test_country}: {len(leagues_created)} new leagues created - {leagues_created}")
+        
+        # This should not create new leagues since they already exist
+        if len(leagues_created) == 0:
+            print("  ✅ Correctly detected existing leagues and didn't duplicate them")
+        else:
+            print(f"  ⚠️ Created {len(leagues_created)} leagues (may be expected if leagues didn't exist)")
+        
+        print("✅ POST /api/admin/initialize-country-leagues endpoint test passed")
+    
+    def test_05_assign_team_to_league(self):
+        """Test POST /api/admin/assign-team-to-league endpoint"""
+        print("\n🔍 Testing POST /api/admin/assign-team-to-league endpoint...")
+        
+        # Skip if admin login failed
+        if not NationalLeagueSystemTester.admin_token:
+            self.skipTest("Admin token not available, skipping assign team to league test")
+        
+        # First, get available teams
+        headers = {"Authorization": f"Bearer {NationalLeagueSystemTester.admin_token}"}
+        response = requests.get(f"{self.base_url}/api/admin/teams", headers=headers)
+        
+        if response.status_code != 200:
+            print("  ⚠️ Could not get teams list, skipping team assignment test")
+            return
+        
+        teams_data = response.json()
+        teams = teams_data.get("teams", [])
+        
+        if not teams:
+            print("  ⚠️ No teams available for assignment, skipping test")
+            return
+        
+        # Find a team from Greece for testing
+        greek_team = None
+        for team in teams:
+            if team.get("country", "").lower() == "greece":
+                greek_team = team
+                break
+        
+        if not greek_team:
+            print("  ⚠️ No Greek teams available for assignment, using first available team")
+            greek_team = teams[0]
+        
+        NationalLeagueSystemTester.test_team_id = greek_team["id"]
+        team_country = greek_team.get("country", "Greece")
+        
+        # Assign team to Premier league
+        assignment_data = {
+            "team_id": NationalLeagueSystemTester.test_team_id,
+            "country": team_country,
+            "league_type": "premier"
+        }
+        
+        response = requests.post(
+            f"{self.base_url}/api/admin/assign-team-to-league",
+            headers=headers,
+            json=assignment_data
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Failed to assign team to league: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("message", data)
+        self.assertIn("team_id", data)
+        self.assertIn("league_name", data)
+        self.assertIn("league_id", data)
+        
+        self.assertEqual(data["team_id"], NationalLeagueSystemTester.test_team_id)
+        NationalLeagueSystemTester.test_league_id = data["league_id"]
+        
+        print(f"  ✅ Successfully assigned team '{greek_team['name']}' to {data['league_name']}")
+        print(f"  League ID: {data['league_id']}")
+        
+        print("✅ POST /api/admin/assign-team-to-league endpoint test passed")
+    
+    def test_06_generate_league_fixtures(self):
+        """Test POST /api/admin/generate-league-fixtures endpoint"""
+        print("\n🔍 Testing POST /api/admin/generate-league-fixtures endpoint...")
+        
+        # Skip if admin login failed or no test league
+        if not NationalLeagueSystemTester.admin_token or not NationalLeagueSystemTester.test_league_id:
+            self.skipTest("Admin token or test league not available, skipping fixture generation test")
+        
+        # First, we need to ensure the league has at least 2 teams
+        # Let's try to assign another team to the same league
+        headers = {"Authorization": f"Bearer {NationalLeagueSystemTester.admin_token}"}
+        response = requests.get(f"{self.base_url}/api/admin/teams", headers=headers)
+        
+        if response.status_code == 200:
+            teams_data = response.json()
+            teams = teams_data.get("teams", [])
+            
+            # Find another team to assign (different from the first one)
+            second_team = None
+            for team in teams:
+                if team["id"] != NationalLeagueSystemTester.test_team_id and team.get("country", "").lower() == "greece":
+                    second_team = team
+                    break
+            
+            if second_team:
+                # Assign second team to the same league
+                assignment_data = {
+                    "team_id": second_team["id"],
+                    "country": "Greece",
+                    "league_type": "premier"
+                }
+                
+                response = requests.post(
+                    f"{self.base_url}/api/admin/assign-team-to-league",
+                    headers=headers,
+                    json=assignment_data
+                )
+                
+                if response.status_code == 200:
+                    print(f"  ✅ Successfully assigned second team '{second_team['name']}' to league")
+                else:
+                    print(f"  ⚠️ Could not assign second team: {response.text}")
+        
+        # Now try to generate fixtures
+        fixture_data = {"league_id": NationalLeagueSystemTester.test_league_id}
+        
+        response = requests.post(
+            f"{self.base_url}/api/admin/generate-league-fixtures",
+            headers=headers,
+            json=fixture_data
+        )
+        
+        print(f"  Generate fixtures response: {response.status_code}")
+        print(f"  Response text: {response.text}")
+        
+        if response.status_code == 400 and "at least 2 teams" in response.text:
+            print("  ⚠️ League doesn't have enough teams for fixture generation (expected behavior)")
+            print("  This is correct validation - leagues need at least 2 teams to generate fixtures")
+            return
+        
+        self.assertEqual(response.status_code, 200, f"Failed to generate league fixtures: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("message", data)
+        self.assertIn("league_id", data)
+        self.assertIn("total_fixtures", data)
+        self.assertIn("total_matchdays", data)
+        self.assertIn("teams_count", data)
+        
+        self.assertEqual(data["league_id"], NationalLeagueSystemTester.test_league_id)
+        
+        print(f"  ✅ Successfully generated {data['total_fixtures']} fixtures")
+        print(f"  Total matchdays: {data['total_matchdays']}")
+        print(f"  Teams in league: {data['teams_count']}")
+        
+        # Verify fixtures were actually created by checking the fixtures endpoint
+        response = requests.get(f"{self.base_url}/api/league-fixtures/Greece/premier")
+        if response.status_code == 200:
+            fixtures_data = response.json()
+            matchdays = fixtures_data.get("matchdays", [])
+            print(f"  ✅ Verified: {len(matchdays)} matchdays created with fixtures")
+        
+        print("✅ POST /api/admin/generate-league-fixtures endpoint test passed")
+
 def run_tests():
     """Run all tests in order"""
     # Allow running specific test groups via command line
