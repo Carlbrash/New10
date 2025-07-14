@@ -662,6 +662,18 @@ function App() {
   const [leagueStandings, setLeagueStandings] = useState([]);
   const [teamsWithoutLeague, setTeamsWithoutLeague] = useState([]);
   const [standingsLoading, setStandingsLoading] = useState(false);
+  const [countrySearchTerm, setCountrySearchTerm] = useState('');
+  const [showAllCountries, setShowAllCountries] = useState(false);
+  
+  // Default countries that always show
+  const defaultCountries = [
+    { name: "Greece", flag: "🇬🇷" },
+    { name: "Italy", flag: "🇮🇹" },
+    { name: "Germany", flag: "🇩🇪" },
+    { name: "England", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
+    { name: "Spain", flag: "🇪🇸" },
+    { name: "France", flag: "🇫🇷" }
+  ];
 
   // Enhanced Loading Component
   const EnhancedLoader = ({ message = "Loading...", size = "medium" }) => (
