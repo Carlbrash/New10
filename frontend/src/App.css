@@ -11533,6 +11533,115 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 10px;
 }
 
+.admin-hint {
+  color: #ffd700;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* Standings Controls */
+.standings-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-container {
+  flex: 1;
+  max-width: 400px;
+}
+
+/* League Placeholder Styles */
+.league-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+}
+
+.league-placeholder.premier {
+  border-left: 4px dashed #ffd700;
+}
+
+.league-placeholder.league2 {
+  border-left: 4px dashed #c0c0c0;
+}
+
+.create-league-btn {
+  background: rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: #ffd700;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-league-btn:hover {
+  background: rgba(255, 215, 0, 0.3);
+  border-color: rgba(255, 215, 0, 0.6);
+}
+
+/* No Data Messages */
+.no-data-message,
+.no-search-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.no-data-message h3,
+.no-search-results h4 {
+  color: #ffd700;
+  margin-bottom: 15px;
+}
+
+.no-data-message p,
+.no-search-results p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 20px;
+}
+
+/* Enhanced Country Cards */
+.country-card {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.country-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.leagues-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+}
+
 /* Standings Responsive */
 @media (max-width: 768px) {
   .countries-grid {
