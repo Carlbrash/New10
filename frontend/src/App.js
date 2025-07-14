@@ -7586,6 +7586,19 @@ function App() {
   // =============================================================================
 
   const renderFixtures = () => {
+    // Create display countries - merge default with fetched leagues (same as standings)
+    const displayCountries = defaultCountries.slice(0, 4).map(defaultCountry => {
+      const existingLeague = nationalLeagues.find(league => 
+        league.country.toLowerCase() === defaultCountry.name.toLowerCase()
+      );
+      return existingLeague || {
+        country: defaultCountry.name,
+        flag: defaultCountry.flag,
+        premier: null,
+        league_2: null
+      };
+    });
+
     if (!selectedLeagueForFixtures) {
       return (
         <motion.div 
@@ -7597,10 +7610,113 @@ function App() {
           transition={pageTransition}
         >
           <div className="container">
-            <div className="fixtures-header">
+            <motion.div className="fixtures-header">
               <h2>📅 League Fixtures</h2>
-              <p>Select a league from the menu to view fixtures</p>
-            </div>
+              <p>Select a country and league to view fixtures</p>
+              
+              {/* Admin Initialize Button */}
+              {isAdmin && nationalLeagues.length === 0 && (
+                <motion.button 
+                  className="btn btn-primary btn-pulse"
+                  onClick={initializeDefaultCountries}
+                  style={{ marginTop: '20px' }}
+                >
+                  🚀 Initialize Default Countries
+                </motion.button>
+              )}
+            </motion.div>
+
+            {/* Country Selection for Fixtures */}
+            <motion.div className="countries-grid">
+              {displayCountries.length === 0 && nationalLeagues.length === 0 ? (
+                <div className="no-data-message">
+                  <h3>🏗️ Setting up leagues...</h3>
+                  <p>Fixture schedules will appear here once leagues are initialized.</p>
+                  {isAdmin && (
+                    <button 
+                      className="btn btn-primary"
+                      onClick={initializeDefaultCountries}
+                    >
+                      🚀 Initialize Default Countries
+                    </button>
+                  )}
+                </div>
+              ) : (
+                displayCountries.map((country, index) => (
+                  <motion.div 
+                    key={country.country} 
+                    className="country-card"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <div className="country-header">
+                      <h3>{country.flag || '🏴'} {country.country}</h3>
+                    </div>
+                    
+                    <div className="leagues-list">
+                      {country.premier ? (
+                        <motion.button 
+                          className="league-button premier"
+                          onClick={() => {
+                            fetchLeagueFixtures(country.country, 'premier');
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <span className="league-icon">📅</span>
+                          <span className="league-name">{country.country} Premier</span>
+                          <span className="team-count">Fixtures</span>
+                        </motion.button>
+                      ) : (
+                        <div className="league-placeholder premier">
+                          <span className="league-icon">📅</span>
+                          <span className="league-name">{country.country} Premier</span>
+                          <span className="team-count">Not created</span>
+                          {isAdmin && (
+                            <button 
+                              className="create-league-btn"
+                              onClick={() => initializeCountryLeagues(country.country)}
+                            >
+                              Create
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      
+                      {country.league_2 ? (
+                        <motion.button 
+                          className="league-button league2"
+                          onClick={() => {
+                            fetchLeagueFixtures(country.country, 'league_2');
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <span className="league-icon">📅</span>
+                          <span className="league-name">{country.country} League 2</span>
+                          <span className="team-count">Fixtures</span>
+                        </motion.button>
+                      ) : (
+                        <div className="league-placeholder league2">
+                          <span className="league-icon">📅</span>
+                          <span className="league-name">{country.country} League 2</span>
+                          <span className="team-count">Not created</span>
+                          {isAdmin && (
+                            <button 
+                              className="create-league-btn"
+                              onClick={() => initializeCountryLeagues(country.country)}
+                            >
+                              Create
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </motion.div>
           </div>
         </motion.div>
       );
