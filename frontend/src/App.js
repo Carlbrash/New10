@@ -7522,6 +7522,29 @@ function App() {
   // =============================================================================
 
   const renderStandings = () => {
+    // Create display countries - merge default with fetched leagues
+    const displayCountries = defaultCountries.map(defaultCountry => {
+      const existingLeague = nationalLeagues.find(league => 
+        league.country.toLowerCase() === defaultCountry.name.toLowerCase()
+      );
+      return existingLeague || {
+        country: defaultCountry.name,
+        flag: defaultCountry.flag,
+        premier: null,
+        league_2: null
+      };
+    });
+
+    // Add other countries if showing all and searching
+    const filteredOtherCountries = nationalLeagues.filter(league => 
+      !defaultCountries.some(def => def.name.toLowerCase() === league.country.toLowerCase()) &&
+      (!countrySearchTerm || league.country.toLowerCase().includes(countrySearchTerm.toLowerCase()))
+    );
+
+    if (showAllCountries) {
+      displayCountries.push(...filteredOtherCountries);
+    }
+
     return (
       <motion.div 
         className="standings-page"
@@ -7535,14 +7558,61 @@ function App() {
           <motion.div className="standings-header">
             <h2>📊 National League Standings</h2>
             <p>Select a country and league to view standings</p>
+            
+            {/* Admin Initialize Button */}
+            {isAdmin && nationalLeagues.length === 0 && (
+              <motion.button 
+                className="btn btn-primary btn-pulse"
+                onClick={initializeDefaultCountries}
+                style={{ marginTop: '20px' }}
+              >
+                🚀 Initialize Default Countries
+              </motion.button>
+            )}
+          </motion.div>
+
+          {/* Search and Filter Controls */}
+          <motion.div className="standings-controls">
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="🔍 Search for a country..."
+                value={countrySearchTerm}
+                onChange={(e) => setCountrySearchTerm(e.target.value)}
+                className="form-input"
+              />
+            </div>
+            
+            <button 
+              className={`btn ${showAllCountries ? 'btn-secondary' : 'btn-outline'}`}
+              onClick={() => setShowAllCountries(!showAllCountries)}
+            >
+              {showAllCountries ? '📋 Show Main Countries' : '🌍 Show All Countries'}
+            </button>
           </motion.div>
 
           {/* Country Selection Grid */}
           <motion.div className="countries-grid">
-            {nationalLeagues.length === 0 ? (
-              <EnhancedLoader message="Loading countries..." size="medium" />
+            {displayCountries.length === 0 && nationalLeagues.length === 0 ? (
+              <div className="no-data-message">
+                <h3>🏗️ Setting up leagues...</h3>
+                <p>National leagues will appear here once they are initialized.</p>
+                {isAdmin && (
+                  <button 
+                    className="btn btn-primary"
+                    onClick={initializeDefaultCountries}
+                  >
+                    🚀 Initialize Default Countries
+                  </button>
+                )}
+              </div>
+            ) : displayCountries.length === 0 ? (
+              <div className="no-search-results">
+                <h4>🔍 No countries found</h4>
+                <p>Try a different search term.</p>
+              </div>
             ) : (
-              nationalLeagues.map((country, index) => (
+              displayCountries.map((country, index) => (
                 <motion.div 
                   key={country.country} 
                   className="country-card"
@@ -7551,11 +7621,11 @@ function App() {
                   transition={{ delay: index * 0.1 }}
                 >
                   <div className="country-header">
-                    <h3>🏴 {country.country}</h3>
+                    <h3>{country.flag || '🏴'} {country.country}</h3>
                   </div>
                   
                   <div className="leagues-list">
-                    {country.premier && (
+                    {country.premier ? (
                       <motion.button 
                         className="league-button premier"
                         onClick={() => {
@@ -7568,9 +7638,23 @@ function App() {
                         <span className="league-name">{country.country} Premier</span>
                         <span className="team-count">{country.premier.teams?.length || 0} teams</span>
                       </motion.button>
+                    ) : (
+                      <div className="league-placeholder premier">
+                        <span className="league-icon">🥇</span>
+                        <span className="league-name">{country.country} Premier</span>
+                        <span className="team-count">Not created</span>
+                        {isAdmin && (
+                          <button 
+                            className="create-league-btn"
+                            onClick={() => initializeCountryLeagues(country.country)}
+                          >
+                            Create
+                          </button>
+                        )}
+                      </div>
                     )}
                     
-                    {country.league_2 && (
+                    {country.league_2 ? (
                       <motion.button 
                         className="league-button league2"
                         onClick={() => {
@@ -7583,6 +7667,20 @@ function App() {
                         <span className="league-name">{country.country} League 2</span>
                         <span className="team-count">{country.league_2.teams?.length || 0} teams</span>
                       </motion.button>
+                    ) : (
+                      <div className="league-placeholder league2">
+                        <span className="league-icon">🥈</span>
+                        <span className="league-name">{country.country} League 2</span>
+                        <span className="team-count">Not created</span>
+                        {isAdmin && (
+                          <button 
+                            className="create-league-btn"
+                            onClick={() => initializeCountryLeagues(country.country)}
+                          >
+                            Create
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </motion.div>
@@ -7609,6 +7707,9 @@ function App() {
                 <div className="no-standings">
                   <h4>No teams in this league yet</h4>
                   <p>Teams will appear here once they are assigned by administrators.</p>
+                  {isAdmin && (
+                    <p className="admin-hint">💡 Go to Admin Panel → Team Management to assign teams to leagues</p>
+                  )}
                 </div>
               ) : (
                 <div className="standings-table">
