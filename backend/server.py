@@ -73,6 +73,7 @@ team_invitations_collection = db.team_invitations
 national_leagues_collection = db.national_leagues
 team_standings_collection = db.team_standings
 league_assignments_collection = db.league_assignments
+match_fixtures_collection = db.match_fixtures
 team_applications_collection = db.team_applications
 
 app = FastAPI(title="WoBeRa - World Betting Rank API", default_response_class=CustomJSONResponse)
