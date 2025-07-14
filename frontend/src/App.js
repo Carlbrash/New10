@@ -7989,6 +7989,66 @@ function App() {
             </button>
           </motion.div>
 
+          {/* Admin Panel for Creating New Leagues */}
+          {isAdmin && (
+            <motion.div 
+              className="admin-league-panel"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="admin-panel-header">
+                <h3>🔧 Admin: League Management</h3>
+                <p>Create and manage national leagues</p>
+              </div>
+              
+              <div className="admin-actions-grid">
+                <div className="admin-action-card">
+                  <h4>🚀 Quick Setup</h4>
+                  <p>Initialize all 8 default countries</p>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={initializeDefaultCountries}
+                  >
+                    Initialize Default Countries
+                  </button>
+                </div>
+                
+                <div className="admin-action-card">
+                  <h4>➕ Create New League</h4>
+                  <p>Create a custom league for any country</p>
+                  <div className="create-league-form">
+                    <input
+                      type="text"
+                      placeholder="Enter country name (e.g., Brazil)"
+                      value={newLeagueCountry}
+                      onChange={(e) => setNewLeagueCountry(e.target.value)}
+                      className="form-input"
+                    />
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={createCustomLeague}
+                      disabled={!newLeagueCountry.trim()}
+                    >
+                      Create League
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="admin-action-card">
+                  <h4>⚽ Auto-Generate Fixtures</h4>
+                  <p>Generate fixtures for leagues with teams</p>
+                  <button 
+                    className="btn btn-accent"
+                    onClick={generateAllFixtures}
+                  >
+                    Generate All Fixtures
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Country Selection Grid */}
           <motion.div className="countries-grid">
             {displayCountries.length === 0 && nationalLeagues.length === 0 ? (
