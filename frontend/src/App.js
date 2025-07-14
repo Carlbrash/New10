@@ -7582,6 +7582,209 @@ function App() {
   };
 
   // =============================================================================
+  // FIXTURES RENDER FUNCTION
+  // =============================================================================
+
+  const renderFixtures = () => {
+    if (!selectedLeagueForFixtures) {
+      return (
+        <motion.div 
+          className="fixtures-page"
+          initial="initial"
+          animate="in"
+          exit="out"
+          variants={pageVariants}
+          transition={pageTransition}
+        >
+          <div className="container">
+            <div className="fixtures-header">
+              <h2>📅 League Fixtures</h2>
+              <p>Select a league from the menu to view fixtures</p>
+            </div>
+          </div>
+        </motion.div>
+      );
+    }
+
+    const currentMatchday = leagueFixtures.find(md => md.matchday === selectedMatchday);
+
+    return (
+      <motion.div 
+        className="fixtures-page"
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+        transition={pageTransition}
+      >
+        <div className="container">
+          <motion.div className="fixtures-header">
+            <h2>📅 {selectedLeagueForFixtures.name} - Fixtures</h2>
+            <p className="season-info">Season: {selectedLeagueForFixtures.season}</p>
+            
+            {/* Admin Generate Fixtures Button */}
+            {isAdmin && leagueFixtures.length === 0 && (
+              <motion.button 
+                className="btn btn-primary btn-pulse"
+                onClick={() => generateLeagueFixtures(selectedLeagueForFixtures.id)}
+                style={{ marginTop: '20px' }}
+              >
+                🔄 Generate Fixtures
+              </motion.button>
+            )}
+          </motion.div>
+
+          {fixturesLoading ? (
+            <EnhancedLoader message="Loading fixtures..." size="medium" />
+          ) : leagueFixtures.length === 0 ? (
+            <div className="no-fixtures">
+              <h3>📋 No fixtures generated yet</h3>
+              <p>Fixtures will appear here once they are generated for this league.</p>
+              {isAdmin && (
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => generateLeagueFixtures(selectedLeagueForFixtures.id)}
+                >
+                  🔄 Generate Fixtures
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* Matchday Navigation */}
+              <motion.div className="matchday-navigation">
+                <div className="matchday-selector">
+                  <button 
+                    className="nav-btn"
+                    onClick={() => setSelectedMatchday(Math.max(1, selectedMatchday - 1))}
+                    disabled={selectedMatchday === 1}
+                  >
+                    ⬅️ Previous
+                  </button>
+                  
+                  <select 
+                    value={selectedMatchday}
+                    onChange={(e) => setSelectedMatchday(parseInt(e.target.value))}
+                    className="matchday-select"
+                  >
+                    {leagueFixtures.map(md => (
+                      <option key={md.matchday} value={md.matchday}>
+                        {md.matchday}η Αγωνιστική
+                      </option>
+                    ))}
+                  </select>
+                  
+                  <button 
+                    className="nav-btn"
+                    onClick={() => setSelectedMatchday(Math.min(leagueFixtures.length, selectedMatchday + 1))}
+                    disabled={selectedMatchday === leagueFixtures.length}
+                  >
+                    Next ➡️
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Current Matchday Fixtures */}
+              {currentMatchday && (
+                <motion.div 
+                  className="matchday-fixtures"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <div className="matchday-header">
+                    <h3>{currentMatchday.matchday}η Αγωνιστική</h3>
+                    <div className="matchday-stats">
+                      <span className="stat">
+                        📊 {currentMatchday.played_matches}/{currentMatchday.total_matches} Played
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="fixtures-grid">
+                    {currentMatchday.matches.map((match, index) => (
+                      <motion.div 
+                        key={match.id}
+                        className={`fixture-card ${match.status}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <div className="match-teams">
+                          <div className="home-team">
+                            <span className="team-name">{match.home_team_name}</span>
+                            <span className="home-indicator">🏠</span>
+                          </div>
+                          
+                          <div className="match-score">
+                            {match.status === 'played' ? (
+                              <div className="score">
+                                {match.home_score} - {match.away_score}
+                              </div>
+                            ) : (
+                              <div className="vs">VS</div>
+                            )}
+                          </div>
+                          
+                          <div className="away-team">
+                            <span className="away-indicator">✈️</span>
+                            <span className="team-name">{match.away_team_name}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="match-info">
+                          <span className={`match-status ${match.status}`}>
+                            {match.status === 'scheduled' && '⏳ Scheduled'}
+                            {match.status === 'played' && '✅ Played'}
+                            {match.status === 'postponed' && '⏸️ Postponed'}
+                          </span>
+                          {match.match_date && (
+                            <span className="match-date">
+                              📅 {new Date(match.match_date).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Full Season Overview */}
+              <motion.div 
+                className="season-overview"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <h3>📊 Season Overview</h3>
+                <div className="overview-stats">
+                  <div className="stat-card">
+                    <span className="stat-number">{leagueFixtures.length}</span>
+                    <span className="stat-label">Total Matchdays</span>
+                  </div>
+                  <div className="stat-card">
+                    <span className="stat-number">
+                      {leagueFixtures.reduce((total, md) => total + md.total_matches, 0)}
+                    </span>
+                    <span className="stat-label">Total Matches</span>
+                  </div>
+                  <div className="stat-card">
+                    <span className="stat-number">
+                      {leagueFixtures.reduce((total, md) => total + md.played_matches, 0)}
+                    </span>
+                    <span className="stat-label">Matches Played</span>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
+
+  // =============================================================================
   // STANDINGS RENDER FUNCTION
   // =============================================================================
 
