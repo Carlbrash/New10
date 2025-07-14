@@ -4659,7 +4659,7 @@ async def initialize_country_leagues(country_data: dict, admin_id: str = Depends
 async def initialize_default_countries(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
     """Initialize the 6 default countries with their leagues (Admin only)"""
     try:
-        default_countries = ["Greece", "Italy", "Germany", "England", "Spain", "France"]
+        default_countries = ["Greece", "Italy", "Germany", "England", "Spain", "France", "Turkey", "Austria"]
         results = []
         
         for country in default_countries:
