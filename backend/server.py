@@ -4655,6 +4655,86 @@ async def initialize_country_leagues(country_data: dict, admin_id: str = Depends
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error initializing country leagues: {str(e)}")
 
+@app.post("/api/admin/initialize-default-countries")
+async def initialize_default_countries(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Initialize the 6 default countries with their leagues (Admin only)"""
+    try:
+        default_countries = ["Greece", "Italy", "Germany", "England", "Spain", "France"]
+        results = []
+        
+        for country in default_countries:
+            leagues_created = []
+            
+            # Create Premier League
+            premier_id = str(uuid.uuid4())
+            premier_league = {
+                "id": premier_id,
+                "country": country,
+                "league_type": "premier",
+                "name": f"{country} Premier",
+                "season": "2024-2025",
+                "teams": [],
+                "standings": [],
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            
+            # Create League 2
+            league2_id = str(uuid.uuid4())
+            league2 = {
+                "id": league2_id,
+                "country": country,
+                "league_type": "league_2",
+                "name": f"{country} League 2",
+                "season": "2024-2025",
+                "teams": [],
+                "standings": [],
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            
+            # Check if leagues already exist
+            existing_premier = national_leagues_collection.find_one({
+                "country": country,
+                "league_type": "premier"
+            })
+            
+            existing_league2 = national_leagues_collection.find_one({
+                "country": country,
+                "league_type": "league_2"
+            })
+            
+            if not existing_premier:
+                national_leagues_collection.insert_one(premier_league)
+                leagues_created.append(f"{country} Premier")
+            
+            if not existing_league2:
+                national_leagues_collection.insert_one(league2)
+                leagues_created.append(f"{country} League 2")
+            
+            results.append({
+                "country": country,
+                "leagues_created": leagues_created
+            })
+        
+        # Log admin action
+        log_admin_action(
+            admin_id,
+            "Initialized default countries",
+            f"Countries: {', '.join(default_countries)}"
+        )
+        
+        return {
+            "message": "Default countries initialized successfully",
+            "results": results,
+            "total_countries": len(default_countries)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error initializing default countries: {str(e)}")
+
 # =============================================================================
 # BULK PAYOUT API ENDPOINTS
 # =============================================================================
