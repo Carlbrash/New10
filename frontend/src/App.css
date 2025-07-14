@@ -11446,6 +11446,31 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 12px;
 }
 
+/* Create League Button */
+.create-league-btn {
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8e53 100%);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+}
+
+.create-league-btn:hover {
+  background: linear-gradient(135deg, #ff8e53 0%, #ff6b35 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 107, 53, 0.4);
+}
+
+.create-league-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+}
+
 /* League Standings Table */
 .league-standings {
   background: rgba(0, 0, 0, 0.3);
