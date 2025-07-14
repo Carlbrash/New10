@@ -2262,6 +2262,32 @@ function App() {
     }
   };
 
+  const initializeDefaultCountries = async () => {
+    if (!token || !isAdmin) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/initialize-default-countries`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast(data.message, 'success');
+        fetchNationalLeagues(); // Refresh leagues
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to initialize default countries', 'error');
+      }
+    } catch (error) {
+      console.error('Error initializing default countries:', error);
+      showToast('Failed to initialize default countries', 'error');
+    }
+  };
+
   // Load national leagues when switching to team management tab
   useEffect(() => {
     if (adminView === 'team-management' && token && isAdmin) {
