@@ -11358,6 +11358,21 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 40px;
 }
 
+/* For exactly 8 countries, optimize layout */
+@media (min-width: 1200px) {
+  .countries-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1600px) {
+  .countries-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1400px;
+    margin: 0 auto 40px;
+  }
+}
+
 .country-card {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 15px;
