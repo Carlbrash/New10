@@ -11657,6 +11657,363 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
 }
 
+/* Dropdown Section Styles */
+.dropdown-section {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-section:last-child {
+  border-bottom: none;
+}
+
+.dropdown-section-header {
+  padding: 12px 16px;
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+  text-align: center;
+}
+
+/* Fixtures Page Styles */
+.fixtures-page {
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.fixtures-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.fixtures-header h2 {
+  color: #ffd700;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.no-fixtures {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.no-fixtures h3 {
+  color: #ffd700;
+  margin-bottom: 15px;
+}
+
+.no-fixtures p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 20px;
+}
+
+/* Matchday Navigation */
+.matchday-navigation {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.matchday-selector {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-btn {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.matchday-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  min-width: 150px;
+}
+
+/* Matchday Fixtures */
+.matchday-fixtures {
+  margin-bottom: 40px;
+}
+
+.matchday-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.matchday-header h3 {
+  color: #ffd700;
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.matchday-stats {
+  display: flex;
+  gap: 15px;
+}
+
+.matchday-stats .stat {
+  background: rgba(255, 215, 0, 0.1);
+  color: #ffd700;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+/* Fixtures Grid */
+.fixtures-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.fixture-card {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.fixture-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.fixture-card.played {
+  border-left: 4px solid #22c55e;
+}
+
+.fixture-card.scheduled {
+  border-left: 4px solid #fbbf24;
+}
+
+.fixture-card.postponed {
+  border-left: 4px solid #ef4444;
+}
+
+.match-teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.home-team,
+.away-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.away-team {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.team-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.home-indicator,
+.away-indicator {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.match-score {
+  text-align: center;
+}
+
+.score {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.vs {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 16px;
+}
+
+.match-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.match-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.match-status.scheduled {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.match-status.played {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.match-status.postponed {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.match-date {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+/* Season Overview */
+.season-overview {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.season-overview h3 {
+  color: #ffd700;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ffd700;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+/* Fixtures Responsive */
+@media (max-width: 768px) {
+  .fixtures-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .matchday-selector {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .matchday-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .fixture-card {
+    padding: 15px;
+  }
+  
+  .match-teams {
+    gap: 10px;
+  }
+  
+  .team-name {
+    font-size: 0.9rem;
+  }
+  
+  .overview-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .fixtures-page {
+    padding: 10px 0;
+  }
+  
+  .fixtures-header h2 {
+    font-size: 2rem;
+  }
+  
+  .matchday-selector {
+    padding: 12px 15px;
+  }
+  
+  .fixture-card {
+    padding: 12px;
+  }
+  
+  .score {
+    font-size: 1.2rem;
+    padding: 6px 12px;
+  }
+}
+
 /* Standings Responsive */
 @media (max-width: 768px) {
   .countries-grid {
