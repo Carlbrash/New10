@@ -4711,6 +4711,15 @@ function App() {
           >
             {t.loadDemo}
           </button>
+          <button 
+            className="btn btn-secondary"
+            onClick={() => {
+              console.log('🧪 Test login function directly');
+              handleLogin({preventDefault: () => {}});
+            }}
+          >
+            Test Login
+          </button>
         </div>
         <p className="auth-switch">
           {t.noAccount}
