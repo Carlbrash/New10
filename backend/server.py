@@ -538,6 +538,81 @@ class TransactionType(str, Enum):
     MANUAL_ADJUSTMENT = "manual_adjustment"
     BONUS = "bonus"
     PENALTY = "penalty"
+    TOURNAMENT_ENTRY = "tournament_entry"
+    TOURNAMENT_REFUND = "tournament_refund"
+    DEPOSIT = "deposit"
+    WITHDRAWAL = "withdrawal"
+
+# Payment System Enums and Models
+class PaymentStatus(str, Enum):
+    PENDING = "pending"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+    REFUNDED = "refunded"
+
+class PaymentProvider(str, Enum):
+    STRIPE = "stripe"
+    PAYPAL = "paypal"
+    COINBASE = "coinbase"
+
+class PaymentRequest(BaseModel):
+    user_id: str
+    tournament_id: str
+    amount: float
+    currency: str = "USD"
+    provider: PaymentProvider
+    return_url: Optional[str] = None
+    cancel_url: Optional[str] = None
+
+class PaymentSession(BaseModel):
+    id: str
+    user_id: str
+    tournament_id: str
+    amount: float
+    currency: str
+    provider: PaymentProvider
+    provider_session_id: str
+    status: PaymentStatus
+    checkout_url: Optional[str] = None
+    created_at: datetime
+    expires_at: Optional[datetime] = None
+    metadata: Optional[Dict] = None
+
+class PaymentRecord(BaseModel):
+    id: str
+    user_id: str
+    tournament_id: str
+    session_id: str
+    amount: float
+    currency: str
+    provider: PaymentProvider
+    provider_transaction_id: str
+    status: PaymentStatus
+    created_at: datetime
+    completed_at: Optional[datetime] = None
+    refunded_at: Optional[datetime] = None
+    metadata: Optional[Dict] = None
+
+class TournamentEntry(BaseModel):
+    id: str
+    user_id: str
+    tournament_id: str
+    payment_id: Optional[str] = None
+    entry_fee: float
+    currency: str = "USD"
+    payment_status: PaymentStatus
+    created_at: datetime
+    paid_at: Optional[datetime] = None
+
+class PayoutRequest(BaseModel):
+    user_id: str
+    amount: float
+    currency: str = "USD"
+    provider: PaymentProvider
+    payout_account: str  # Stripe account ID, PayPal email, or crypto wallet address
+    metadata: Optional[Dict] = None
 
 class WalletBalance(BaseModel):
     id: str
