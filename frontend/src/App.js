@@ -9487,17 +9487,38 @@ function App() {
       }
     };
     
+    // Start polling for messages
+    const pollMessages = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/chat/messages/${currentChatRoom}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('💬 Messages:', data.messages);
+          setChatMessages(data.messages);
+        }
+      } catch (error) {
+        console.error('Failed to fetch messages:', error);
+      }
+    };
+    
     // Initial fetch
     pollOnlineUsers();
     pollRooms();
+    pollMessages();
     
     // Set up polling intervals
     const onlineUsersInterval = setInterval(pollOnlineUsers, 5000); // Every 5 seconds
     const roomsInterval = setInterval(pollRooms, 10000); // Every 10 seconds
+    const messagesInterval = setInterval(pollMessages, 3000); // Every 3 seconds
     
     // Store intervals for cleanup
     setChatSocket({ 
-      intervals: [onlineUsersInterval, roomsInterval],
+      intervals: [onlineUsersInterval, roomsInterval, messagesInterval],
       isPolling: true
     });
   };
