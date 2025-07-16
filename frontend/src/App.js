@@ -4203,7 +4203,8 @@ function App() {
           password: '',
           country: '',
           full_name: '',
-          avatar_url: ''
+          avatar_url: '',
+          affiliate_code: ''
         });
       } else {
         const errorData = await response.json();
