@@ -162,7 +162,7 @@ class InsufficientBalanceModalTester(unittest.TestCase):
         return high_fee_tournament
 
     def test_04_attempt_join_high_fee_tournament(self):
-        """Try to join tournament with entry fee higher than balance and verify error message"""
+        """Try to join tournament with entry fee and verify insufficient balance error"""
         print("\n🔍 Attempting to join tournament with insufficient balance...")
         
         if not self.token:
@@ -172,15 +172,20 @@ class InsufficientBalanceModalTester(unittest.TestCase):
             self.test_03_find_high_entry_fee_tournament()
         
         tournament_id = self.high_fee_tournament["id"]
+        entry_fee = self.high_fee_tournament["entry_fee"]
         headers = {"Authorization": f"Bearer {self.token}"}
+        
+        print(f"  Attempting to join tournament: {self.high_fee_tournament['name']}")
+        print(f"  Entry fee: €{entry_fee}")
+        print(f"  User balance: €0.0")
         
         response = requests.post(
             f"{self.base_url}/api/tournaments/{tournament_id}/join",
             headers=headers
         )
         
-        print(f"Response status: {response.status_code}")
-        print(f"Response body: {response.text}")
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response body: {response.text}")
         
         # The response should be an error (400 or similar) with insufficient balance message
         self.assertNotEqual(response.status_code, 200, "Expected error response for insufficient balance")
@@ -191,28 +196,20 @@ class InsufficientBalanceModalTester(unittest.TestCase):
                 error_data = response.json()
                 error_message = error_data.get("detail", "").lower()
                 
+                print(f"  Error message: {error_data.get('detail', 'No detail provided')}")
+                
                 # Check for insufficient balance related error messages
-                insufficient_balance_keywords = [
-                    "insufficient balance",
-                    "insufficient funds", 
-                    "not enough balance",
-                    "balance too low",
-                    "cannot afford"
-                ]
+                balance_keywords = ["insufficient", "balance", "€", "funds", "money", "payment"]
+                found_keywords = [keyword for keyword in balance_keywords if keyword in error_message]
                 
-                found_insufficient_balance_error = any(keyword in error_message for keyword in insufficient_balance_keywords)
+                print(f"  Found balance-related keywords: {found_keywords}")
                 
-                if found_insufficient_balance_error:
-                    print(f"✅ Correct 'Insufficient balance' error returned: {error_data.get('detail')}")
-                    print("✅ Backend correctly validates wallet balance before tournament join")
-                else:
-                    print(f"⚠️ Error returned but not insufficient balance related: {error_data.get('detail')}")
-                    # This might be due to tournament status or other validation
-                    if "not open" in error_message or "registration" in error_message:
-                        print("   This appears to be a tournament status error, not balance error")
-                        print("   Need to find an open tournament for proper testing")
-                    else:
-                        print("   Unexpected error message format")
+                # Verify that the error message contains balance-related keywords
+                self.assertTrue(len(found_keywords) > 0, 
+                              f"Expected error message to contain balance-related keywords like 'insufficient', 'balance', or '€'. Got: {error_message}")
+                
+                print("  ✅ Insufficient balance error message contains expected keywords")
+                print("  ✅ Backend correctly validates wallet balance before tournament join")
                 
             except json.JSONDecodeError:
                 print(f"⚠️ Non-JSON error response: {response.text}")
