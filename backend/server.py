@@ -7568,6 +7568,388 @@ async def refund_payment(payment_id: str, admin_user_id: str = Depends(verify_ad
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error refunding payment: {str(e)}")
 
+# =============================================================================
+# SOCIAL SHARING SYSTEM HELPER FUNCTIONS
+# =============================================================================
+
+def generate_share_content(user_id: str, share_type: ShareType, reference_id: str, platform: SocialPlatform, custom_message: Optional[str] = None) -> dict:
+    """Generate social sharing content based on type and platform"""
+    try:
+        # Get user information
+        user = users_collection.find_one({"id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get template for this share type and platform
+        template = share_templates_collection.find_one({
+            "share_type": share_type,
+            "platform": platform,
+            "is_active": True
+        })
+        
+        if not template:
+            # Use default template
+            template = get_default_share_template(share_type, platform)
+        
+        # Generate content based on share type
+        if share_type == ShareType.TOURNAMENT_VICTORY:
+            return generate_tournament_victory_content(user, reference_id, template, custom_message)
+        elif share_type == ShareType.TEAM_FORMATION:
+            return generate_team_formation_content(user, reference_id, template, custom_message)
+        elif share_type == ShareType.PERSONAL_ACHIEVEMENT:
+            return generate_achievement_content(user, reference_id, template, custom_message)
+        elif share_type == ShareType.TOURNAMENT_PARTICIPATION:
+            return generate_tournament_participation_content(user, reference_id, template, custom_message)
+        elif share_type == ShareType.RANKING_ACHIEVEMENT:
+            return generate_ranking_achievement_content(user, reference_id, template, custom_message)
+        else:
+            return generate_generic_content(user, reference_id, template, custom_message)
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating share content: {str(e)}")
+
+def generate_tournament_victory_content(user: dict, tournament_id: str, template: dict, custom_message: Optional[str] = None) -> dict:
+    """Generate content for tournament victory shares"""
+    try:
+        # Get tournament details
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+        
+        # Get user's final position and prize
+        participant = tournament_participants_collection.find_one({
+            "user_id": user["id"],
+            "tournament_id": tournament_id
+        })
+        
+        prize_won = participant.get("prize_won", 0) if participant else 0
+        position = participant.get("final_position", 1) if participant else 1
+        
+        # Generate content
+        share_data = {
+            "title": template["title_template"].format(
+                user_name=user["full_name"],
+                tournament_name=tournament["name"],
+                position=get_position_suffix(position)
+            ),
+            "description": template["description_template"].format(
+                user_name=user["full_name"],
+                tournament_name=tournament["name"],
+                position=get_position_suffix(position),
+                prize_amount=f"€{prize_won:.2f}" if prize_won > 0 else "glory",
+                participants=tournament.get("current_participants", 0)
+            ),
+            "hashtags": template.get("hashtags", []) + ["#WoBeRaTournament", "#Victory", "#Esports"],
+            "call_to_action": template.get("call_to_action", "Join WoBeRa and compete in epic tournaments!"),
+            "metadata": {
+                "tournament_id": tournament_id,
+                "tournament_name": tournament["name"],
+                "position": position,
+                "prize_won": prize_won,
+                "participants": tournament.get("current_participants", 0)
+            }
+        }
+        
+        if custom_message:
+            share_data["description"] = f"{custom_message}\n\n{share_data['description']}"
+        
+        return share_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating tournament victory content: {str(e)}")
+
+def generate_team_formation_content(user: dict, team_id: str, template: dict, custom_message: Optional[str] = None) -> dict:
+    """Generate content for team formation shares"""
+    try:
+        # Get team details
+        team = teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        # Get team members count
+        members_count = len(team.get("members", []))
+        
+        share_data = {
+            "title": template["title_template"].format(
+                user_name=user["full_name"],
+                team_name=team["name"]
+            ),
+            "description": template["description_template"].format(
+                user_name=user["full_name"],
+                team_name=team["name"],
+                city=team.get("city", "Unknown"),
+                country=team.get("country", "Unknown"),
+                members_count=members_count
+            ),
+            "hashtags": template.get("hashtags", []) + ["#WoBeRaTeam", "#TeamFormation", "#Esports", f"#{team.get('country', 'Global')}"],
+            "call_to_action": template.get("call_to_action", "Join our team and compete together!"),
+            "metadata": {
+                "team_id": team_id,
+                "team_name": team["name"],
+                "members_count": members_count,
+                "city": team.get("city"),
+                "country": team.get("country")
+            }
+        }
+        
+        if custom_message:
+            share_data["description"] = f"{custom_message}\n\n{share_data['description']}"
+        
+        return share_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating team formation content: {str(e)}")
+
+def generate_achievement_content(user: dict, achievement_data: str, template: dict, custom_message: Optional[str] = None) -> dict:
+    """Generate content for personal achievement shares"""
+    try:
+        # Parse achievement data (could be JSON string with achievement details)
+        achievement = json.loads(achievement_data) if isinstance(achievement_data, str) else achievement_data
+        
+        share_data = {
+            "title": template["title_template"].format(
+                user_name=user["full_name"],
+                achievement=achievement.get("title", "New Achievement")
+            ),
+            "description": template["description_template"].format(
+                user_name=user["full_name"],
+                achievement=achievement.get("title", "New Achievement"),
+                description=achievement.get("description", "Amazing accomplishment!")
+            ),
+            "hashtags": template.get("hashtags", []) + ["#WoBeRaAchievement", "#Success", "#Esports"],
+            "call_to_action": template.get("call_to_action", "Unlock your potential with WoBeRa!"),
+            "metadata": {
+                "achievement_type": achievement.get("type", "general"),
+                "achievement_title": achievement.get("title"),
+                "achievement_description": achievement.get("description")
+            }
+        }
+        
+        if custom_message:
+            share_data["description"] = f"{custom_message}\n\n{share_data['description']}"
+        
+        return share_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating achievement content: {str(e)}")
+
+def generate_tournament_participation_content(user: dict, tournament_id: str, template: dict, custom_message: Optional[str] = None) -> dict:
+    """Generate content for tournament participation shares"""
+    try:
+        # Get tournament details
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+        
+        share_data = {
+            "title": template["title_template"].format(
+                user_name=user["full_name"],
+                tournament_name=tournament["name"]
+            ),
+            "description": template["description_template"].format(
+                user_name=user["full_name"],
+                tournament_name=tournament["name"],
+                prize_pool=f"€{tournament.get('prize_pool', 0):.2f}",
+                participants=tournament.get("current_participants", 0),
+                start_date=tournament.get("tournament_start", "").split('T')[0] if tournament.get("tournament_start") else "Soon"
+            ),
+            "hashtags": template.get("hashtags", []) + ["#WoBeRaTournament", "#Competition", "#Esports"],
+            "call_to_action": template.get("call_to_action", "Join me in this epic tournament!"),
+            "metadata": {
+                "tournament_id": tournament_id,
+                "tournament_name": tournament["name"],
+                "prize_pool": tournament.get("prize_pool", 0),
+                "participants": tournament.get("current_participants", 0)
+            }
+        }
+        
+        if custom_message:
+            share_data["description"] = f"{custom_message}\n\n{share_data['description']}"
+        
+        return share_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating tournament participation content: {str(e)}")
+
+def generate_ranking_achievement_content(user: dict, ranking_data: str, template: dict, custom_message: Optional[str] = None) -> dict:
+    """Generate content for ranking achievement shares"""
+    try:
+        # Parse ranking data
+        ranking = json.loads(ranking_data) if isinstance(ranking_data, str) else ranking_data
+        
+        share_data = {
+            "title": template["title_template"].format(
+                user_name=user["full_name"],
+                rank=ranking.get("rank", 1),
+                rank_suffix=get_position_suffix(ranking.get("rank", 1))
+            ),
+            "description": template["description_template"].format(
+                user_name=user["full_name"],
+                rank=ranking.get("rank", 1),
+                rank_suffix=get_position_suffix(ranking.get("rank", 1)),
+                total_players=ranking.get("total_players", 1000),
+                points=ranking.get("points", 0)
+            ),
+            "hashtags": template.get("hashtags", []) + ["#WoBeRaRankings", "#TopPlayer", "#Esports"],
+            "call_to_action": template.get("call_to_action", "Climb the rankings with WoBeRa!"),
+            "metadata": {
+                "rank": ranking.get("rank"),
+                "total_players": ranking.get("total_players"),
+                "points": ranking.get("points")
+            }
+        }
+        
+        if custom_message:
+            share_data["description"] = f"{custom_message}\n\n{share_data['description']}"
+        
+        return share_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating ranking achievement content: {str(e)}")
+
+def generate_generic_content(user: dict, reference_id: str, template: dict, custom_message: Optional[str] = None) -> dict:
+    """Generate generic social sharing content"""
+    try:
+        share_data = {
+            "title": template["title_template"].format(user_name=user["full_name"]),
+            "description": template["description_template"].format(user_name=user["full_name"]),
+            "hashtags": template.get("hashtags", []) + ["#WoBeRa", "#Gaming", "#Esports"],
+            "call_to_action": template.get("call_to_action", "Join WoBeRa today!"),
+            "metadata": {"reference_id": reference_id}
+        }
+        
+        if custom_message:
+            share_data["description"] = f"{custom_message}\n\n{share_data['description']}"
+        
+        return share_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating generic content: {str(e)}")
+
+def get_default_share_template(share_type: ShareType, platform: SocialPlatform) -> dict:
+    """Get default template for share type and platform"""
+    templates = {
+        ShareType.TOURNAMENT_VICTORY: {
+            "title_template": "🏆 {user_name} claimed victory in {tournament_name}!",
+            "description_template": "🎉 {user_name} finished {position} in {tournament_name}! Won {prize_amount} competing against {participants} players. What an incredible achievement!",
+            "hashtags": ["#Victory", "#Tournament", "#WoBeRa"],
+            "call_to_action": "Join WoBeRa and compete for glory!"
+        },
+        ShareType.TEAM_FORMATION: {
+            "title_template": "🚀 {user_name} formed a new team: {team_name}!",
+            "description_template": "🎯 {user_name} just created {team_name} from {city}, {country}! The team now has {members_count} members ready for action.",
+            "hashtags": ["#TeamFormation", "#NewTeam", "#WoBeRa"],
+            "call_to_action": "Form your team and compete together!"
+        },
+        ShareType.PERSONAL_ACHIEVEMENT: {
+            "title_template": "⭐ {user_name} unlocked: {achievement}!",
+            "description_template": "🎊 {user_name} just achieved {achievement}! {description}",
+            "hashtags": ["#Achievement", "#Success", "#WoBeRa"],
+            "call_to_action": "Unlock your potential with WoBeRa!"
+        },
+        ShareType.TOURNAMENT_PARTICIPATION: {
+            "title_template": "🎮 {user_name} is competing in {tournament_name}!",
+            "description_template": "🔥 {user_name} joined {tournament_name} with a {prize_pool} prize pool! {participants} players competing. Starting {start_date}.",
+            "hashtags": ["#Competition", "#Tournament", "#WoBeRa"],
+            "call_to_action": "Join the tournament and compete!"
+        },
+        ShareType.RANKING_ACHIEVEMENT: {
+            "title_template": "📈 {user_name} reached {rank}{rank_suffix} place!",
+            "description_template": "🏅 {user_name} climbed to {rank}{rank_suffix} place out of {total_players} players with {points} points!",
+            "hashtags": ["#Rankings", "#TopPlayer", "#WoBeRa"],
+            "call_to_action": "Climb the rankings with WoBeRa!"
+        }
+    }
+    
+    return templates.get(share_type, templates[ShareType.PERSONAL_ACHIEVEMENT])
+
+def get_position_suffix(position: int) -> str:
+    """Get position suffix (1st, 2nd, 3rd, etc.)"""
+    if 10 <= position % 100 <= 20:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(position % 10, "th")
+    return suffix
+
+def create_share_url(share_id: str, user_id: str) -> str:
+    """Create trackable share URL"""
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
+    return f"{base_url}/share/{share_id}?ref={user_id}"
+
+def track_share_click(share_id: str, referrer_id: Optional[str] = None) -> None:
+    """Track when someone clicks on a shared link"""
+    try:
+        # Update share clicks
+        social_shares_collection.update_one(
+            {"id": share_id},
+            {
+                "$inc": {"clicks": 1},
+                "$set": {"last_clicked": datetime.utcnow()}
+            }
+        )
+        
+        # Record click event
+        click_record = {
+            "id": str(uuid.uuid4()),
+            "share_id": share_id,
+            "referrer_id": referrer_id,
+            "clicked_at": datetime.utcnow(),
+            "user_agent": None,  # Could be added from request headers
+            "ip_address": None   # Could be added from request
+        }
+        
+        share_clicks_collection.insert_one(click_record)
+        
+        # Update viral metrics if applicable
+        if referrer_id:
+            viral_metrics_collection.update_one(
+                {"share_id": share_id},
+                {
+                    "$inc": {"referred_users": 1},
+                    "$set": {"updated_at": datetime.utcnow()}
+                },
+                upsert=True
+            )
+        
+    except Exception as e:
+        print(f"Error tracking share click: {str(e)}")
+
+def calculate_viral_coefficient(share_id: str) -> float:
+    """Calculate viral coefficient for a share"""
+    try:
+        share = social_shares_collection.find_one({"id": share_id})
+        if not share:
+            return 0.0
+        
+        # Get viral metrics
+        metrics = viral_metrics_collection.find_one({"share_id": share_id})
+        if not metrics:
+            return 0.0
+        
+        # Calculate viral coefficient
+        # Viral coefficient = (New users from share) / (Original shares)
+        new_users = metrics.get("referred_users", 0)
+        original_shares = 1  # The original share
+        
+        viral_coefficient = new_users / original_shares if original_shares > 0 else 0.0
+        
+        # Update metrics
+        viral_metrics_collection.update_one(
+            {"share_id": share_id},
+            {
+                "$set": {
+                    "viral_coefficient": viral_coefficient,
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        return viral_coefficient
+        
+    except Exception as e:
+        print(f"Error calculating viral coefficient: {str(e)}")
+        return 0.0
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
