@@ -282,6 +282,55 @@ code {
   text-align: center;
 }
 
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: linear-gradient(135deg, #ffd700, #ffed4a);
+  color: #1a1a1a;
+  font-weight: bold;
+  border-radius: 10px 10px 0 0;
+}
+
+.chat-connection-status {
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+.connected {
+  color: #22c55e;
+}
+
+.disconnected {
+  color: #ef4444;
+}
+
+.chat-tabs {
+  display: flex;
+  background: #2d2d2d;
+}
+
+.chat-tab {
+  flex: 1;
+  padding: 10px;
+  background: #2d2d2d;
+  color: #ffd700;
+  border: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.chat-tab:hover {
+  background: #3d3d3d;
+}
+
+.chat-tab.active {
+  background: #1a1a1a;
+  border-bottom-color: #ffd700;
+}
+
 .btn.btn-xs {
   padding: 2px 4px;
   font-size: 0.6rem;
