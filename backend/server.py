@@ -8510,7 +8510,7 @@ async def respond_friend_request(request: dict, current_user: dict = Depends(get
 async def get_friends_list(current_user: dict = Depends(get_current_user)):
     """Get user's friends list"""
     try:
-        user_id = current_user["user_id"]
+        user_id = current_user["id"]
         
         # Get friends
         friends = list(friends_collection.find({"user_id": user_id}))
