@@ -644,6 +644,267 @@ class SiteMessagesTester(unittest.TestCase):
         self.assertTrue(found, "Created message not found in GET response")
         print("✅ Site message verification test passed")
 
+class RecentActivityNewUserTester(unittest.TestCase):
+    """Test Recent Activity fix for new users"""
+    
+    def __init__(self, *args, **kwargs):
+        super(RecentActivityNewUserTester, self).__init__(*args, **kwargs)
+        self.base_url = "https://3d143e9e-75ad-464c-82db-c896bc1e2a10.preview.emergentagent.com"
+        self.token = None
+        self.user_id = None
+        
+        # Specific test user as requested
+        self.test_user = {
+            "username": "testuser_new",
+            "email": "testuser_new@example.com",
+            "password": "test123",
+            "country": "GR",
+            "full_name": "Test User New",
+            "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
+        }
+
+    def test_01_create_new_user(self):
+        """Create a new user account with username 'testuser_new' and password 'test123'"""
+        print("\n🔍 Testing new user creation for Recent Activity fix...")
+        
+        # First, try to delete the user if it already exists (cleanup)
+        try:
+            login_response = requests.post(
+                f"{self.base_url}/api/login",
+                json={"username": self.test_user["username"], "password": self.test_user["password"]}
+            )
+            if login_response.status_code == 200:
+                print("  ⚠️ User already exists, this is expected for testing")
+                data = login_response.json()
+                self.token = data["token"]
+                self.user_id = data["user_id"]
+                return
+        except:
+            pass
+        
+        # Create new user
+        response = requests.post(
+            f"{self.base_url}/api/register",
+            json=self.test_user
+        )
+        
+        if response.status_code == 400 and "already exists" in response.text:
+            print("  ⚠️ User already exists, attempting to login instead...")
+            login_response = requests.post(
+                f"{self.base_url}/api/login",
+                json={"username": self.test_user["username"], "password": self.test_user["password"]}
+            )
+            self.assertEqual(login_response.status_code, 200)
+            data = login_response.json()
+            self.token = data["token"]
+            self.user_id = data["user_id"]
+            print(f"  ✅ Logged in existing user - User ID: {self.user_id}")
+        else:
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertIn("token", data)
+            self.assertIn("user_id", data)
+            self.token = data["token"]
+            self.user_id = data["user_id"]
+            print(f"  ✅ New user created successfully - User ID: {self.user_id}")
+
+    def test_02_login_new_user(self):
+        """Login with the new user"""
+        print("\n🔍 Testing login with new user...")
+        
+        if not self.token:
+            login_data = {
+                "username": self.test_user["username"],
+                "password": self.test_user["password"]
+            }
+            response = requests.post(
+                f"{self.base_url}/api/login",
+                json=login_data
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertIn("token", data)
+            self.token = data["token"]
+            self.user_id = data["user_id"]
+        
+        print(f"  ✅ Login successful - Token obtained")
+
+    def test_03_check_user_profile_activity(self):
+        """Check if the user has any activity (should be 0 bets, 0 tournaments, etc.)"""
+        print("\n🔍 Testing user profile for activity data...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping profile activity test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.base_url}/api/profile",
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Check betting activity fields
+        self.assertEqual(data.get("total_bets", 0), 0, "New user should have 0 total bets")
+        self.assertEqual(data.get("won_bets", 0), 0, "New user should have 0 won bets")
+        self.assertEqual(data.get("lost_bets", 0), 0, "New user should have 0 lost bets")
+        self.assertEqual(data.get("total_amount", 0.0), 0.0, "New user should have 0 total amount")
+        self.assertEqual(data.get("total_winnings", 0.0), 0.0, "New user should have 0 total winnings")
+        self.assertEqual(data.get("avg_odds", 0.0), 0.0, "New user should have 0 average odds")
+        self.assertEqual(data.get("score", 0.0), 0.0, "New user should have 0 score")
+        
+        print("  ✅ User profile shows no betting activity (as expected for new user)")
+        print(f"    Total bets: {data.get('total_bets', 0)}")
+        print(f"    Won bets: {data.get('won_bets', 0)}")
+        print(f"    Lost bets: {data.get('lost_bets', 0)}")
+        print(f"    Total amount: {data.get('total_amount', 0.0)}")
+        print(f"    Total winnings: {data.get('total_winnings', 0.0)}")
+        print(f"    Score: {data.get('score', 0.0)}")
+
+    def test_04_check_user_tournaments(self):
+        """Check user's tournament participation (should be empty)"""
+        print("\n🔍 Testing user tournament participation...")
+        
+        if not self.token or not self.user_id:
+            self.skipTest("Token or user_id not available, skipping tournament participation test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.base_url}/api/tournaments/user/{self.user_id}",
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Check that user has no tournament participation
+        tournaments = data.get("tournaments", [])
+        self.assertEqual(len(tournaments), 0, "New user should have no tournament participation")
+        
+        print("  ✅ User has no tournament participation (as expected for new user)")
+        print(f"    Tournaments joined: {len(tournaments)}")
+
+    def test_05_check_wallet_activity(self):
+        """Check user's wallet activity (should be minimal/empty)"""
+        print("\n🔍 Testing user wallet activity...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping wallet activity test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        # Check wallet balance
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200)
+        balance_data = response.json()
+        
+        # New user should have minimal wallet activity
+        self.assertEqual(balance_data.get("total_earned", 0.0), 0.0, "New user should have 0 total earned")
+        self.assertEqual(balance_data.get("available_balance", 0.0), 0.0, "New user should have 0 available balance")
+        self.assertEqual(balance_data.get("withdrawn_balance", 0.0), 0.0, "New user should have 0 withdrawn balance")
+        
+        print("  ✅ User wallet shows no activity (as expected for new user)")
+        print(f"    Total earned: {balance_data.get('total_earned', 0.0)}")
+        print(f"    Available balance: {balance_data.get('available_balance', 0.0)}")
+        print(f"    Withdrawn balance: {balance_data.get('withdrawn_balance', 0.0)}")
+        
+        # Check wallet transactions
+        response = requests.get(
+            f"{self.base_url}/api/wallet/transactions",
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200)
+        transactions_data = response.json()
+        
+        transactions = transactions_data.get("transactions", [])
+        self.assertEqual(len(transactions), 0, "New user should have no wallet transactions")
+        
+        print(f"    Wallet transactions: {len(transactions)}")
+
+    def test_06_check_affiliate_activity(self):
+        """Check user's affiliate activity (should be empty if not an affiliate)"""
+        print("\n🔍 Testing user affiliate activity...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping affiliate activity test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        # Check if user is an affiliate
+        response = requests.get(
+            f"{self.base_url}/api/affiliate/profile",
+            headers=headers
+        )
+        
+        if response.status_code == 404:
+            print("  ✅ User is not an affiliate (as expected for new user)")
+            print("    No affiliate activity to check")
+            return
+        
+        # If user is an affiliate, check their stats
+        if response.status_code == 200:
+            print("  ⚠️ User is an affiliate, checking affiliate activity...")
+            
+            # Check affiliate stats
+            stats_response = requests.get(
+                f"{self.base_url}/api/affiliate/stats",
+                headers=headers
+            )
+            self.assertEqual(stats_response.status_code, 200)
+            stats_data = stats_response.json()
+            
+            # New affiliate should have minimal activity
+            self.assertEqual(stats_data.get("total_referrals", 0), 0, "New affiliate should have 0 referrals")
+            self.assertEqual(stats_data.get("total_earnings", 0.0), 0.0, "New affiliate should have 0 earnings")
+            
+            print(f"    Total referrals: {stats_data.get('total_referrals', 0)}")
+            print(f"    Total earnings: {stats_data.get('total_earnings', 0.0)}")
+            print("  ✅ Affiliate activity is minimal (as expected for new user)")
+
+    def test_07_verify_recent_activity_empty(self):
+        """Verify that the Recent Activity section should be empty for new users with no activity"""
+        print("\n🔍 Testing Recent Activity section for new user...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping recent activity test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        # Check wallet stats which includes recent transactions
+        response = requests.get(
+            f"{self.base_url}/api/wallet/stats",
+            headers=headers
+        )
+        self.assertEqual(response.status_code, 200)
+        stats_data = response.json()
+        
+        # Check recent transactions
+        recent_transactions = stats_data.get("recent_transactions", [])
+        self.assertEqual(len(recent_transactions), 0, "New user should have no recent transactions")
+        
+        # Check monthly earnings
+        monthly_earnings = stats_data.get("monthly_earnings", [])
+        for month_data in monthly_earnings:
+            self.assertEqual(month_data.get("earnings", 0.0), 0.0, "New user should have 0 monthly earnings")
+            self.assertEqual(month_data.get("transactions", 0), 0, "New user should have 0 monthly transactions")
+        
+        print("  ✅ Recent Activity section is empty (as expected for new user)")
+        print(f"    Recent transactions: {len(recent_transactions)}")
+        print(f"    Monthly earnings periods: {len(monthly_earnings)}")
+        
+        # Verify commission breakdown is empty
+        commission_breakdown = stats_data.get("commission_breakdown", {})
+        for commission_type, amount in commission_breakdown.items():
+            self.assertEqual(amount, 0.0, f"New user should have 0 {commission_type} commissions")
+        
+        print("  ✅ Commission breakdown is empty (as expected for new user)")
+        print(f"    Registration commissions: {commission_breakdown.get('registration', 0.0)}")
+        print(f"    Tournament commissions: {commission_breakdown.get('tournament', 0.0)}")
+        print(f"    Deposit commissions: {commission_breakdown.get('deposit', 0.0)}")
+        print(f"    Bonus earnings: {commission_breakdown.get('bonus', 0.0)}")
+
 class NationalLeagueSystemTester(unittest.TestCase):
     base_url = "https://3d143e9e-75ad-464c-82db-c896bc1e2a10.preview.emergentagent.com"
     
