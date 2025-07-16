@@ -12267,7 +12267,10 @@ function App() {
               <h3>💳 Payment Required</h3>
               <button 
                 className="btn btn-secondary"
-                onClick={() => setShowPaymentModal(false)}
+                onClick={() => {
+                  console.log('🚫 Payment modal closed by user');
+                  setShowPaymentModal(false);
+                }}
               >
                 ✕
               </button>
@@ -12345,13 +12348,19 @@ function App() {
             <div className="modal-footer">
               <button 
                 className="btn btn-secondary"
-                onClick={() => setShowPaymentModal(false)}
+                onClick={() => {
+                  console.log('🚫 Payment modal cancelled by user');
+                  setShowPaymentModal(false);
+                }}
               >
                 Cancel
               </button>
               <button 
                 className="btn btn-primary"
-                onClick={() => createPaymentSession(selectedPaymentProvider)}
+                onClick={() => {
+                  console.log('💳 Payment initiated with provider:', selectedPaymentProvider);
+                  createPaymentSession(selectedPaymentProvider);
+                }}
                 disabled={paymentLoading || (!paymentConfig?.stripe_enabled && !paymentConfig?.paypal_enabled && !paymentConfig?.coinbase_enabled)}
               >
                 {paymentLoading ? 'Processing...' : `Pay $${selectedTournamentForPayment.entry_fee}`}
@@ -12360,6 +12369,13 @@ function App() {
           </div>
         </div>
       )}
+      
+      {/* Debug Payment Modal State */}
+      {console.log('🔍 Payment Modal Debug:', {
+        showPaymentModal,
+        selectedTournamentForPayment: selectedTournamentForPayment?.name,
+        paymentConfig
+      })}
 
       {/* Payout Request Modal */}
       {showPayoutRequestModal && (
