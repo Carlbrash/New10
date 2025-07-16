@@ -4699,7 +4699,10 @@ function App() {
           <p>{t.demoCredentials}</p>
           <button 
             className="btn btn-secondary"
-            onClick={() => setLoginForm({ username: 'testuser', password: 'test123' })}
+            onClick={() => {
+              console.log('🔧 Demo button clicked');
+              setLoginForm({ username: 'testuser', password: 'test123' });
+            }}
           >
             {t.loadDemo}
           </button>
