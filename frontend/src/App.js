@@ -2746,12 +2746,15 @@ function App() {
 
   // Join tournament
   const joinTournament = async (tournamentId) => {
+    console.log('🏆 joinTournament called with tournamentId:', tournamentId);
+    
     if (!token) {
       alert(t.loginRequired || 'Please login to join tournaments');
       return;
     }
     
     try {
+      console.log('🚀 Making tournament join request...');
       const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/join`, {
         method: 'POST',
         headers: {
@@ -2760,7 +2763,11 @@ function App() {
         }
       });
       
+      console.log('📬 Response status:', response.status);
+      console.log('📬 Response ok:', response.ok);
+      
       if (response.ok) {
+        console.log('✅ Tournament join successful');
         alert(t.joinSuccessful || 'Successfully joined tournament!');
         // Refresh tournament details
         if (selectedTournament && selectedTournament.id === tournamentId) {
@@ -2794,7 +2801,7 @@ function App() {
         }
       }
     } catch (error) {
-      console.error('Error joining tournament:', error);
+      console.error('💥 Error joining tournament:', error);
       alert('Error joining tournament');
     }
   };
