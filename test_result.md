@@ -1713,15 +1713,18 @@ backend:
 
   - task: "Enhanced Payout Request - POST /api/payments/payout"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "Enhanced Payout Request endpoint has validation issues. Returns 422 validation errors for missing required fields: affiliate_user_id, payment_method, payment_details. The endpoint requires authentication but the request payload structure doesn't match the expected Pydantic model. This indicates the payout request model needs to be updated to match the expected payload structure from the review request."
+      - working: true
+        agent: "testing"
+        comment: "✅ PAYMENT PAYOUT REQUEST MODEL FIX VERIFIED: Successfully tested the payment payout endpoint with correct PayoutRequest model structure. TESTS PASSED: 1) ✅ PayoutRequest model accepts correct payload structure with fields: user_id, amount, provider, payout_account, metadata, 2) ✅ Authentication working correctly, 3) ✅ Business logic validation working (fails with insufficient balance as expected for test user), 4) ✅ No model validation errors (422) - endpoint accepts the correct payload format. The PayoutRequest model is working correctly and accepts the payload structure specified in the review request: amount, provider, payout_account, metadata."
 
   - task: "Enhanced Payment System Authentication and Security"
     implemented: true
