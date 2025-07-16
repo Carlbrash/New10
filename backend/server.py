@@ -1039,11 +1039,20 @@ def get_or_create_wallet(user_id: str) -> dict:
             wallet_balances_collection.insert_one(wallet_data)
             return wallet_data
         
-        # Convert ObjectId to string
-        if "_id" in wallet:
-            wallet["_id"] = str(wallet["_id"])
+        # Clean wallet data for JSON serialization
+        clean_wallet = {}
+        for key, value in wallet.items():
+            if key == "_id":
+                clean_wallet[key] = str(value)
+            elif isinstance(value, datetime):
+                clean_wallet[key] = value.isoformat()
+            elif hasattr(value, "__dict__"):
+                # Skip complex objects that can't be serialized
+                continue
+            else:
+                clean_wallet[key] = value
         
-        return wallet
+        return clean_wallet
     except Exception as e:
         print(f"Error getting/creating wallet: {e}")
         return {}
