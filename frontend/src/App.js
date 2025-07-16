@@ -10033,7 +10033,10 @@ function App() {
   // Initialize chat when user logs in
   useEffect(() => {
     if (user && token && !chatSocket) {
-      initializeChatSocket();
+      // Add a small delay to avoid blocking the UI
+      setTimeout(() => {
+        initializeChatSocket();
+      }, 1000);
     } else if (!user && chatSocket) {
       disconnectFromChat();
     }
