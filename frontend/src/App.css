@@ -12960,6 +12960,11 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(66, 103, 178, 0.1);
 }
 
+.platform-btn.instagram:hover {
+  border-color: #e4405f;
+  background: rgba(228, 64, 95, 0.1);
+}
+
 .platform-btn.linkedin:hover {
   border-color: #0077b5;
   background: rgba(0, 119, 181, 0.1);
