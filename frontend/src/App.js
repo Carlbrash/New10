@@ -12663,6 +12663,16 @@ function App() {
                   </motion.button>
                   
                   <motion.button 
+                    className="platform-btn instagram"
+                    onClick={() => openSocialPlatform('instagram', shareContent)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="platform-icon">📸</span>
+                    <span>Instagram</span>
+                  </motion.button>
+                  
+                  <motion.button 
                     className="platform-btn linkedin"
                     onClick={() => openSocialPlatform('linkedin', shareContent)}
                     whileHover={{ scale: 1.05 }}
