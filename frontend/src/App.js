@@ -1148,6 +1148,18 @@ function App() {
   const [affiliateRequests, setAffiliateRequests] = useState([]);
   const [adminAffiliateStats, setAdminAffiliateStats] = useState(null);
   const [adminAffiliateLoading, setAdminAffiliateLoading] = useState(false);
+
+  // Social Sharing States
+  const [socialShares, setSocialShares] = useState([]);
+  const [socialStats, setSocialStats] = useState(null);
+  const [showSocialShareModal, setShowSocialShareModal] = useState(false);
+  const [shareContent, setShareContent] = useState(null);
+  const [shareType, setShareType] = useState('tournament_victory');
+  const [sharePlatform, setSharePlatform] = useState('twitter');
+  const [shareLoading, setShareLoading] = useState(false);
+  const [viralContent, setViralContent] = useState([]);
+  const [shareCustomMessage, setShareCustomMessage] = useState('');
+  const [showShareSuccessModal, setShowShareSuccessModal] = useState(false);
   const [showAdminAffiliateModal, setShowAdminAffiliateModal] = useState(false);
   const [selectedAffiliateUser, setSelectedAffiliateUser] = useState(null);
   const [affiliateBonusForm, setAffiliateBonusForm] = useState({
