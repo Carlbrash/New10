@@ -19,6 +19,11 @@ import 'chartjs-adapter-date-fns';
 import './App.css';
 import DownloadBackup from './DownloadBackup';
 
+// Payment Gateway Imports
+import { loadStripe } from '@stripe/stripe-js';
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
+import CoinbaseCommerceButton from 'react-coinbase-commerce';
+
 // Register Chart.js components
 ChartJS.register(
   CategoryScale,
