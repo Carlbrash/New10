@@ -8250,6 +8250,427 @@ try:
 except Exception as e:
     print(f"❌ Error loading social sharing endpoints: {str(e)}")
 
+# =============================================================================
+# FRIEND IMPORT SYSTEM
+# =============================================================================
+
+# Friend Import Collections
+friends_collection = db["friends"]
+friend_requests_collection = db["friend_requests"]
+friend_imports_collection = db["friend_imports"]
+
+# Friend Import Models
+class FriendRequest(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sender_id: str
+    recipient_id: str
+    status: str = "pending"  # pending, accepted, rejected
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class FriendImportRequest(BaseModel):
+    provider: str  # google, discord, email
+    contacts: List[str] = []
+    emails: List[str] = []
+
+class FriendRecommendation(BaseModel):
+    user_id: str
+    username: str
+    full_name: str
+    avatar_url: str = ""
+    mutual_friends: int = 0
+    common_teams: int = 0
+    reason: str = ""
+
+# Friend Import Endpoints
+@app.get("/api/friends/recommendations")
+async def get_friend_recommendations(current_user: dict = Depends(get_current_user)):
+    """Get friend recommendations based on mutual connections"""
+    try:
+        user_id = current_user["user_id"]
+        
+        # Get user's current friends
+        user_friends = list(friends_collection.find({"user_id": user_id}))
+        friend_ids = [f["friend_id"] for f in user_friends]
+        
+        # Get user's teams
+        user_teams = list(teams_collection.find({"$or": [
+            {"captain_id": user_id},
+            {"members.user_id": user_id}
+        ]}))
+        user_team_ids = [str(team["id"]) for team in user_teams]
+        
+        # Find potential friends
+        recommendations = []
+        
+        # 1. Team members who are not friends
+        for team in user_teams:
+            for member in team.get("members", []):
+                if member["user_id"] not in friend_ids and member["user_id"] != user_id:
+                    user_data = users_collection.find_one({"user_id": member["user_id"]})
+                    if user_data:
+                        recommendations.append({
+                            "user_id": member["user_id"],
+                            "username": user_data["username"],
+                            "full_name": user_data.get("full_name", ""),
+                            "avatar_url": user_data.get("avatar_url", ""),
+                            "mutual_friends": 0,
+                            "common_teams": 1,
+                            "reason": f"Team member in {team['name']}"
+                        })
+        
+        # 2. Friends of friends
+        for friend_id in friend_ids:
+            friend_friends = list(friends_collection.find({"user_id": friend_id}))
+            for ff in friend_friends:
+                if ff["friend_id"] not in friend_ids and ff["friend_id"] != user_id:
+                    user_data = users_collection.find_one({"user_id": ff["friend_id"]})
+                    if user_data:
+                        # Check if already in recommendations
+                        existing = next((r for r in recommendations if r["user_id"] == ff["friend_id"]), None)
+                        if existing:
+                            existing["mutual_friends"] += 1
+                            existing["reason"] += f", mutual friend"
+                        else:
+                            recommendations.append({
+                                "user_id": ff["friend_id"],
+                                "username": user_data["username"],
+                                "full_name": user_data.get("full_name", ""),
+                                "avatar_url": user_data.get("avatar_url", ""),
+                                "mutual_friends": 1,
+                                "common_teams": 0,
+                                "reason": "Mutual friend"
+                            })
+        
+        # Sort by relevance score
+        recommendations.sort(key=lambda x: x["mutual_friends"] + x["common_teams"], reverse=True)
+        
+        return CustomJSONResponse(content={
+            "recommendations": recommendations[:20]  # Limit to 20
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting friend recommendations: {str(e)}")
+
+@app.post("/api/friends/send-request")
+async def send_friend_request(request: dict, current_user: dict = Depends(get_current_user)):
+    """Send friend request"""
+    try:
+        user_id = current_user["user_id"]
+        recipient_id = request.get("recipient_id")
+        
+        if not recipient_id:
+            raise HTTPException(status_code=400, detail="Recipient ID is required")
+        
+        # Check if recipient exists
+        recipient = users_collection.find_one({"user_id": recipient_id})
+        if not recipient:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Check if already friends
+        existing_friendship = friends_collection.find_one({
+            "$or": [
+                {"user_id": user_id, "friend_id": recipient_id},
+                {"user_id": recipient_id, "friend_id": user_id}
+            ]
+        })
+        if existing_friendship:
+            raise HTTPException(status_code=400, detail="Already friends")
+        
+        # Check if request already exists
+        existing_request = friend_requests_collection.find_one({
+            "sender_id": user_id,
+            "recipient_id": recipient_id,
+            "status": "pending"
+        })
+        if existing_request:
+            raise HTTPException(status_code=400, detail="Friend request already sent")
+        
+        # Create friend request
+        friend_request = {
+            "id": str(uuid.uuid4()),
+            "sender_id": user_id,
+            "recipient_id": recipient_id,
+            "status": "pending",
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        friend_requests_collection.insert_one(friend_request)
+        
+        return CustomJSONResponse(content={
+            "message": "Friend request sent successfully",
+            "request_id": friend_request["id"]
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sending friend request: {str(e)}")
+
+@app.get("/api/friends/requests")
+async def get_friend_requests(current_user: dict = Depends(get_current_user)):
+    """Get pending friend requests"""
+    try:
+        user_id = current_user["user_id"]
+        
+        # Get received requests
+        received_requests = list(friend_requests_collection.find({
+            "recipient_id": user_id,
+            "status": "pending"
+        }))
+        
+        # Get sent requests
+        sent_requests = list(friend_requests_collection.find({
+            "sender_id": user_id,
+            "status": "pending"
+        }))
+        
+        # Enrich with user data
+        for request in received_requests:
+            sender = users_collection.find_one({"user_id": request["sender_id"]})
+            if sender:
+                request["sender_username"] = sender["username"]
+                request["sender_full_name"] = sender.get("full_name", "")
+                request["sender_avatar_url"] = sender.get("avatar_url", "")
+        
+        for request in sent_requests:
+            recipient = users_collection.find_one({"user_id": request["recipient_id"]})
+            if recipient:
+                request["recipient_username"] = recipient["username"]
+                request["recipient_full_name"] = recipient.get("full_name", "")
+                request["recipient_avatar_url"] = recipient.get("avatar_url", "")
+        
+        return CustomJSONResponse(content={
+            "received_requests": received_requests,
+            "sent_requests": sent_requests
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting friend requests: {str(e)}")
+
+@app.post("/api/friends/respond-request")
+async def respond_friend_request(request: dict, current_user: dict = Depends(get_current_user)):
+    """Accept or reject friend request"""
+    try:
+        user_id = current_user["user_id"]
+        request_id = request.get("request_id")
+        action = request.get("action")  # accept or reject
+        
+        if not request_id or not action:
+            raise HTTPException(status_code=400, detail="Request ID and action are required")
+        
+        if action not in ["accept", "reject"]:
+            raise HTTPException(status_code=400, detail="Action must be 'accept' or 'reject'")
+        
+        # Find friend request
+        friend_request = friend_requests_collection.find_one({
+            "id": request_id,
+            "recipient_id": user_id,
+            "status": "pending"
+        })
+        
+        if not friend_request:
+            raise HTTPException(status_code=404, detail="Friend request not found")
+        
+        # Update request status
+        friend_requests_collection.update_one(
+            {"id": request_id},
+            {
+                "$set": {
+                    "status": "accepted" if action == "accept" else "rejected",
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        # If accepted, create friendship
+        if action == "accept":
+            friendship_data = {
+                "user_id": user_id,
+                "friend_id": friend_request["sender_id"],
+                "created_at": datetime.utcnow()
+            }
+            friends_collection.insert_one(friendship_data)
+            
+            # Create reverse friendship
+            reverse_friendship = {
+                "user_id": friend_request["sender_id"],
+                "friend_id": user_id,
+                "created_at": datetime.utcnow()
+            }
+            friends_collection.insert_one(reverse_friendship)
+        
+        return CustomJSONResponse(content={
+            "message": f"Friend request {action}ed successfully"
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error responding to friend request: {str(e)}")
+
+@app.get("/api/friends/list")
+async def get_friends_list(current_user: dict = Depends(get_current_user)):
+    """Get user's friends list"""
+    try:
+        user_id = current_user["user_id"]
+        
+        # Get friends
+        friends = list(friends_collection.find({"user_id": user_id}))
+        
+        # Enrich with user data
+        friends_data = []
+        for friend in friends:
+            user_data = users_collection.find_one({"user_id": friend["friend_id"]})
+            if user_data:
+                friends_data.append({
+                    "user_id": friend["friend_id"],
+                    "username": user_data["username"],
+                    "full_name": user_data.get("full_name", ""),
+                    "avatar_url": user_data.get("avatar_url", ""),
+                    "country": user_data.get("country", ""),
+                    "friends_since": friend["created_at"],
+                    "is_online": False  # Could be enhanced with real-time status
+                })
+        
+        return CustomJSONResponse(content={
+            "friends": friends_data,
+            "total_friends": len(friends_data)
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting friends list: {str(e)}")
+
+@app.post("/api/friends/import")
+async def import_friends(request: FriendImportRequest, current_user: dict = Depends(get_current_user)):
+    """Import friends from external providers"""
+    try:
+        user_id = current_user["user_id"]
+        
+        imported_friends = []
+        
+        if request.provider == "email":
+            # Import by email addresses
+            for email in request.emails:
+                # Find user by email
+                user = users_collection.find_one({"email": email})
+                if user and user["user_id"] != user_id:
+                    # Check if already friends
+                    existing = friends_collection.find_one({
+                        "user_id": user_id,
+                        "friend_id": user["user_id"]
+                    })
+                    if not existing:
+                        imported_friends.append({
+                            "user_id": user["user_id"],
+                            "username": user["username"],
+                            "full_name": user.get("full_name", ""),
+                            "email": email,
+                            "found": True
+                        })
+        
+        elif request.provider == "google":
+            # Mock Google import - in real implementation, this would use Google Contacts API
+            return CustomJSONResponse(content={
+                "message": "Google import not yet implemented",
+                "imported_friends": [],
+                "total_imported": 0
+            })
+        
+        elif request.provider == "discord":
+            # Mock Discord import - in real implementation, this would use Discord API
+            return CustomJSONResponse(content={
+                "message": "Discord import not yet implemented", 
+                "imported_friends": [],
+                "total_imported": 0
+            })
+        
+        # Save import record
+        import_record = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "provider": request.provider,
+            "imported_count": len(imported_friends),
+            "created_at": datetime.utcnow()
+        }
+        friend_imports_collection.insert_one(import_record)
+        
+        return CustomJSONResponse(content={
+            "message": f"Successfully found {len(imported_friends)} friends",
+            "imported_friends": imported_friends,
+            "total_imported": len(imported_friends)
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error importing friends: {str(e)}")
+
+@app.delete("/api/friends/remove")
+async def remove_friend(request: dict, current_user: dict = Depends(get_current_user)):
+    """Remove friend"""
+    try:
+        user_id = current_user["user_id"]
+        friend_id = request.get("friend_id")
+        
+        if not friend_id:
+            raise HTTPException(status_code=400, detail="Friend ID is required")
+        
+        # Remove friendship (both directions)
+        friends_collection.delete_one({"user_id": user_id, "friend_id": friend_id})
+        friends_collection.delete_one({"user_id": friend_id, "friend_id": user_id})
+        
+        return CustomJSONResponse(content={
+            "message": "Friend removed successfully"
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error removing friend: {str(e)}")
+
+@app.get("/api/friends/search")
+async def search_friends(q: str, current_user: dict = Depends(get_current_user)):
+    """Search for users to add as friends"""
+    try:
+        user_id = current_user["user_id"]
+        
+        if not q or len(q) < 2:
+            raise HTTPException(status_code=400, detail="Search query must be at least 2 characters")
+        
+        # Search users by username or full name
+        users = list(users_collection.find({
+            "$and": [
+                {"user_id": {"$ne": user_id}},  # Exclude self
+                {
+                    "$or": [
+                        {"username": {"$regex": q, "$options": "i"}},
+                        {"full_name": {"$regex": q, "$options": "i"}}
+                    ]
+                }
+            ]
+        }).limit(20))
+        
+        # Get user's friends to filter them out
+        user_friends = list(friends_collection.find({"user_id": user_id}))
+        friend_ids = [f["friend_id"] for f in user_friends]
+        
+        # Filter out friends and enrich data
+        search_results = []
+        for user in users:
+            if user["user_id"] not in friend_ids:
+                search_results.append({
+                    "user_id": user["user_id"],
+                    "username": user["username"],
+                    "full_name": user.get("full_name", ""),
+                    "avatar_url": user.get("avatar_url", ""),
+                    "country": user.get("country", ""),
+                    "is_friend": False
+                })
+        
+        return CustomJSONResponse(content={
+            "users": search_results,
+            "total": len(search_results)
+        })
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error searching friends: {str(e)}")
+
+print("✅ Friend Import System endpoints loaded successfully")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
