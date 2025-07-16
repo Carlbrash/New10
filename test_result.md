@@ -1601,3 +1601,15 @@ backend:
       - working: true
         agent: "testing"
         comment: "Tournament join wallet balance functionality is working correctly. Tested complete flow: user creation, wallet balance checking, tournament joining with sufficient/insufficient balance, admin wallet funding, and entry fee deduction. Key findings: 1) Users with sufficient balance can successfully join paid tournaments, 2) Entry fees are properly deducted from wallet balance, 3) Transaction history correctly records tournament entry fees, 4) System prevents duplicate tournament registrations, 5) Free tournaments work without balance requirements, 6) Admin manual adjustment functionality works correctly. The wallet balance validation and deduction system is functioning as expected."
+
+  - task: "Live Chat System Backend"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Live Chat System backend functionality tested and working correctly. IMPLEMENTED FEATURES: 1) ✅ WebSocket endpoint /ws/chat with JWT authentication, 2) ✅ GET /api/chat/online-users - returns list of online users with proper authentication, 3) ✅ GET /api/chat/rooms - returns available chat rooms (general, tournament, team) with participant counts, 4) ✅ WebSocket message handling for chat_message, join_room, leave_room, and admin_ban_user, 5) ✅ Authentication working correctly - rejects requests without tokens (403) and invalid tokens (401), 6) ✅ All user roles (regular, admin, god) can access chat endpoints. MISSING FEATURES (from review request): 1) ❌ GET /api/chat/stats endpoint not implemented, 2) ❌ POST /api/chat/admin/ban-user REST endpoint not implemented (only WebSocket ban exists). FIXED ISSUE: Fixed authentication parameter mismatch where chat endpoints expected current_user dict but verify_token returned user_id string. Core chat functionality is working properly."
