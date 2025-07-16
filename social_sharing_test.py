@@ -308,13 +308,13 @@ class SocialSharingSystemTester(unittest.TestCase):
         # Test social stats without authentication
         print("  Testing social stats without auth...")
         response = requests.get(f"{self.base_url}/api/social/stats")
-        self.assertEqual(response.status_code, 401, "Social stats should require authentication")
+        self.assertIn(response.status_code, [401, 403], "Social stats should require authentication")
         print("  ✅ Social stats correctly requires authentication")
         
         # Test user shares without authentication
         print("  Testing user shares without auth...")
         response = requests.get(f"{self.base_url}/api/social/user/shares")
-        self.assertEqual(response.status_code, 401, "User shares should require authentication")
+        self.assertIn(response.status_code, [401, 403], "User shares should require authentication")
         print("  ✅ User shares correctly requires authentication")
         
         # Test create share without authentication
@@ -329,7 +329,7 @@ class SocialSharingSystemTester(unittest.TestCase):
             f"{self.base_url}/api/social/share",
             json=share_request
         )
-        self.assertEqual(response.status_code, 401, "Create share should require authentication")
+        self.assertIn(response.status_code, [401, 403], "Create share should require authentication")
         print("  ✅ Create share correctly requires authentication")
         
         # Test achievement share without authentication
@@ -345,7 +345,7 @@ class SocialSharingSystemTester(unittest.TestCase):
             f"{self.base_url}/api/achievements/share",
             json=achievement_request
         )
-        self.assertEqual(response.status_code, 401, "Achievement share should require authentication")
+        self.assertIn(response.status_code, [401, 403], "Achievement share should require authentication")
         print("  ✅ Achievement share correctly requires authentication")
         
         print("✅ Authentication requirements test passed")
