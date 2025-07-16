@@ -10256,6 +10256,21 @@ function App() {
                 ⚙️ Settings
               </button>
               
+              <button 
+                className="nav-link chat-button"
+                onClick={() => {
+                  setShowChatPopup(!showChatPopup);
+                  if (!isConnectedToChat) {
+                    initializeChatSocket();
+                  }
+                }}
+              >
+                💬 Chat
+                {unreadMessages > 0 && (
+                  <span className="unread-badge">{unreadMessages}</span>
+                )}
+              </button>
+              
               <button className="btn btn-logout" onClick={handleLogout}>
                 {t.logout}
               </button>
