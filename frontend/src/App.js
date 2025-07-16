@@ -12172,6 +12172,198 @@ function App() {
         </div>
       )}
 
+      {/* Payment Modal */}
+      {showPaymentModal && selectedTournamentForPayment && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>💳 Payment Required</h3>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowPaymentModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="payment-summary">
+                <h4>Tournament: {selectedTournamentForPayment.name}</h4>
+                <div className="payment-details">
+                  <div className="detail-row">
+                    <span>Entry Fee:</span>
+                    <span className="amount">${selectedTournamentForPayment.entry_fee}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span>Prize Pool:</span>
+                    <span className="amount">${selectedTournamentForPayment.prize_pool}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span>Participants:</span>
+                    <span>{selectedTournamentForPayment.current_participants}/{selectedTournamentForPayment.max_participants}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="payment-methods">
+                <h4>Choose Payment Method:</h4>
+                <div className="payment-options">
+                  {paymentConfig?.stripe_enabled && (
+                    <button 
+                      className={`payment-option ${selectedPaymentProvider === 'stripe' ? 'selected' : ''}`}
+                      onClick={() => setSelectedPaymentProvider('stripe')}
+                    >
+                      <div className="payment-icon">💳</div>
+                      <div className="payment-info">
+                        <span className="payment-name">Credit/Debit Card</span>
+                        <span className="payment-desc">Powered by Stripe</span>
+                      </div>
+                    </button>
+                  )}
+                  
+                  {paymentConfig?.paypal_enabled && (
+                    <button 
+                      className={`payment-option ${selectedPaymentProvider === 'paypal' ? 'selected' : ''}`}
+                      onClick={() => setSelectedPaymentProvider('paypal')}
+                    >
+                      <div className="payment-icon">🅿️</div>
+                      <div className="payment-info">
+                        <span className="payment-name">PayPal</span>
+                        <span className="payment-desc">Pay with PayPal account</span>
+                      </div>
+                    </button>
+                  )}
+                  
+                  {paymentConfig?.coinbase_enabled && (
+                    <button 
+                      className={`payment-option ${selectedPaymentProvider === 'coinbase' ? 'selected' : ''}`}
+                      onClick={() => setSelectedPaymentProvider('coinbase')}
+                    >
+                      <div className="payment-icon">₿</div>
+                      <div className="payment-info">
+                        <span className="payment-name">Cryptocurrency</span>
+                        <span className="payment-desc">Bitcoin, Ethereum, etc.</span>
+                      </div>
+                    </button>
+                  )}
+                </div>
+              </div>
+              
+              {!paymentConfig?.stripe_enabled && !paymentConfig?.paypal_enabled && !paymentConfig?.coinbase_enabled && (
+                <div className="no-payment-methods">
+                  <p>⚠️ No payment methods are currently available. Please contact support.</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowPaymentModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={() => createPaymentSession(selectedPaymentProvider)}
+                disabled={paymentLoading || (!paymentConfig?.stripe_enabled && !paymentConfig?.paypal_enabled && !paymentConfig?.coinbase_enabled)}
+              >
+                {paymentLoading ? 'Processing...' : `Pay $${selectedTournamentForPayment.entry_fee}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payout Request Modal */}
+      {showPayoutRequestModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>💰 Request Payout</h3>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowPayoutRequestModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Amount ($):</label>
+                <input 
+                  type="number" 
+                  className="form-input"
+                  value={payoutRequestForm.amount}
+                  onChange={(e) => setPayoutRequestForm({...payoutRequestForm, amount: e.target.value})}
+                  placeholder="Minimum $10.00"
+                  min="10"
+                  step="0.01"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Payment Method:</label>
+                <select 
+                  className="form-input"
+                  value={payoutRequestForm.provider}
+                  onChange={(e) => setPayoutRequestForm({...payoutRequestForm, provider: e.target.value})}
+                >
+                  <option value="stripe">Stripe (Bank Transfer)</option>
+                  <option value="paypal">PayPal</option>
+                  <option value="coinbase">Cryptocurrency</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>
+                  {payoutRequestForm.provider === 'stripe' && 'Bank Account Details:'}
+                  {payoutRequestForm.provider === 'paypal' && 'PayPal Email:'}
+                  {payoutRequestForm.provider === 'coinbase' && 'Crypto Wallet Address:'}
+                </label>
+                <input 
+                  type="text" 
+                  className="form-input"
+                  value={payoutRequestForm.payout_account}
+                  onChange={(e) => setPayoutRequestForm({...payoutRequestForm, payout_account: e.target.value})}
+                  placeholder={
+                    payoutRequestForm.provider === 'stripe' ? 'Account holder name and details' :
+                    payoutRequestForm.provider === 'paypal' ? 'your@email.com' :
+                    '1A2B3C4D5E6F7G8H9I0J...'
+                  }
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Notes (optional):</label>
+                <textarea 
+                  className="form-input"
+                  value={payoutRequestForm.notes}
+                  onChange={(e) => setPayoutRequestForm({...payoutRequestForm, notes: e.target.value})}
+                  placeholder="Any additional notes for the payout request"
+                  rows="3"
+                />
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowPayoutRequestModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={handlePayoutRequest}
+                disabled={paymentLoading}
+              >
+                {paymentLoading ? 'Processing...' : 'Submit Payout Request'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Live Chat System */}
       {renderChatPopup()}
       {renderPrivateMessageModal()}
