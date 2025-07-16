@@ -6220,8 +6220,7 @@ class TournamentWalletBalanceTester(unittest.TestCase):
 
     def test_01_create_test_user(self):
         """Create a new test user 'alex_test' with password 'test123'"""
-        print("
-🔍 Step 1: Creating test user 'alex_test'...")
+        print("\n🔍 Step 1: Creating test user 'alex_test'...")
         
         # First, try to login if user already exists
         try:
