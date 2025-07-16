@@ -8363,7 +8363,7 @@ async def send_friend_request(request: dict, current_user: dict = Depends(get_cu
             raise HTTPException(status_code=400, detail="Recipient ID is required")
         
         # Check if recipient exists
-        recipient = users_collection.find_one({"user_id": recipient_id})
+        recipient = users_collection.find_one({"id": recipient_id})
         if not recipient:
             raise HTTPException(status_code=404, detail="User not found")
         
