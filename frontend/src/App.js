@@ -1696,7 +1696,8 @@ function App() {
     password: '',
     country: '',
     full_name: '',
-    avatar_url: ''
+    avatar_url: '',
+    affiliate_code: ''
   });
 
   const changeLanguage = (newLang) => {
