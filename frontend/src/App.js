@@ -9720,7 +9720,7 @@ function App() {
     if (!showChatPopup) return null;
 
     return (
-      <div className="chat-popup">
+      <div className={`chat-popup ${isChatMinimized ? 'minimized' : ''}`}>
         <div className="chat-header">
           <div className="chat-title">
             <span>💬 Live Chat</span>
@@ -9735,184 +9735,207 @@ function App() {
           <div className="chat-controls">
             <button 
               className="btn btn-sm btn-secondary"
+              onClick={() => setIsChatMinimized(!isChatMinimized)}
+              title={isChatMinimized ? "Maximize" : "Minimize"}
+            >
+              {isChatMinimized ? '⬆️' : '⬇️'}
+            </button>
+            <button 
+              className="btn btn-sm btn-secondary"
               onClick={() => setShowChatPopup(false)}
+              title="Close"
             >
               ✕
             </button>
           </div>
         </div>
 
-        <div className="chat-tabs">
-          <button 
-            className={`chat-tab ${chatTab === 'room' ? 'active' : ''}`}
-            onClick={() => setChatTab('room')}
-          >
-            Rooms
-          </button>
-          <button 
-            className={`chat-tab ${chatTab === 'private' ? 'active' : ''}`}
-            onClick={() => setChatTab('private')}
-          >
-            Private ({privateMessages.length})
-          </button>
-        </div>
+        {!isChatMinimized && (
+          <>
+            <div className="chat-tabs">
+              <button 
+                className={`chat-tab ${chatTab === 'room' ? 'active' : ''}`}
+                onClick={() => setChatTab('room')}
+              >
+                Rooms
+              </button>
+              <button 
+                className={`chat-tab ${chatTab === 'private' ? 'active' : ''}`}
+                onClick={() => setChatTab('private')}
+              >
+                Private ({privateMessages.length})
+              </button>
+            </div>
 
-        <div className="chat-content">
-          <div className="chat-main">
-            {chatTab === 'room' && (
-              <div className="chat-room-section">
-                <div className="chat-room-selector">
-                  <select 
-                    value={currentChatRoom} 
-                    onChange={(e) => joinChatRoom(e.target.value)}
-                    className="room-select"
-                  >
-                    {/* Always show general room as first option */}
-                    <option value="general">General Chat</option>
-                    {chatRooms.filter(room => room.id !== 'general').map(room => (
-                      <option key={room.id} value={room.id}>
-                        {room.name} ({room.participant_count || 0})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="chat-messages">
-                  {chatMessages
-                    .filter(msg => msg.room_id === currentChatRoom)
-                    .map(message => (
-                    <div key={message.id} className={`chat-message ${message.is_system ? 'system' : ''}`}>
-                      <div className="message-header">
-                        <span className={`username ${message.sender_username === user?.username ? 'own-message' : ''}`}>
-                          {message.sender_username}
-                        </span>
-                        <span className="timestamp">{formatChatTime(message.timestamp)}</span>
-                        {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && !message.is_system && (
-                          <button 
-                            className="btn btn-sm btn-danger"
-                            onClick={() => deleteMessage(message.id)}
-                            title="Delete message"
-                          >
-                            🗑️
-                          </button>
-                        )}
-                      </div>
-                      <div className="message-text">{message.message}</div>
+            <div className="chat-content">
+              <div className="chat-main">
+                {chatTab === 'room' && (
+                  <div className="chat-room-section">
+                    <div className="chat-room-selector">
+                      <select 
+                        value={currentChatRoom} 
+                        onChange={(e) => joinChatRoom(e.target.value)}
+                        className="room-select"
+                      >
+                        {/* Always show general room as first option */}
+                        <option value="general">General Chat</option>
+                        {chatRooms.filter(room => room.id !== 'general').map(room => (
+                          <option key={room.id} value={room.id}>
+                            {room.name} ({room.participant_count || 0})
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  ))}
-                </div>
 
-                <div className="chat-input-container">
-                  <div className="chat-input-row">
-                    <input
-                      type="text"
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
-                      placeholder="Type a message..."
-                      className="chat-input"
-                    />
-                    <button 
-                      className="btn btn-sm btn-secondary"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    >
-                      😊
-                    </button>
-                    <button 
-                      className="btn btn-sm btn-primary"
-                      onClick={sendChatMessage}
-                      disabled={!chatMessage.trim()}
-                    >
-                      Send
-                    </button>
-                  </div>
-                  
-                  {showEmojiPicker && (
-                    <div className="emoji-picker-container">
-                      <EmojiPicker
-                        onEmojiClick={addEmojiToMessage}
-                        autoFocusSearch={false}
-                      />
+                    <div className="chat-messages">
+                      {chatMessages
+                        .filter(msg => msg.room_id === currentChatRoom)
+                        .map(message => (
+                        <div key={message.id} className={`chat-message ${message.is_system ? 'system' : ''}`}>
+                          <div className="message-header">
+                            <span className={`username ${message.sender_username === user?.username ? 'own-message' : ''}`}>
+                              {message.sender_username}
+                            </span>
+                            <span className="timestamp">{formatChatTime(message.timestamp)}</span>
+                            {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && !message.is_system && (
+                              <button 
+                                className="btn btn-sm btn-danger"
+                                onClick={() => deleteMessage(message.id)}
+                                title="Delete message"
+                              >
+                                🗑️
+                              </button>
+                            )}
+                          </div>
+                          <div className="message-text">{message.message}</div>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
 
-            {chatTab === 'private' && (
-              <div className="private-messages-section">
-                <div className="private-messages-header">
-                  <button 
-                    className="btn btn-sm btn-primary"
-                    onClick={() => setShowPrivateMessageModal(true)}
-                  >
-                    + New Private Message
-                  </button>
-                </div>
-                
-                <div className="private-messages-list">
-                  {privateMessages.map(message => (
-                    <div key={message.id} className="private-message">
-                      <div className="message-header">
-                        <span className={`username ${message.sender_username === user?.username ? 'own-message' : ''}`}>
-                          {message.sender_username === user?.username ? 'You' : message.sender_username}
-                        </span>
-                        <span className="timestamp">{formatChatTime(message.timestamp)}</span>
-                      </div>
-                      <div className="message-text">{message.message}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="chat-sidebar">
-            <div className="online-users">
-              <h4>Online Users ({onlineUsers.length})</h4>
-              <div className="users-list">
-                {onlineUsers.length === 0 ? (
-                  <div className="no-users">Connecting...</div>
-                ) : (
-                  onlineUsers.map(onlineUser => (
-                    <div key={onlineUser.user_id} className="online-user">
-                      <span className={`user-role ${onlineUser.admin_role}`}>
-                        {onlineUser.admin_role === 'god' ? '👑' : 
-                         onlineUser.admin_role === 'super_admin' ? '⚡' :
-                         onlineUser.admin_role === 'admin' ? '⭐' : '👤'}
-                      </span>
-                      <span className="username">{onlineUser.username}</span>
-                      <div className="user-actions">
+                    <div className="chat-input-container">
+                      <div className="chat-input-row">
+                        <input
+                          type="text"
+                          value={chatMessage}
+                          onChange={(e) => setChatMessage(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
+                          placeholder="Type a message..."
+                          className="chat-input"
+                        />
                         <button 
-                          className="btn btn-xs btn-primary"
-                          onClick={() => {
-                            setSelectedPrivateUser(onlineUser);
-                            setShowPrivateMessageModal(true);
-                          }}
-                          title="Send private message"
+                          className="btn btn-sm btn-secondary"
+                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                         >
-                          💬
+                          😊
                         </button>
-                        {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && onlineUser.user_id !== user.user_id && (
-                          <button 
-                            className="btn btn-xs btn-danger"
-                            onClick={() => {
-                              setSelectedUserForBan(onlineUser);
-                              setShowAdminChatModal(true);
-                            }}
-                            title="Ban user"
-                          >
-                            🚫
-                          </button>
-                        )}
+                        <button 
+                          className="btn btn-sm btn-primary"
+                          onClick={sendChatMessage}
+                          disabled={!chatMessage.trim()}
+                        >
+                          Send
+                        </button>
                       </div>
+                      
+                      {showEmojiPicker && (
+                        <div className="emoji-picker-container">
+                          <EmojiPicker
+                            onEmojiClick={addEmojiToMessage}
+                            autoFocusSearch={false}
+                          />
+                        </div>
+                      )}
                     </div>
-                  ))
+                  </div>
+                )}
+
+                {chatTab === 'private' && (
+                  <div className="private-messages-section">
+                    <div className="private-messages-header">
+                      <button 
+                        className="btn btn-sm btn-primary"
+                        onClick={() => setShowPrivateMessageModal(true)}
+                      >
+                        + New Private Message
+                      </button>
+                    </div>
+                    
+                    <div className="private-messages-list">
+                      {privateMessages.map(message => (
+                        <div key={message.id} className="private-message">
+                          <div className="message-header">
+                            <span className={`username ${message.sender_username === user?.username ? 'own-message' : ''}`}>
+                              {message.sender_username === user?.username ? 'You' : message.sender_username}
+                            </span>
+                            <span className="timestamp">{formatChatTime(message.timestamp)}</span>
+                          </div>
+                          <div className="message-text">{message.message}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
+
+              <div className="chat-sidebar">
+                <div className="online-users">
+                  <h4>Online Users ({onlineUsers.length})</h4>
+                  <div className="users-list">
+                    {onlineUsers.length === 0 ? (
+                      <div className="no-users">Connecting...</div>
+                    ) : (
+                      onlineUsers.map(onlineUser => (
+                        <div key={onlineUser.user_id} className="online-user">
+                          <span className={`user-role ${onlineUser.admin_role}`}>
+                            {onlineUser.admin_role === 'god' ? '👑' : 
+                             onlineUser.admin_role === 'super_admin' ? '⚡' :
+                             onlineUser.admin_role === 'admin' ? '⭐' : '👤'}
+                          </span>
+                          <span className="username">{onlineUser.username}</span>
+                          <div className="user-actions">
+                            <button 
+                              className="btn btn-xs btn-primary"
+                              onClick={() => {
+                                setSelectedPrivateUser(onlineUser);
+                                setShowPrivateMessageModal(true);
+                              }}
+                              title="Send private message"
+                            >
+                              💬
+                            </button>
+                            {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && onlineUser.user_id !== user.user_id && (
+                              <button 
+                                className="btn btn-xs btn-danger"
+                                onClick={() => {
+                                  setSelectedUserForBan(onlineUser);
+                                  setShowAdminChatModal(true);
+                                }}
+                                title="Ban user"
+                              >
+                                🚫
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {isChatMinimized && (
+          <div className="chat-minimized-content">
+            <div className="chat-summary">
+              <span>💬 {onlineUsers.length} online</span>
+              {unreadMessages > 0 && (
+                <span className="unread-mini-badge">{unreadMessages}</span>
+              )}
             </div>
           </div>
-        </div>
+        )}
       </div>
     );
   };
