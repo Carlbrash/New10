@@ -7534,5 +7534,401 @@ class SocialSharingSystemTester(unittest.TestCase):
         
         print("✅ Social sharing system integration test passed")
 
+class FriendImportSystemTester(unittest.TestCase):
+    """Test Friend Import System backend endpoints"""
+    
+    base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
+    
+    # Test user credentials
+    testuser_credentials = {
+        "username": "testuser",
+        "password": "test123"
+    }
+    
+    # Admin credentials
+    admin_credentials = {
+        "username": "admin",
+        "password": "Kiki1999@"
+    }
+    
+    testuser_token = None
+    admin_token = None
+    testuser_id = None
+    admin_id = None
+    friend_request_id = None
+    
+    def test_01_testuser_login(self):
+        """Login as testuser to get token for friend system testing"""
+        print("\n🔍 Testing testuser login for Friend Import System testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.testuser_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Testuser login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("user_id", data)
+        FriendImportSystemTester.testuser_token = data["token"]
+        FriendImportSystemTester.testuser_id = data["user_id"]
+        print(f"✅ Testuser login successful - User ID: {FriendImportSystemTester.testuser_id}")
+    
+    def test_02_admin_login(self):
+        """Login as admin to get token for friend system testing"""
+        print("\n🔍 Testing admin login for Friend Import System testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.admin_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("user_id", data)
+        FriendImportSystemTester.admin_token = data["token"]
+        FriendImportSystemTester.admin_id = data["user_id"]
+        print(f"✅ Admin login successful - User ID: {FriendImportSystemTester.admin_id}")
+    
+    def test_03_friend_recommendations(self):
+        """Test GET /api/friends/recommendations - Get friend recommendations"""
+        print("\n🔍 Testing GET /api/friends/recommendations endpoint...")
+        
+        if not FriendImportSystemTester.testuser_token:
+            self.skipTest("Testuser token not available, skipping friend recommendations test")
+        
+        headers = {"Authorization": f"Bearer {FriendImportSystemTester.testuser_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/friends/recommendations",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Friend recommendations request failed: {response.text}")
+        
+        data = response.json()
+        
+        # Verify response structure
+        required_fields = ["recommendations"]
+        for field in required_fields:
+            self.assertIn(field, data, f"Missing required field: {field}")
+        
+        # Verify data types
+        self.assertIsInstance(data["recommendations"], list)
+        
+        recommendations = data["recommendations"]
+        print(f"  ✅ Friend recommendations retrieved successfully:")
+        print(f"    Total recommendations: {len(recommendations)}")
+        
+        # Check structure of recommendations if any exist
+        if recommendations:
+            first_rec = recommendations[0]
+            rec_fields = ["user_id", "username", "full_name", "country", "avatar_url", "common_teams", "mutual_friends"]
+            for field in rec_fields:
+                if field in first_rec:
+                    print(f"    Sample recommendation field '{field}': {first_rec[field]}")
+        else:
+            print("    No recommendations found (expected for new user)")
+        
+        print("✅ GET /api/friends/recommendations endpoint test passed")
+    
+    def test_04_friend_search(self):
+        """Test GET /api/friends/search?q=admin - Search for friends"""
+        print("\n🔍 Testing GET /api/friends/search endpoint...")
+        
+        if not FriendImportSystemTester.testuser_token:
+            self.skipTest("Testuser token not available, skipping friend search test")
+        
+        headers = {"Authorization": f"Bearer {FriendImportSystemTester.testuser_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/friends/search?q=admin",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Friend search request failed: {response.text}")
+        
+        data = response.json()
+        
+        # Verify response structure
+        required_fields = ["results"]
+        for field in required_fields:
+            self.assertIn(field, data, f"Missing required field: {field}")
+        
+        # Verify data types
+        self.assertIsInstance(data["results"], list)
+        
+        results = data["results"]
+        print(f"  ✅ Friend search results retrieved successfully:")
+        print(f"    Search query: 'admin'")
+        print(f"    Total results: {len(results)}")
+        
+        # Check if admin user is found in results
+        admin_found = False
+        for result in results:
+            if "admin" in result.get("username", "").lower():
+                admin_found = True
+                print(f"    Found admin user: {result.get('username')} ({result.get('full_name')})")
+                break
+        
+        if admin_found:
+            print("    ✅ Admin user found in search results")
+        else:
+            print("    ⚠️ Admin user not found in search results")
+        
+        print("✅ GET /api/friends/search endpoint test passed")
+    
+    def test_05_send_friend_request(self):
+        """Test POST /api/friends/send-request - Send friend request to admin"""
+        print("\n🔍 Testing POST /api/friends/send-request endpoint...")
+        
+        if not FriendImportSystemTester.testuser_token or not FriendImportSystemTester.admin_id:
+            self.skipTest("Required tokens not available, skipping send friend request test")
+        
+        request_data = {
+            "recipient_id": FriendImportSystemTester.admin_id
+        }
+        
+        headers = {"Authorization": f"Bearer {FriendImportSystemTester.testuser_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/friends/send-request",
+            headers=headers,
+            json=request_data
+        )
+        
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response body: {response.text}")
+        
+        # Check if request was successful or if they're already friends
+        if response.status_code == 200:
+            data = response.json()
+            self.assertIn("message", data)
+            if "request_id" in data:
+                FriendImportSystemTester.friend_request_id = data["request_id"]
+            print("  ✅ Friend request sent successfully")
+            print(f"    Message: {data.get('message')}")
+            if FriendImportSystemTester.friend_request_id:
+                print(f"    Request ID: {FriendImportSystemTester.friend_request_id}")
+        elif response.status_code == 400:
+            # Could be already friends or already sent request
+            print("  ✅ Friend request failed with expected validation (already friends or request exists)")
+        else:
+            self.fail(f"Unexpected response status: {response.status_code}")
+        
+        print("✅ POST /api/friends/send-request endpoint test passed")
+    
+    def test_06_get_friend_requests(self):
+        """Test GET /api/friends/requests - Get friend requests as admin"""
+        print("\n🔍 Testing GET /api/friends/requests endpoint...")
+        
+        if not FriendImportSystemTester.admin_token:
+            self.skipTest("Admin token not available, skipping get friend requests test")
+        
+        headers = {"Authorization": f"Bearer {FriendImportSystemTester.admin_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/friends/requests",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Get friend requests failed: {response.text}")
+        
+        data = response.json()
+        
+        # Verify response structure
+        required_fields = ["requests"]
+        for field in required_fields:
+            self.assertIn(field, data, f"Missing required field: {field}")
+        
+        # Verify data types
+        self.assertIsInstance(data["requests"], list)
+        
+        requests_list = data["requests"]
+        print(f"  ✅ Friend requests retrieved successfully:")
+        print(f"    Total pending requests: {len(requests_list)}")
+        
+        # Look for request from testuser
+        testuser_request = None
+        for req in requests_list:
+            if req.get("sender_id") == FriendImportSystemTester.testuser_id:
+                testuser_request = req
+                FriendImportSystemTester.friend_request_id = req.get("id")
+                break
+        
+        if testuser_request:
+            print(f"    ✅ Found friend request from testuser")
+            print(f"      Request ID: {testuser_request.get('id')}")
+            print(f"      Sender: {testuser_request.get('sender_username')}")
+            print(f"      Status: {testuser_request.get('status')}")
+        else:
+            print("    ⚠️ No friend request from testuser found (may have been processed already)")
+        
+        print("✅ GET /api/friends/requests endpoint test passed")
+    
+    def test_07_respond_to_friend_request(self):
+        """Test POST /api/friends/respond-request - Accept friend request"""
+        print("\n🔍 Testing POST /api/friends/respond-request endpoint...")
+        
+        if not FriendImportSystemTester.admin_token:
+            self.skipTest("Admin token not available, skipping respond to friend request test")
+        
+        if not FriendImportSystemTester.friend_request_id:
+            print("  ⚠️ No friend request ID available, skipping response test")
+            print("  This could mean no pending request exists or it was already processed")
+            return
+        
+        response_data = {
+            "request_id": FriendImportSystemTester.friend_request_id,
+            "action": "accept"
+        }
+        
+        headers = {"Authorization": f"Bearer {FriendImportSystemTester.admin_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/friends/respond-request",
+            headers=headers,
+            json=response_data
+        )
+        
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response body: {response.text}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            self.assertIn("message", data)
+            print("  ✅ Friend request accepted successfully")
+            print(f"    Message: {data.get('message')}")
+        elif response.status_code == 404:
+            print("  ✅ Friend request not found (may have been processed already)")
+        elif response.status_code == 400:
+            print("  ✅ Friend request response failed with validation error (expected)")
+        else:
+            self.fail(f"Unexpected response status: {response.status_code}")
+        
+        print("✅ POST /api/friends/respond-request endpoint test passed")
+    
+    def test_08_get_friends_list(self):
+        """Test GET /api/friends/list - Get friends list as testuser"""
+        print("\n🔍 Testing GET /api/friends/list endpoint...")
+        
+        if not FriendImportSystemTester.testuser_token:
+            self.skipTest("Testuser token not available, skipping get friends list test")
+        
+        headers = {"Authorization": f"Bearer {FriendImportSystemTester.testuser_token}"}
+        response = requests.get(
+            f"{self.base_url}/api/friends/list",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Get friends list failed: {response.text}")
+        
+        data = response.json()
+        
+        # Verify response structure
+        required_fields = ["friends"]
+        for field in required_fields:
+            self.assertIn(field, data, f"Missing required field: {field}")
+        
+        # Verify data types
+        self.assertIsInstance(data["friends"], list)
+        
+        friends_list = data["friends"]
+        print(f"  ✅ Friends list retrieved successfully:")
+        print(f"    Total friends: {len(friends_list)}")
+        
+        # Check if admin is in friends list
+        admin_friend = None
+        for friend in friends_list:
+            if friend.get("friend_id") == FriendImportSystemTester.admin_id:
+                admin_friend = friend
+                break
+        
+        if admin_friend:
+            print(f"    ✅ Admin user found in friends list")
+            print(f"      Friend: {admin_friend.get('friend_username')} ({admin_friend.get('friend_full_name')})")
+            print(f"      Since: {admin_friend.get('created_at')}")
+        else:
+            print("    ⚠️ Admin user not found in friends list (friendship may not have been created)")
+        
+        print("✅ GET /api/friends/list endpoint test passed")
+    
+    def test_09_friend_import_email(self):
+        """Test POST /api/friends/import - Import friends by email"""
+        print("\n🔍 Testing POST /api/friends/import endpoint...")
+        
+        if not FriendImportSystemTester.testuser_token:
+            self.skipTest("Testuser token not available, skipping friend import test")
+        
+        import_data = {
+            "provider": "email",
+            "emails": ["admin@example.com", "nonexistent@example.com"]
+        }
+        
+        headers = {"Authorization": f"Bearer {FriendImportSystemTester.testuser_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/friends/import",
+            headers=headers,
+            json=import_data
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Friend import failed: {response.text}")
+        
+        data = response.json()
+        
+        # Verify response structure
+        required_fields = ["found_users", "not_found_emails", "total_found", "total_not_found"]
+        for field in required_fields:
+            self.assertIn(field, data, f"Missing required field: {field}")
+        
+        # Verify data types
+        self.assertIsInstance(data["found_users"], list)
+        self.assertIsInstance(data["not_found_emails"], list)
+        self.assertIsInstance(data["total_found"], int)
+        self.assertIsInstance(data["total_not_found"], int)
+        
+        print(f"  ✅ Friend import completed successfully:")
+        print(f"    Total found: {data['total_found']}")
+        print(f"    Total not found: {data['total_not_found']}")
+        print(f"    Found users: {len(data['found_users'])}")
+        print(f"    Not found emails: {data['not_found_emails']}")
+        
+        # Check if admin email was found
+        admin_found = False
+        for user in data["found_users"]:
+            if user.get("email") == "admin@example.com":
+                admin_found = True
+                print(f"    ✅ Admin user found by email: {user.get('username')} ({user.get('full_name')})")
+                break
+        
+        if not admin_found:
+            print("    ⚠️ Admin user not found by email (may not have admin@example.com as email)")
+        
+        # Verify nonexistent email is in not found list
+        if "nonexistent@example.com" in data["not_found_emails"]:
+            print("    ✅ Nonexistent email correctly identified as not found")
+        
+        print("✅ POST /api/friends/import endpoint test passed")
+    
+    def test_10_authentication_requirements(self):
+        """Test that friend endpoints properly require authentication"""
+        print("\n🔍 Testing authentication requirements for friend endpoints...")
+        
+        # Test endpoints without authentication
+        endpoints_to_test = [
+            ("GET", "/api/friends/recommendations"),
+            ("GET", "/api/friends/search?q=test"),
+            ("POST", "/api/friends/send-request"),
+            ("GET", "/api/friends/requests"),
+            ("POST", "/api/friends/respond-request"),
+            ("GET", "/api/friends/list"),
+            ("POST", "/api/friends/import")
+        ]
+        
+        for method, endpoint in endpoints_to_test:
+            print(f"  Testing {method} {endpoint} without auth...")
+            
+            if method == "GET":
+                response = requests.get(f"{self.base_url}{endpoint}")
+            elif method == "POST":
+                response = requests.post(f"{self.base_url}{endpoint}", json={})
+            
+            self.assertEqual(response.status_code, 401, f"{method} {endpoint} should require authentication")
+            print(f"    ✅ {method} {endpoint} correctly requires authentication")
+        
+        print("✅ Authentication requirements test passed")
+
 if __name__ == "__main__":
     unittest.main()
