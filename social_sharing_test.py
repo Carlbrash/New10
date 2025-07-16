@@ -247,13 +247,12 @@ class SocialSharingSystemTester(unittest.TestCase):
             "achievement_data": {
                 "title": "First Tournament Win",
                 "description": "Won my first tournament on WoBeRa!"
-            },
-            "platform": "twitter"
+            }
         }
         
         headers = {"Authorization": f"Bearer {SocialSharingSystemTester.test_user_token}"}
         response = requests.post(
-            f"{self.base_url}/api/achievements/share",
+            f"{self.base_url}/api/achievements/share?platform=twitter",
             headers=headers,
             json=achievement_request
         )
