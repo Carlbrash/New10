@@ -4181,12 +4181,22 @@ function App() {
       console.log('Registration attempt with:', { ...registerForm, password: '***' });
       console.log('API URL:', `${API_BASE_URL}/api/register`);
       
+      const registrationData = {
+        username: registerForm.username,
+        email: registerForm.email,
+        password: registerForm.password,
+        country: registerForm.country,
+        full_name: registerForm.full_name,
+        avatar_url: registerForm.avatar_url,
+        referral_code: registerForm.affiliate_code || null
+      };
+      
       const response = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(registerForm)
+        body: JSON.stringify(registrationData)
       });
       
       console.log('Registration response status:', response.status);
