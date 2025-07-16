@@ -9522,26 +9522,47 @@ function App() {
   };
 
   // Send chat message
-  const sendChatMessage = () => {
-    if (!chatSocket || !chatMessage.trim()) {
-      console.log('❌ Cannot send message: socket or message empty', {
-        hasSocket: !!chatSocket,
+  const sendChatMessage = async () => {
+    if (!chatMessage.trim() || !isConnectedToChat) {
+      console.log('❌ Cannot send message: message empty or not connected', {
         message: chatMessage,
         isConnected: isConnectedToChat
       });
       return;
     }
 
-    const messageData = {
-      type: 'room_message',
-      room_id: currentChatRoom,
-      message: chatMessage.trim()
-    };
+    try {
+      const messageData = {
+        room_id: currentChatRoom,
+        message: chatMessage.trim()
+      };
 
-    console.log('📤 Sending message:', messageData);
-    chatSocket.send(JSON.stringify(messageData));
-    setChatMessage('');
-    setShowEmojiPicker(false);
+      console.log('📤 Sending message:', messageData);
+      
+      const response = await fetch(`${API_BASE_URL}/api/chat/send-message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(messageData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Message sent successfully:', result);
+        
+        // Add message to local state immediately
+        setChatMessages(prev => [...prev, result.data]);
+        
+        setChatMessage('');
+        setShowEmojiPicker(false);
+      } else {
+        console.error('❌ Failed to send message:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('❌ Error sending message:', error);
+    }
   };
 
   // Send private message
