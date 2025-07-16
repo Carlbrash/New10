@@ -1436,8 +1436,8 @@ async def login_user(user: UserLogin):
     if not user_data or not verify_password(user.password, user_data["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    token = create_token(user_data["id"])
-    return {"message": "Login successful", "token": token, "user_id": user_data["id"]}
+    token = create_token(user_data["user_id"])
+    return {"message": "Login successful", "token": token, "user_id": user_data["user_id"]}
 
 @app.get("/api/profile")
 async def get_profile(user_id: str = Depends(verify_token)):
