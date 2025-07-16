@@ -92,9 +92,9 @@ class InsufficientBalanceModalTester(unittest.TestCase):
         
         print(f"✅ Successfully logged in as modal_test - User ID: {self.user_id}")
 
-    def test_02_check_wallet_balance(self):
-        """Check testuser's wallet balance"""
-        print("\n🔍 Checking testuser's wallet balance...")
+    def test_03_check_wallet_balance(self):
+        """Check modal_test user's wallet balance (should be 0)"""
+        print("\n🔍 Checking modal_test user's wallet balance...")
         
         if not self.token:
             self.skipTest("Token not available, skipping wallet balance test")
@@ -112,9 +112,13 @@ class InsufficientBalanceModalTester(unittest.TestCase):
         self.assertIn("available_balance", data)
         balance = data["available_balance"]
         
-        print(f"✅ Testuser's wallet balance: €{balance}")
+        print(f"✅ Modal_test user's wallet balance: €{balance}")
         print(f"   Total earned: €{data.get('total_earned', 0.0)}")
         print(f"   Withdrawn balance: €{data.get('withdrawn_balance', 0.0)}")
+        
+        # New user should have 0 balance
+        self.assertEqual(balance, 0.0, "New user should have 0 available balance")
+        self.assertEqual(data.get('total_earned', 0.0), 0.0, "New user should have 0 total earned")
         
         # Store balance for next test
         self.wallet_balance = balance
