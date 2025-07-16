@@ -8542,7 +8542,7 @@ async def get_friends_list(current_user: dict = Depends(get_current_user)):
 async def import_friends(request: FriendImportRequest, current_user: dict = Depends(get_current_user)):
     """Import friends from external providers"""
     try:
-        user_id = current_user["user_id"]
+        user_id = current_user["id"]
         
         imported_friends = []
         
