@@ -58,6 +58,41 @@ code {
   z-index: 1000;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.chat-popup.minimized {
+  height: 60px;
+  width: 300px;
+}
+
+.chat-minimized-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.chat-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.unread-mini-badge {
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
 }
 
 .chat-content {
