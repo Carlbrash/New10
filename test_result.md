@@ -637,30 +637,58 @@ agent_communication:
   - agent: "testing"
     message: "I've completed additional testing of the Tournament Bracket System. The bracket generation endpoint correctly validates that at least 2 participants are required to generate a bracket. The endpoint returns a 400 error with appropriate message when attempting to generate a bracket for a tournament with fewer than 2 participants. This is the expected behavior to ensure fair tournament brackets."
 
-user_problem_statement: "Implement Advanced Analytics with Enhanced Dashboard and Charts
+user_problem_statement: "Test the new Social Sharing System backend endpoints that were just implemented.
 
-The user requested to implement Advanced Analytics focusing on:
+Please test the following Social Sharing System endpoints:
 
-1. **Enhanced Dashboard with Charts:**
-   - User registration trends (line charts)
-   - Tournament participation analytics (bar charts)
-   - Revenue/Financial analytics (pie charts)
-   - Geographic distribution (maps/charts)
-   - Performance metrics (KPI cards)
+1. **POST /api/social/share** - Create social share content (requires authentication)
+   - Login as testuser (testuser/test123)
+   - Try to create a share with payload:
+   ```json
+   {
+     \"share_type\": \"tournament_victory\",
+     \"reference_id\": \"existing_tournament_id\",
+     \"platform\": \"twitter\",
+     \"custom_message\": \"Check out my amazing victory!\"
+   }
+   ```
+   - Should return share content with title, description, hashtags, and share URL
 
-2. **Advanced Metrics:**
-   - User engagement metrics (daily/weekly/monthly active users)
-   - Tournament success rates and patterns
-   - Affiliate conversion funnels
-   - Financial performance indicators
-   - Retention analytics
+2. **GET /api/social/user/shares** - Get user's share history (requires authentication)
+   - Login as testuser (testuser/test123)
+   - Should return user's share history with pagination
 
-Implementation includes:
-- New backend endpoints: /api/admin/analytics/advanced-dashboard and /api/admin/analytics/engagement-metrics
-- Chart.js integration for data visualization
-- Comprehensive analytics dashboard with KPIs, charts, and metrics
-- Interactive visualizations with proper loading states
-- Responsive design for all device sizes"
+3. **GET /api/social/stats** - Get social sharing statistics (requires authentication)
+   - Login as testuser (testuser/test123)
+   - Should return social sharing stats including total shares, clicks, engagement rate
+
+4. **GET /api/social/viral-content** - Get viral content (no authentication required)
+   - Should return trending viral content based on clicks and engagement
+
+5. **POST /api/tournaments/{tournament_id}/share-victory** - Share tournament victory (requires authentication)
+   - Login as testuser (testuser/test123)
+   - Try to share victory for a tournament the user participated in
+   - Should return share content for tournament victory
+
+6. **POST /api/achievements/share** - Share achievement (requires authentication)
+   - Login as testuser (testuser/test123)
+   - Try to share an achievement with payload:
+   ```json
+   {
+     \"achievement_data\": {
+       \"title\": \"First Tournament Win\",
+       \"description\": \"Won my first tournament on WoBeRa!\"
+     },
+     \"platform\": \"twitter\"
+   }
+   ```
+   - Should return share content for achievement
+
+Focus on testing the API structure, authentication requirements, and content generation. The social sharing system should integrate properly with the existing tournament and user systems.
+
+Test user credentials:
+- Username: testuser
+- Password: test123"
 
 backend:
   - task: "Check referral code validation: GET /api/register/check-referral/DEMO2024"
