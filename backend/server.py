@@ -6150,22 +6150,6 @@ async def websocket_chat_endpoint(websocket: WebSocket):
             await chat_manager.disconnect(user_id)
 
 # REST API endpoints for chat management
-@app.get("/api/chat/online-users")
-async def get_online_users(user_id: str = Depends(verify_token)):
-    """Get list of online users"""
-    online_users = [
-        {
-            "user_id": user.user_id,
-            "username": user.username,
-            "admin_role": user.admin_role,
-            "current_room": user.current_room,
-            "last_seen": user.last_seen.isoformat()
-        }
-        for user in chat_manager.online_users.values()
-    ]
-    
-    return CustomJSONResponse(content={"online_users": online_users})
-
 @app.get("/api/chat/rooms")
 async def get_user_chat_rooms(user_id: str = Depends(verify_token)):
     """Get available chat rooms for current user"""
