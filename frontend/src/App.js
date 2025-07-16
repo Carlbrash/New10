@@ -1124,7 +1124,7 @@ function App() {
   // Admin Affiliate States
   const [affiliateUsers, setAffiliateUsers] = useState([]);
   const [affiliateRequests, setAffiliateRequests] = useState([]);
-  const [affiliateStats, setAffiliateStats] = useState(null);
+  const [adminAffiliateStats, setAdminAffiliateStats] = useState(null);
   const [affiliateLoading, setAffiliateLoading] = useState(false);
   const [showAffiliateModal, setShowAffiliateModal] = useState(false);
   const [selectedAffiliateUser, setSelectedAffiliateUser] = useState(null);
