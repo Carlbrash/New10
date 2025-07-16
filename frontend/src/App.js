@@ -4672,7 +4672,7 @@ function App() {
     <div className="auth-container">
       <div className="auth-card">
         <h2 className="auth-title">{t.loginTitle}</h2>
-        <form onSubmit={handleLogin}>
+        <div>
           <div className="form-group">
             <label>{t.username}</label>
             <input
@@ -4692,7 +4692,7 @@ function App() {
             />
           </div>
           <button 
-            type="submit" 
+            type="button" 
             className="btn btn-primary" 
             disabled={loading}
             onClick={async (e) => {
@@ -4709,7 +4709,7 @@ function App() {
           >
             {loading ? t.loggingIn : t.loginBtn}
           </button>
-        </form>
+        </div>
         <div className="demo-section">
           <p>{t.demoCredentials}</p>
           <button 
