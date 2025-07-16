@@ -7376,7 +7376,7 @@ async def get_payment_config():
 # =============================================================================
 
 @app.get("/api/admin/payments")
-async def get_all_payments(admin_user_id: str = Depends(verify_admin_token), limit: int = 50, skip: int = 0):
+async def get_all_payments(admin_user_id: str = Depends(verify_admin_token()), limit: int = 50, skip: int = 0):
     """Get all payments for admin"""
     try:
         payments = list(payments_collection.find(
