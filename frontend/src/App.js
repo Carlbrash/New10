@@ -2805,13 +2805,28 @@ function App() {
     setTournamentLoading(false);
   };
 
-  // Join tournament
+  // Join tournament with payment integration
   const joinTournament = async (tournamentId) => {
     if (!token) {
       alert(t.loginRequired || 'Please login to join tournaments');
       return;
     }
     
+    // Get tournament details to check entry fee
+    const tournament = tournaments.find(t => t.id === tournamentId) || selectedTournament;
+    if (!tournament) {
+      alert('Tournament not found');
+      return;
+    }
+    
+    // If tournament has an entry fee, show payment modal
+    if (tournament.entry_fee > 0) {
+      setSelectedTournamentForPayment(tournament);
+      setShowPaymentModal(true);
+      return;
+    }
+    
+    // If free tournament, join directly
     try {
       const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/join`, {
         method: 'POST',
