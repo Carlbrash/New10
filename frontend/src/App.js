@@ -2765,7 +2765,20 @@ function App() {
         fetchUserTournaments();
       } else {
         const error = await response.json();
-        alert(error.detail || 'Failed to join tournament');
+        const errorMessage = error.detail || 'Failed to join tournament';
+        
+        // Check if it's an insufficient balance error
+        if (errorMessage.toLowerCase().includes('insufficient') && errorMessage.toLowerCase().includes('balance')) {
+          // Show beautiful insufficient balance modal
+          setInsufficientBalanceModal({
+            show: true,
+            message: errorMessage,
+            tournamentId: tournamentId
+          });
+        } else {
+          // Show regular alert for other errors
+          alert(errorMessage);
+        }
       }
     } catch (error) {
       console.error('Error joining tournament:', error);
