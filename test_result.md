@@ -1697,16 +1697,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Live Chat System Backend"
-    - "Team System API - GET /api/teams"
-    - "Team System API - POST /api/teams"
-    - "Team System API - GET /api/teams/{team_id}"
-    - "Team System API - POST /api/teams/{team_id}/invite"
-    - "Team System API - GET /api/teams/my-invitations"
+    - "Social Sharing System - POST /api/social/share"
+    - "Social Sharing System - GET /api/social/user/shares"
+    - "Social Sharing System - GET /api/social/stats"
+    - "Social Sharing System - GET /api/social/viral-content"
+    - "Social Sharing System - POST /api/tournaments/{tournament_id}/share-victory"
+    - "Social Sharing System - POST /api/achievements/share"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  next_phase: "ready_for_frontend_testing"
 
 agent_communication:
   - agent: "testing"
