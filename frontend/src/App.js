@@ -10067,12 +10067,49 @@ function App() {
     }
   }, [user, token]);
 
-  // Reset unread messages when chat popup opens
+  // Reset unread messages when chat popup opens or maximizes
   useEffect(() => {
-    if (showChatPopup) {
+    if (showChatPopup && !isChatMinimized) {
       setUnreadMessages(0);
     }
-  }, [showChatPopup]);
+  }, [showChatPopup, isChatMinimized]);
+
+  // Save chat persistent state to localStorage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('wobera_chat_state', JSON.stringify({
+        isMinimized: isChatMinimized,
+        showPopup: showChatPopup,
+        persistentState: chatPersistentState
+      }));
+    }
+  }, [isChatMinimized, showChatPopup, chatPersistentState, user]);
+
+  // Load chat persistent state from localStorage
+  useEffect(() => {
+    if (user) {
+      const savedState = localStorage.getItem('wobera_chat_state');
+      if (savedState) {
+        try {
+          const parsedState = JSON.parse(savedState);
+          if (parsedState.persistentState) {
+            setIsChatMinimized(parsedState.isMinimized || false);
+            setShowChatPopup(parsedState.showPopup || false);
+          }
+        } catch (error) {
+          console.error('Error loading chat state:', error);
+        }
+      }
+    }
+  }, [user]);
+
+  // Don't close chat when changing views if it's in persistent state
+  useEffect(() => {
+    if (user && chatSocket && !showChatPopup && chatPersistentState) {
+      // Keep chat running in background
+      console.log('Chat running in background...');
+    }
+  }, [currentView, chatSocket, showChatPopup, chatPersistentState, user]);
 
   return (
     <div className="App">
