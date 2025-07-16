@@ -4691,7 +4691,16 @@ function App() {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            disabled={loading}
+            onClick={async (e) => {
+              e.preventDefault();
+              console.log('🔘 Login button clicked directly');
+              await handleLogin(e);
+            }}
+          >
             {loading ? t.loggingIn : t.loginBtn}
           </button>
         </form>
