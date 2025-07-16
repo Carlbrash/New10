@@ -2642,6 +2642,18 @@ async def join_tournament(tournament_id: str, user_id: str = Depends(verify_toke
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
             
+        # Check wallet balance for tournaments with entry fee
+        entry_fee = tournament.get("entry_fee", 0.0)
+        if entry_fee > 0:
+            wallet = get_or_create_wallet(user_id)
+            available_balance = wallet.get("available_balance", 0.0)
+            
+            if available_balance < entry_fee:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Insufficient balance. You need €{entry_fee:.2f} but only have €{available_balance:.2f}. Please deposit funds or join a free tournament."
+                )
+        
         # Create participant record
         participant_id = str(uuid.uuid4())
         participant_data = {
@@ -2653,7 +2665,7 @@ async def join_tournament(tournament_id: str, user_id: str = Depends(verify_toke
             "country": user_data["country"],
             "avatar_url": user_data.get("avatar_url"),
             "registered_at": datetime.utcnow(),
-            "payment_status": "pending",  # For now, we'll mark as pending
+            "payment_status": "completed" if entry_fee == 0 else "completed",  # Mark as completed after balance check
             "current_round": 1,
             "is_eliminated": False,
             "eliminated_at": None,
@@ -2662,6 +2674,22 @@ async def join_tournament(tournament_id: str, user_id: str = Depends(verify_toke
         }
         
         tournament_participants_collection.insert_one(participant_data)
+        
+        # Deduct entry fee from wallet if tournament has entry fee
+        if entry_fee > 0:
+            transaction_success = add_transaction(
+                user_id=user_id,
+                transaction_type="tournament_entry",
+                amount=entry_fee,
+                description=f"Tournament entry fee: {tournament['name']}",
+                tournament_id=tournament_id,
+                metadata={"tournament_name": tournament["name"], "entry_fee": entry_fee}
+            )
+            
+            if not transaction_success:
+                # Remove participant if transaction failed
+                tournament_participants_collection.delete_one({"id": participant_id})
+                raise HTTPException(status_code=500, detail="Failed to process tournament entry fee")
         
         # Update tournament participant count
         new_participant_count = current_participants + 1
@@ -2678,7 +2706,12 @@ async def join_tournament(tournament_id: str, user_id: str = Depends(verify_toke
                 entry_fee=tournament["entry_fee"]
             )
         
-        return {"message": "Successfully joined tournament", "participant_id": participant_id}
+        return {
+            "message": "Successfully joined tournament", 
+            "participant_id": participant_id,
+            "entry_fee_paid": entry_fee,
+            "remaining_balance": wallet.get("available_balance", 0.0) - entry_fee if entry_fee > 0 else None
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error joining tournament: {str(e)}")
 
