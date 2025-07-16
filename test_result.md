@@ -1632,15 +1632,18 @@ backend:
 
   - task: "Payment System Backend - GET /api/admin/payments"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "CRITICAL SECURITY ISSUE: GET /api/admin/payments endpoint is not properly protected. Despite having verify_admin_token dependency in the code, the endpoint is accessible without authentication and by regular users. This is a serious security vulnerability that allows unauthorized access to all payment data in the system. The endpoint returns proper pagination structure but lacks proper authentication enforcement."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL SECURITY FIX VERIFIED: Successfully tested the admin payments endpoint security fix. SECURITY TESTS PASSED: 1) ✅ Unauthorized access blocked (403 'Not authenticated' error), 2) ✅ Regular user access blocked (403 'Insufficient admin privileges' error), 3) ✅ Admin user access working correctly (200 success with proper data structure), 4) ✅ God admin access working correctly (200 success with proper data structure). The endpoint now properly enforces authentication and authorization. Returns correct pagination structure with payments, total, page, and pages fields. All security requirements have been successfully implemented and tested. The admin payments endpoint is now properly secured."
 
   - task: "Payment System Integration with Tournament and Wallet Systems"
     implemented: true
