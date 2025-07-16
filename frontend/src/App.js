@@ -4250,6 +4250,18 @@ function App() {
     }
   }, [currentView, walletView, user, token]);
 
+  // Load payment configuration on app start
+  useEffect(() => {
+    fetchPaymentConfig();
+  }, []);
+
+  // Load payment history when user logs in
+  useEffect(() => {
+    if (user && token) {
+      fetchPaymentHistory();
+    }
+  }, [user, token]);
+
   // Fetch admin financial data when view changes
   useEffect(() => {
     if (currentView === 'admin' && adminView === 'financial' && isAdmin && token) {
