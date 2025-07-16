@@ -5599,6 +5599,609 @@ async def reset_data():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============================================================================
+# LIVE CHAT SYSTEM - WEBSOCKET IMPLEMENTATION
+# ============================================================================
+
+# Chat Room Types
+class ChatRoomType(str, Enum):
+    GENERAL = "general"
+    TOURNAMENT = "tournament"
+    TEAM = "team"
+    PRIVATE = "private"
+
+# Pydantic Models for Chat
+class ChatMessage(BaseModel):
+    id: str
+    room_id: str
+    room_type: ChatRoomType
+    sender_id: str
+    sender_username: str
+    message: str
+    timestamp: datetime
+    is_system: bool = False
+    private_recipient: Optional[str] = None
+
+class ChatRoom(BaseModel):
+    id: str
+    name: str
+    type: ChatRoomType
+    tournament_id: Optional[str] = None
+    team_id: Optional[str] = None
+    participants: List[str] = []
+    created_at: datetime
+
+class OnlineUser(BaseModel):
+    user_id: str
+    username: str
+    admin_role: str = "user"
+    current_room: str = "general"
+    last_seen: datetime
+
+# WebSocket Connection Manager
+class ChatConnectionManager:
+    def __init__(self):
+        # WebSocket connections: {user_id: websocket}
+        self.active_connections: Dict[str, WebSocket] = {}
+        # Online users: {user_id: OnlineUser}
+        self.online_users: Dict[str, OnlineUser] = {}
+        # Chat rooms: {room_id: ChatRoom}
+        self.chat_rooms: Dict[str, ChatRoom] = {}
+        # Room messages: {room_id: [ChatMessage]}
+        self.room_messages: Dict[str, List[ChatMessage]] = {}
+        
+        # Initialize default general chat room
+        self.initialize_default_rooms()
+    
+    def initialize_default_rooms(self):
+        """Initialize default chat rooms"""
+        general_room = ChatRoom(
+            id="general",
+            name="General Chat",
+            type=ChatRoomType.GENERAL,
+            participants=[],
+            created_at=datetime.utcnow()
+        )
+        self.chat_rooms["general"] = general_room
+        self.room_messages["general"] = []
+    
+    async def connect(self, websocket: WebSocket, user_id: str, username: str, admin_role: str = "user"):
+        """Connect a user to the chat system"""
+        await websocket.accept()
+        
+        # Store connection
+        self.active_connections[user_id] = websocket
+        
+        # Add to online users
+        online_user = OnlineUser(
+            user_id=user_id,
+            username=username,
+            admin_role=admin_role,
+            current_room="general",
+            last_seen=datetime.utcnow()
+        )
+        self.online_users[user_id] = online_user
+        
+        # Add to general room
+        if "general" not in self.chat_rooms:
+            self.initialize_default_rooms()
+        
+        if user_id not in self.chat_rooms["general"].participants:
+            self.chat_rooms["general"].participants.append(user_id)
+        
+        # Send system message about user joining
+        join_message = ChatMessage(
+            id=str(uuid.uuid4()),
+            room_id="general",
+            room_type=ChatRoomType.GENERAL,
+            sender_id="system",
+            sender_username="System",
+            message=f"{username} joined the chat",
+            timestamp=datetime.utcnow(),
+            is_system=True
+        )
+        
+        # Add to room messages
+        self.room_messages["general"].append(join_message)
+        
+        # Broadcast to all users in general room
+        await self.broadcast_to_room("general", join_message.dict())
+        
+        # Send online users list to the new user
+        await self.send_online_users_update()
+        
+        # Send available rooms to the new user
+        await self.send_user_rooms_update(user_id)
+    
+    async def disconnect(self, user_id: str):
+        """Disconnect a user from the chat system"""
+        if user_id in self.active_connections:
+            username = self.online_users.get(user_id, {}).username if user_id in self.online_users else "Unknown"
+            
+            # Remove from active connections
+            del self.active_connections[user_id]
+            
+            # Remove from online users
+            if user_id in self.online_users:
+                del self.online_users[user_id]
+            
+            # Remove from all room participants
+            for room in self.chat_rooms.values():
+                if user_id in room.participants:
+                    room.participants.remove(user_id)
+            
+            # Send system message about user leaving
+            if username != "Unknown":
+                leave_message = ChatMessage(
+                    id=str(uuid.uuid4()),
+                    room_id="general",
+                    room_type=ChatRoomType.GENERAL,
+                    sender_id="system",
+                    sender_username="System",
+                    message=f"{username} left the chat",
+                    timestamp=datetime.utcnow(),
+                    is_system=True
+                )
+                
+                # Add to room messages
+                self.room_messages["general"].append(leave_message)
+                
+                # Broadcast to all users in general room
+                await self.broadcast_to_room("general", leave_message.dict())
+            
+            # Update online users list
+            await self.send_online_users_update()
+    
+    async def send_personal_message(self, websocket: WebSocket, message: dict):
+        """Send message to a specific user"""
+        await websocket.send_json(message)
+    
+    async def broadcast_to_room(self, room_id: str, message: dict):
+        """Broadcast message to all users in a room"""
+        if room_id in self.chat_rooms:
+            room = self.chat_rooms[room_id]
+            for user_id in room.participants:
+                if user_id in self.active_connections:
+                    try:
+                        await self.active_connections[user_id].send_json(message)
+                    except:
+                        # Connection might be closed
+                        pass
+    
+    async def send_private_message(self, sender_id: str, recipient_id: str, message: ChatMessage):
+        """Send private message between two users"""
+        # Send to sender
+        if sender_id in self.active_connections:
+            try:
+                await self.active_connections[sender_id].send_json(message.dict())
+            except:
+                pass
+        
+        # Send to recipient
+        if recipient_id in self.active_connections:
+            try:
+                await self.active_connections[recipient_id].send_json(message.dict())
+            except:
+                pass
+    
+    async def send_online_users_update(self):
+        """Send updated online users list to all connected users"""
+        online_users_list = [
+            {
+                "user_id": user.user_id,
+                "username": user.username,
+                "admin_role": user.admin_role,
+                "current_room": user.current_room,
+                "last_seen": user.last_seen.isoformat()
+            }
+            for user in self.online_users.values()
+        ]
+        
+        update_message = {
+            "type": "online_users_update",
+            "data": online_users_list
+        }
+        
+        # Send to all connected users
+        for user_id, websocket in self.active_connections.items():
+            try:
+                await websocket.send_json(update_message)
+            except:
+                pass
+    
+    async def send_user_rooms_update(self, user_id: str):
+        """Send available rooms to a specific user"""
+        if user_id not in self.active_connections:
+            return
+        
+        user_rooms = []
+        
+        # Add general room
+        user_rooms.append({
+            "id": "general",
+            "name": "General Chat",
+            "type": "general",
+            "participant_count": len(self.chat_rooms["general"].participants) if "general" in self.chat_rooms else 0
+        })
+        
+        # Add tournament rooms for tournaments the user is in
+        user_tournaments = list(tournaments_collection.find({"participants": user_id}))
+        for tournament in user_tournaments:
+            room_id = f"tournament_{tournament['tournament_id']}"
+            if room_id not in self.chat_rooms:
+                self.create_tournament_room(tournament['tournament_id'], tournament['name'])
+            
+            user_rooms.append({
+                "id": room_id,
+                "name": f"Tournament: {tournament['name']}",
+                "type": "tournament",
+                "tournament_id": tournament['tournament_id'],
+                "participant_count": len(self.chat_rooms[room_id].participants) if room_id in self.chat_rooms else 0
+            })
+        
+        # Add team rooms for teams the user is in
+        user_teams = list(teams_collection.find({"$or": [{"captain_id": user_id}, {"members.user_id": user_id}]}))
+        for team in user_teams:
+            room_id = f"team_{team['team_id']}"
+            if room_id not in self.chat_rooms:
+                self.create_team_room(team['team_id'], team['name'])
+            
+            user_rooms.append({
+                "id": room_id,
+                "name": f"Team: {team['name']}",
+                "type": "team",
+                "team_id": team['team_id'],
+                "participant_count": len(self.chat_rooms[room_id].participants) if room_id in self.chat_rooms else 0
+            })
+        
+        rooms_update = {
+            "type": "user_rooms_update",
+            "data": user_rooms
+        }
+        
+        try:
+            await self.active_connections[user_id].send_json(rooms_update)
+        except:
+            pass
+    
+    def create_tournament_room(self, tournament_id: str, tournament_name: str):
+        """Create a tournament-specific chat room"""
+        room_id = f"tournament_{tournament_id}"
+        
+        tournament_room = ChatRoom(
+            id=room_id,
+            name=f"Tournament: {tournament_name}",
+            type=ChatRoomType.TOURNAMENT,
+            tournament_id=tournament_id,
+            participants=[],
+            created_at=datetime.utcnow()
+        )
+        
+        self.chat_rooms[room_id] = tournament_room
+        self.room_messages[room_id] = []
+    
+    def create_team_room(self, team_id: str, team_name: str):
+        """Create a team-specific chat room"""
+        room_id = f"team_{team_id}"
+        
+        team_room = ChatRoom(
+            id=room_id,
+            name=f"Team: {team_name}",
+            type=ChatRoomType.TEAM,
+            team_id=team_id,
+            participants=[],
+            created_at=datetime.utcnow()
+        )
+        
+        self.chat_rooms[room_id] = team_room
+        self.room_messages[room_id] = []
+    
+    async def join_room(self, user_id: str, room_id: str):
+        """Join a user to a specific room"""
+        if user_id not in self.online_users:
+            return
+        
+        if room_id not in self.chat_rooms:
+            return
+        
+        # Update user's current room
+        self.online_users[user_id].current_room = room_id
+        
+        # Add to room participants
+        if user_id not in self.chat_rooms[room_id].participants:
+            self.chat_rooms[room_id].participants.append(user_id)
+        
+        # Send recent messages from this room (last 50 messages)
+        if room_id in self.room_messages:
+            recent_messages = self.room_messages[room_id][-50:]  # Last 50 messages
+            for message in recent_messages:
+                if user_id in self.active_connections:
+                    try:
+                        await self.active_connections[user_id].send_json(message.dict())
+                    except:
+                        pass
+        
+        # Update rooms for this user
+        await self.send_user_rooms_update(user_id)
+    
+    async def handle_message(self, user_id: str, message_data: dict):
+        """Handle incoming chat message"""
+        if user_id not in self.online_users:
+            return
+        
+        user = self.online_users[user_id]
+        message_type = message_data.get("type", "room_message")
+        
+        if message_type == "room_message":
+            await self.handle_room_message(user_id, message_data)
+        elif message_type == "private_message":
+            await self.handle_private_message(user_id, message_data)
+        elif message_type == "join_room":
+            await self.join_room(user_id, message_data.get("room_id"))
+        elif message_type == "admin_delete_message":
+            await self.handle_admin_delete_message(user_id, message_data)
+        elif message_type == "admin_ban_user":
+            await self.handle_admin_ban_user(user_id, message_data)
+    
+    async def handle_room_message(self, user_id: str, message_data: dict):
+        """Handle room message"""
+        user = self.online_users[user_id]
+        room_id = message_data.get("room_id", user.current_room)
+        message_text = message_data.get("message", "").strip()
+        
+        if not message_text or room_id not in self.chat_rooms:
+            return
+        
+        # Create message
+        chat_message = ChatMessage(
+            id=str(uuid.uuid4()),
+            room_id=room_id,
+            room_type=self.chat_rooms[room_id].type,
+            sender_id=user_id,
+            sender_username=user.username,
+            message=message_text,
+            timestamp=datetime.utcnow(),
+            is_system=False
+        )
+        
+        # Add to room messages
+        if room_id not in self.room_messages:
+            self.room_messages[room_id] = []
+        
+        self.room_messages[room_id].append(chat_message)
+        
+        # Keep only last 100 messages per room (since no history needed)
+        if len(self.room_messages[room_id]) > 100:
+            self.room_messages[room_id] = self.room_messages[room_id][-100:]
+        
+        # Broadcast to room
+        await self.broadcast_to_room(room_id, chat_message.dict())
+    
+    async def handle_private_message(self, user_id: str, message_data: dict):
+        """Handle private message"""
+        user = self.online_users[user_id]
+        recipient_id = message_data.get("recipient_id")
+        message_text = message_data.get("message", "").strip()
+        
+        if not message_text or not recipient_id:
+            return
+        
+        # Create private message
+        private_message = ChatMessage(
+            id=str(uuid.uuid4()),
+            room_id="private",
+            room_type=ChatRoomType.PRIVATE,
+            sender_id=user_id,
+            sender_username=user.username,
+            message=message_text,
+            timestamp=datetime.utcnow(),
+            is_system=False,
+            private_recipient=recipient_id
+        )
+        
+        # Send to both users
+        await self.send_private_message(user_id, recipient_id, private_message)
+    
+    async def handle_admin_delete_message(self, user_id: str, message_data: dict):
+        """Handle admin message deletion"""
+        user = self.online_users[user_id]
+        
+        # Check if user is admin
+        if user.admin_role not in ["admin", "super_admin", "god"]:
+            return
+        
+        message_id = message_data.get("message_id")
+        room_id = message_data.get("room_id")
+        
+        if not message_id or room_id not in self.room_messages:
+            return
+        
+        # Find and remove message
+        messages = self.room_messages[room_id]
+        for i, msg in enumerate(messages):
+            if msg.id == message_id:
+                del messages[i]
+                
+                # Send deletion notification
+                delete_notification = {
+                    "type": "message_deleted",
+                    "message_id": message_id,
+                    "room_id": room_id,
+                    "deleted_by": user.username
+                }
+                
+                await self.broadcast_to_room(room_id, delete_notification)
+                break
+    
+    async def handle_admin_ban_user(self, user_id: str, message_data: dict):
+        """Handle admin user ban"""
+        user = self.online_users[user_id]
+        
+        # Check if user is admin
+        if user.admin_role not in ["admin", "super_admin", "god"]:
+            return
+        
+        target_user_id = message_data.get("target_user_id")
+        reason = message_data.get("reason", "No reason provided")
+        
+        if not target_user_id or target_user_id not in self.online_users:
+            return
+        
+        target_user = self.online_users[target_user_id]
+        
+        # Send ban notification to target user
+        ban_notification = {
+            "type": "user_banned",
+            "reason": reason,
+            "banned_by": user.username
+        }
+        
+        if target_user_id in self.active_connections:
+            try:
+                await self.active_connections[target_user_id].send_json(ban_notification)
+            except:
+                pass
+        
+        # Disconnect banned user
+        await self.disconnect(target_user_id)
+        
+        # Send system message to general room
+        ban_message = ChatMessage(
+            id=str(uuid.uuid4()),
+            room_id="general",
+            room_type=ChatRoomType.GENERAL,
+            sender_id="system",
+            sender_username="System",
+            message=f"{target_user.username} was banned by {user.username}. Reason: {reason}",
+            timestamp=datetime.utcnow(),
+            is_system=True
+        )
+        
+        self.room_messages["general"].append(ban_message)
+        await self.broadcast_to_room("general", ban_message.dict())
+
+# Global chat manager instance
+chat_manager = ChatConnectionManager()
+
+# WebSocket endpoint for chat
+@app.websocket("/ws/chat")
+async def websocket_chat_endpoint(websocket: WebSocket):
+    """WebSocket endpoint for live chat"""
+    user_id = None
+    try:
+        # Get user info from query params or headers
+        query_params = websocket.query_params
+        token = query_params.get("token")
+        
+        if not token:
+            await websocket.close(code=4001, reason="Authentication required")
+            return
+        
+        # Verify JWT token
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            user_id = payload.get("user_id")
+            
+            if not user_id:
+                await websocket.close(code=4001, reason="Invalid token")
+                return
+            
+            # Get user details
+            user = users_collection.find_one({"user_id": user_id})
+            if not user:
+                await websocket.close(code=4001, reason="User not found")
+                return
+            
+            username = user.get("username", "Unknown")
+            admin_role = user.get("admin_role", "user")
+            
+        except jwt.ExpiredSignatureError:
+            await websocket.close(code=4001, reason="Token expired")
+            return
+        except jwt.InvalidTokenError:
+            await websocket.close(code=4001, reason="Invalid token")
+            return
+        
+        # Connect user to chat
+        await chat_manager.connect(websocket, user_id, username, admin_role)
+        
+        # Listen for messages
+        while True:
+            try:
+                data = await websocket.receive_json()
+                await chat_manager.handle_message(user_id, data)
+            except WebSocketDisconnect:
+                break
+            except Exception as e:
+                print(f"Error handling message: {e}")
+                break
+                
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+    finally:
+        if user_id:
+            await chat_manager.disconnect(user_id)
+
+# REST API endpoints for chat management
+@app.get("/api/chat/online-users")
+async def get_online_users(current_user: dict = Depends(verify_token)):
+    """Get list of online users"""
+    online_users = [
+        {
+            "user_id": user.user_id,
+            "username": user.username,
+            "admin_role": user.admin_role,
+            "current_room": user.current_room,
+            "last_seen": user.last_seen.isoformat()
+        }
+        for user in chat_manager.online_users.values()
+    ]
+    
+    return CustomJSONResponse(content={"online_users": online_users})
+
+@app.get("/api/chat/rooms")
+async def get_user_chat_rooms(current_user: dict = Depends(verify_token)):
+    """Get available chat rooms for current user"""
+    user_id = current_user["user_id"]
+    
+    user_rooms = []
+    
+    # Add general room
+    user_rooms.append({
+        "id": "general",
+        "name": "General Chat",
+        "type": "general",
+        "participant_count": len(chat_manager.chat_rooms["general"].participants) if "general" in chat_manager.chat_rooms else 0
+    })
+    
+    # Add tournament rooms
+    user_tournaments = list(tournaments_collection.find({"participants": user_id}))
+    for tournament in user_tournaments:
+        room_id = f"tournament_{tournament['tournament_id']}"
+        user_rooms.append({
+            "id": room_id,
+            "name": f"Tournament: {tournament['name']}",
+            "type": "tournament",
+            "tournament_id": tournament['tournament_id'],
+            "participant_count": len(chat_manager.chat_rooms[room_id].participants) if room_id in chat_manager.chat_rooms else 0
+        })
+    
+    # Add team rooms
+    user_teams = list(teams_collection.find({"$or": [{"captain_id": user_id}, {"members.user_id": user_id}]}))
+    for team in user_teams:
+        room_id = f"team_{team['team_id']}"
+        user_rooms.append({
+            "id": room_id,
+            "name": f"Team: {team['name']}",
+            "type": "team",
+            "team_id": team['team_id'],
+            "participant_count": len(chat_manager.chat_rooms[room_id].participants) if room_id in chat_manager.chat_rooms else 0
+        })
+    
+    return CustomJSONResponse(content={"rooms": user_rooms})
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
