@@ -6271,6 +6271,13 @@ async def get_chat_statistics(user_id: str = Depends(verify_token)):
     
     return CustomJSONResponse(content=stats)
 
+# Global chat manager instance
+chat_manager = ChatConnectionManager()
+
+# Simple in-memory storage for chat messages (since WebSocket is not working)
+chat_messages_storage = {}
+online_users_storage = {}
+
 @app.post("/api/chat/send-message")
 async def send_chat_message(
     request: dict,
@@ -6299,8 +6306,25 @@ async def send_chat_message(
         "is_system": False
     }
     
-    # For now, just store in memory (in a real app, you'd store in database)
-    # We'll simulate immediate return since there's no WebSocket
+    # Store message in memory
+    if room_id not in chat_messages_storage:
+        chat_messages_storage[room_id] = []
+    
+    chat_messages_storage[room_id].append(message_data)
+    
+    # Keep only last 50 messages per room
+    if len(chat_messages_storage[room_id]) > 50:
+        chat_messages_storage[room_id] = chat_messages_storage[room_id][-50:]
+    
+    # Update online users
+    online_users_storage[user_id] = {
+        "user_id": user_id,
+        "username": user.get("username", "Unknown"),
+        "admin_role": user.get("admin_role", "user"),
+        "current_room": room_id,
+        "last_seen": datetime.utcnow().isoformat()
+    }
+    
     return CustomJSONResponse(content={"message": "Message sent successfully", "data": message_data})
 
 @app.get("/api/chat/messages/{room_id}")
@@ -6309,9 +6333,40 @@ async def get_chat_messages(
     user_id: str = Depends(verify_token)
 ):
     """Get recent chat messages for a room"""
-    # For now, return empty messages since we don't have persistent storage
-    # In a real implementation, you'd fetch from database
-    return CustomJSONResponse(content={"messages": []})
+    messages = chat_messages_storage.get(room_id, [])
+    return CustomJSONResponse(content={"messages": messages})
+
+@app.get("/api/chat/online-users")
+async def get_online_users(user_id: str = Depends(verify_token)):
+    """Get list of online users"""
+    # Clean up old users (older than 1 minute)
+    now = datetime.utcnow()
+    active_users = []
+    
+    for user_data in online_users_storage.values():
+        try:
+            last_seen = datetime.fromisoformat(user_data["last_seen"])
+            if (now - last_seen).total_seconds() < 60:  # 1 minute
+                active_users.append(user_data)
+        except:
+            pass
+    
+    # Update current user as online
+    user = users_collection.find_one({"$or": [{"user_id": user_id}, {"id": user_id}]})
+    if user:
+        online_users_storage[user_id] = {
+            "user_id": user_id,
+            "username": user.get("username", "Unknown"),
+            "admin_role": user.get("admin_role", "user"),
+            "current_room": "general",
+            "last_seen": datetime.utcnow().isoformat()
+        }
+        
+        # Add current user to active users if not already there
+        if not any(u["user_id"] == user_id for u in active_users):
+            active_users.append(online_users_storage[user_id])
+    
+    return CustomJSONResponse(content={"online_users": active_users})
 
 if __name__ == "__main__":
     import uvicorn
