@@ -7951,6 +7951,222 @@ def calculate_viral_coefficient(share_id: str) -> float:
         return 0.0
 
 # =============================================================================
+# SOCIAL SHARING SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.post("/api/social/share")
+async def create_share(request: ShareRequest, user_id: str = Depends(verify_token)):
+    """Create social share content"""
+    try:
+        # Generate share content
+        share_data = generate_share_content(
+            user_id=user_id,
+            share_type=request.share_type,
+            reference_id=request.reference_id,
+            platform=request.platform,
+            custom_message=request.custom_message
+        )
+        
+        # Create share record
+        share_id = str(uuid.uuid4())
+        share_url = create_share_url(share_id, user_id)
+        
+        share_record = {
+            "id": share_id,
+            "user_id": user_id,
+            "share_type": request.share_type,
+            "platform": request.platform,
+            "title": share_data["title"],
+            "description": share_data["description"],
+            "image_url": None,  # Will be implemented later
+            "share_url": share_url,
+            "metadata": share_data["metadata"],
+            "created_at": datetime.utcnow(),
+            "shared_at": None,
+            "clicks": 0,
+            "engagement_score": 0.0,
+            "is_viral": False
+        }
+        
+        # Save share record
+        social_shares_collection.insert_one(share_record)
+        
+        # Create viral metrics record
+        viral_record = {
+            "share_id": share_id,
+            "original_user_id": user_id,
+            "referred_users": 0,
+            "tournament_joins": 0,
+            "team_joins": 0,
+            "conversion_rate": 0.0,
+            "revenue_generated": 0.0,
+            "viral_coefficient": 0.0,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        viral_metrics_collection.insert_one(viral_record)
+        
+        # Return share content for frontend
+        return {
+            "share_id": share_id,
+            "title": share_data["title"],
+            "description": share_data["description"],
+            "hashtags": share_data["hashtags"],
+            "call_to_action": share_data["call_to_action"],
+            "share_url": share_url,
+            "platform": request.platform,
+            "share_type": request.share_type
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating share: {str(e)}")
+
+@app.get("/api/social/viral-content")
+async def get_viral_content(limit: int = 10):
+    """Get trending viral content"""
+    try:
+        # Get most clicked and shared content
+        viral_content = list(social_shares_collection.find(
+            {"clicks": {"$gt": 0}},  # Content with clicks
+            {"_id": 0}
+        ).sort("clicks", -1).limit(limit))
+        
+        # Clean datetime objects
+        for share in viral_content:
+            for key, value in share.items():
+                if isinstance(value, datetime):
+                    share[key] = value.isoformat()
+        
+        return {
+            "viral_content": viral_content,
+            "total_viral": len(viral_content)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching viral content: {str(e)}")
+
+@app.get("/api/social/user/shares")
+async def get_user_shares(user_id: str = Depends(verify_token), limit: int = 20, skip: int = 0):
+    """Get user's share history"""
+    try:
+        shares = list(social_shares_collection.find(
+            {"user_id": user_id},
+            {"_id": 0}
+        ).sort("created_at", -1).skip(skip).limit(limit))
+        
+        # Convert datetime objects to ISO strings
+        for share in shares:
+            for key, value in share.items():
+                if isinstance(value, datetime):
+                    share[key] = value.isoformat()
+        
+        total_shares = social_shares_collection.count_documents({"user_id": user_id})
+        
+        return {
+            "shares": shares,
+            "total": total_shares,
+            "page": skip // limit + 1,
+            "pages": (total_shares + limit - 1) // limit
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching user shares: {str(e)}")
+
+@app.get("/api/social/stats")
+async def get_social_stats(user_id: str = Depends(verify_token)):
+    """Get user's social sharing statistics"""
+    try:
+        # Get user's sharing stats
+        stats = share_stats_collection.find_one({"user_id": user_id})
+        if not stats:
+            stats = {
+                "total_shares": 0,
+                "shares_by_platform": {},
+                "shares_by_type": {},
+                "total_clicks": 0,
+                "viral_shares": 0,
+                "engagement_rate": 0.0,
+                "top_performing_content": []
+            }
+        
+        # Get recent shares performance
+        recent_shares = list(social_shares_collection.find(
+            {"user_id": user_id},
+            {"_id": 0}
+        ).sort("created_at", -1).limit(10))
+        
+        # Calculate additional metrics
+        total_shares = len(recent_shares)
+        total_clicks = sum(share.get("clicks", 0) for share in recent_shares)
+        
+        # Update stats
+        stats["total_clicks"] = total_clicks
+        stats["engagement_rate"] = (total_clicks / total_shares) if total_shares > 0 else 0.0
+        
+        # Clean datetime objects
+        for share in recent_shares:
+            for key, value in share.items():
+                if isinstance(value, datetime):
+                    share[key] = value.isoformat()
+        
+        return {
+            "stats": stats,
+            "recent_shares": recent_shares,
+            "viral_coefficient": calculate_viral_coefficient(recent_shares[0]["id"]) if recent_shares else 0.0
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching social stats: {str(e)}")
+
+@app.post("/api/achievements/share")
+async def share_achievement(achievement_data: dict, platform: SocialPlatform, user_id: str = Depends(verify_token)):
+    """Share personal achievement"""
+    try:
+        # Generate share content
+        share_data = generate_share_content(
+            user_id=user_id,
+            share_type=ShareType.PERSONAL_ACHIEVEMENT,
+            reference_id=json.dumps(achievement_data),
+            platform=platform
+        )
+        
+        # Create share record
+        share_id = str(uuid.uuid4())
+        share_url = create_share_url(share_id, user_id)
+        
+        share_record = {
+            "id": share_id,
+            "user_id": user_id,
+            "share_type": ShareType.PERSONAL_ACHIEVEMENT,
+            "platform": platform,
+            "title": share_data["title"],
+            "description": share_data["description"],
+            "image_url": None,
+            "share_url": share_url,
+            "metadata": share_data["metadata"],
+            "created_at": datetime.utcnow(),
+            "shared_at": None,
+            "clicks": 0,
+            "engagement_score": 0.0,
+            "is_viral": False
+        }
+        
+        social_shares_collection.insert_one(share_record)
+        
+        return {
+            "share_id": share_id,
+            "title": share_data["title"],
+            "description": share_data["description"],
+            "hashtags": share_data["hashtags"],
+            "call_to_action": share_data["call_to_action"],
+            "share_url": share_url
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sharing achievement: {str(e)}")
+
+# =============================================================================
 # SOCIAL SHARING ENDPOINTS SETUP
 # =============================================================================
 
