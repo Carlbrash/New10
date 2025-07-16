@@ -114,6 +114,7 @@ code {
   display: flex;
   flex-direction: column;
   height: 100%;
+  margin-right: 180px; /* Make space for sidebar */
 }
 
 .chat-room-selector {
@@ -139,6 +140,8 @@ code {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #ffd700 #2d2d2d;
+  min-height: 250px;
+  max-height: 300px;
 }
 
 .chat-messages::-webkit-scrollbar {
