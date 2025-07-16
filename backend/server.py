@@ -8166,6 +8166,62 @@ async def share_achievement(achievement_data: dict, platform: SocialPlatform, us
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error sharing achievement: {str(e)}")
 
+@app.post("/api/tournaments/{tournament_id}/share-victory")
+async def share_tournament_victory(tournament_id: str, platform: SocialPlatform, user_id: str = Depends(verify_token)):
+    """Share tournament victory"""
+    try:
+        # Check if user actually won/participated in tournament
+        participant = tournament_participants_collection.find_one({
+            "user_id": user_id,
+            "tournament_id": tournament_id
+        })
+        
+        if not participant:
+            raise HTTPException(status_code=404, detail="User not found in tournament")
+        
+        # Generate share content
+        share_data = generate_share_content(
+            user_id=user_id,
+            share_type=ShareType.TOURNAMENT_VICTORY,
+            reference_id=tournament_id,
+            platform=platform
+        )
+        
+        # Create share record
+        share_id = str(uuid.uuid4())
+        share_url = create_share_url(share_id, user_id)
+        
+        share_record = {
+            "id": share_id,
+            "user_id": user_id,
+            "share_type": ShareType.TOURNAMENT_VICTORY,
+            "platform": platform,
+            "title": share_data["title"],
+            "description": share_data["description"],
+            "image_url": None,
+            "share_url": share_url,
+            "metadata": share_data["metadata"],
+            "created_at": datetime.utcnow(),
+            "shared_at": None,
+            "clicks": 0,
+            "engagement_score": 0.0,
+            "is_viral": False
+        }
+        
+        social_shares_collection.insert_one(share_record)
+        
+        return {
+            "share_id": share_id,
+            "title": share_data["title"],
+            "description": share_data["description"],
+            "hashtags": share_data["hashtags"],
+            "call_to_action": share_data["call_to_action"],
+            "share_url": share_url
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sharing tournament victory: {str(e)}")
+
 # =============================================================================
 # SOCIAL SHARING ENDPOINTS SETUP
 # =============================================================================
