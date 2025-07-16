@@ -9592,11 +9592,36 @@ function App() {
         
         setChatMessage('');
         setShowEmojiPicker(false);
+        
+        // Trigger immediate message refresh
+        setTimeout(() => {
+          refreshMessages();
+        }, 100);
       } else {
         console.error('❌ Failed to send message:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('❌ Error sending message:', error);
+    }
+  };
+
+  // Refresh messages manually
+  const refreshMessages = async () => {
+    if (!token || !currentChatRoom) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat/messages/${currentChatRoom}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setChatMessages(data.messages);
+      }
+    } catch (error) {
+      console.error('Failed to refresh messages:', error);
     }
   };
 
