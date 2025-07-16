@@ -9425,6 +9425,502 @@ function App() {
     );
   };
 
+  // =============================================================================
+  // LIVE CHAT SYSTEM FUNCTIONS
+  // =============================================================================
+
+  // Initialize chat WebSocket connection
+  const initializeChatSocket = () => {
+    if (!user || !token || chatSocket) return;
+
+    const wsUrl = API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+    const socket = new WebSocket(`${wsUrl}/ws/chat?token=${token}`);
+
+    socket.onopen = () => {
+      console.log('✅ Chat WebSocket connected');
+      setIsConnectedToChat(true);
+      setChatSocket(socket);
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+      if (data.type === 'online_users_update') {
+        setOnlineUsers(data.data);
+      } else if (data.type === 'user_rooms_update') {
+        setChatRooms(data.data);
+      } else if (data.type === 'message_deleted') {
+        setChatMessages(prev => prev.filter(msg => msg.id !== data.message_id));
+      } else if (data.type === 'user_banned') {
+        alert(`You have been banned from chat. Reason: ${data.reason}`);
+        setShowChatPopup(false);
+        disconnectFromChat();
+      } else if (data.private_recipient) {
+        // Private message
+        setPrivateMessages(prev => [...prev, data]);
+        if (!showChatPopup) {
+          setUnreadMessages(prev => prev + 1);
+        }
+      } else {
+        // Room message
+        setChatMessages(prev => [...prev, data]);
+        if (!showChatPopup) {
+          setUnreadMessages(prev => prev + 1);
+        }
+      }
+    };
+
+    socket.onclose = () => {
+      console.log('❌ Chat WebSocket disconnected');
+      setIsConnectedToChat(false);
+      setChatSocket(null);
+    };
+
+    socket.onerror = (error) => {
+      console.error('Chat WebSocket error:', error);
+      setIsConnectedToChat(false);
+    };
+  };
+
+  // Disconnect from chat
+  const disconnectFromChat = () => {
+    if (chatSocket) {
+      chatSocket.close();
+      setChatSocket(null);
+    }
+    setIsConnectedToChat(false);
+    setChatMessages([]);
+    setOnlineUsers([]);
+    setChatRooms([]);
+    setPrivateMessages([]);
+  };
+
+  // Send chat message
+  const sendChatMessage = () => {
+    if (!chatSocket || !chatMessage.trim()) return;
+
+    const messageData = {
+      type: 'room_message',
+      room_id: currentChatRoom,
+      message: chatMessage.trim()
+    };
+
+    chatSocket.send(JSON.stringify(messageData));
+    setChatMessage('');
+    setShowEmojiPicker(false);
+  };
+
+  // Send private message
+  const sendPrivateMessage = () => {
+    if (!chatSocket || !privateMessage.trim() || !selectedPrivateUser) return;
+
+    const messageData = {
+      type: 'private_message',
+      recipient_id: selectedPrivateUser.user_id,
+      message: privateMessage.trim()
+    };
+
+    chatSocket.send(JSON.stringify(messageData));
+    setPrivateMessage('');
+    setShowPrivateMessageModal(false);
+  };
+
+  // Join chat room
+  const joinChatRoom = (roomId) => {
+    if (!chatSocket) return;
+
+    const messageData = {
+      type: 'join_room',
+      room_id: roomId
+    };
+
+    chatSocket.send(JSON.stringify(messageData));
+    setCurrentChatRoom(roomId);
+    setChatMessages([]); // Clear previous messages
+  };
+
+  // Admin: Delete message
+  const deleteMessage = (messageId) => {
+    if (!chatSocket || !user || !['admin', 'super_admin', 'god'].includes(user.admin_role)) return;
+
+    const messageData = {
+      type: 'admin_delete_message',
+      message_id: messageId,
+      room_id: currentChatRoom
+    };
+
+    chatSocket.send(JSON.stringify(messageData));
+  };
+
+  // Admin: Ban user
+  const banUserFromChat = async () => {
+    if (!selectedUserForBan || !banReason.trim()) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat/admin/ban-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          user_id: selectedUserForBan.user_id,
+          reason: banReason.trim()
+        })
+      });
+
+      if (response.ok) {
+        setShowAdminChatModal(false);
+        setSelectedUserForBan(null);
+        setBanReason('');
+        alert('User banned successfully');
+      }
+    } catch (error) {
+      console.error('Error banning user:', error);
+    }
+  };
+
+  // Format timestamp for chat messages
+  const formatChatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Add emoji to message
+  const addEmojiToMessage = (emojiObject) => {
+    setChatMessage(prev => prev + emojiObject.emoji);
+    setShowEmojiPicker(false);
+  };
+
+  // Get current room name
+  const getCurrentRoomName = () => {
+    const room = chatRooms.find(r => r.id === currentChatRoom);
+    return room ? room.name : 'General Chat';
+  };
+
+  // Render chat popup
+  const renderChatPopup = () => {
+    if (!showChatPopup) return null;
+
+    return (
+      <div className="chat-popup">
+        <div className="chat-header">
+          <div className="chat-title">
+            <span>💬 Live Chat</span>
+            <div className="chat-connection-status">
+              {isConnectedToChat ? (
+                <span className="connected">🟢 Connected</span>
+              ) : (
+                <span className="disconnected">🔴 Disconnected</span>
+              )}
+            </div>
+          </div>
+          <div className="chat-controls">
+            <button 
+              className="btn btn-sm btn-secondary"
+              onClick={() => setShowChatPopup(false)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div className="chat-tabs">
+          <button 
+            className={`chat-tab ${chatTab === 'room' ? 'active' : ''}`}
+            onClick={() => setChatTab('room')}
+          >
+            Rooms
+          </button>
+          <button 
+            className={`chat-tab ${chatTab === 'private' ? 'active' : ''}`}
+            onClick={() => setChatTab('private')}
+          >
+            Private ({privateMessages.length})
+          </button>
+        </div>
+
+        {chatTab === 'room' && (
+          <div className="chat-room-section">
+            <div className="chat-room-selector">
+              <select 
+                value={currentChatRoom} 
+                onChange={(e) => joinChatRoom(e.target.value)}
+                className="room-select"
+              >
+                {chatRooms.map(room => (
+                  <option key={room.id} value={room.id}>
+                    {room.name} ({room.participant_count})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="chat-messages" style={{ height: '300px', overflowY: 'auto' }}>
+              {chatMessages
+                .filter(msg => msg.room_id === currentChatRoom)
+                .map(message => (
+                <div key={message.id} className={`chat-message ${message.is_system ? 'system' : ''}`}>
+                  <div className="message-header">
+                    <span className={`username ${message.sender_username === user?.username ? 'own-message' : ''}`}>
+                      {message.sender_username}
+                    </span>
+                    <span className="timestamp">{formatChatTime(message.timestamp)}</span>
+                    {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && !message.is_system && (
+                      <button 
+                        className="btn btn-sm btn-danger"
+                        onClick={() => deleteMessage(message.id)}
+                        title="Delete message"
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
+                  <div className="message-text">{message.message}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="chat-input-container">
+              <div className="chat-input-row">
+                <input
+                  type="text"
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
+                  placeholder="Type a message..."
+                  className="chat-input"
+                />
+                <button 
+                  className="btn btn-sm btn-secondary"
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                >
+                  😊
+                </button>
+                <button 
+                  className="btn btn-sm btn-primary"
+                  onClick={sendChatMessage}
+                  disabled={!chatMessage.trim()}
+                >
+                  Send
+                </button>
+              </div>
+              
+              {showEmojiPicker && (
+                <div className="emoji-picker-container">
+                  <EmojiPicker
+                    onEmojiClick={addEmojiToMessage}
+                    autoFocusSearch={false}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {chatTab === 'private' && (
+          <div className="private-messages-section">
+            <div className="private-messages-header">
+              <button 
+                className="btn btn-sm btn-primary"
+                onClick={() => setShowPrivateMessageModal(true)}
+              >
+                + New Private Message
+              </button>
+            </div>
+            
+            <div className="private-messages-list" style={{ height: '350px', overflowY: 'auto' }}>
+              {privateMessages.map(message => (
+                <div key={message.id} className="private-message">
+                  <div className="message-header">
+                    <span className={`username ${message.sender_username === user?.username ? 'own-message' : ''}`}>
+                      {message.sender_username === user?.username ? 'You' : message.sender_username}
+                    </span>
+                    <span className="timestamp">{formatChatTime(message.timestamp)}</span>
+                  </div>
+                  <div className="message-text">{message.message}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="chat-sidebar">
+          <div className="online-users">
+            <h4>Online Users ({onlineUsers.length})</h4>
+            <div className="users-list">
+              {onlineUsers.map(user => (
+                <div key={user.user_id} className="online-user">
+                  <span className={`user-role ${user.admin_role}`}>
+                    {user.admin_role === 'god' ? '👑' : 
+                     user.admin_role === 'super_admin' ? '⚡' :
+                     user.admin_role === 'admin' ? '⭐' : '👤'}
+                  </span>
+                  <span className="username">{user.username}</span>
+                  <div className="user-actions">
+                    <button 
+                      className="btn btn-xs btn-primary"
+                      onClick={() => {
+                        setSelectedPrivateUser(user);
+                        setShowPrivateMessageModal(true);
+                      }}
+                      title="Send private message"
+                    >
+                      💬
+                    </button>
+                    {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && (
+                      <button 
+                        className="btn btn-xs btn-danger"
+                        onClick={() => {
+                          setSelectedUserForBan(user);
+                          setShowAdminChatModal(true);
+                        }}
+                        title="Ban user"
+                      >
+                        🚫
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render private message modal
+  const renderPrivateMessageModal = () => {
+    if (!showPrivateMessageModal) return null;
+
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Send Private Message</h3>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowPrivateMessageModal(false)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="modal-body">
+            <div className="form-group">
+              <label>To:</label>
+              <select 
+                value={selectedPrivateUser?.user_id || ''}
+                onChange={(e) => {
+                  const user = onlineUsers.find(u => u.user_id === e.target.value);
+                  setSelectedPrivateUser(user);
+                }}
+                className="form-control"
+              >
+                <option value="">Select user...</option>
+                {onlineUsers.filter(u => u.user_id !== user?.user_id).map(u => (
+                  <option key={u.user_id} value={u.user_id}>
+                    {u.username}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Message:</label>
+              <textarea
+                value={privateMessage}
+                onChange={(e) => setPrivateMessage(e.target.value)}
+                placeholder="Type your private message..."
+                className="form-control"
+                rows="3"
+              />
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowPrivateMessageModal(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              className="btn btn-primary"
+              onClick={sendPrivateMessage}
+              disabled={!selectedPrivateUser || !privateMessage.trim()}
+            >
+              Send Message
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render admin chat modal
+  const renderAdminChatModal = () => {
+    if (!showAdminChatModal) return null;
+
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Ban User from Chat</h3>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowAdminChatModal(false)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="modal-body">
+            <p>Are you sure you want to ban <strong>{selectedUserForBan?.username}</strong> from chat?</p>
+            <div className="form-group">
+              <label>Reason:</label>
+              <textarea
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                placeholder="Reason for ban..."
+                className="form-control"
+                rows="3"
+              />
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowAdminChatModal(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              className="btn btn-danger"
+              onClick={banUserFromChat}
+              disabled={!banReason.trim()}
+            >
+              Ban User
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Initialize chat when user logs in
+  useEffect(() => {
+    if (user && token && !chatSocket) {
+      initializeChatSocket();
+    } else if (!user && chatSocket) {
+      disconnectFromChat();
+    }
+  }, [user, token]);
+
+  // Reset unread messages when chat popup opens
+  useEffect(() => {
+    if (showChatPopup) {
+      setUnreadMessages(0);
+    }
+  }, [showChatPopup]);
+
   return (
     <div className="App">
       <nav className="navbar">
