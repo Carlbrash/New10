@@ -4698,7 +4698,13 @@ function App() {
             onClick={async (e) => {
               e.preventDefault();
               console.log('🔘 Login button clicked directly');
-              await handleLogin(e);
+              alert('Login button clicked!');
+              try {
+                await handleLogin(e);
+              } catch (error) {
+                console.error('❌ Login handler error:', error);
+                alert('Login handler error: ' + error.message);
+              }
             }}
           >
             {loading ? t.loggingIn : t.loginBtn}
