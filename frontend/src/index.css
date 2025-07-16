@@ -498,6 +498,14 @@ code {
   font-weight: bold;
 }
 
+.form-help {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: #999;
+  font-style: italic;
+}
+
 .form-control {
   width: 100%;
   padding: 8px;
