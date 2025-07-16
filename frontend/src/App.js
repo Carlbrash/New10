@@ -9657,16 +9657,43 @@ function App() {
   };
 
   // Admin: Delete message
-  const deleteMessage = (messageId) => {
-    if (!chatSocket || !user || !['admin', 'super_admin', 'god'].includes(user.admin_role)) return;
+  const deleteMessage = async (messageId) => {
+    if (!user || !['admin', 'super_admin', 'god'].includes(user.admin_role)) {
+      console.log('❌ Not authorized to delete messages');
+      return;
+    }
 
-    const messageData = {
-      type: 'admin_delete_message',
-      message_id: messageId,
-      room_id: currentChatRoom
-    };
+    if (!confirm('Are you sure you want to delete this message?')) {
+      return;
+    }
 
-    chatSocket.send(JSON.stringify(messageData));
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat/messages/${messageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        console.log('✅ Message deleted successfully');
+        
+        // Remove message from local state
+        setChatMessages(prev => prev.filter(msg => msg.id !== messageId));
+        
+        // Refresh messages to make sure we're in sync
+        setTimeout(() => {
+          refreshMessages();
+        }, 500);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ Failed to delete message:', response.status, errorData);
+        alert('Failed to delete message. Please try again.');
+      }
+    } catch (error) {
+      console.error('❌ Error deleting message:', error);
+      alert('Error deleting message. Please try again.');
+    }
   };
 
   // Admin: Ban user
