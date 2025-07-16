@@ -6383,6 +6383,269 @@ async def delete_chat_message(
     
     return CustomJSONResponse(content={"message": "Message deleted successfully"})
 
+# Helper function to clean MongoDB documents
+def clean_mongo_docs(docs):
+    """Clean MongoDB documents for JSON serialization"""
+    if not docs:
+        return []
+    
+    cleaned_docs = []
+    for doc in docs:
+        cleaned_doc = {}
+        for key, value in doc.items():
+            if isinstance(value, ObjectId):
+                cleaned_doc[key] = str(value)
+            elif isinstance(value, datetime):
+                cleaned_doc[key] = value.isoformat()
+            else:
+                cleaned_doc[key] = value
+        cleaned_docs.append(cleaned_doc)
+    
+    return cleaned_docs
+
+# ============================================================================
+# ADMIN AFFILIATE MANAGEMENT ENDPOINTS
+# ============================================================================
+
+@app.get("/api/admin/affiliate/requests")
+async def get_affiliate_requests(user_id: str = Depends(verify_token)):
+    """Get all affiliate requests for admin review"""
+    # Get user details
+    user = users_collection.find_one({"$or": [{"user_id": user_id}, {"id": user_id}]})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check admin permissions
+    if user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get all affiliate applications
+        affiliate_requests = list(affiliate_applications_collection.find({}))
+        
+        # Get user details for each request
+        for request in affiliate_requests:
+            user_data = users_collection.find_one({"$or": [{"user_id": request["user_id"]}, {"id": request["user_id"]}]})
+            if user_data:
+                request["user_details"] = {
+                    "username": user_data.get("username", "Unknown"),
+                    "email": user_data.get("email", "Unknown"),
+                    "full_name": user_data.get("full_name", "Unknown"),
+                    "created_at": user_data.get("created_at", "Unknown")
+                }
+        
+        return CustomJSONResponse(content={"requests": clean_mongo_docs(affiliate_requests)})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/admin/affiliate/approve/{user_id}")
+async def approve_affiliate_request(
+    user_id: str,
+    request: dict,
+    admin_user_id: str = Depends(verify_token)
+):
+    """Approve affiliate request and set bonuses"""
+    # Get admin user details
+    admin_user = users_collection.find_one({"$or": [{"user_id": admin_user_id}, {"id": admin_user_id}]})
+    if not admin_user:
+        raise HTTPException(status_code=404, detail="Admin user not found")
+    
+    # Check admin permissions
+    if admin_user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Update affiliate application
+        affiliate_applications_collection.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "status": "approved",
+                    "approved_by": admin_user_id,
+                    "approved_at": datetime.utcnow(),
+                    "referral_bonus": request.get("referral_bonus", 5.0),
+                    "deposit_bonus": request.get("deposit_bonus", 10.0),
+                    "bonus_type": request.get("bonus_type", "registration"),
+                    "is_active": True
+                }
+            }
+        )
+        
+        # Update user role to affiliate
+        users_collection.update_one(
+            {"$or": [{"user_id": user_id}, {"id": user_id}]},
+            {"$set": {"admin_role": "affiliate"}}
+        )
+        
+        return CustomJSONResponse(content={"message": "Affiliate request approved successfully"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/admin/affiliate/reject/{user_id}")
+async def reject_affiliate_request(
+    user_id: str,
+    request: dict,
+    admin_user_id: str = Depends(verify_token)
+):
+    """Reject affiliate request"""
+    # Get admin user details
+    admin_user = users_collection.find_one({"$or": [{"user_id": admin_user_id}, {"id": admin_user_id}]})
+    if not admin_user:
+        raise HTTPException(status_code=404, detail="Admin user not found")
+    
+    # Check admin permissions
+    if admin_user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Update affiliate application
+        affiliate_applications_collection.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "status": "rejected",
+                    "rejected_by": admin_user_id,
+                    "rejected_at": datetime.utcnow(),
+                    "rejection_reason": request.get("reason", "No reason provided")
+                }
+            }
+        )
+        
+        return CustomJSONResponse(content={"message": "Affiliate request rejected"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/admin/affiliate/stats")
+async def get_admin_affiliate_stats(admin_user_id: str = Depends(verify_token)):
+    """Get affiliate statistics for admin"""
+    # Get admin user details
+    admin_user = users_collection.find_one({"$or": [{"user_id": admin_user_id}, {"id": admin_user_id}]})
+    if not admin_user:
+        raise HTTPException(status_code=404, detail="Admin user not found")
+    
+    # Check admin permissions
+    if admin_user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get affiliate statistics
+        total_affiliates = affiliate_applications_collection.count_documents({"status": "approved"})
+        pending_requests = affiliate_applications_collection.count_documents({"status": "pending"})
+        total_referrals = referrals_collection.count_documents({})
+        total_commissions = commissions_collection.count_documents({})
+        
+        # Calculate total commission amount
+        commission_pipeline = [
+            {"$group": {"_id": None, "total": {"$sum": "$commission_amount"}}}
+        ]
+        commission_result = list(commissions_collection.aggregate(commission_pipeline))
+        total_commission_amount = commission_result[0]["total"] if commission_result else 0.0
+        
+        # Get recent affiliate activity
+        recent_referrals = list(referrals_collection.find().sort("created_at", -1).limit(5))
+        recent_commissions = list(commissions_collection.find().sort("created_at", -1).limit(5))
+        
+        return CustomJSONResponse(content={
+            "total_affiliates": total_affiliates,
+            "pending_requests": pending_requests,
+            "total_referrals": total_referrals,
+            "total_commissions": total_commissions,
+            "total_commission_amount": total_commission_amount,
+            "recent_referrals": clean_mongo_docs(recent_referrals),
+            "recent_commissions": clean_mongo_docs(recent_commissions)
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/admin/affiliate/users")
+async def get_all_affiliate_users(admin_user_id: str = Depends(verify_token)):
+    """Get all approved affiliate users"""
+    # Get admin user details
+    admin_user = users_collection.find_one({"$or": [{"user_id": admin_user_id}, {"id": admin_user_id}]})
+    if not admin_user:
+        raise HTTPException(status_code=404, detail="Admin user not found")
+    
+    # Check admin permissions
+    if admin_user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get all approved affiliate applications
+        affiliate_apps = list(affiliate_applications_collection.find({"status": "approved"}))
+        
+        # Get user details and referral stats for each affiliate
+        affiliate_users = []
+        for app in affiliate_apps:
+            user_data = users_collection.find_one({"$or": [{"user_id": app["user_id"]}, {"id": app["user_id"]}]})
+            if user_data:
+                # Get referral stats
+                referral_count = referrals_collection.count_documents({"referrer_id": app["user_id"]})
+                commission_count = commissions_collection.count_documents({"affiliate_id": app["user_id"]})
+                
+                # Calculate total earnings
+                earnings_pipeline = [
+                    {"$match": {"affiliate_id": app["user_id"]}},
+                    {"$group": {"_id": None, "total": {"$sum": "$commission_amount"}}}
+                ]
+                earnings_result = list(commissions_collection.aggregate(earnings_pipeline))
+                total_earnings = earnings_result[0]["total"] if earnings_result else 0.0
+                
+                affiliate_users.append({
+                    "user_id": app["user_id"],
+                    "username": user_data.get("username", "Unknown"),
+                    "email": user_data.get("email", "Unknown"),
+                    "full_name": user_data.get("full_name", "Unknown"),
+                    "referral_code": app.get("referral_code", ""),
+                    "referral_bonus": app.get("referral_bonus", 5.0),
+                    "deposit_bonus": app.get("deposit_bonus", 10.0),
+                    "bonus_type": app.get("bonus_type", "registration"),
+                    "is_active": app.get("is_active", True),
+                    "approved_at": app.get("approved_at", "Unknown"),
+                    "referral_count": referral_count,
+                    "commission_count": commission_count,
+                    "total_earnings": total_earnings
+                })
+        
+        return CustomJSONResponse(content={"affiliate_users": affiliate_users})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/admin/affiliate/bonuses/{user_id}")
+async def update_affiliate_bonuses(
+    user_id: str,
+    request: dict,
+    admin_user_id: str = Depends(verify_token)
+):
+    """Update affiliate bonuses"""
+    # Get admin user details
+    admin_user = users_collection.find_one({"$or": [{"user_id": admin_user_id}, {"id": admin_user_id}]})
+    if not admin_user:
+        raise HTTPException(status_code=404, detail="Admin user not found")
+    
+    # Check admin permissions
+    if admin_user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Update affiliate bonuses
+        affiliate_applications_collection.update_one(
+            {"user_id": user_id, "status": "approved"},
+            {
+                "$set": {
+                    "referral_bonus": request.get("referral_bonus", 5.0),
+                    "deposit_bonus": request.get("deposit_bonus", 10.0),
+                    "bonus_type": request.get("bonus_type", "registration"),
+                    "is_active": request.get("is_active", True),
+                    "updated_by": admin_user_id,
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        return CustomJSONResponse(content={"message": "Affiliate bonuses updated successfully"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
