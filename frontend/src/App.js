@@ -4486,6 +4486,7 @@ function App() {
   };
 
   const handleLogin = async (e) => {
+    console.log('🚀 handleLogin function called!');
     e.preventDefault();
     setLoading(true);
     
