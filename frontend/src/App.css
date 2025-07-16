@@ -3653,6 +3653,175 @@ body {
   font-size: 1.2rem;
 }
 
+
+/* Insufficient Balance Modal */
+.insufficient-balance-modal {
+  max-width: 500px;
+  background: linear-gradient(145deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 20px;
+  padding: 0;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.insufficient-balance-header {
+  text-align: center;
+  padding: 2rem 2rem 1rem;
+  background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+  border-radius: 20px 20px 0 0;
+}
+
+.balance-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.insufficient-balance-header h3 {
+  color: #ffd700;
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.insufficient-balance-body {
+  padding: 2rem;
+}
+
+.balance-message {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.balance-message p {
+  color: #e2e8f0;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.balance-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.balance-info {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.balance-info span:first-child {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.required-amount {
+  color: #ef4444 !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+}
+
+.available-amount {
+  color: #10b981 !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+}
+
+.suggested-actions {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.suggested-actions h4 {
+  color: #ffd700;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.suggested-actions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggested-actions li {
+  color: #e2e8f0;
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.insufficient-balance-modal .modal-actions {
+  padding: 1.5rem 2rem 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.insufficient-balance-modal .modal-actions .btn {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.insufficient-balance-modal .modal-actions .btn-primary {
+  background: linear-gradient(145deg, #ffd700, #ffed4e);
+  color: #1a1a2e;
+  border: none;
+}
+
+.insufficient-balance-modal .modal-actions .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+}
+
+.insufficient-balance-modal .modal-actions .btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.insufficient-balance-modal .modal-actions .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .insufficient-balance-modal {
+    max-width: 90%;
+    margin: 1rem;
+  }
+  
+  .balance-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .insufficient-balance-modal .modal-actions {
+    flex-direction: column;
+  }
+}
 /* Stats Cards Grid */
 .stats-cards-grid {
   display: grid;
