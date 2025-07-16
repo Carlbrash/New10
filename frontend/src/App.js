@@ -9434,7 +9434,10 @@ function App() {
     if (!user || !token || chatSocket) return;
 
     const wsUrl = API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://');
-    const socket = new WebSocket(`${wsUrl}/ws/chat?token=${token}`);
+    const socketUrl = `${wsUrl}/ws/chat?token=${token}`;
+    
+    console.log('🔗 Attempting to connect to WebSocket:', socketUrl);
+    const socket = new WebSocket(socketUrl);
 
     socket.onopen = () => {
       console.log('✅ Chat WebSocket connected');
@@ -9455,11 +9458,14 @@ function App() {
     };
 
     socket.onmessage = (event) => {
+      console.log('📨 WebSocket message received:', event.data);
       const data = JSON.parse(event.data);
       
       if (data.type === 'online_users_update') {
+        console.log('👥 Online users update:', data.data);
         setOnlineUsers(data.data);
       } else if (data.type === 'user_rooms_update') {
+        console.log('🏠 User rooms update:', data.data);
         setChatRooms(data.data);
       } else if (data.type === 'message_deleted') {
         setChatMessages(prev => prev.filter(msg => msg.id !== data.message_id));
@@ -9475,6 +9481,7 @@ function App() {
         }
       } else {
         // Room message
+        console.log('💬 Room message:', data);
         setChatMessages(prev => [...prev, data]);
         if (!showChatPopup) {
           setUnreadMessages(prev => prev + 1);
@@ -9482,14 +9489,14 @@ function App() {
       }
     };
 
-    socket.onclose = () => {
-      console.log('❌ Chat WebSocket disconnected');
+    socket.onclose = (event) => {
+      console.log('❌ Chat WebSocket disconnected:', event.code, event.reason);
       setIsConnectedToChat(false);
       setChatSocket(null);
     };
 
     socket.onerror = (error) => {
-      console.error('Chat WebSocket error:', error);
+      console.error('💥 Chat WebSocket error:', error);
       setIsConnectedToChat(false);
     };
   };
