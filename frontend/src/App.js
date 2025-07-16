@@ -4246,6 +4246,8 @@ function App() {
         fetchWalletStats();
       } else if (walletView === 'transactions') {
         fetchWalletTransactions();
+      } else if (walletView === 'payments') {
+        fetchPaymentHistory();
       }
     }
   }, [currentView, walletView, user, token]);
