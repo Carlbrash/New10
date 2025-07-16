@@ -12371,11 +12371,19 @@ h1, h2, h3, h4, h5, h6 {
 
 .teams-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
   padding: 20px 0;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+/* Optimized for 3 cards per row on desktop */
+@media (min-width: 1024px) {
+  .teams-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
 }
 
 .team-card-modern {
