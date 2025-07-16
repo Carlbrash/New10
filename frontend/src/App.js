@@ -9776,6 +9776,12 @@ function App() {
               📋 {t.transactionHistory}
             </button>
             <button 
+              className={`tab-btn ${walletView === 'payments' ? 'active' : ''}`}
+              onClick={() => setWalletView('payments')}
+            >
+              💳 Payments
+            </button>
+            <button 
               className={`tab-btn ${walletView === 'settings' ? 'active' : ''}`}
               onClick={() => setWalletView('settings')}
             >
