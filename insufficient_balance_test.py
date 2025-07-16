@@ -278,8 +278,9 @@ class InsufficientBalanceModalTester(unittest.TestCase):
 if __name__ == "__main__":
     # Run insufficient balance modal tests
     insufficient_balance_suite = unittest.TestSuite()
-    insufficient_balance_suite.addTest(InsufficientBalanceModalTester('test_01_login_testuser'))
-    insufficient_balance_suite.addTest(InsufficientBalanceModalTester('test_02_check_wallet_balance'))
+    insufficient_balance_suite.addTest(InsufficientBalanceModalTester('test_01_create_modal_test_user'))
+    insufficient_balance_suite.addTest(InsufficientBalanceModalTester('test_02_login_modal_test_user'))
+    insufficient_balance_suite.addTest(InsufficientBalanceModalTester('test_03_check_wallet_balance'))
     insufficient_balance_suite.addTest(InsufficientBalanceModalTester('test_03_find_high_entry_fee_tournament'))
     insufficient_balance_suite.addTest(InsufficientBalanceModalTester('test_04_attempt_join_high_fee_tournament'))
     insufficient_balance_suite.addTest(InsufficientBalanceModalTester('test_05_verify_error_message_format'))
