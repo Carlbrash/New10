@@ -936,6 +936,13 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     except:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+async def get_current_user(user_id: str = Depends(verify_token)) -> dict:
+    """Get current user from token"""
+    user = users_collection.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
 def verify_admin_token(min_role: AdminRole = AdminRole.ADMIN):
     def admin_check(credentials: HTTPAuthorizationCredentials = Depends(security)):
         try:
