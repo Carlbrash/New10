@@ -1818,6 +1818,27 @@ function App() {
     }
   }, [user, rankings]);
 
+  // Friend system effects
+  useEffect(() => {
+    if (token && user) {
+      fetchFriends();
+      fetchFriendRequests();
+      fetchFriendRecommendations();
+    }
+  }, [token, user]);
+
+  // Search friends effect
+  useEffect(() => {
+    if (friendSearchQuery) {
+      const timer = setTimeout(() => {
+        searchFriends(friendSearchQuery);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setFriendSearchResults([]);
+    }
+  }, [friendSearchQuery]);
+
   // Close language dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
