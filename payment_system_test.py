@@ -23,6 +23,7 @@ class PaymentSystemTester(unittest.TestCase):
     admin_token = None
     test_user_id = None
     test_tournament_id = None
+    test_tournament_fee = 10.0
     
     def test_01_test_user_login(self):
         """Login as testuser to get token for payment endpoints"""
