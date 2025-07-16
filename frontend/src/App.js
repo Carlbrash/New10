@@ -2774,9 +2774,14 @@ function App() {
         const error = await response.json();
         const errorMessage = error.detail || 'Failed to join tournament';
         
+        console.log('🔍 Tournament join error:', errorMessage);
+        console.log('🔍 Contains insufficient?', errorMessage.toLowerCase().includes('insufficient'));
+        console.log('🔍 Contains balance?', errorMessage.toLowerCase().includes('balance'));
+        
         // Check if it's an insufficient balance error
         if (errorMessage.toLowerCase().includes('insufficient') && errorMessage.toLowerCase().includes('balance')) {
           // Show beautiful insufficient balance modal
+          console.log('🎨 Showing insufficient balance modal');
           setInsufficientBalanceModal({
             show: true,
             message: errorMessage,
@@ -2784,6 +2789,7 @@ function App() {
           });
         } else {
           // Show regular alert for other errors
+          console.log('⚠️ Showing regular alert for error:', errorMessage);
           alert(errorMessage);
         }
       }
