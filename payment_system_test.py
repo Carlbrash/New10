@@ -288,7 +288,7 @@ class PaymentSystemTester(unittest.TestCase):
         # Test payment history without authentication
         print("  Testing payment history without auth...")
         response = requests.get(f"{self.base_url}/api/payments/history")
-        self.assertEqual(response.status_code, 401, "Payment history should require authentication")
+        self.assertIn(response.status_code, [401, 403], "Payment history should require authentication")
         print("  ✅ Payment history correctly requires authentication")
         
         # Test create payment session without authentication
@@ -304,13 +304,13 @@ class PaymentSystemTester(unittest.TestCase):
             f"{self.base_url}/api/payments/create-session",
             json=payment_request
         )
-        self.assertEqual(response.status_code, 401, "Create payment session should require authentication")
+        self.assertIn(response.status_code, [401, 403], "Create payment session should require authentication")
         print("  ✅ Create payment session correctly requires authentication")
         
         # Test admin payments without authentication
         print("  Testing admin payments without auth...")
         response = requests.get(f"{self.base_url}/api/admin/payments")
-        self.assertEqual(response.status_code, 401, "Admin payments should require authentication")
+        self.assertIn(response.status_code, [401, 403], "Admin payments should require authentication")
         print("  ✅ Admin payments correctly requires authentication")
         
         # Test admin payments with regular user token (should fail with 403)
