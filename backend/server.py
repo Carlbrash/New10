@@ -8356,7 +8356,7 @@ async def get_friend_recommendations(current_user: dict = Depends(get_current_us
 async def send_friend_request(request: dict, current_user: dict = Depends(get_current_user)):
     """Send friend request"""
     try:
-        user_id = current_user["user_id"]
+        user_id = current_user["id"]
         recipient_id = request.get("recipient_id")
         
         if not recipient_id:
