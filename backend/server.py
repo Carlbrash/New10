@@ -8287,7 +8287,7 @@ class FriendRecommendation(BaseModel):
 async def get_friend_recommendations(current_user: dict = Depends(get_current_user)):
     """Get friend recommendations based on mutual connections"""
     try:
-        user_id = current_user["user_id"]
+        user_id = current_user["id"]
         
         # Get user's current friends
         user_friends = list(friends_collection.find({"user_id": user_id}))
