@@ -9433,72 +9433,73 @@ function App() {
   const initializeChatSocket = () => {
     if (!user || !token || chatSocket) return;
 
-    const wsUrl = API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://');
-    const socketUrl = `${wsUrl}/ws/chat?token=${token}`;
+    // Use polling instead of WebSocket for better compatibility
+    console.log('🔄 Starting chat polling...');
     
-    console.log('🔗 Attempting to connect to WebSocket:', socketUrl);
-    const socket = new WebSocket(socketUrl);
-
-    socket.onopen = () => {
-      console.log('✅ Chat WebSocket connected');
-      setIsConnectedToChat(true);
-      setChatSocket(socket);
-      
-      // Initialize default rooms if empty
-      if (chatRooms.length === 0) {
-        setChatRooms([
-          {
-            id: "general",
-            name: "General Chat",
-            type: "general",
-            participant_count: 1
+    // Set connected state
+    setIsConnectedToChat(true);
+    
+    // Initialize default rooms
+    setChatRooms([
+      {
+        id: "general",
+        name: "General Chat",
+        type: "general",
+        participant_count: 1
+      }
+    ]);
+    
+    // Start polling for online users
+    const pollOnlineUsers = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/chat/online-users`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        ]);
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('👥 Online users:', data.online_users);
+          setOnlineUsers(data.online_users);
+        }
+      } catch (error) {
+        console.error('Failed to fetch online users:', error);
       }
     };
-
-    socket.onmessage = (event) => {
-      console.log('📨 WebSocket message received:', event.data);
-      const data = JSON.parse(event.data);
-      
-      if (data.type === 'online_users_update') {
-        console.log('👥 Online users update:', data.data);
-        setOnlineUsers(data.data);
-      } else if (data.type === 'user_rooms_update') {
-        console.log('🏠 User rooms update:', data.data);
-        setChatRooms(data.data);
-      } else if (data.type === 'message_deleted') {
-        setChatMessages(prev => prev.filter(msg => msg.id !== data.message_id));
-      } else if (data.type === 'user_banned') {
-        alert(`You have been banned from chat. Reason: ${data.reason}`);
-        setShowChatPopup(false);
-        disconnectFromChat();
-      } else if (data.private_recipient) {
-        // Private message
-        setPrivateMessages(prev => [...prev, data]);
-        if (!showChatPopup) {
-          setUnreadMessages(prev => prev + 1);
+    
+    // Start polling for rooms
+    const pollRooms = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/chat/rooms`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('🏠 Available rooms:', data.rooms);
+          setChatRooms(data.rooms);
         }
-      } else {
-        // Room message
-        console.log('💬 Room message:', data);
-        setChatMessages(prev => [...prev, data]);
-        if (!showChatPopup) {
-          setUnreadMessages(prev => prev + 1);
-        }
+      } catch (error) {
+        console.error('Failed to fetch rooms:', error);
       }
     };
-
-    socket.onclose = (event) => {
-      console.log('❌ Chat WebSocket disconnected:', event.code, event.reason);
-      setIsConnectedToChat(false);
-      setChatSocket(null);
-    };
-
-    socket.onerror = (error) => {
-      console.error('💥 Chat WebSocket error:', error);
-      setIsConnectedToChat(false);
-    };
+    
+    // Initial fetch
+    pollOnlineUsers();
+    pollRooms();
+    
+    // Set up polling intervals
+    const onlineUsersInterval = setInterval(pollOnlineUsers, 5000); // Every 5 seconds
+    const roomsInterval = setInterval(pollRooms, 10000); // Every 10 seconds
+    
+    // Store intervals for cleanup
+    setChatSocket({ 
+      intervals: [onlineUsersInterval, roomsInterval],
+      isPolling: true
+    });
   };
 
   // Disconnect from chat
