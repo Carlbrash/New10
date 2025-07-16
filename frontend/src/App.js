@@ -1125,8 +1125,8 @@ function App() {
   const [affiliateUsers, setAffiliateUsers] = useState([]);
   const [affiliateRequests, setAffiliateRequests] = useState([]);
   const [adminAffiliateStats, setAdminAffiliateStats] = useState(null);
-  const [affiliateLoading, setAffiliateLoading] = useState(false);
-  const [showAffiliateModal, setShowAffiliateModal] = useState(false);
+  const [adminAffiliateLoading, setAdminAffiliateLoading] = useState(false);
+  const [showAdminAffiliateModal, setShowAdminAffiliateModal] = useState(false);
   const [selectedAffiliateUser, setSelectedAffiliateUser] = useState(null);
   const [affiliateBonusForm, setAffiliateBonusForm] = useState({
     referral_bonus: 5.0,
