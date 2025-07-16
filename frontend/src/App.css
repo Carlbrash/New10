@@ -12617,3 +12617,77 @@ h1, h2, h3, h4, h5, h6 {
     align-self: flex-end;
   }
 }
+
+/* Payment Methods Status Styles */
+.payment-config {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.payment-config h4 {
+  color: #4fc3f7;
+  margin-bottom: 15px;
+}
+
+.payment-methods-status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.method-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.method-status.enabled {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.method-status.disabled {
+  border-color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.method-status .status {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.method-status.enabled .status {
+  color: #4caf50;
+}
+
+.method-status.disabled .status {
+  color: #f44336;
+}
+
+.payout-section {
+  text-align: center;
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.payout-note {
+  color: #bbb;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.no-payments {
+  text-align: center;
+  padding: 40px;
+  color: #bbb;
+}
