@@ -8552,15 +8552,15 @@ async def import_friends(request: FriendImportRequest, current_user: dict = Depe
             for email in request.emails:
                 # Find user by email
                 user = users_collection.find_one({"email": email})
-                if user and user["user_id"] != user_id:
+                if user and user["id"] != user_id:
                     # Check if already friends
                     existing = friends_collection.find_one({
                         "user_id": user_id,
-                        "friend_id": user["user_id"]
+                        "friend_id": user["id"]
                     })
                     if not existing:
                         imported_friends.append({
-                            "user_id": user["user_id"],
+                            "user_id": user["id"],
                             "username": user["username"],
                             "full_name": user.get("full_name", ""),
                             "email": email,
