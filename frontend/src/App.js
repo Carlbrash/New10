@@ -9597,6 +9597,17 @@ function App() {
                         <span className="social-icon">📸</span>
                         <span>Instagram</span>
                       </motion.button>
+                      
+                      <motion.button 
+                        className="social-btn all-platforms-btn"
+                        onClick={() => shareTeamFormation(team.id, 'twitter')}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        title="Share on all platforms"
+                      >
+                        <span className="social-icon">🚀</span>
+                        <span>More</span>
+                      </motion.button>
                     </div>
                   </div>
                 </div>
