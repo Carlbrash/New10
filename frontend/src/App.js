@@ -650,6 +650,13 @@ function App() {
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
   
+  // Insufficient Balance Modal State
+  const [insufficientBalanceModal, setInsufficientBalanceModal] = useState({
+    show: false,
+    message: '',
+    tournamentId: null
+  });
+  
   // Dropdown Menu States
   const [showRankingsDropdown, setShowRankingsDropdown] = useState(false);
   const [showTournamentsDropdown, setShowTournamentsDropdown] = useState(false);
