@@ -9440,6 +9440,18 @@ function App() {
       console.log('✅ Chat WebSocket connected');
       setIsConnectedToChat(true);
       setChatSocket(socket);
+      
+      // Initialize default rooms if empty
+      if (chatRooms.length === 0) {
+        setChatRooms([
+          {
+            id: "general",
+            name: "General Chat",
+            type: "general",
+            participant_count: 1
+          }
+        ]);
+      }
     };
 
     socket.onmessage = (event) => {
