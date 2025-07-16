@@ -6766,6 +6766,721 @@ async def update_affiliate_bonuses(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# =============================================================================
+# PAYMENT SYSTEM HELPER FUNCTIONS
+# =============================================================================
+
+def create_payment_session(user_id: str, tournament_id: str, amount: float, provider: PaymentProvider) -> dict:
+    """Create a payment session for tournament entry"""
+    try:
+        session_id = str(uuid.uuid4())
+        
+        # Get tournament details
+        tournament = tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+        
+        # Create payment session record
+        session_data = {
+            "id": session_id,
+            "user_id": user_id,
+            "tournament_id": tournament_id,
+            "amount": amount,
+            "currency": "USD",
+            "provider": provider,
+            "status": PaymentStatus.PENDING,
+            "created_at": datetime.utcnow(),
+            "expires_at": datetime.utcnow() + timedelta(hours=1),
+            "metadata": {
+                "tournament_name": tournament.get("name", "Tournament"),
+                "tournament_type": tournament.get("type", "single_elimination")
+            }
+        }
+        
+        # Create provider-specific session
+        if provider == PaymentProvider.STRIPE:
+            return create_stripe_session(session_data)
+        elif provider == PaymentProvider.PAYPAL:
+            return create_paypal_session(session_data)
+        elif provider == PaymentProvider.COINBASE:
+            return create_coinbase_session(session_data)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid payment provider")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating payment session: {str(e)}")
+
+def create_stripe_session(session_data: dict) -> dict:
+    """Create Stripe checkout session"""
+    try:
+        if not STRIPE_SECRET_KEY:
+            raise HTTPException(status_code=500, detail="Stripe not configured")
+        
+        # Create Stripe checkout session
+        stripe_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': f'Tournament Entry - {session_data["metadata"]["tournament_name"]}',
+                        'description': f'Entry fee for {session_data["metadata"]["tournament_name"]}',
+                    },
+                    'unit_amount': int(session_data["amount"] * 100),  # Convert to cents
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=f'{FRONTEND_URL}/payment/success?session_id={{CHECKOUT_SESSION_ID}}',
+            cancel_url=f'{FRONTEND_URL}/payment/cancel?session_id={session_data["id"]}',
+            metadata={
+                'session_id': session_data["id"],
+                'user_id': session_data["user_id"],
+                'tournament_id': session_data["tournament_id"]
+            }
+        )
+        
+        # Update session with Stripe data
+        session_data["provider_session_id"] = stripe_session.id
+        session_data["checkout_url"] = stripe_session.url
+        
+        # Save to database
+        payment_sessions_collection.insert_one(session_data)
+        
+        return {
+            "session_id": session_data["id"],
+            "checkout_url": stripe_session.url,
+            "provider": "stripe"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating Stripe session: {str(e)}")
+
+def create_paypal_session(session_data: dict) -> dict:
+    """Create PayPal payment session"""
+    try:
+        if not PAYPAL_CLIENT_ID or not PAYPAL_CLIENT_SECRET:
+            raise HTTPException(status_code=500, detail="PayPal not configured")
+        
+        # Create PayPal payment
+        payment = paypalrestsdk.Payment({
+            "intent": "sale",
+            "payer": {
+                "payment_method": "paypal"
+            },
+            "transactions": [{
+                "amount": {
+                    "total": str(session_data["amount"]),
+                    "currency": "USD"
+                },
+                "description": f'Tournament Entry - {session_data["metadata"]["tournament_name"]}',
+                "custom": session_data["id"]  # Our session ID
+            }],
+            "redirect_urls": {
+                "return_url": f'{FRONTEND_URL}/payment/success?session_id={session_data["id"]}',
+                "cancel_url": f'{FRONTEND_URL}/payment/cancel?session_id={session_data["id"]}'
+            }
+        })
+        
+        if payment.create():
+            # Find approval URL
+            approval_url = None
+            for link in payment.links:
+                if link.rel == "approval_url":
+                    approval_url = link.href
+                    break
+            
+            if not approval_url:
+                raise HTTPException(status_code=500, detail="PayPal approval URL not found")
+            
+            # Update session with PayPal data
+            session_data["provider_session_id"] = payment.id
+            session_data["checkout_url"] = approval_url
+            
+            # Save to database
+            payment_sessions_collection.insert_one(session_data)
+            
+            return {
+                "session_id": session_data["id"],
+                "checkout_url": approval_url,
+                "provider": "paypal"
+            }
+        else:
+            raise HTTPException(status_code=500, detail=f"PayPal payment creation failed: {payment.error}")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating PayPal session: {str(e)}")
+
+def create_coinbase_session(session_data: dict) -> dict:
+    """Create Coinbase Commerce session"""
+    try:
+        if not coinbase_client:
+            raise HTTPException(status_code=500, detail="Coinbase not configured")
+        
+        # Create Coinbase charge
+        charge = coinbase_client.charge.create(
+            name=f'Tournament Entry - {session_data["metadata"]["tournament_name"]}',
+            description=f'Entry fee for {session_data["metadata"]["tournament_name"]}',
+            pricing_type='fixed_price',
+            local_price={
+                'amount': str(session_data["amount"]),
+                'currency': 'USD'
+            },
+            metadata={
+                'session_id': session_data["id"],
+                'user_id': session_data["user_id"],
+                'tournament_id': session_data["tournament_id"]
+            },
+            redirect_url=f'{FRONTEND_URL}/payment/success?session_id={session_data["id"]}',
+            cancel_url=f'{FRONTEND_URL}/payment/cancel?session_id={session_data["id"]}'
+        )
+        
+        # Update session with Coinbase data
+        session_data["provider_session_id"] = charge.id
+        session_data["checkout_url"] = charge.hosted_url
+        
+        # Save to database
+        payment_sessions_collection.insert_one(session_data)
+        
+        return {
+            "session_id": session_data["id"],
+            "checkout_url": charge.hosted_url,
+            "provider": "coinbase"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating Coinbase session: {str(e)}")
+
+def process_payment_success(session_id: str, provider_data: dict) -> dict:
+    """Process successful payment and update tournament entry"""
+    try:
+        # Get payment session
+        session = payment_sessions_collection.find_one({"id": session_id})
+        if not session:
+            raise HTTPException(status_code=404, detail="Payment session not found")
+        
+        # Check if already processed
+        if session.get("status") == PaymentStatus.COMPLETED:
+            return {"message": "Payment already processed"}
+        
+        # Create payment record
+        payment_id = str(uuid.uuid4())
+        payment_record = {
+            "id": payment_id,
+            "user_id": session["user_id"],
+            "tournament_id": session["tournament_id"],
+            "session_id": session_id,
+            "amount": session["amount"],
+            "currency": session["currency"],
+            "provider": session["provider"],
+            "provider_transaction_id": provider_data.get("transaction_id", ""),
+            "status": PaymentStatus.COMPLETED,
+            "created_at": datetime.utcnow(),
+            "completed_at": datetime.utcnow(),
+            "metadata": provider_data
+        }
+        
+        # Save payment record
+        payments_collection.insert_one(payment_record)
+        
+        # Update payment session
+        payment_sessions_collection.update_one(
+            {"id": session_id},
+            {"$set": {"status": PaymentStatus.COMPLETED, "completed_at": datetime.utcnow()}}
+        )
+        
+        # Create tournament entry
+        entry_id = str(uuid.uuid4())
+        tournament_entry = {
+            "id": entry_id,
+            "user_id": session["user_id"],
+            "tournament_id": session["tournament_id"],
+            "payment_id": payment_id,
+            "entry_fee": session["amount"],
+            "currency": session["currency"],
+            "payment_status": PaymentStatus.COMPLETED,
+            "created_at": datetime.utcnow(),
+            "paid_at": datetime.utcnow()
+        }
+        
+        tournament_entries_collection.insert_one(tournament_entry)
+        
+        # Add user to tournament participants
+        participant_data = {
+            "user_id": session["user_id"],
+            "tournament_id": session["tournament_id"],
+            "registration_date": datetime.utcnow(),
+            "payment_status": "paid"
+        }
+        
+        # Check if user is already registered
+        existing_participant = tournament_participants_collection.find_one({
+            "user_id": session["user_id"],
+            "tournament_id": session["tournament_id"]
+        })
+        
+        if not existing_participant:
+            tournament_participants_collection.insert_one(participant_data)
+        else:
+            # Update payment status
+            tournament_participants_collection.update_one(
+                {"user_id": session["user_id"], "tournament_id": session["tournament_id"]},
+                {"$set": {"payment_status": "paid"}}
+            )
+        
+        # Add transaction to wallet system
+        add_transaction(
+            user_id=session["user_id"],
+            transaction_type=TransactionType.TOURNAMENT_ENTRY,
+            amount=-session["amount"],  # Debit from wallet
+            description=f'Tournament entry fee for {session["metadata"]["tournament_name"]}',
+            tournament_id=session["tournament_id"],
+            metadata={"payment_id": payment_id, "provider": session["provider"]}
+        )
+        
+        return {"message": "Payment processed successfully", "entry_id": entry_id}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing payment: {str(e)}")
+
+def process_payout(user_id: str, amount: float, provider: PaymentProvider, payout_account: str) -> dict:
+    """Process payout to user"""
+    try:
+        # Get user wallet
+        wallet = get_or_create_wallet(user_id)
+        
+        # Check if user has sufficient balance
+        if wallet.get("available_balance", 0) < amount:
+            raise HTTPException(status_code=400, detail="Insufficient balance")
+        
+        # Create payout record
+        payout_id = str(uuid.uuid4())
+        payout_record = {
+            "id": payout_id,
+            "user_id": user_id,
+            "amount": amount,
+            "currency": "USD",
+            "provider": provider,
+            "payout_account": payout_account,
+            "status": PaymentStatus.PROCESSING,
+            "created_at": datetime.utcnow(),
+            "metadata": {}
+        }
+        
+        # Process based on provider
+        if provider == PaymentProvider.STRIPE:
+            # For Stripe, we'd need to create a transfer to connected account
+            # This requires the user to have a connected Stripe account
+            payout_record["metadata"]["note"] = "Stripe payout requires connected account setup"
+            payout_record["status"] = PaymentStatus.PENDING
+            
+        elif provider == PaymentProvider.PAYPAL:
+            # For PayPal, we'd use the Payouts API
+            payout_record["metadata"]["paypal_email"] = payout_account
+            payout_record["status"] = PaymentStatus.PENDING
+            
+        elif provider == PaymentProvider.COINBASE:
+            # For crypto, we'd need to handle wallet transfers
+            payout_record["metadata"]["wallet_address"] = payout_account
+            payout_record["status"] = PaymentStatus.PENDING
+        
+        # Save payout record
+        payouts_collection.insert_one(payout_record)
+        
+        # Update wallet balance
+        wallet_balances_collection.update_one(
+            {"user_id": user_id},
+            {
+                "$inc": {
+                    "available_balance": -amount,
+                    "pending_withdrawal": amount
+                }
+            }
+        )
+        
+        # Add transaction
+        add_transaction(
+            user_id=user_id,
+            transaction_type=TransactionType.PAYOUT_REQUESTED,
+            amount=-amount,
+            description=f"Payout request via {provider}",
+            payout_id=payout_id,
+            metadata={"provider": provider, "payout_account": payout_account}
+        )
+        
+        return {"message": "Payout request submitted", "payout_id": payout_id}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing payout: {str(e)}")
+
+# =============================================================================
+# PAYMENT SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.post("/api/payments/create-session")
+async def create_payment_session_endpoint(request: PaymentRequest, user_id: str = Depends(verify_token)):
+    """Create payment session for tournament entry"""
+    try:
+        # Validate user can join tournament
+        tournament = tournaments_collection.find_one({"id": request.tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+        
+        # Check if user is already registered
+        existing_participant = tournament_participants_collection.find_one({
+            "user_id": user_id,
+            "tournament_id": request.tournament_id
+        })
+        
+        if existing_participant:
+            raise HTTPException(status_code=400, detail="Already registered for this tournament")
+        
+        # Check tournament status
+        if tournament.get("status") != "open":
+            raise HTTPException(status_code=400, detail="Tournament registration is closed")
+        
+        # Validate entry fee
+        expected_fee = tournament.get("entry_fee", 0)
+        if abs(request.amount - expected_fee) > 0.01:  # Allow small floating point differences
+            raise HTTPException(status_code=400, detail="Invalid entry fee amount")
+        
+        # Create payment session
+        session = create_payment_session(user_id, request.tournament_id, request.amount, request.provider)
+        
+        return session
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating payment session: {str(e)}")
+
+@app.get("/api/payments/session/{session_id}")
+async def get_payment_session(session_id: str, user_id: str = Depends(verify_token)):
+    """Get payment session details"""
+    try:
+        session = payment_sessions_collection.find_one({"id": session_id})
+        if not session:
+            raise HTTPException(status_code=404, detail="Payment session not found")
+        
+        # Check if user owns this session
+        if session["user_id"] != user_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Clean session data for response
+        clean_session = {}
+        for key, value in session.items():
+            if key == "_id":
+                continue
+            elif isinstance(value, datetime):
+                clean_session[key] = value.isoformat()
+            else:
+                clean_session[key] = value
+        
+        return clean_session
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payment session: {str(e)}")
+
+@app.post("/api/payments/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhook events"""
+    try:
+        if not STRIPE_WEBHOOK_SECRET:
+            raise HTTPException(status_code=500, detail="Stripe webhook secret not configured")
+        
+        payload = await request.body()
+        sig_header = request.headers.get('stripe-signature')
+        
+        # Verify webhook signature
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
+        
+        # Store webhook event
+        webhook_record = {
+            "id": str(uuid.uuid4()),
+            "provider": "stripe",
+            "event_type": event['type'],
+            "event_id": event['id'],
+            "processed": False,
+            "created_at": datetime.utcnow(),
+            "data": event['data']
+        }
+        payment_webhooks_collection.insert_one(webhook_record)
+        
+        # Process event
+        if event['type'] == 'checkout.session.completed':
+            session_data = event['data']['object']
+            session_id = session_data['metadata'].get('session_id')
+            
+            if session_id:
+                process_payment_success(session_id, {
+                    "transaction_id": session_data['payment_intent'],
+                    "provider_data": session_data
+                })
+        
+        # Mark webhook as processed
+        payment_webhooks_collection.update_one(
+            {"id": webhook_record["id"]},
+            {"$set": {"processed": True}}
+        )
+        
+        return {"status": "success"}
+        
+    except Exception as e:
+        print(f"Stripe webhook error: {str(e)}")
+        raise HTTPException(status_code=400, detail="Webhook processing failed")
+
+@app.post("/api/payments/webhook/paypal")
+async def paypal_webhook(request: Request):
+    """Handle PayPal webhook events"""
+    try:
+        payload = await request.body()
+        webhook_data = json.loads(payload)
+        
+        # Store webhook event
+        webhook_record = {
+            "id": str(uuid.uuid4()),
+            "provider": "paypal",
+            "event_type": webhook_data.get('event_type'),
+            "event_id": webhook_data.get('id'),
+            "processed": False,
+            "created_at": datetime.utcnow(),
+            "data": webhook_data
+        }
+        payment_webhooks_collection.insert_one(webhook_record)
+        
+        # Process payment completion
+        if webhook_data.get('event_type') == 'PAYMENT.SALE.COMPLETED':
+            # Extract session ID from custom field
+            resource = webhook_data.get('resource', {})
+            session_id = resource.get('custom')
+            
+            if session_id:
+                process_payment_success(session_id, {
+                    "transaction_id": resource.get('id'),
+                    "provider_data": resource
+                })
+        
+        # Mark webhook as processed
+        payment_webhooks_collection.update_one(
+            {"id": webhook_record["id"]},
+            {"$set": {"processed": True}}
+        )
+        
+        return {"status": "success"}
+        
+    except Exception as e:
+        print(f"PayPal webhook error: {str(e)}")
+        raise HTTPException(status_code=400, detail="Webhook processing failed")
+
+@app.post("/api/payments/webhook/coinbase")
+async def coinbase_webhook(request: Request):
+    """Handle Coinbase Commerce webhook events"""
+    try:
+        payload = await request.body()
+        webhook_data = json.loads(payload)
+        
+        # Store webhook event
+        webhook_record = {
+            "id": str(uuid.uuid4()),
+            "provider": "coinbase",
+            "event_type": webhook_data.get('type'),
+            "event_id": webhook_data.get('id'),
+            "processed": False,
+            "created_at": datetime.utcnow(),
+            "data": webhook_data
+        }
+        payment_webhooks_collection.insert_one(webhook_record)
+        
+        # Process charge completion
+        if webhook_data.get('type') == 'charge:confirmed':
+            event_data = webhook_data.get('data', {})
+            metadata = event_data.get('metadata', {})
+            session_id = metadata.get('session_id')
+            
+            if session_id:
+                process_payment_success(session_id, {
+                    "transaction_id": event_data.get('id'),
+                    "provider_data": event_data
+                })
+        
+        # Mark webhook as processed
+        payment_webhooks_collection.update_one(
+            {"id": webhook_record["id"]},
+            {"$set": {"processed": True}}
+        )
+        
+        return {"status": "success"}
+        
+    except Exception as e:
+        print(f"Coinbase webhook error: {str(e)}")
+        raise HTTPException(status_code=400, detail="Webhook processing failed")
+
+@app.get("/api/payments/history")
+async def get_payment_history(user_id: str = Depends(verify_token), limit: int = 50, skip: int = 0):
+    """Get user's payment history"""
+    try:
+        payments = list(payments_collection.find(
+            {"user_id": user_id},
+            {"_id": 0}
+        ).sort("created_at", -1).skip(skip).limit(limit))
+        
+        # Convert datetime objects to ISO strings
+        for payment in payments:
+            for key, value in payment.items():
+                if isinstance(value, datetime):
+                    payment[key] = value.isoformat()
+        
+        total_payments = payments_collection.count_documents({"user_id": user_id})
+        
+        return {
+            "payments": payments,
+            "total": total_payments,
+            "page": skip // limit + 1,
+            "pages": (total_payments + limit - 1) // limit
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payment history: {str(e)}")
+
+@app.post("/api/payments/payout")
+async def request_payout(request: PayoutRequest, user_id: str = Depends(verify_token)):
+    """Request payout from wallet"""
+    try:
+        result = process_payout(user_id, request.amount, request.provider, request.payout_account)
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing payout request: {str(e)}")
+
+@app.get("/api/payments/config")
+async def get_payment_config():
+    """Get payment configuration for frontend"""
+    try:
+        config = {
+            "stripe_enabled": bool(STRIPE_PUBLISHABLE_KEY),
+            "paypal_enabled": bool(PAYPAL_CLIENT_ID),
+            "coinbase_enabled": bool(COINBASE_API_KEY),
+            "stripe_public_key": STRIPE_PUBLISHABLE_KEY if STRIPE_PUBLISHABLE_KEY else None,
+            "paypal_client_id": PAYPAL_CLIENT_ID if PAYPAL_CLIENT_ID else None,
+            "supported_currencies": ["USD"],
+            "minimum_payout": 10.0
+        }
+        
+        return config
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payment config: {str(e)}")
+
+# =============================================================================
+# ADMIN PAYMENT MANAGEMENT ENDPOINTS
+# =============================================================================
+
+@app.get("/api/admin/payments")
+async def get_all_payments(admin_user_id: str = Depends(verify_admin_token), limit: int = 50, skip: int = 0):
+    """Get all payments for admin"""
+    try:
+        payments = list(payments_collection.find(
+            {},
+            {"_id": 0}
+        ).sort("created_at", -1).skip(skip).limit(limit))
+        
+        # Convert datetime objects to ISO strings
+        for payment in payments:
+            for key, value in payment.items():
+                if isinstance(value, datetime):
+                    payment[key] = value.isoformat()
+        
+        total_payments = payments_collection.count_documents({})
+        
+        return {
+            "payments": payments,
+            "total": total_payments,
+            "page": skip // limit + 1,
+            "pages": (total_payments + limit - 1) // limit
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching payments: {str(e)}")
+
+@app.post("/api/admin/payments/{payment_id}/refund")
+async def refund_payment(payment_id: str, admin_user_id: str = Depends(verify_admin_token)):
+    """Refund a payment"""
+    try:
+        # Get payment record
+        payment = payments_collection.find_one({"id": payment_id})
+        if not payment:
+            raise HTTPException(status_code=404, detail="Payment not found")
+        
+        if payment["status"] != PaymentStatus.COMPLETED:
+            raise HTTPException(status_code=400, detail="Cannot refund non-completed payment")
+        
+        # Process refund based on provider
+        if payment["provider"] == PaymentProvider.STRIPE:
+            # Create Stripe refund
+            refund = stripe.Refund.create(
+                payment_intent=payment["provider_transaction_id"],
+                amount=int(payment["amount"] * 100)  # Convert to cents
+            )
+            
+            # Update payment record
+            payments_collection.update_one(
+                {"id": payment_id},
+                {
+                    "$set": {
+                        "status": PaymentStatus.REFUNDED,
+                        "refunded_at": datetime.utcnow(),
+                        "refund_id": refund.id
+                    }
+                }
+            )
+            
+        elif payment["provider"] == PaymentProvider.PAYPAL:
+            # PayPal refund would require additional implementation
+            # For now, mark as refunded in our system
+            payments_collection.update_one(
+                {"id": payment_id},
+                {
+                    "$set": {
+                        "status": PaymentStatus.REFUNDED,
+                        "refunded_at": datetime.utcnow()
+                    }
+                }
+            )
+            
+        elif payment["provider"] == PaymentProvider.COINBASE:
+            # Coinbase refunds require manual processing
+            payments_collection.update_one(
+                {"id": payment_id},
+                {
+                    "$set": {
+                        "status": PaymentStatus.REFUNDED,
+                        "refunded_at": datetime.utcnow()
+                    }
+                }
+            )
+        
+        # Add refund transaction to wallet
+        add_transaction(
+            user_id=payment["user_id"],
+            transaction_type=TransactionType.TOURNAMENT_REFUND,
+            amount=payment["amount"],
+            description=f"Refund for tournament entry",
+            tournament_id=payment["tournament_id"],
+            processed_by=admin_user_id,
+            metadata={"refund_payment_id": payment_id}
+        )
+        
+        # Remove user from tournament if applicable
+        tournament_participants_collection.delete_one({
+            "user_id": payment["user_id"],
+            "tournament_id": payment["tournament_id"]
+        })
+        
+        return {"message": "Payment refunded successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error refunding payment: {str(e)}")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
