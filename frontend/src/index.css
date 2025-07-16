@@ -261,15 +261,16 @@ code {
 }
 
 .chat-sidebar {
-  width: 180px;
+  width: 170px;
   background: #2d2d2d;
   border-left: 1px solid #444;
   padding: 10px;
   position: absolute;
   right: 0;
-  top: 0;
-  bottom: 0;
+  top: 110px; /* Below header and tabs */
+  bottom: 60px; /* Above input area */
   overflow-y: auto;
+  border-radius: 0 0 10px 0;
 }
 
 .online-users h4 {
