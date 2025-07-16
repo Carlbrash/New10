@@ -11722,6 +11722,25 @@ function App() {
             )}
           </div>
           
+          {/* Friends Menu - only show for logged in users */}
+          {user && (
+            <div className="nav-dropdown">
+              <button 
+                className="nav-link"
+                onClick={() => {
+                  setShowFriendsModal(true);
+                  fetchFriends();
+                  fetchFriendRequests();
+                  fetchFriendRecommendations();
+                }}
+              >
+                👥 Friends {friendRequests.length > 0 && (
+                  <span className="friend-request-badge">{friendRequests.length}</span>
+                )}
+              </button>
+            </div>
+          )}
+          
           {/* Affiliate menu item - only show for logged in users */}
           {user && (
             <button 
