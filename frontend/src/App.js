@@ -12375,13 +12375,6 @@ function App() {
         </div>
       )}
       
-      {/* Debug Payment Modal State */}
-      {console.log('🔍 Payment Modal Debug:', {
-        showPaymentModal,
-        selectedTournamentForPayment: selectedTournamentForPayment?.name,
-        paymentConfig
-      })}
-
       {/* Payout Request Modal */}
       {showPayoutRequestModal && (
         <div className="modal-overlay">
