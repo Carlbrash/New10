@@ -669,6 +669,8 @@ function App() {
   const [banReason, setBanReason] = useState('');
   const [chatStats, setChatStats] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [isChatMinimized, setIsChatMinimized] = useState(false);
+  const [chatPersistentState, setChatPersistentState] = useState(true);
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
   
