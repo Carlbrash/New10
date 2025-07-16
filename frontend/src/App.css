@@ -12778,6 +12778,252 @@ h1, h2, h3, h4, h5, h6 {
    SOCIAL SHARING MODAL STYLES
 ============================================================================= */
 
+.social-share-modal {
+  max-width: 600px;
+  width: 90%;
+}
+
+.share-preview {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.share-preview h4 {
+  color: #4fc3f7;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.share-content-preview {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.share-content-preview h5 {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.share-content-preview p {
+  color: #ddd;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.share-hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hashtag {
+  background: rgba(79, 195, 247, 0.2);
+  color: #4fc3f7;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.social-platforms {
+  margin-bottom: 25px;
+}
+
+.social-platforms h4 {
+  color: #4fc3f7;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.platform-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.platform-btn:hover {
+  border-color: #4fc3f7;
+  background: rgba(79, 195, 247, 0.1);
+  transform: translateY(-2px);
+}
+
+.platform-btn.twitter:hover {
+  border-color: #1da1f2;
+  background: rgba(29, 161, 242, 0.1);
+}
+
+.platform-btn.facebook:hover {
+  border-color: #4267b2;
+  background: rgba(66, 103, 178, 0.1);
+}
+
+.platform-btn.linkedin:hover {
+  border-color: #0077b5;
+  background: rgba(0, 119, 181, 0.1);
+}
+
+.platform-btn.whatsapp:hover {
+  border-color: #25d366;
+  background: rgba(37, 211, 102, 0.1);
+}
+
+.platform-btn.telegram:hover {
+  border-color: #0088cc;
+  background: rgba(0, 136, 204, 0.1);
+}
+
+.platform-btn.discord:hover {
+  border-color: #7289da;
+  background: rgba(114, 137, 218, 0.1);
+}
+
+.platform-btn.native:hover {
+  border-color: #ff9800;
+  background: rgba(255, 152, 0, 0.1);
+}
+
+.platform-icon {
+  font-size: 1.8rem;
+}
+
+.share-url-section {
+  margin-bottom: 20px;
+}
+
+.share-url-section h4 {
+  color: #4fc3f7;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.share-url-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.share-url-input .form-input {
+  flex: 1;
+  font-size: 0.9rem;
+  padding: 10px;
+}
+
+.share-url-input .btn {
+  white-space: nowrap;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+}
+
+.share-success-modal {
+  max-width: 400px;
+  width: 90%;
+}
+
+.success-message {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.success-message h4 {
+  color: #4fc3f7;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+
+.success-message p {
+  color: #ddd;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .social-share-modal {
+    width: 95%;
+    max-width: none;
+  }
+  
+  .platform-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+  }
+  
+  .platform-btn {
+    padding: 12px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .platform-icon {
+    font-size: 1.5rem;
+  }
+  
+  .share-url-input {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .share-url-input .form-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .share-preview {
+    padding: 15px;
+  }
+  
+  .platform-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .platform-btn {
+    padding: 10px 6px;
+    font-size: 0.75rem;
+  }
+  
+  .platform-icon {
+    font-size: 1.3rem;
+  }
+  
+  .hashtag {
+    font-size: 0.8rem;
+    padding: 3px 6px;
+  }
+}
+
+/* =============================================================================
+   PAYMENT SYSTEM STYLES
+============================================================================= */
+
 .payment-summary {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
