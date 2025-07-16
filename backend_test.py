@@ -1622,6 +1622,23 @@ def run_tests():
             print("=" * 50)
             runner.run(site_messages_suite)
             return
+        elif sys.argv[1] == "recent_activity":
+            # Run only recent activity tests for new users
+            recent_activity_suite = unittest.TestSuite()
+            recent_activity_suite.addTest(RecentActivityNewUserTester('test_01_create_new_user'))
+            recent_activity_suite.addTest(RecentActivityNewUserTester('test_02_login_new_user'))
+            recent_activity_suite.addTest(RecentActivityNewUserTester('test_03_check_user_profile_activity'))
+            recent_activity_suite.addTest(RecentActivityNewUserTester('test_04_check_user_tournaments'))
+            recent_activity_suite.addTest(RecentActivityNewUserTester('test_05_check_wallet_activity'))
+            recent_activity_suite.addTest(RecentActivityNewUserTester('test_06_check_affiliate_activity'))
+            recent_activity_suite.addTest(RecentActivityNewUserTester('test_07_verify_recent_activity_empty'))
+            
+            runner = unittest.TextTestRunner(verbosity=2)
+            print("\n" + "=" * 50)
+            print("TESTING RECENT ACTIVITY FIX FOR NEW USERS")
+            print("=" * 50)
+            runner.run(recent_activity_suite)
+            return
         elif sys.argv[1] == "rankings_search":
             # Run only rankings and search tests
             rankings_search_suite = unittest.TestSuite()
