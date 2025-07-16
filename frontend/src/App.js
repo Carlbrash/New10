@@ -1120,6 +1120,20 @@ function App() {
   const [adminTransactions, setAdminTransactions] = useState([]);
   const [financialLoading, setFinancialLoading] = useState(false);
   const [showManualAdjustmentModal, setShowManualAdjustmentModal] = useState(false);
+  
+  // Admin Affiliate States
+  const [affiliateUsers, setAffiliateUsers] = useState([]);
+  const [affiliateRequests, setAffiliateRequests] = useState([]);
+  const [affiliateStats, setAffiliateStats] = useState(null);
+  const [affiliateLoading, setAffiliateLoading] = useState(false);
+  const [showAffiliateModal, setShowAffiliateModal] = useState(false);
+  const [selectedAffiliateUser, setSelectedAffiliateUser] = useState(null);
+  const [affiliateBonusForm, setAffiliateBonusForm] = useState({
+    referral_bonus: 5.0,
+    deposit_bonus: 10.0,
+    bonus_type: 'registration',
+    is_active: true
+  });
   const [selectedUserId, setSelectedUserId] = useState('');
   const [manualAdjustmentForm, setManualAdjustmentForm] = useState({
     user_id: '',
