@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Depends, status, WebSocket, WebSocketDisconnect, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -14,6 +14,15 @@ import uuid
 from enum import Enum
 import json
 import asyncio
+
+# Payment Gateway Imports
+import stripe
+import paypalrestsdk
+from coinbase_commerce.client import Client as CoinbaseClient
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Custom JSON encoder to handle ObjectId
 class CustomJSONEncoder(json.JSONEncoder):
