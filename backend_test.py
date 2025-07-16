@@ -6293,8 +6293,7 @@ class PaymentSystemFixesTester(unittest.TestCase):
     
     def test_01_test_user_login(self):
         """Login as testuser to get token for payment endpoints"""
-        print("
-🔍 Testing testuser login for Payment System Fixes testing...")
+        print("\n🔍 Testing testuser login for Payment System Fixes testing...")
         response = requests.post(
             f"{self.base_url}/api/login",
             json=self.test_user_credentials
