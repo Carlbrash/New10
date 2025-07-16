@@ -1062,7 +1062,7 @@ def add_transaction(user_id: str, transaction_type: str, amount: float, descript
         
         if transaction_type in ["commission_earned", "bonus", "manual_adjustment"]:
             balance_after = balance_before + amount
-        elif transaction_type in ["payout_requested", "payout_completed", "penalty"]:
+        elif transaction_type in ["payout_requested", "payout_completed", "penalty", "tournament_entry"]:
             balance_after = balance_before - amount
         else:
             balance_after = balance_before
