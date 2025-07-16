@@ -122,6 +122,13 @@ payment_sessions_collection = db.payment_sessions
 payment_webhooks_collection = db.payment_webhooks
 tournament_entries_collection = db.tournament_entries
 
+# Social Sharing System Collections
+social_shares_collection = db.social_shares
+share_templates_collection = db.share_templates
+share_stats_collection = db.share_stats
+viral_metrics_collection = db.viral_metrics
+share_clicks_collection = db.share_clicks
+
 app = FastAPI(title="WoBeRa - World Betting Rank API", default_response_class=CustomJSONResponse)
 
 # CORS configuration
