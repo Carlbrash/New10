@@ -3164,13 +3164,18 @@ function App() {
     
     setShareLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/teams/${teamId}/share-formation`, {
+      const response = await fetch(`${API_BASE_URL}/api/social/share`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ platform })
+        body: JSON.stringify({
+          share_type: 'team_formation',
+          reference_id: teamId,
+          platform: platform,
+          custom_message: `Check out our amazing team formation! 🚀`
+        })
       });
       
       if (response.ok) {
