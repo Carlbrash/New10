@@ -33,7 +33,7 @@ ChartJS.register(
   TimeScale,
 );
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com';
 
 // Language translations
 const translations = {

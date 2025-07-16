@@ -10,7 +10,7 @@ class BettingFederationAPITest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(BettingFederationAPITest, self).__init__(*args, **kwargs)
         # Use the public endpoint from frontend/.env
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         
@@ -209,7 +209,7 @@ class BettingFederationAPITest(unittest.TestCase):
 class DecimalRemovalTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(DecimalRemovalTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     def test_01_ui_decimal_removal_verification(self):
         """Test that UI correctly rounds decimal values from the API"""
@@ -279,7 +279,7 @@ class DecimalRemovalTester(unittest.TestCase):
 class BackupTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(BackupTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
 
     def test_01_direct_targz_download(self):
         """Test direct download of TAR.GZ backup file"""
@@ -340,7 +340,7 @@ class BackupTester(unittest.TestCase):
 class AvatarTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(AvatarTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         
         # Generate random user data for testing with avatar
         random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
@@ -428,7 +428,7 @@ class AvatarTester(unittest.TestCase):
 class WorldMapSearchTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(WorldMapSearchTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     def test_01_country_stats_for_search(self):
         """Test that country stats API returns data needed for search functionality"""
@@ -481,7 +481,7 @@ class WorldMapSearchTester(unittest.TestCase):
 class GlobalRankingsTester(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(GlobalRankingsTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     def test_01_global_rankings_data(self):
         """Test that global rankings API returns complete data with avatars"""
@@ -547,7 +547,7 @@ class GlobalRankingsTester(unittest.TestCase):
         print("✅ Enhanced search functionality test completed - UI testing required for full verification")
 
 class SiteMessagesTester(unittest.TestCase):
-    base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     # Using the correct credentials from server.py
     admin_credentials = {
         "username": "God",
@@ -649,7 +649,7 @@ class RecentActivityNewUserTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(RecentActivityNewUserTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         
@@ -906,7 +906,7 @@ class RecentActivityNewUserTester(unittest.TestCase):
         print(f"    Bonus earnings: {commission_breakdown.get('bonus', 0.0)}")
 
 class NationalLeagueSystemTester(unittest.TestCase):
-    base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     # Admin credentials for admin endpoints
     admin_credentials = {
@@ -1376,7 +1376,7 @@ def run_tests():
     runner.run(site_messages_suite)
 
 class RankingsAndSearchTester(unittest.TestCase):
-    base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     # Using the correct credentials from server.py
     admin_credentials = {
         "username": "admin",
@@ -1547,7 +1547,7 @@ class LiveChatSystemTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(LiveChatSystemTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         
         # Test credentials
         self.admin_credentials = {"username": "admin", "password": "Kiki1999@"}
@@ -2057,7 +2057,7 @@ def run_tests():
     runner.run(wallet_test_suite)
 
 class AdvancedAnalyticsTester(unittest.TestCase):
-    base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     # Admin credentials for admin endpoints
     admin_credentials = {
@@ -2316,7 +2316,7 @@ class AdvancedAnalyticsTester(unittest.TestCase):
         print("✅ Existing analytics endpoints compatibility test passed")
 
 class TournamentSystemTester(unittest.TestCase):
-    base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     # Admin credentials for admin endpoints
     admin_credentials = {
@@ -2890,7 +2890,7 @@ class TournamentSystemTester(unittest.TestCase):
         print("✅ Unauthorized admin access tests passed")
 
 class TournamentBracketTester(unittest.TestCase):
-    base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     # Admin credentials for admin endpoints
     admin_credentials = {
@@ -3684,7 +3684,7 @@ class WalletBalanceFixTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(WalletBalanceFixTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         
@@ -3897,7 +3897,7 @@ class WalletBalanceFixTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(WalletBalanceFixTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         
@@ -4106,7 +4106,7 @@ class WalletBalanceFixTester(unittest.TestCase):
         print("✅ Tournament join workflow verification completed")
 
 class WalletSystemTester(unittest.TestCase):
-    base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     # Test user credentials
     user_credentials = {
@@ -4691,7 +4691,7 @@ def run_wallet_tests():
     runner.run(wallet_test_suite)
 
 class AdminUsersTester(unittest.TestCase):
-    base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
     
     # Admin credentials
     admin_credentials = {
@@ -4794,7 +4794,7 @@ class InsufficientBalanceModalTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(InsufficientBalanceModalTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         
@@ -5014,7 +5014,7 @@ class LiveChatSystemTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(LiveChatSystemTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         
         # Test credentials as specified in the review request
         self.test_credentials = {
@@ -5471,7 +5471,7 @@ class TournamentWalletBalanceTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(TournamentWalletBalanceTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         self.admin_token = None

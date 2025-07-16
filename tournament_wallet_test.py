@@ -7,7 +7,7 @@ class TournamentWalletBalanceTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(TournamentWalletBalanceTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://52d00773-33f8-49d4-9102-623401ffa370.preview.emergentagent.com"
+        self.base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         self.admin_token = None
