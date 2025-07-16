@@ -12611,6 +12611,177 @@ function App() {
         </div>
       )}
 
+      {/* Social Share Modal */}
+      {showSocialShareModal && shareContent && (
+        <div className="modal-overlay">
+          <div className="modal-content social-share-modal">
+            <div className="modal-header">
+              <h3>🚀 Share on Social Media</h3>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowSocialShareModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="share-preview">
+                <h4>Preview:</h4>
+                <div className="share-content-preview">
+                  <h5>{shareContent.title}</h5>
+                  <p>{shareContent.description}</p>
+                  <div className="share-hashtags">
+                    {shareContent.hashtags && shareContent.hashtags.map((tag, index) => (
+                      <span key={index} className="hashtag">#{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="social-platforms">
+                <h4>Choose Platform:</h4>
+                <div className="platform-grid">
+                  <motion.button 
+                    className="platform-btn twitter"
+                    onClick={() => openSocialPlatform('twitter', shareContent)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="platform-icon">🐦</span>
+                    <span>Twitter</span>
+                  </motion.button>
+                  
+                  <motion.button 
+                    className="platform-btn facebook"
+                    onClick={() => openSocialPlatform('facebook', shareContent)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="platform-icon">📘</span>
+                    <span>Facebook</span>
+                  </motion.button>
+                  
+                  <motion.button 
+                    className="platform-btn linkedin"
+                    onClick={() => openSocialPlatform('linkedin', shareContent)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="platform-icon">💼</span>
+                    <span>LinkedIn</span>
+                  </motion.button>
+                  
+                  <motion.button 
+                    className="platform-btn whatsapp"
+                    onClick={() => openSocialPlatform('whatsapp', shareContent)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="platform-icon">💬</span>
+                    <span>WhatsApp</span>
+                  </motion.button>
+                  
+                  <motion.button 
+                    className="platform-btn telegram"
+                    onClick={() => openSocialPlatform('telegram', shareContent)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="platform-icon">✈️</span>
+                    <span>Telegram</span>
+                  </motion.button>
+                  
+                  <motion.button 
+                    className="platform-btn discord"
+                    onClick={() => openSocialPlatform('discord', shareContent)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="platform-icon">🎮</span>
+                    <span>Discord</span>
+                  </motion.button>
+                  
+                  <motion.button 
+                    className="platform-btn native"
+                    onClick={() => openNativeShare(shareContent)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="platform-icon">📱</span>
+                    <span>More</span>
+                  </motion.button>
+                </div>
+              </div>
+              
+              <div className="share-url-section">
+                <h4>Share URL:</h4>
+                <div className="share-url-input">
+                  <input 
+                    type="text" 
+                    value={shareContent.share_url} 
+                    readOnly 
+                    className="form-input"
+                  />
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      navigator.clipboard.writeText(shareContent.share_url);
+                      alert('URL copied to clipboard!');
+                    }}
+                  >
+                    📋 Copy
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowSocialShareModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Success Modal */}
+      {showShareSuccessModal && (
+        <div className="modal-overlay">
+          <div className="modal-content share-success-modal">
+            <div className="modal-header">
+              <h3>🎉 Shared Successfully!</h3>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowShareSuccessModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="success-message">
+                <div className="success-icon">🚀</div>
+                <h4>Your content has been shared!</h4>
+                <p>Thank you for spreading the word about WoBeRa!</p>
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                className="btn btn-primary"
+                onClick={() => setShowShareSuccessModal(false)}
+              >
+                Awesome!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Payment Modal */}
       {showPaymentModal && selectedTournamentForPayment && (
         <div className="modal-overlay">
