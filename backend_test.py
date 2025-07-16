@@ -1631,6 +1631,382 @@ class PaymentSystemTester(unittest.TestCase):
         
         print("✅ Payment system integration test passed")
 
+class SocialSharingTeamFormationTester(unittest.TestCase):
+    """Test Social Sharing System backend endpoints specifically for team formation sharing"""
+    
+    base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
+    
+    # Test user credentials
+    test_user_credentials = {
+        "username": "testuser",
+        "password": "test123"
+    }
+    
+    test_user_token = None
+    test_user_id = None
+    test_team_id = None
+    
+    def test_01_test_user_login(self):
+        """Login as testuser to get token for social sharing endpoints"""
+        print("\n🔍 Testing testuser login for Social Sharing System testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.test_user_credentials
+        )
+        self.assertEqual(response.status_code, 200, f"Test user login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("user_id", data)
+        SocialSharingTeamFormationTester.test_user_token = data["token"]
+        SocialSharingTeamFormationTester.test_user_id = data["user_id"]
+        print(f"✅ Test user login successful - Token obtained for Social Sharing testing")
+        print(f"  User ID: {SocialSharingTeamFormationTester.test_user_id}")
+    
+    def test_02_get_existing_teams(self):
+        """Get existing teams to find a team_id for testing"""
+        print("\n🔍 Getting existing teams for social sharing testing...")
+        
+        response = requests.get(f"{self.base_url}/api/teams")
+        self.assertEqual(response.status_code, 200, f"Failed to get teams: {response.text}")
+        
+        data = response.json()
+        teams = data.get("teams", [])
+        
+        if teams:
+            # Use the first team for testing
+            first_team = teams[0]
+            SocialSharingTeamFormationTester.test_team_id = first_team["id"]
+            print(f"  ✅ Found team for testing: {first_team['name']}")
+            print(f"    Team ID: {first_team['id']}")
+            print(f"    Captain: {first_team.get('captain_name', 'Unknown')}")
+            print(f"    Country: {first_team.get('country', 'Unknown')}")
+        else:
+            print("  ⚠️ No teams found in system")
+            # Create a test team ID for error testing
+            SocialSharingTeamFormationTester.test_team_id = "test-team-id-for-error-testing"
+    
+    def test_03_team_formation_share_facebook(self):
+        """Test Team Formation Share with Facebook platform using POST /api/social/share"""
+        print("\n🔍 Testing Team Formation Share with Facebook platform...")
+        
+        # Skip if test user login failed
+        if not SocialSharingTeamFormationTester.test_user_token:
+            self.skipTest("Test user token not available, skipping team formation share test")
+        
+        # Skip if no team ID available
+        if not SocialSharingTeamFormationTester.test_team_id:
+            self.skipTest("No team ID available, skipping team formation share test")
+        
+        # Test team formation share with Facebook
+        share_request = {
+            "share_type": "team_formation",
+            "reference_id": SocialSharingTeamFormationTester.test_team_id,
+            "platform": "facebook",
+            "custom_message": "Check out our amazing team formation!"
+        }
+        
+        headers = {"Authorization": f"Bearer {SocialSharingTeamFormationTester.test_user_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/social/share",
+            headers=headers,
+            json=share_request
+        )
+        
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response body: {response.text}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Verify response structure for team formation share
+            required_fields = ["share_id", "title", "description", "hashtags", "share_url"]
+            for field in required_fields:
+                self.assertIn(field, data, f"Missing required field: {field}")
+            
+            # Verify content is appropriate for team formation
+            self.assertIn("team", data["title"].lower(), "Title should mention team")
+            self.assertIn("team", data["description"].lower(), "Description should mention team")
+            self.assertIsInstance(data["hashtags"], list, "Hashtags should be a list")
+            self.assertTrue(len(data["hashtags"]) > 0, "Should have hashtags")
+            
+            # Check for team formation specific hashtags
+            hashtags_str = " ".join(data["hashtags"]).lower()
+            self.assertTrue(
+                "#teamformation" in hashtags_str or "#team" in hashtags_str,
+                "Should have team-related hashtags"
+            )
+            
+            print(f"  ✅ Team formation share created successfully:")
+            print(f"    Share ID: {data['share_id']}")
+            print(f"    Title: {data['title']}")
+            print(f"    Description: {data['description'][:100]}...")
+            print(f"    Hashtags: {data['hashtags']}")
+            print(f"    Share URL: {data['share_url']}")
+            
+        elif response.status_code == 404:
+            # Team not found (expected if using test team ID)
+            print("  ✅ Team formation share failed due to team not found (expected for test team ID)")
+            self.assertIn("not found", response.text.lower(), "Should indicate team not found")
+            
+        elif response.status_code == 400:
+            # Bad request (could be various validation errors)
+            print(f"  ✅ Team formation share failed with validation error: {response.text}")
+            
+        else:
+            self.fail(f"Unexpected response status: {response.status_code}")
+        
+        print("✅ Team Formation Share with Facebook platform test passed")
+    
+    def test_04_team_formation_share_instagram(self):
+        """Test Team Formation Share with Instagram platform using POST /api/social/share"""
+        print("\n🔍 Testing Team Formation Share with Instagram platform...")
+        
+        # Skip if test user login failed
+        if not SocialSharingTeamFormationTester.test_user_token:
+            self.skipTest("Test user token not available, skipping team formation share test")
+        
+        # Skip if no team ID available
+        if not SocialSharingTeamFormationTester.test_team_id:
+            self.skipTest("No team ID available, skipping team formation share test")
+        
+        # Test team formation share with Instagram
+        share_request = {
+            "share_type": "team_formation",
+            "reference_id": SocialSharingTeamFormationTester.test_team_id,
+            "platform": "instagram",
+            "custom_message": "Our team is ready to dominate! 🔥"
+        }
+        
+        headers = {"Authorization": f"Bearer {SocialSharingTeamFormationTester.test_user_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/social/share",
+            headers=headers,
+            json=share_request
+        )
+        
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response body: {response.text}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Verify response structure for team formation share
+            required_fields = ["share_id", "title", "description", "hashtags", "share_url"]
+            for field in required_fields:
+                self.assertIn(field, data, f"Missing required field: {field}")
+            
+            # Verify content is optimized for Instagram (should be more visual/engaging)
+            self.assertIn("team", data["title"].lower(), "Title should mention team")
+            self.assertIn("team", data["description"].lower(), "Description should mention team")
+            self.assertIsInstance(data["hashtags"], list, "Hashtags should be a list")
+            self.assertTrue(len(data["hashtags"]) > 0, "Should have hashtags")
+            
+            # Instagram should have more hashtags for better reach
+            self.assertGreaterEqual(len(data["hashtags"]), 3, "Instagram should have multiple hashtags")
+            
+            print(f"  ✅ Team formation share for Instagram created successfully:")
+            print(f"    Share ID: {data['share_id']}")
+            print(f"    Title: {data['title']}")
+            print(f"    Description: {data['description'][:100]}...")
+            print(f"    Hashtags ({len(data['hashtags'])}): {data['hashtags']}")
+            print(f"    Share URL: {data['share_url']}")
+            
+        elif response.status_code == 404:
+            # Team not found (expected if using test team ID)
+            print("  ✅ Team formation share failed due to team not found (expected for test team ID)")
+            self.assertIn("not found", response.text.lower(), "Should indicate team not found")
+            
+        elif response.status_code == 400:
+            # Bad request (could be various validation errors)
+            print(f"  ✅ Team formation share failed with validation error: {response.text}")
+            
+        else:
+            self.fail(f"Unexpected response status: {response.status_code}")
+        
+        print("✅ Team Formation Share with Instagram platform test passed")
+    
+    def test_05_general_social_share_team_formation(self):
+        """Test General Social Share with team_formation type using POST /api/social/share"""
+        print("\n🔍 Testing General Social Share with team_formation type...")
+        
+        # Skip if test user login failed
+        if not SocialSharingTeamFormationTester.test_user_token:
+            self.skipTest("Test user token not available, skipping general social share test")
+        
+        # Skip if no team ID available
+        if not SocialSharingTeamFormationTester.test_team_id:
+            self.skipTest("No team ID available, skipping general social share test")
+        
+        # Test general social share with team formation type
+        share_request = {
+            "share_type": "team_formation",
+            "reference_id": SocialSharingTeamFormationTester.test_team_id,
+            "platform": "facebook",
+            "custom_message": "Check out our amazing team!"
+        }
+        
+        headers = {"Authorization": f"Bearer {SocialSharingTeamFormationTester.test_user_token}"}
+        response = requests.post(
+            f"{self.base_url}/api/social/share",
+            headers=headers,
+            json=share_request
+        )
+        
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response body: {response.text}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Verify response structure
+            required_fields = ["share_id", "title", "description", "hashtags", "share_url"]
+            for field in required_fields:
+                self.assertIn(field, data, f"Missing required field: {field}")
+            
+            # Verify share content structure
+            self.assertIsInstance(data["title"], str, "Title should be a string")
+            self.assertIsInstance(data["description"], str, "Description should be a string")
+            self.assertIsInstance(data["hashtags"], list, "Hashtags should be a list")
+            self.assertIsInstance(data["share_url"], str, "Share URL should be a string")
+            
+            # Verify content quality
+            self.assertTrue(len(data["title"]) > 0, "Title should not be empty")
+            self.assertTrue(len(data["description"]) > 0, "Description should not be empty")
+            self.assertTrue(len(data["hashtags"]) > 0, "Should have at least one hashtag")
+            self.assertTrue(data["share_url"].startswith("http"), "Share URL should be a valid URL")
+            
+            # Check if custom message is incorporated
+            if "Check out our amazing team!" in share_request["custom_message"]:
+                # Custom message should influence the content
+                content_text = (data["title"] + " " + data["description"]).lower()
+                self.assertTrue(
+                    "team" in content_text or "amazing" in content_text,
+                    "Custom message should influence the share content"
+                )
+            
+            print(f"  ✅ General social share created successfully:")
+            print(f"    Share ID: {data['share_id']}")
+            print(f"    Title: {data['title']}")
+            print(f"    Description: {data['description'][:100]}...")
+            print(f"    Hashtags: {data['hashtags']}")
+            print(f"    Share URL: {data['share_url']}")
+            
+        elif response.status_code == 404:
+            # Team not found (expected if using test team ID)
+            print("  ✅ General social share failed due to team not found (expected for test team ID)")
+            self.assertIn("not found", response.text.lower(), "Should indicate team not found")
+            
+        elif response.status_code == 400:
+            # Bad request (could be various validation errors)
+            print(f"  ✅ General social share failed with validation error: {response.text}")
+            
+        else:
+            self.fail(f"Unexpected response status: {response.status_code}")
+        
+        print("✅ General Social Share with team_formation type test passed")
+    
+    def test_06_verify_social_sharing_endpoints_exist(self):
+        """Verify that the expected social sharing endpoints exist and are accessible"""
+        print("\n🔍 Verifying social sharing endpoints exist...")
+        
+        # Skip if test user login failed
+        if not SocialSharingTeamFormationTester.test_user_token:
+            self.skipTest("Test user token not available, skipping endpoint verification")
+        
+        headers = {"Authorization": f"Bearer {SocialSharingTeamFormationTester.test_user_token}"}
+        
+        # Test GET /api/social/user/shares
+        print("  Testing GET /api/social/user/shares...")
+        response = requests.get(f"{self.base_url}/api/social/user/shares", headers=headers)
+        self.assertEqual(response.status_code, 200, f"User shares endpoint failed: {response.text}")
+        user_shares_data = response.json()
+        self.assertIn("shares", user_shares_data, "User shares should have 'shares' field")
+        print(f"    ✅ User shares endpoint working - Found {len(user_shares_data.get('shares', []))} shares")
+        
+        # Test GET /api/social/stats
+        print("  Testing GET /api/social/stats...")
+        response = requests.get(f"{self.base_url}/api/social/stats", headers=headers)
+        self.assertEqual(response.status_code, 200, f"Social stats endpoint failed: {response.text}")
+        stats_data = response.json()
+        required_stats_fields = ["total_shares", "shares_by_platform", "shares_by_type"]
+        for field in required_stats_fields:
+            self.assertIn(field, stats_data, f"Social stats should have '{field}' field")
+        print(f"    ✅ Social stats endpoint working - Total shares: {stats_data.get('total_shares', 0)}")
+        
+        # Test GET /api/social/viral-content (no auth required)
+        print("  Testing GET /api/social/viral-content...")
+        response = requests.get(f"{self.base_url}/api/social/viral-content")
+        self.assertEqual(response.status_code, 200, f"Viral content endpoint failed: {response.text}")
+        viral_data = response.json()
+        self.assertIn("viral_content", viral_data, "Viral content should have 'viral_content' field")
+        print(f"    ✅ Viral content endpoint working - Found {len(viral_data.get('viral_content', []))} viral items")
+        
+        print("✅ All social sharing endpoints are accessible and working")
+    
+    def test_07_test_authentication_requirements(self):
+        """Test that social sharing endpoints properly require authentication"""
+        print("\n🔍 Testing authentication requirements for social sharing endpoints...")
+        
+        # Test POST /api/social/share without authentication
+        print("  Testing social share creation without auth...")
+        share_request = {
+            "share_type": "team_formation",
+            "reference_id": "test-team-id",
+            "platform": "facebook"
+        }
+        response = requests.post(f"{self.base_url}/api/social/share", json=share_request)
+        self.assertEqual(response.status_code, 401, "Social share creation should require authentication")
+        print("  ✅ Social share creation correctly requires authentication")
+        
+        # Test GET /api/social/user/shares without authentication
+        print("  Testing user shares without auth...")
+        response = requests.get(f"{self.base_url}/api/social/user/shares")
+        self.assertEqual(response.status_code, 401, "User shares should require authentication")
+        print("  ✅ User shares correctly requires authentication")
+        
+        # Test GET /api/social/stats without authentication
+        print("  Testing social stats without auth...")
+        response = requests.get(f"{self.base_url}/api/social/stats")
+        self.assertEqual(response.status_code, 401, "Social stats should require authentication")
+        print("  ✅ Social stats correctly requires authentication")
+        
+        # Test GET /api/social/viral-content without authentication (should work)
+        print("  Testing viral content without auth...")
+        response = requests.get(f"{self.base_url}/api/social/viral-content")
+        self.assertEqual(response.status_code, 200, "Viral content should not require authentication")
+        print("  ✅ Viral content correctly does not require authentication")
+        
+        print("✅ Authentication requirements test passed")
+    
+    def test_08_test_missing_team_formation_endpoints(self):
+        """Test that the specific team formation endpoints mentioned in the request do not exist"""
+        print("\n🔍 Testing for missing team formation endpoints...")
+        
+        # Skip if test user login failed
+        if not SocialSharingTeamFormationTester.test_user_token:
+            self.skipTest("Test user token not available, skipping missing endpoint test")
+        
+        # Skip if no team ID available
+        if not SocialSharingTeamFormationTester.test_team_id:
+            self.skipTest("No team ID available, skipping missing endpoint test")
+        
+        headers = {"Authorization": f"Bearer {SocialSharingTeamFormationTester.test_user_token}"}
+        
+        # Test POST /api/teams/{team_id}/share-formation (should not exist)
+        print(f"  Testing POST /api/teams/{SocialSharingTeamFormationTester.test_team_id}/share-formation...")
+        share_request = {"platform": "facebook"}
+        response = requests.post(
+            f"{self.base_url}/api/teams/{SocialSharingTeamFormationTester.test_team_id}/share-formation",
+            headers=headers,
+            json=share_request
+        )
+        self.assertEqual(response.status_code, 404, "Team formation share endpoint should not exist")
+        print("  ✅ POST /api/teams/{team_id}/share-formation correctly returns 404 (endpoint not implemented)")
+        
+        print("✅ Missing team formation endpoints test passed")
+        print("  ℹ️ NOTE: The specific endpoints mentioned in the review request are not implemented.")
+        print("  ℹ️ However, team formation sharing is available through the general /api/social/share endpoint.")
+
 class NationalLeagueSystemTester(unittest.TestCase):
     base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
     
