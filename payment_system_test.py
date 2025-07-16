@@ -137,7 +137,7 @@ class PaymentSystemTester(unittest.TestCase):
         payment_request = {
             "user_id": PaymentSystemTester.test_user_id,
             "tournament_id": PaymentSystemTester.test_tournament_id,
-            "amount": 10.0,
+            "amount": 25.0,  # Use the actual tournament entry fee
             "currency": "USD",
             "provider": "stripe"
         }
