@@ -2872,6 +2872,130 @@ function App() {
     }
   };
 
+  // Payment System Functions
+  const fetchPaymentConfig = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/payments/config`);
+      if (response.ok) {
+        const config = await response.json();
+        setPaymentConfig(config);
+        
+        // Initialize Stripe if available
+        if (config.stripe_enabled && config.stripe_public_key) {
+          const stripe = await loadStripe(config.stripe_public_key);
+          setStripePromise(stripe);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching payment config:', error);
+    }
+  };
+
+  const fetchPaymentHistory = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/payments/history`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setPaymentHistory(data.payments || []);
+      }
+    } catch (error) {
+      console.error('Error fetching payment history:', error);
+    }
+  };
+
+  const createPaymentSession = async (provider) => {
+    if (!selectedTournamentForPayment || !token) return;
+    
+    setPaymentLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/payments/create-session`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          tournament_id: selectedTournamentForPayment.id,
+          amount: selectedTournamentForPayment.entry_fee,
+          currency: 'USD',
+          provider: provider
+        })
+      });
+      
+      if (response.ok) {
+        const session = await response.json();
+        setPaymentSession(session);
+        
+        // Redirect to payment gateway
+        if (session.checkout_url) {
+          window.location.href = session.checkout_url;
+        }
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to create payment session');
+      }
+    } catch (error) {
+      console.error('Error creating payment session:', error);
+      alert('Error creating payment session');
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const handlePayoutRequest = async () => {
+    if (!token || !payoutRequestForm.amount || !payoutRequestForm.payout_account) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    setPaymentLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/payments/payout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: parseFloat(payoutRequestForm.amount),
+          provider: payoutRequestForm.provider,
+          payout_account: payoutRequestForm.payout_account,
+          metadata: { notes: payoutRequestForm.notes }
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        alert(result.message || 'Payout request submitted successfully');
+        setShowPayoutRequestModal(false);
+        setPayoutRequestForm({
+          amount: '',
+          provider: 'stripe',
+          payout_account: '',
+          notes: ''
+        });
+        // Refresh wallet data
+        fetchWalletBalance();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to submit payout request');
+      }
+    } catch (error) {
+      console.error('Error submitting payout request:', error);
+      alert('Error submitting payout request');
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   // Leave tournament
   const leaveTournament = async (tournamentId) => {
     if (!token) return;
