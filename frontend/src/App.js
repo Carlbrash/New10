@@ -10748,6 +10748,73 @@ function App() {
           </button>
         </div>
       )}
+
+      {/* Insufficient Balance Modal */}
+      {insufficientBalanceModal.show && (
+        <div className="modal-overlay" onClick={() => setInsufficientBalanceModal({show: false, message: '', tournamentId: null})}>
+          <div className="modal insufficient-balance-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content">
+              <div className="insufficient-balance-header">
+                <div className="balance-icon">
+                  💰
+                </div>
+                <h3>Insufficient Balance</h3>
+              </div>
+              
+              <div className="insufficient-balance-body">
+                <div className="balance-message">
+                  <p>You don't have enough funds to join this tournament.</p>
+                  <div className="balance-details">
+                    {insufficientBalanceModal.message.includes('need') && (
+                      <div className="balance-info">
+                        <span>Required:</span>
+                        <span className="required-amount">
+                          {insufficientBalanceModal.message.match(/need €([\d.]+)/)?.[1] || '0.00'}€
+                        </span>
+                      </div>
+                    )}
+                    {insufficientBalanceModal.message.includes('have') && (
+                      <div className="balance-info">
+                        <span>Available:</span>
+                        <span className="available-amount">
+                          {insufficientBalanceModal.message.match(/have €([\d.]+)/)?.[1] || '0.00'}€
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="suggested-actions">
+                  <h4>What you can do:</h4>
+                  <ul>
+                    <li>💎 Deposit funds to your wallet</li>
+                    <li>🎯 Join a free tournament instead</li>
+                    <li>🏆 Win prizes in other tournaments</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="modal-actions">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setInsufficientBalanceModal({show: false, message: '', tournamentId: null})}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    setInsufficientBalanceModal({show: false, message: '', tournamentId: null});
+                    setCurrentView('wallet');
+                  }}
+                >
+                  💰 Go to Wallet
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
