@@ -9660,9 +9660,11 @@ function App() {
                 onChange={(e) => joinChatRoom(e.target.value)}
                 className="room-select"
               >
-                {chatRooms.map(room => (
+                {/* Always show general room as first option */}
+                <option value="general">General Chat</option>
+                {chatRooms.filter(room => room.id !== 'general').map(room => (
                   <option key={room.id} value={room.id}>
-                    {room.name} ({room.participant_count})
+                    {room.name} ({room.participant_count || 0})
                   </option>
                 ))}
               </select>
