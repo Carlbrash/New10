@@ -3256,6 +3256,11 @@ function App() {
       case 'linkedin':
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}&title=${encodedTitle}&summary=${encodedDescription}`;
         break;
+      case 'instagram':
+        // Instagram doesn't have a direct share URL, so we'll copy to clipboard
+        navigator.clipboard.writeText(`${shareContent.title}\n\n${shareContent.description}\n\n${shareContent.share_url}`);
+        alert('Content copied to clipboard! Paste it as a story or post on Instagram.');
+        return;
       case 'whatsapp':
         shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
         break;
