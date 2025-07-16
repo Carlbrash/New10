@@ -8426,14 +8426,14 @@ async def get_friend_requests(current_user: dict = Depends(get_current_user)):
         
         # Enrich with user data
         for request in received_requests:
-            sender = users_collection.find_one({"user_id": request["sender_id"]})
+            sender = users_collection.find_one({"id": request["sender_id"]})
             if sender:
                 request["sender_username"] = sender["username"]
                 request["sender_full_name"] = sender.get("full_name", "")
                 request["sender_avatar_url"] = sender.get("avatar_url", "")
         
         for request in sent_requests:
-            recipient = users_collection.find_one({"user_id": request["recipient_id"]})
+            recipient = users_collection.find_one({"id": request["recipient_id"]})
             if recipient:
                 request["recipient_username"] = recipient["username"]
                 request["recipient_full_name"] = recipient.get("full_name", "")
