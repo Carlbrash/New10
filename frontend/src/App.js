@@ -3561,6 +3561,153 @@ function App() {
     setAffiliateLoading(false);
   };
 
+  // ============================================================================
+  // ADMIN AFFILIATE MANAGEMENT FUNCTIONS
+  // ============================================================================
+
+  // Fetch affiliate requests for admin
+  const fetchAffiliateRequests = async () => {
+    if (!token) return;
+    
+    setAdminAffiliateLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/affiliate/requests`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAffiliateRequests(data.requests);
+      }
+    } catch (error) {
+      console.error('Error fetching affiliate requests:', error);
+    }
+    setAdminAffiliateLoading(false);
+  };
+
+  // Fetch admin affiliate statistics
+  const fetchAdminAffiliateStats = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/affiliate/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdminAffiliateStats(data);
+      }
+    } catch (error) {
+      console.error('Error fetching admin affiliate stats:', error);
+    }
+  };
+
+  // Fetch all affiliate users
+  const fetchAffiliateUsers = async () => {
+    if (!token) return;
+    
+    setAdminAffiliateLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/affiliate/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAffiliateUsers(data.affiliate_users);
+      }
+    } catch (error) {
+      console.error('Error fetching affiliate users:', error);
+    }
+    setAdminAffiliateLoading(false);
+  };
+
+  // Approve affiliate request
+  const approveAffiliateRequest = async (userId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/affiliate/approve/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(affiliateBonusForm)
+      });
+      
+      if (response.ok) {
+        alert('Affiliate request approved successfully!');
+        fetchAffiliateRequests();
+        fetchAdminAffiliateStats();
+        setShowAdminAffiliateModal(false);
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to approve affiliate request');
+      }
+    } catch (error) {
+      console.error('Error approving affiliate request:', error);
+      alert('Error approving affiliate request');
+    }
+  };
+
+  // Reject affiliate request
+  const rejectAffiliateRequest = async (userId, reason) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/affiliate/reject/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ reason })
+      });
+      
+      if (response.ok) {
+        alert('Affiliate request rejected');
+        fetchAffiliateRequests();
+        fetchAdminAffiliateStats();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to reject affiliate request');
+      }
+    } catch (error) {
+      console.error('Error rejecting affiliate request:', error);
+      alert('Error rejecting affiliate request');
+    }
+  };
+
+  // Update affiliate bonuses
+  const updateAffiliateBonuses = async (userId, bonusData) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/affiliate/bonuses/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(bonusData)
+      });
+      
+      if (response.ok) {
+        alert('Affiliate bonuses updated successfully!');
+        fetchAffiliateUsers();
+        setShowAdminAffiliateModal(false);
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to update affiliate bonuses');
+      }
+    } catch (error) {
+      console.error('Error updating affiliate bonuses:', error);
+      alert('Error updating affiliate bonuses');
+    }
+  };
+
   // Fetch affiliate referrals
   const fetchAffiliateReferrals = async () => {
     if (!token) return;
