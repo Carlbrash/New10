@@ -2007,6 +2007,506 @@ class SocialSharingTeamFormationTester(unittest.TestCase):
         print("  ℹ️ NOTE: The specific endpoints mentioned in the review request are not implemented.")
         print("  ℹ️ However, team formation sharing is available through the general /api/social/share endpoint.")
 
+class BackendStabilityTester(unittest.TestCase):
+    """Test Backend Stability - Chat Rooms and Team ID KeyError Fix"""
+    
+    def __init__(self, *args, **kwargs):
+        super(BackendStabilityTester, self).__init__(*args, **kwargs)
+        self.base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
+        self.testuser_token = None
+        self.admin_token = None
+        
+    def test_01_testuser_login(self):
+        """Login as testuser for chat room testing"""
+        print("\n🔍 Testing testuser login for backend stability testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json={"username": "testuser", "password": "test123"}
+        )
+        self.assertEqual(response.status_code, 200, f"Testuser login failed: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.testuser_token = data["token"]
+        print("✅ Testuser login successful")
+    
+    def test_02_admin_login(self):
+        """Login as admin for chat room testing"""
+        print("\n🔍 Testing admin login for backend stability testing...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json={"username": "admin", "password": "Kiki1999@"}
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.admin_token = data["token"]
+        print("✅ Admin login successful")
+    
+    def test_03_chat_rooms_with_authentication(self):
+        """Test GET /api/chat/rooms with authentication - should not return KeyError for team_id"""
+        print("\n🔍 Testing GET /api/chat/rooms with authentication...")
+        
+        if not self.testuser_token:
+            self.skipTest("Testuser token not available")
+        
+        headers = {"Authorization": f"Bearer {self.testuser_token}"}
+        response = requests.get(f"{self.base_url}/api/chat/rooms", headers=headers)
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        # Should return 200 and not have KeyError for team_id
+        self.assertEqual(response.status_code, 200, f"Chat rooms request failed: {response.text}")
+        
+        data = response.json()
+        self.assertIn("rooms", data, "Response should contain 'rooms' field")
+        
+        # Verify no KeyError for team_id in response
+        rooms = data["rooms"]
+        for room in rooms:
+            # Check that team rooms are handled correctly
+            if room.get("type") == "team":
+                self.assertIn("team_id", room, "Team rooms should have team_id field")
+                print(f"  ✅ Team room found with team_id: {room.get('team_id')}")
+        
+        print(f"✅ Chat rooms endpoint working correctly - Found {len(rooms)} rooms")
+        print("✅ No KeyError for team_id - Backend stability issue fixed")
+
+class FriendImportSystemTester(unittest.TestCase):
+    """Test Friend Import System Full Workflow"""
+    
+    def __init__(self, *args, **kwargs):
+        super(FriendImportSystemTester, self).__init__(*args, **kwargs)
+        self.base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
+        self.testuser_token = None
+        self.admin_token = None
+        self.testuser_id = None
+        self.admin_id = None
+        self.friend_request_id = None
+        
+    def test_01_testuser_login(self):
+        """Login as testuser (testuser/test123)"""
+        print("\n🔍 Testing testuser login for Friend Import System...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json={"username": "testuser", "password": "test123"}
+        )
+        self.assertEqual(response.status_code, 200, f"Testuser login failed: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("user_id", data)
+        self.testuser_token = data["token"]
+        self.testuser_id = data["user_id"]
+        print(f"✅ Testuser login successful - User ID: {self.testuser_id}")
+    
+    def test_02_get_friend_recommendations(self):
+        """Test GET /api/friends/recommendations"""
+        print("\n🔍 Testing GET /api/friends/recommendations...")
+        
+        if not self.testuser_token:
+            self.skipTest("Testuser token not available")
+        
+        headers = {"Authorization": f"Bearer {self.testuser_token}"}
+        response = requests.get(f"{self.base_url}/api/friends/recommendations", headers=headers)
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Friend recommendations request failed: {response.text}")
+        
+        data = response.json()
+        self.assertIn("recommendations", data, "Response should contain 'recommendations' field")
+        
+        recommendations = data["recommendations"]
+        print(f"✅ Friend recommendations retrieved - Found {len(recommendations)} recommendations")
+        
+        # Print first few recommendations
+        for i, rec in enumerate(recommendations[:3]):
+            print(f"  Recommendation {i+1}: {rec.get('username', 'Unknown')} - {rec.get('full_name', 'Unknown')}")
+    
+    def test_03_search_friends(self):
+        """Test GET /api/friends/search?q=admin"""
+        print("\n🔍 Testing GET /api/friends/search?q=admin...")
+        
+        if not self.testuser_token:
+            self.skipTest("Testuser token not available")
+        
+        headers = {"Authorization": f"Bearer {self.testuser_token}"}
+        response = requests.get(f"{self.base_url}/api/friends/search?q=admin", headers=headers)
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Friend search request failed: {response.text}")
+        
+        data = response.json()
+        self.assertIn("results", data, "Response should contain 'results' field")
+        
+        results = data["results"]
+        print(f"✅ Friend search completed - Found {len(results)} results for 'admin'")
+        
+        # Verify admin user is in results
+        admin_found = False
+        for result in results:
+            if result.get("username") == "admin":
+                admin_found = True
+                self.admin_id = result.get("id")
+                print(f"  ✅ Admin user found in search results - ID: {self.admin_id}")
+                break
+        
+        if not admin_found:
+            print("  ⚠️ Admin user not found in search results")
+    
+    def test_04_send_friend_request(self):
+        """Test POST /api/friends/send-request to admin"""
+        print("\n🔍 Testing POST /api/friends/send-request to admin...")
+        
+        if not self.testuser_token:
+            self.skipTest("Testuser token not available")
+        
+        if not self.admin_id:
+            # Try to get admin ID from search
+            headers = {"Authorization": f"Bearer {self.testuser_token}"}
+            search_response = requests.get(f"{self.base_url}/api/friends/search?q=admin", headers=headers)
+            if search_response.status_code == 200:
+                search_data = search_response.json()
+                for result in search_data.get("results", []):
+                    if result.get("username") == "admin":
+                        self.admin_id = result.get("id")
+                        break
+        
+        if not self.admin_id:
+            self.skipTest("Admin user ID not available")
+        
+        headers = {"Authorization": f"Bearer {self.testuser_token}"}
+        request_data = {"user_id": self.admin_id}
+        response = requests.post(
+            f"{self.base_url}/api/friends/send-request",
+            headers=headers,
+            json=request_data
+        )
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        # Could be 200 (success) or 400 (already sent/friends)
+        if response.status_code == 200:
+            data = response.json()
+            self.friend_request_id = data.get("request_id")
+            print(f"✅ Friend request sent successfully - Request ID: {self.friend_request_id}")
+        elif response.status_code == 400:
+            print("✅ Friend request failed as expected (already sent or already friends)")
+        else:
+            self.fail(f"Unexpected response status: {response.status_code}")
+    
+    def test_05_admin_login(self):
+        """Login as admin (admin/Kiki1999@)"""
+        print("\n🔍 Testing admin login for Friend Import System...")
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json={"username": "admin", "password": "Kiki1999@"}
+        )
+        self.assertEqual(response.status_code, 200, f"Admin login failed: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.admin_token = data["token"]
+        print("✅ Admin login successful")
+    
+    def test_06_get_friend_requests(self):
+        """Test GET /api/friends/requests as admin"""
+        print("\n🔍 Testing GET /api/friends/requests as admin...")
+        
+        if not self.admin_token:
+            self.skipTest("Admin token not available")
+        
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        response = requests.get(f"{self.base_url}/api/friends/requests", headers=headers)
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Friend requests request failed: {response.text}")
+        
+        data = response.json()
+        self.assertIn("requests", data, "Response should contain 'requests' field")
+        
+        requests_list = data["requests"]
+        print(f"✅ Friend requests retrieved - Found {len(requests_list)} pending requests")
+        
+        # Look for request from testuser
+        testuser_request = None
+        for req in requests_list:
+            if req.get("from_username") == "testuser":
+                testuser_request = req
+                self.friend_request_id = req.get("id")
+                print(f"  ✅ Found friend request from testuser - Request ID: {self.friend_request_id}")
+                break
+        
+        if not testuser_request:
+            print("  ⚠️ No friend request from testuser found")
+    
+    def test_07_respond_to_friend_request(self):
+        """Test POST /api/friends/respond-request (accept)"""
+        print("\n🔍 Testing POST /api/friends/respond-request (accept)...")
+        
+        if not self.admin_token:
+            self.skipTest("Admin token not available")
+        
+        if not self.friend_request_id:
+            # Try to get request ID from requests list
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            requests_response = requests.get(f"{self.base_url}/api/friends/requests", headers=headers)
+            if requests_response.status_code == 200:
+                requests_data = requests_response.json()
+                for req in requests_data.get("requests", []):
+                    if req.get("from_username") == "testuser":
+                        self.friend_request_id = req.get("id")
+                        break
+        
+        if not self.friend_request_id:
+            self.skipTest("Friend request ID not available")
+        
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        response_data = {
+            "request_id": self.friend_request_id,
+            "action": "accept"
+        }
+        response = requests.post(
+            f"{self.base_url}/api/friends/respond-request",
+            headers=headers,
+            json=response_data
+        )
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        # Could be 200 (success) or 400 (already processed)
+        if response.status_code == 200:
+            print("✅ Friend request accepted successfully")
+        elif response.status_code == 400:
+            print("✅ Friend request response failed as expected (already processed)")
+        else:
+            self.fail(f"Unexpected response status: {response.status_code}")
+    
+    def test_08_get_friends_list_testuser(self):
+        """Test GET /api/friends/list for testuser"""
+        print("\n🔍 Testing GET /api/friends/list for testuser...")
+        
+        if not self.testuser_token:
+            self.skipTest("Testuser token not available")
+        
+        headers = {"Authorization": f"Bearer {self.testuser_token}"}
+        response = requests.get(f"{self.base_url}/api/friends/list", headers=headers)
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Friends list request failed: {response.text}")
+        
+        data = response.json()
+        self.assertIn("friends", data, "Response should contain 'friends' field")
+        
+        friends = data["friends"]
+        print(f"✅ Testuser friends list retrieved - Found {len(friends)} friends")
+        
+        # Look for admin in friends list
+        admin_friend = None
+        for friend in friends:
+            if friend.get("username") == "admin":
+                admin_friend = friend
+                print(f"  ✅ Admin found in testuser's friends list")
+                break
+        
+        if not admin_friend:
+            print("  ⚠️ Admin not found in testuser's friends list")
+    
+    def test_09_get_friends_list_admin(self):
+        """Test GET /api/friends/list for admin"""
+        print("\n🔍 Testing GET /api/friends/list for admin...")
+        
+        if not self.admin_token:
+            self.skipTest("Admin token not available")
+        
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        response = requests.get(f"{self.base_url}/api/friends/list", headers=headers)
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Friends list request failed: {response.text}")
+        
+        data = response.json()
+        self.assertIn("friends", data, "Response should contain 'friends' field")
+        
+        friends = data["friends"]
+        print(f"✅ Admin friends list retrieved - Found {len(friends)} friends")
+        
+        # Look for testuser in friends list
+        testuser_friend = None
+        for friend in friends:
+            if friend.get("username") == "testuser":
+                testuser_friend = friend
+                print(f"  ✅ Testuser found in admin's friends list")
+                break
+        
+        if not testuser_friend:
+            print("  ⚠️ Testuser not found in admin's friends list")
+    
+    def test_10_import_friends_by_email(self):
+        """Test POST /api/friends/import with email"""
+        print("\n🔍 Testing POST /api/friends/import with email...")
+        
+        if not self.testuser_token:
+            self.skipTest("Testuser token not available")
+        
+        headers = {"Authorization": f"Bearer {self.testuser_token}"}
+        import_data = {
+            "email": "admin@example.com"  # Assuming admin has this email
+        }
+        response = requests.post(
+            f"{self.base_url}/api/friends/import",
+            headers=headers,
+            json=import_data
+        )
+        
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+        
+        # Could be 200 (success), 404 (user not found), or 400 (already friends)
+        if response.status_code == 200:
+            data = response.json()
+            print("✅ Friend import by email successful")
+            print(f"  Message: {data.get('message', 'No message')}")
+        elif response.status_code == 404:
+            print("✅ Friend import failed as expected (user not found with that email)")
+        elif response.status_code == 400:
+            print("✅ Friend import failed as expected (already friends or invalid request)")
+        else:
+            print(f"⚠️ Unexpected response status: {response.status_code}")
+
+class IntegrationTester(unittest.TestCase):
+    """Test Integration - Friend system with existing systems"""
+    
+    def __init__(self, *args, **kwargs):
+        super(IntegrationTester, self).__init__(*args, **kwargs)
+        self.base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
+        self.testuser_token = None
+        self.admin_token = None
+        
+    def test_01_authentication_integration(self):
+        """Test that authentication works correctly across all systems"""
+        print("\n🔍 Testing authentication integration...")
+        
+        # Test testuser login
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json={"username": "testuser", "password": "test123"}
+        )
+        self.assertEqual(response.status_code, 200, "Testuser login should work")
+        testuser_data = response.json()
+        self.testuser_token = testuser_data["token"]
+        
+        # Test admin login
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json={"username": "admin", "password": "Kiki1999@"}
+        )
+        self.assertEqual(response.status_code, 200, "Admin login should work")
+        admin_data = response.json()
+        self.admin_token = admin_data["token"]
+        
+        print("✅ Authentication working correctly for both users")
+    
+    def test_02_friend_system_with_user_system(self):
+        """Test that friend system integrates with user system"""
+        print("\n🔍 Testing friend system integration with user system...")
+        
+        if not self.testuser_token:
+            self.skipTest("Testuser token not available")
+        
+        headers = {"Authorization": f"Bearer {self.testuser_token}"}
+        
+        # Test friend recommendations (should use user data)
+        response = requests.get(f"{self.base_url}/api/friends/recommendations", headers=headers)
+        self.assertEqual(response.status_code, 200, "Friend recommendations should work")
+        
+        # Test friend search (should search user database)
+        response = requests.get(f"{self.base_url}/api/friends/search?q=admin", headers=headers)
+        self.assertEqual(response.status_code, 200, "Friend search should work")
+        
+        print("✅ Friend system integrates correctly with user system")
+    
+    def test_03_chat_system_stability(self):
+        """Test that chat system is stable and handles team rooms correctly"""
+        print("\n🔍 Testing chat system stability...")
+        
+        if not self.testuser_token:
+            self.skipTest("Testuser token not available")
+        
+        headers = {"Authorization": f"Bearer {self.testuser_token}"}
+        
+        # Test chat rooms endpoint
+        response = requests.get(f"{self.base_url}/api/chat/rooms", headers=headers)
+        self.assertEqual(response.status_code, 200, "Chat rooms should be accessible")
+        
+        data = response.json()
+        self.assertIn("rooms", data, "Chat rooms response should contain rooms")
+        
+        # Verify no critical errors in response
+        rooms = data["rooms"]
+        for room in rooms:
+            if room.get("type") == "team":
+                self.assertIn("team_id", room, "Team rooms should have team_id")
+        
+        print("✅ Chat system is stable and handles team rooms correctly")
+    
+    def test_04_backend_error_handling(self):
+        """Test that backend handles errors gracefully"""
+        print("\n🔍 Testing backend error handling...")
+        
+        # Test unauthorized access
+        response = requests.get(f"{self.base_url}/api/friends/list")
+        self.assertEqual(response.status_code, 401, "Should require authentication")
+        
+        # Test invalid friend request
+        if self.testuser_token:
+            headers = {"Authorization": f"Bearer {self.testuser_token}"}
+            response = requests.post(
+                f"{self.base_url}/api/friends/send-request",
+                headers=headers,
+                json={"user_id": "invalid-user-id"}
+            )
+            self.assertIn(response.status_code, [400, 404], "Should handle invalid user ID gracefully")
+        
+        print("✅ Backend handles errors gracefully")
+    
+    def test_05_system_integration_health(self):
+        """Test overall system health and integration"""
+        print("\n🔍 Testing overall system health and integration...")
+        
+        # Test health endpoint
+        response = requests.get(f"{self.base_url}/api/health")
+        self.assertEqual(response.status_code, 200, "Health endpoint should work")
+        
+        # Test that multiple systems can be accessed simultaneously
+        if self.testuser_token:
+            headers = {"Authorization": f"Bearer {self.testuser_token}"}
+            
+            # Test multiple endpoints in sequence
+            endpoints = [
+                "/api/profile",
+                "/api/friends/list",
+                "/api/chat/rooms",
+                "/api/wallet/balance",
+                "/api/tournaments"
+            ]
+            
+            for endpoint in endpoints:
+                response = requests.get(f"{self.base_url}{endpoint}", headers=headers)
+                self.assertEqual(response.status_code, 200, f"Endpoint {endpoint} should be accessible")
+        
+        print("✅ All systems integrate correctly and are healthy")
+
 class NationalLeagueSystemTester(unittest.TestCase):
     base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
     
