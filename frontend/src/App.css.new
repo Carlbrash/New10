@@ -1,0 +1,314 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* =============================================================================
+   FRIEND IMPORT SYSTEM STYLES
+============================================================================= */
+
+.friends-modal {
+  max-width: 700px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.friends-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #ddd;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  background: rgba(79, 195, 247, 0.2);
+  border-color: #4fc3f7;
+  color: #4fc3f7;
+}
+
+.tab-content {
+  min-height: 300px;
+}
+
+.friends-list,
+.friend-requests,
+.friend-search,
+.friend-recommendations,
+.friend-import {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.friend-item,
+.friend-request-item,
+.search-result-item,
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.friend-item:hover,
+.friend-request-item:hover,
+.search-result-item:hover,
+.recommendation-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+.friend-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.friend-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.default-avatar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.friend-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.friend-info h4 {
+  margin: 0 0 5px 0;
+  color: #4fc3f7;
+  font-size: 1.1rem;
+}
+
+.friend-info p {
+  margin: 0 0 5px 0;
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.friend-country {
+  color: #bbb;
+  font-size: 0.8rem;
+}
+
+.recommendation-reason {
+  color: #ffd700;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.friend-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.friend-actions .btn {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-box .form-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+}
+
+.search-box .form-input::placeholder {
+  color: #bbb;
+}
+
+.search-box .form-input:focus {
+  outline: none;
+  border-color: #4fc3f7;
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+}
+
+.no-friends,
+.no-requests,
+.no-recommendations {
+  text-align: center;
+  padding: 40px 20px;
+  color: #bbb;
+}
+
+.no-friends h4,
+.no-requests h4,
+.no-recommendations h4 {
+  color: #4fc3f7;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.import-method {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.import-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.import-options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.import-options input[type="radio"] {
+  accent-color: #4fc3f7;
+}
+
+.email-import {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.email-import p {
+  color: #ddd;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-textarea::placeholder {
+  color: #bbb;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #4fc3f7;
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+}
+
+.coming-soon {
+  text-align: center;
+  padding: 40px 20px;
+  color: #bbb;
+}
+
+.friend-request-badge {
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  margin-left: 5px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .friends-modal {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .tab-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tab-btn {
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .friend-item,
+  .friend-request-item,
+  .search-result-item,
+  .recommendation-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .friend-info {
+    text-align: center;
+  }
+  
+  .friend-actions {
+    justify-content: center;
+  }
+}
+
+/* =============================================================================
+   ENHANCED SPACING SYSTEM
+============================================================================= */
+
+/* Container Spacing */
+.teams-page,
+.tournaments-page,
+.dashboard-page,
+.admin-page {
+  padding: var(--space-8) var(--space-6);
+  max-width: 1400px;
+  margin: 0 auto;
+}
