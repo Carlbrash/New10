@@ -8410,7 +8410,7 @@ async def send_friend_request(request: dict, current_user: dict = Depends(get_cu
 async def get_friend_requests(current_user: dict = Depends(get_current_user)):
     """Get pending friend requests"""
     try:
-        user_id = current_user["user_id"]
+        user_id = current_user["id"]
         
         # Get received requests
         received_requests = list(friend_requests_collection.find({
