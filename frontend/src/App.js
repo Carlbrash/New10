@@ -2786,7 +2786,10 @@ function App() {
         console.log('🔍 Contains balance?', errorMessage.toLowerCase().includes('balance'));
         
         // Check if it's an insufficient balance error
-        if (errorMessage.toLowerCase().includes('insufficient') && errorMessage.toLowerCase().includes('balance')) {
+        if (errorMessage.toLowerCase().includes('insufficient') || 
+            errorMessage.toLowerCase().includes('balance') || 
+            errorMessage.toLowerCase().includes('funds') ||
+            errorMessage.includes('€')) {
           // Show beautiful insufficient balance modal
           console.log('🎨 Showing insufficient balance modal');
           setInsufficientBalanceModal({
