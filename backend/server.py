@@ -1010,7 +1010,7 @@ def generate_referral_code(username: str, user_id: str) -> str:
 
 def generate_referral_link(referral_code: str) -> str:
     """Generate full referral link"""
-    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
+    base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
     return f"{base_url}/?ref={referral_code}"
 
 def process_referral_registration(referred_user_id: str, referral_code: str, registration_ip: str = None) -> bool:
@@ -7873,7 +7873,7 @@ def get_position_suffix(position: int) -> str:
 
 def create_share_url(share_id: str, user_id: str) -> str:
     """Create trackable share URL"""
-    base_url = "https://78c7ac4b-94f2-4bf0-bbd2-312dbf98f23a.preview.emergentagent.com"
+    base_url = "https://256afdf2-fd60-42a3-bf4a-1e98ae9326e2.preview.emergentagent.com"
     return f"{base_url}/share/{share_id}?ref={user_id}"
 
 def track_share_click(share_id: str, referrer_id: Optional[str] = None) -> None:
