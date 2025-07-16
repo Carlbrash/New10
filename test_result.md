@@ -202,6 +202,18 @@ backend:
         comment: "✅ GET /api/social/viral-content endpoint is working correctly. Successfully returns viral content structure with viral_content array and total_viral count. No authentication required as expected. Returns empty array initially which is expected for a new system. The endpoint is properly accessible and returns correct data structure."
 
 frontend:
+  - task: "Social Sharing UI Enhancement - Facebook & Instagram Buttons"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ FACEBOOK & INSTAGRAM SHARE BUTTONS IMPLEMENTED: Successfully added Facebook and Instagram share buttons to team cards as requested by user. Key features: 1) Added dedicated Facebook and Instagram buttons with brand-appropriate styling, 2) Updated shareTeamFormation function to use correct backend endpoint (/api/social/share), 3) Enhanced social sharing modal with Instagram platform support, 4) Added Instagram case to openSocialPlatform function with clipboard fallback, 5) Added 'More' button for accessing all platforms. Backend testing confirmed social sharing endpoints work correctly with both platforms."
+      
   - task: "Team Card Layout - Three Column Display"
     implemented: true
     working: true
