@@ -9466,122 +9466,144 @@ function App() {
           initial="hidden"
           animate="visible"
         >
-          {/* Show loading skeletons */}
-          {teamLoading && teams.length === 0 ? (
-            <>
-              {[...Array(6)].map((_, index) => (
-                <TeamCardSkeleton key={`skeleton-${index}`} />
-              ))}
-            </>
-          ) : teams.length === 0 ? (
+          {teams.map((team, index) => (
             <motion.div 
-              className="no-teams"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              key={team.id} 
+              className="team-card-modern"
+              variants={itemVariants}
+              whileHover={{ 
+                scale: 1.03,
+                rotateY: 5,
+                transition: { duration: 0.2 }
+              }}
+              whileTap={{ scale: 0.98 }}
             >
-              <h3>No teams found</h3>
-              <p>Be the first to create a team!</p>
-            </motion.div>
-          ) : (
-            teams.map((team, index) => (
-              <motion.div 
-                key={team.id} 
-                className="team-card"
-                variants={cardVariants}
-                initial="hidden"
-                animate="visible"
-                whileHover="hover"
-                transition={{ delay: index * 0.1 }}
-              >
-                <div className="team-header">
-                  <div className="team-logo">
-                    {team.logo_url ? (
-                      <img src={team.logo_url} alt={`${team.name} logo`} />
-                    ) : (
-                      <div className="default-logo" style={{backgroundColor: team.colors?.primary || '#FF0000'}}>
-                        {team.name.charAt(0)}
-                      </div>
+              {/* Team Header with Gradient */}
+              <div className="team-header-modern" style={{
+                background: `linear-gradient(135deg, ${team.colors?.primary || '#4fc3f7'}, ${team.colors?.secondary || '#29b6f6'})`
+              }}>
+                <div className="team-logo-modern">
+                  {team.logo_url ? (
+                    <img src={team.logo_url} alt={`${team.name} logo`} />
+                  ) : (
+                    <div className="default-logo-modern">
+                      {team.name.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div className="team-badge">
+                  <span className="team-status-badge">{team.status}</span>
+                </div>
+              </div>
+
+              {/* Team Content */}
+              <div className="team-content-modern">
+                <div className="team-name-section">
+                  <h3 className="team-name-modern">{team.name}</h3>
+                  <div className="team-location-modern">
+                    <span className="location-icon">📍</span>
+                    <span>{team.city}, {team.country}</span>
+                  </div>
+                </div>
+
+                {/* Team Stats */}
+                <div className="team-stats-modern">
+                  <div className="stat-item-modern">
+                    <div className="stat-icon">👥</div>
+                    <div className="stat-content">
+                      <span className="stat-value">{team.current_player_count}</span>
+                      <span className="stat-label">Players</span>
+                    </div>
+                  </div>
+                  <div className="stat-item-modern">
+                    <div className="stat-icon">👑</div>
+                    <div className="stat-content">
+                      <span className="stat-value">{team.captain_name}</span>
+                      <span className="stat-label">Captain</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Team Colors Showcase */}
+                <div className="team-colors-modern">
+                  <span className="colors-label">Team Colors:</span>
+                  <div className="colors-display">
+                    <motion.div 
+                      className="color-dot-modern primary" 
+                      style={{backgroundColor: team.colors?.primary || '#4fc3f7'}}
+                      whileHover={{ scale: 1.3, rotate: 360 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    {team.colors?.secondary && (
+                      <motion.div 
+                        className="color-dot-modern secondary" 
+                        style={{backgroundColor: team.colors.secondary}}
+                        whileHover={{ scale: 1.3, rotate: -360 }}
+                        transition={{ duration: 0.3 }}
+                      />
                     )}
                   </div>
-                  <div className="team-info">
-                    <h3>{team.name}</h3>
-                    <p>📍 {team.city}, {team.country}</p>
-                    <p>👑 Captain: {team.captain_name}</p>
-                  </div>
-                </div>
-                
-                <div className="team-stats">
-                  <div className="stat">
-                    <span className="stat-value">{team.current_player_count}</span>
-                    <span className="stat-label">Players</span>
-                  </div>
-                  <div className="stat">
-                    <span className="stat-value">{team.status}</span>
-                    <span className="stat-label">Status</span>
-                  </div>
                 </div>
 
-                <div className="team-colors">
-                  <motion.div 
-                    className="color-primary" 
-                    style={{backgroundColor: team.colors?.primary}}
-                    title="Primary Color"
-                    whileHover={{ scale: 1.2, rotate: 10 }}
-                    transition={{ duration: 0.2 }}
-                  ></motion.div>
-                  {team.colors?.secondary && (
-                    <motion.div 
-                      className="color-secondary" 
-                      style={{backgroundColor: team.colors.secondary}}
-                      title="Secondary Color"
-                      whileHover={{ scale: 1.2, rotate: -10 }}
-                      transition={{ duration: 0.2 }}
-                    ></motion.div>
-                  )}
-                </div>
-
-                <div className="team-actions">
+                {/* Social Share Button */}
+                <div className="team-social-section">
                   <motion.button 
-                    className="btn btn-outline"
-                    onClick={() => setCurrentView(`team-${team.id}`)}
-                    variants={buttonVariants}
-                    whileHover="hover"
-                    whileTap="tap"
+                    className="share-team-btn"
+                    onClick={() => shareTeamFormation(team.id, 'twitter')}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    title="Share team formation"
                   >
-                    👁️ View Details
+                    <span className="share-icon">🚀</span>
+                    <span>Share Formation</span>
                   </motion.button>
-                  
-                  {/* Captain actions */}
-                  {user && user.id === team.captain_id && (
-                    <>
-                      <motion.button 
-                        className="btn btn-secondary"
-                        onClick={() => {
-                          setSelectedTeamForInvite(team);
-                          setShowTeamInviteModal(true);
-                        }}
-                        variants={buttonVariants}
-                        whileHover="hover"
-                        whileTap="tap"
-                      >
-                        📧 Invite Player
-                      </motion.button>
-                      <motion.button 
-                        className="btn btn-primary btn-pulse"
-                        onClick={() => openEditTeamModal(team)}
-                        variants={buttonVariants}
-                        whileHover="hover"
-                        whileTap="tap"
-                      >
-                        ✏️ Edit Team
-                      </motion.button>
-                    </>
-                  )}
                 </div>
-              </motion.div>
-            ))
-          )}
+              </div>
+
+              {/* Team Actions */}
+              <div className="team-actions-modern">
+                <motion.button 
+                  className="btn-modern btn-outline-modern"
+                  onClick={() => setCurrentView(`team-${team.id}`)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="btn-icon">👁️</span>
+                  View Details
+                </motion.button>
+                
+                {/* Captain actions */}
+                {user && user.id === team.captain_id && (
+                  <div className="captain-actions-modern">
+                    <motion.button 
+                      className="btn-modern btn-secondary-modern"
+                      onClick={() => {
+                        setSelectedTeamForInvite(team);
+                        setShowTeamInviteModal(true);
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <span className="btn-icon">📧</span>
+                      Invite Player
+                    </motion.button>
+                    <motion.button 
+                      className="btn-modern btn-primary-modern"
+                      onClick={() => openEditTeamModal(team)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <span className="btn-icon">✏️</span>
+                      Edit Team
+                    </motion.button>
+                  </div>
+                )}
+              </div>
+
+              {/* Hover Effects */}
+              <div className="team-card-overlay" />
+            </motion.div>
+          ))}
         </motion.div>
       </motion.div>
     );
