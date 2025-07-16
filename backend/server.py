@@ -8626,7 +8626,7 @@ async def remove_friend(request: dict, current_user: dict = Depends(get_current_
 async def search_friends(q: str, current_user: dict = Depends(get_current_user)):
     """Search for users to add as friends"""
     try:
-        user_id = current_user["user_id"]
+        user_id = current_user["id"]
         
         if not q or len(q) < 2:
             raise HTTPException(status_code=400, detail="Search query must be at least 2 characters")
