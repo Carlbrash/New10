@@ -6111,8 +6111,8 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                 await websocket.close(code=4001, reason="Invalid token")
                 return
             
-            # Get user details
-            user = users_collection.find_one({"user_id": user_id})
+            # Get user details - handle both old and new user ID formats
+            user = users_collection.find_one({"$or": [{"user_id": user_id}, {"id": user_id}]})
             if not user:
                 await websocket.close(code=4001, reason="User not found")
                 return
