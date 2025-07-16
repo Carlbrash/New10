@@ -5999,6 +5999,18 @@ function App() {
             </button>
             
             <button 
+              className={`admin-tab ${adminView === 'affiliates' ? 'active' : ''}`}
+              onClick={() => {
+                setAdminView('affiliates');
+                fetchAffiliateRequests();
+                fetchAdminAffiliateStats();
+                fetchAffiliateUsers();
+              }}
+            >
+              🤝 Affiliate Management
+            </button>
+            
+            <button 
               className={`admin-tab ${adminView === 'tournaments' ? 'active' : ''}`}
               onClick={() => setAdminView('tournaments')}
             >
