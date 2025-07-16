@@ -8451,7 +8451,7 @@ async def get_friend_requests(current_user: dict = Depends(get_current_user)):
 async def respond_friend_request(request: dict, current_user: dict = Depends(get_current_user)):
     """Accept or reject friend request"""
     try:
-        user_id = current_user["user_id"]
+        user_id = current_user["id"]
         request_id = request.get("request_id")
         action = request.get("action")  # accept or reject
         
