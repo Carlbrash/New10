@@ -4414,6 +4414,16 @@ function App() {
               required
             />
           </div>
+          <div className="form-group">
+            <label>Affiliate Code (Optional)</label>
+            <input
+              type="text"
+              value={registerForm.affiliate_code}
+              onChange={(e) => setRegisterForm({...registerForm, affiliate_code: e.target.value})}
+              placeholder="Enter referral code if you have one"
+            />
+            <small className="form-help">If someone referred you, enter their affiliate code here</small>
+          </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? t.registering : t.register}
           </button>
