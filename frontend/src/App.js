@@ -10011,6 +10011,79 @@ function App() {
             </div>
           )}
 
+          {/* Payments View */}
+          {walletView === 'payments' && (
+            <div className="wallet-content">
+              <h3>💳 Payment History</h3>
+              
+              {/* Payment Methods Configuration */}
+              {paymentConfig && (
+                <div className="payment-config">
+                  <h4>Available Payment Methods</h4>
+                  <div className="payment-methods-status">
+                    <div className={`method-status ${paymentConfig.stripe_enabled ? 'enabled' : 'disabled'}`}>
+                      <span>💳 Credit/Debit Cards</span>
+                      <span className="status">{paymentConfig.stripe_enabled ? 'Enabled' : 'Disabled'}</span>
+                    </div>
+                    <div className={`method-status ${paymentConfig.paypal_enabled ? 'enabled' : 'disabled'}`}>
+                      <span>🅿️ PayPal</span>
+                      <span className="status">{paymentConfig.paypal_enabled ? 'Enabled' : 'Disabled'}</span>
+                    </div>
+                    <div className={`method-status ${paymentConfig.coinbase_enabled ? 'enabled' : 'disabled'}`}>
+                      <span>₿ Cryptocurrency</span>
+                      <span className="status">{paymentConfig.coinbase_enabled ? 'Enabled' : 'Disabled'}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Payout Request Button */}
+              <div className="payout-section">
+                <button 
+                  className="payout-request-button"
+                  onClick={() => setShowPayoutRequestModal(true)}
+                  disabled={!walletBalance || walletBalance.available_balance < (paymentConfig?.minimum_payout || 10)}
+                >
+                  💰 Request Payout
+                </button>
+                <p className="payout-note">
+                  Minimum payout: ${paymentConfig?.minimum_payout || 10}
+                </p>
+              </div>
+
+              {/* Payment History */}
+              <div className="payment-history">
+                <h4>💳 Recent Payments</h4>
+                {paymentHistory.length > 0 ? (
+                  <div className="payment-list">
+                    {paymentHistory.map((payment, index) => (
+                      <div key={index} className="payment-item">
+                        <div className="payment-item-info">
+                          <div className="payment-item-tournament">
+                            Tournament Entry - {payment.tournament_id}
+                          </div>
+                          <div className="payment-item-date">
+                            {new Date(payment.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <div className="payment-item-amount">
+                          ${payment.amount}
+                        </div>
+                        <div className={`payment-item-status ${payment.status}`}>
+                          {payment.status}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-payments">
+                    <p>No payment history found.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Settings View */}
           {walletView === 'settings' && (
             <div className="wallet-content">
