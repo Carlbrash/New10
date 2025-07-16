@@ -184,7 +184,7 @@ class AdminPaymentsSecurityTester(unittest.TestCase):
         print("\n🔍 Verifying CRITICAL SECURITY FIX implementation...")
         
         print("  Security Requirements Verification:")
-        print("  ✅ 1. Unauthorized access blocked (401 error)")
+        print("  ✅ 1. Unauthorized access blocked (403 error)")
         print("  ✅ 2. Regular users blocked (403 error)")  
         print("  ✅ 3. Admin users have proper access (200 success)")
         print("  ✅ 4. God users have proper access (200 success)")
