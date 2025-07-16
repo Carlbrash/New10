@@ -50,6 +50,36 @@ MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 DB_NAME = os.environ.get('DB_NAME', 'betting_federation')
 SECRET_KEY = "your-secret-key-here"
 
+# Payment Gateway Configuration
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+
+PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', '')
+PAYPAL_CLIENT_SECRET = os.environ.get('PAYPAL_CLIENT_SECRET', '')
+PAYPAL_MODE = os.environ.get('PAYPAL_MODE', 'sandbox')
+
+COINBASE_API_KEY = os.environ.get('COINBASE_API_KEY', '')
+COINBASE_WEBHOOK_SECRET = os.environ.get('COINBASE_WEBHOOK_SECRET', '')
+
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+
+# Initialize Payment Gateways
+if STRIPE_SECRET_KEY:
+    stripe.api_key = STRIPE_SECRET_KEY
+
+if PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET:
+    paypalrestsdk.configure({
+        "mode": PAYPAL_MODE,
+        "client_id": PAYPAL_CLIENT_ID,
+        "client_secret": PAYPAL_CLIENT_SECRET
+    })
+
+if COINBASE_API_KEY:
+    coinbase_client = CoinbaseClient(api_key=COINBASE_API_KEY)
+else:
+    coinbase_client = None
+
 # MongoDB connection
 client = MongoClient(MONGO_URL)
 db = client[DB_NAME]
