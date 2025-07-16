@@ -648,6 +648,27 @@ function App() {
   const [showFloatingMenu, setShowFloatingMenu] = useState(false);
   const [breadcrumbPath, setBreadcrumbPath] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Live Chat System States
+  const [showChatPopup, setShowChatPopup] = useState(false);
+  const [chatSocket, setChatSocket] = useState(null);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [currentChatRoom, setCurrentChatRoom] = useState('general');
+  const [chatRooms, setChatRooms] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [chatMessage, setChatMessage] = useState('');
+  const [isConnectedToChat, setIsConnectedToChat] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showPrivateMessageModal, setShowPrivateMessageModal] = useState(false);
+  const [selectedPrivateUser, setSelectedPrivateUser] = useState(null);
+  const [privateMessage, setPrivateMessage] = useState('');
+  const [privateMessages, setPrivateMessages] = useState([]);
+  const [chatTab, setChatTab] = useState('room'); // 'room' or 'private'
+  const [showAdminChatModal, setShowAdminChatModal] = useState(false);
+  const [selectedUserForBan, setSelectedUserForBan] = useState(null);
+  const [banReason, setBanReason] = useState('');
+  const [chatStats, setChatStats] = useState(null);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
   
