@@ -14,8 +14,18 @@ class InsufficientBalanceModalTester(unittest.TestCase):
         
         # Test user credentials as specified in the request
         self.test_user_credentials = {
-            "username": "testuser",
+            "username": "modal_test",
             "password": "test123"
+        }
+        
+        # New user registration data
+        self.new_user_data = {
+            "username": "modal_test",
+            "email": "modal_test@example.com",
+            "password": "test123",
+            "country": "GR",
+            "full_name": "Modal Test User",
+            "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
         }
 
     def test_01_login_testuser(self):
