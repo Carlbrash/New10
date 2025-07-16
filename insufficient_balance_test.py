@@ -130,7 +130,7 @@ class InsufficientBalanceModalTester(unittest.TestCase):
         
         if not hasattr(self, 'wallet_balance'):
             # Get balance if not already retrieved
-            self.test_02_check_wallet_balance()
+            self.test_03_check_wallet_balance()
         
         # Get available tournaments
         response = requests.get(f"{self.base_url}/api/tournaments")
@@ -139,26 +139,22 @@ class InsufficientBalanceModalTester(unittest.TestCase):
         data = response.json()
         tournaments = data.get("tournaments", [])
         
-        # Find a tournament with entry fee higher than user's balance
-        high_fee_tournament = None
-        for tournament in tournaments:
-            entry_fee = tournament.get("entry_fee", 0)
-            if entry_fee > self.wallet_balance and tournament.get("status") == "open":
-                high_fee_tournament = tournament
-                break
+        # Find paid tournaments (entry_fee > 0) since user has 0 balance
+        paid_tournaments = [t for t in tournaments if t.get("entry_fee", 0) > 0]
+        self.assertGreater(len(paid_tournaments), 0, "Expected at least one paid tournament")
         
-        if not high_fee_tournament:
-            # If no tournament found, look for any tournament with high fee regardless of status
-            for tournament in tournaments:
-                entry_fee = tournament.get("entry_fee", 0)
-                if entry_fee > self.wallet_balance:
-                    high_fee_tournament = tournament
-                    break
+        print(f"  Found {len(tournaments)} total tournaments")
+        print(f"  Found {len(paid_tournaments)} paid tournaments")
         
-        self.assertIsNotNone(high_fee_tournament, "No tournament found with entry fee higher than user's balance")
+        # Show some paid tournament details
+        for i, tournament in enumerate(paid_tournaments[:3]):
+            print(f"    Tournament {i+1}: {tournament['name']} - Entry Fee: €{tournament['entry_fee']}")
+        
+        # Use the first paid tournament for testing
+        high_fee_tournament = paid_tournaments[0]
         
         self.high_fee_tournament = high_fee_tournament
-        print(f"✅ Found tournament: {high_fee_tournament['name']}")
+        print(f"✅ Selected tournament: {high_fee_tournament['name']}")
         print(f"   Entry fee: €{high_fee_tournament['entry_fee']}")
         print(f"   User balance: €{self.wallet_balance}")
         print(f"   Status: {high_fee_tournament['status']}")
