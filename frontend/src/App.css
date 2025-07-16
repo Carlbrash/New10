@@ -12851,6 +12851,15 @@ h1, h2, h3, h4, h5, h6 {
     padding: 6px 12px;
     font-size: 0.75rem;
   }
+  
+  .social-btn {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+  
+  .social-share-buttons {
+    gap: 6px;
+  }
 }
 
 /* =============================================================================
