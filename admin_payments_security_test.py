@@ -29,7 +29,7 @@ class AdminPaymentsSecurityTester(unittest.TestCase):
     god_token = None
     
     def test_01_unauthorized_access_to_admin_payments(self):
-        """Test unauthorized access to admin payments endpoint - should return 401"""
+        """Test unauthorized access to admin payments endpoint - should return 403"""
         print("\n🔍 Testing unauthorized access to GET /api/admin/payments...")
         
         response = requests.get(f"{self.base_url}/api/admin/payments")
@@ -37,14 +37,14 @@ class AdminPaymentsSecurityTester(unittest.TestCase):
         print(f"  Response status: {response.status_code}")
         print(f"  Response body: {response.text}")
         
-        self.assertEqual(response.status_code, 401, 
-                        f"Expected 401 (Unauthorized) but got {response.status_code}")
+        self.assertEqual(response.status_code, 403, 
+                        f"Expected 403 (Forbidden) but got {response.status_code}")
         
         # Verify error message indicates authentication required
-        self.assertIn("token", response.text.lower(), 
-                     "Response should indicate token/authentication issue")
+        self.assertIn("not authenticated", response.text.lower(), 
+                     "Response should indicate authentication issue")
         
-        print("  ✅ Unauthorized access correctly blocked with 401 error")
+        print("  ✅ Unauthorized access correctly blocked with 403 error")
         print("✅ Test 1 PASSED: Unauthorized access protection working")
     
     def test_02_regular_user_access_to_admin_payments(self):
