@@ -4548,6 +4548,19 @@ function App() {
     }
   }, [user, token]);
 
+  // Load social sharing data when user logs in
+  useEffect(() => {
+    if (user && token) {
+      fetchSocialStats();
+      fetchUserShares();
+    }
+  }, [user, token]);
+
+  // Load viral content on app start
+  useEffect(() => {
+    fetchViralContent();
+  }, []);
+
   // Fetch admin financial data when view changes
   useEffect(() => {
     if (currentView === 'admin' && adminView === 'financial' && isAdmin && token) {
