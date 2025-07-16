@@ -6352,6 +6352,37 @@ async def get_online_users(user_id: str = Depends(verify_token)):
     
     return CustomJSONResponse(content={"online_users": active_users})
 
+@app.delete("/api/chat/messages/{message_id}")
+async def delete_chat_message(
+    message_id: str,
+    user_id: str = Depends(verify_token)
+):
+    """Delete a chat message (Admin only)"""
+    # Get user details
+    user = users_collection.find_one({"$or": [{"user_id": user_id}, {"id": user_id}]})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check admin permissions
+    if user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Find and delete message from all rooms
+    deleted = False
+    for room_id, messages in chat_messages_storage.items():
+        for i, msg in enumerate(messages):
+            if msg["id"] == message_id:
+                del messages[i]
+                deleted = True
+                break
+        if deleted:
+            break
+    
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    return CustomJSONResponse(content={"message": "Message deleted successfully"})
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
