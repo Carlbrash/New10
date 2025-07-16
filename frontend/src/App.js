@@ -3019,6 +3019,267 @@ function App() {
     }
   };
 
+  // Social Sharing Functions
+  const createSocialShare = async (shareType, referenceId, platform, customMessage = '') => {
+    if (!token) return;
+    
+    setShareLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/social/share`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          share_type: shareType,
+          reference_id: referenceId,
+          platform: platform,
+          custom_message: customMessage
+        })
+      });
+      
+      if (response.ok) {
+        const shareData = await response.json();
+        setShareContent(shareData);
+        setShowSocialShareModal(true);
+        return shareData;
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to create share');
+      }
+    } catch (error) {
+      console.error('Error creating social share:', error);
+      alert('Error creating social share');
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const markAsShared = async (shareId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/social/share/${shareId}/shared`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        setShowShareSuccessModal(true);
+        setShowSocialShareModal(false);
+        // Refresh social stats
+        fetchSocialStats();
+      }
+    } catch (error) {
+      console.error('Error marking share as shared:', error);
+    }
+  };
+
+  const fetchSocialStats = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/social/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const stats = await response.json();
+        setSocialStats(stats);
+      }
+    } catch (error) {
+      console.error('Error fetching social stats:', error);
+    }
+  };
+
+  const fetchUserShares = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/social/user/shares`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSocialShares(data.shares || []);
+      }
+    } catch (error) {
+      console.error('Error fetching user shares:', error);
+    }
+  };
+
+  const fetchViralContent = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/social/viral-content`);
+      if (response.ok) {
+        const data = await response.json();
+        setViralContent(data.viral_content || []);
+      }
+    } catch (error) {
+      console.error('Error fetching viral content:', error);
+    }
+  };
+
+  const shareTournamentVictory = async (tournamentId, platform) => {
+    if (!token) return;
+    
+    setShareLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/share-victory`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ platform })
+      });
+      
+      if (response.ok) {
+        const shareData = await response.json();
+        setShareContent(shareData);
+        setShowSocialShareModal(true);
+        return shareData;
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to share tournament victory');
+      }
+    } catch (error) {
+      console.error('Error sharing tournament victory:', error);
+      alert('Error sharing tournament victory');
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const shareTeamFormation = async (teamId, platform) => {
+    if (!token) return;
+    
+    setShareLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/teams/${teamId}/share-formation`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ platform })
+      });
+      
+      if (response.ok) {
+        const shareData = await response.json();
+        setShareContent(shareData);
+        setShowSocialShareModal(true);
+        return shareData;
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to share team formation');
+      }
+    } catch (error) {
+      console.error('Error sharing team formation:', error);
+      alert('Error sharing team formation');
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const shareAchievement = async (achievementData, platform) => {
+    if (!token) return;
+    
+    setShareLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/achievements/share`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          achievement_data: achievementData,
+          platform 
+        })
+      });
+      
+      if (response.ok) {
+        const shareData = await response.json();
+        setShareContent(shareData);
+        setShowSocialShareModal(true);
+        return shareData;
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to share achievement');
+      }
+    } catch (error) {
+      console.error('Error sharing achievement:', error);
+      alert('Error sharing achievement');
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const openNativeShare = (shareContent) => {
+    if (navigator.share) {
+      navigator.share({
+        title: shareContent.title,
+        text: shareContent.description,
+        url: shareContent.share_url
+      });
+    } else {
+      // Fallback to clipboard
+      navigator.clipboard.writeText(`${shareContent.title}\n\n${shareContent.description}\n\n${shareContent.share_url}`);
+      alert('Share content copied to clipboard!');
+    }
+  };
+
+  const openSocialPlatform = (platform, shareContent) => {
+    const encodedTitle = encodeURIComponent(shareContent.title);
+    const encodedDescription = encodeURIComponent(shareContent.description);
+    const encodedUrl = encodeURIComponent(shareContent.share_url);
+    const hashtags = shareContent.hashtags ? shareContent.hashtags.join(',') : '';
+    
+    let shareUrl = '';
+    
+    switch (platform) {
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}&hashtags=${hashtags}`;
+        break;
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedTitle}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}&title=${encodedTitle}&summary=${encodedDescription}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+        break;
+      case 'telegram':
+        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
+        break;
+      case 'discord':
+        // Discord doesn't have a direct share URL, so we'll copy to clipboard
+        navigator.clipboard.writeText(`${shareContent.title}\n\n${shareContent.description}\n\n${shareContent.share_url}`);
+        alert('Share content copied to clipboard! Paste it in Discord.');
+        return;
+      default:
+        openNativeShare(shareContent);
+        return;
+    }
+    
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+    
+    // Mark as shared after opening
+    if (shareContent.share_id) {
+      markAsShared(shareContent.share_id);
+    }
+  };
+
   // Leave tournament
   const leaveTournament = async (tournamentId) => {
     if (!token) return;
