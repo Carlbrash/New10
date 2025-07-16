@@ -13098,6 +13098,302 @@ function App() {
         </div>
       )}
 
+      {/* Friends Modal */}
+      {showFriendsModal && (
+        <div className="modal-overlay">
+          <div className="modal-content friends-modal">
+            <div className="modal-header">
+              <h3>👥 Friends</h3>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowFriendsModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="friends-tabs">
+                <div className="tab-buttons">
+                  <button 
+                    className={`tab-btn ${currentView === 'friends' ? 'active' : ''}`}
+                    onClick={() => setCurrentView('friends')}
+                  >
+                    👥 My Friends ({friendsData.length})
+                  </button>
+                  <button 
+                    className={`tab-btn ${currentView === 'friend-requests' ? 'active' : ''}`}
+                    onClick={() => {
+                      setCurrentView('friend-requests');
+                      fetchFriendRequests();
+                    }}
+                  >
+                    📬 Requests ({friendRequests.length})
+                  </button>
+                  <button 
+                    className={`tab-btn ${currentView === 'friend-search' ? 'active' : ''}`}
+                    onClick={() => setCurrentView('friend-search')}
+                  >
+                    🔍 Find Friends
+                  </button>
+                  <button 
+                    className={`tab-btn ${currentView === 'friend-recommendations' ? 'active' : ''}`}
+                    onClick={() => {
+                      setCurrentView('friend-recommendations');
+                      fetchFriendRecommendations();
+                    }}
+                  >
+                    ⭐ Recommendations
+                  </button>
+                  <button 
+                    className={`tab-btn ${currentView === 'friend-import' ? 'active' : ''}`}
+                    onClick={() => setCurrentView('friend-import')}
+                  >
+                    📥 Import Friends
+                  </button>
+                </div>
+                
+                <div className="tab-content">
+                  {currentView === 'friends' && (
+                    <div className="friends-list">
+                      {friendsLoading ? (
+                        <div className="loading">Loading friends...</div>
+                      ) : friendsData.length === 0 ? (
+                        <div className="no-friends">
+                          <h4>No friends yet</h4>
+                          <p>Start by searching for friends or check out recommendations!</p>
+                        </div>
+                      ) : (
+                        friendsData.map((friend) => (
+                          <div key={friend.friend_id} className="friend-item">
+                            <div className="friend-avatar">
+                              {friend.avatar_url ? (
+                                <img src={friend.avatar_url} alt={friend.friend_username} />
+                              ) : (
+                                <div className="default-avatar">
+                                  {friend.friend_username?.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <div className="friend-info">
+                              <h4>{friend.friend_username}</h4>
+                              <p>{friend.friend_full_name}</p>
+                              <span className="friend-country">{friend.country}</span>
+                            </div>
+                            <div className="friend-actions">
+                              <button 
+                                className="btn btn-danger btn-sm"
+                                onClick={() => removeFriend(friend.friend_id)}
+                                disabled={friendActionLoading}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                  
+                  {currentView === 'friend-requests' && (
+                    <div className="friend-requests">
+                      {friendRequests.length === 0 ? (
+                        <div className="no-requests">
+                          <h4>No pending requests</h4>
+                          <p>You have no pending friend requests.</p>
+                        </div>
+                      ) : (
+                        friendRequests.map((request) => (
+                          <div key={request.id} className="friend-request-item">
+                            <div className="friend-avatar">
+                              {request.sender_avatar_url ? (
+                                <img src={request.sender_avatar_url} alt={request.sender_username} />
+                              ) : (
+                                <div className="default-avatar">
+                                  {request.sender_username?.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <div className="friend-info">
+                              <h4>{request.sender_username}</h4>
+                              <p>{request.sender_full_name}</p>
+                            </div>
+                            <div className="friend-actions">
+                              <button 
+                                className="btn btn-success btn-sm"
+                                onClick={() => respondFriendRequest(request.id, 'accept')}
+                                disabled={friendActionLoading}
+                              >
+                                Accept
+                              </button>
+                              <button 
+                                className="btn btn-danger btn-sm"
+                                onClick={() => respondFriendRequest(request.id, 'reject')}
+                                disabled={friendActionLoading}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                  
+                  {currentView === 'friend-search' && (
+                    <div className="friend-search">
+                      <div className="search-box">
+                        <input 
+                          type="text" 
+                          placeholder="Search for friends..." 
+                          value={friendSearchQuery}
+                          onChange={(e) => setFriendSearchQuery(e.target.value)}
+                          className="form-input"
+                        />
+                      </div>
+                      <div className="search-results">
+                        {friendSearchResults.map((user) => (
+                          <div key={user.user_id} className="search-result-item">
+                            <div className="friend-avatar">
+                              {user.avatar_url ? (
+                                <img src={user.avatar_url} alt={user.username} />
+                              ) : (
+                                <div className="default-avatar">
+                                  {user.username?.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <div className="friend-info">
+                              <h4>{user.username}</h4>
+                              <p>{user.full_name}</p>
+                              <span className="friend-country">{user.country}</span>
+                            </div>
+                            <div className="friend-actions">
+                              <button 
+                                className="btn btn-primary btn-sm"
+                                onClick={() => sendFriendRequest(user.user_id)}
+                                disabled={friendActionLoading}
+                              >
+                                Add Friend
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {currentView === 'friend-recommendations' && (
+                    <div className="friend-recommendations">
+                      {friendRecommendations.length === 0 ? (
+                        <div className="no-recommendations">
+                          <h4>No recommendations</h4>
+                          <p>We'll show friend recommendations based on your activity.</p>
+                        </div>
+                      ) : (
+                        friendRecommendations.map((rec) => (
+                          <div key={rec.user_id} className="recommendation-item">
+                            <div className="friend-avatar">
+                              {rec.avatar_url ? (
+                                <img src={rec.avatar_url} alt={rec.username} />
+                              ) : (
+                                <div className="default-avatar">
+                                  {rec.username?.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <div className="friend-info">
+                              <h4>{rec.username}</h4>
+                              <p>{rec.full_name}</p>
+                              <span className="recommendation-reason">{rec.reason}</span>
+                            </div>
+                            <div className="friend-actions">
+                              <button 
+                                className="btn btn-primary btn-sm"
+                                onClick={() => sendFriendRequest(rec.user_id)}
+                                disabled={friendActionLoading}
+                              >
+                                Add Friend
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                  
+                  {currentView === 'friend-import' && (
+                    <div className="friend-import">
+                      <div className="import-method">
+                        <h4>Import Friends</h4>
+                        <div className="import-options">
+                          <label>
+                            <input 
+                              type="radio" 
+                              name="importProvider"
+                              value="email"
+                              checked={friendImportProvider === 'email'}
+                              onChange={(e) => setFriendImportProvider(e.target.value)}
+                            />
+                            📧 Email Addresses
+                          </label>
+                          <label>
+                            <input 
+                              type="radio" 
+                              name="importProvider"
+                              value="google"
+                              checked={friendImportProvider === 'google'}
+                              onChange={(e) => setFriendImportProvider(e.target.value)}
+                            />
+                            🔗 Google Contacts (Coming Soon)
+                          </label>
+                          <label>
+                            <input 
+                              type="radio" 
+                              name="importProvider"
+                              value="discord"
+                              checked={friendImportProvider === 'discord'}
+                              onChange={(e) => setFriendImportProvider(e.target.value)}
+                            />
+                            🎮 Discord Friends (Coming Soon)
+                          </label>
+                        </div>
+                        
+                        {friendImportProvider === 'email' && (
+                          <div className="email-import">
+                            <p>Enter email addresses (one per line):</p>
+                            <textarea 
+                              value={friendImportEmails}
+                              onChange={(e) => setFriendImportEmails(e.target.value)}
+                              placeholder="friend1@example.com&#10;friend2@example.com"
+                              className="form-textarea"
+                              rows="5"
+                            />
+                            <button 
+                              className="btn btn-primary"
+                              onClick={importFriends}
+                              disabled={friendActionLoading || !friendImportEmails.trim()}
+                            >
+                              {friendActionLoading ? 'Importing...' : 'Import Friends'}
+                            </button>
+                          </div>
+                        )}
+                        
+                        {friendImportProvider !== 'email' && (
+                          <div className="coming-soon">
+                            <p>This import method is coming soon!</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Payment Modal */}
       {showPaymentModal && selectedTournamentForPayment && (
         <div className="modal-overlay">
