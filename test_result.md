@@ -1579,8 +1579,7 @@ test_plan:
     - "Team System API - GET /api/teams/{team_id}"
     - "Team System API - POST /api/teams/{team_id}/invite"
     - "Team System API - GET /api/teams/my-invitations"
-  stuck_tasks:
-    - "Payment System Backend - GET /api/admin/payments"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
   next_phase: "ready_for_frontend_testing"
