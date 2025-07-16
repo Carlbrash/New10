@@ -8519,15 +8519,15 @@ async def get_friends_list(current_user: dict = Depends(get_current_user)):
         # Enrich with user data
         friends_data = []
         for friend in friends:
-            user_data = users_collection.find_one({"user_id": friend["friend_id"]})
+            user_data = users_collection.find_one({"id": friend["friend_id"]})
             if user_data:
                 friends_data.append({
-                    "user_id": friend["friend_id"],
-                    "username": user_data["username"],
-                    "full_name": user_data.get("full_name", ""),
+                    "friend_id": friend["friend_id"],
+                    "friend_username": user_data["username"],
+                    "friend_full_name": user_data.get("full_name", ""),
                     "avatar_url": user_data.get("avatar_url", ""),
                     "country": user_data.get("country", ""),
-                    "friends_since": friend["created_at"],
+                    "created_at": friend["created_at"],
                     "is_online": False  # Could be enhanced with real-time status
                 })
         
