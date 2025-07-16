@@ -9568,18 +9568,31 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Social Share Button */}
+                  {/* Social Share Buttons */}
                   <div className="team-social-section">
-                    <motion.button 
-                      className="share-team-btn"
-                      onClick={() => shareTeamFormation(team.id, 'twitter')}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      title="Share team formation"
-                    >
-                      <span className="share-icon">🚀</span>
-                      <span>Share Formation</span>
-                    </motion.button>
+                    <div className="social-share-buttons">
+                      <motion.button 
+                        className="social-btn facebook-btn"
+                        onClick={() => shareTeamFormation(team.id, 'facebook')}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        title="Share on Facebook"
+                      >
+                        <span className="social-icon">📘</span>
+                        <span>Facebook</span>
+                      </motion.button>
+                      
+                      <motion.button 
+                        className="social-btn instagram-btn"
+                        onClick={() => shareTeamFormation(team.id, 'instagram')}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        title="Share on Instagram"
+                      >
+                        <span className="social-icon">📸</span>
+                        <span>Instagram</span>
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
 
