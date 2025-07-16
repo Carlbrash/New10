@@ -4488,10 +4488,13 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    
+    // Add debugging to track login attempts
+    console.log('🔄 Login form submitted');
+    console.log('Login attempt with:', { username: loginForm.username, password: '***' });
+    console.log('API URL:', `${API_BASE_URL}/api/login`);
+    
     try {
-      console.log('Login attempt with:', { username: loginForm.username, password: '***' });
-      console.log('API URL:', `${API_BASE_URL}/api/login`);
-      
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: {
