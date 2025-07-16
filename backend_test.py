@@ -3384,6 +3384,219 @@ def run_tournament_bracket_tests():
     print("=" * 50)
     runner.run(bracket_test_suite)
 
+class WalletBalanceFixTester(unittest.TestCase):
+    """Test wallet balance endpoint fix and tournament join workflow"""
+    
+    def __init__(self, *args, **kwargs):
+        super(WalletBalanceFixTester, self).__init__(*args, **kwargs)
+        self.base_url = "https://3d143e9e-75ad-464c-82db-c896bc1e2a10.preview.emergentagent.com"
+        self.token = None
+        self.user_id = None
+        
+        # Test user credentials as specified in the review request
+        self.test_user = {
+            "username": "testuser",
+            "password": "test123"
+        }
+
+    def test_01_login_testuser(self):
+        """Login as testuser with password test123"""
+        print("\n🔍 Testing login as testuser with password test123...")
+        
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.test_user
+        )
+        
+        print(f"Login response status: {response.status_code}")
+        print(f"Login response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("user_id", data)
+        
+        self.token = data["token"]
+        self.user_id = data["user_id"]
+        
+        print(f"✅ Login successful - User ID: {self.user_id}")
+
+    def test_02_check_wallet_balance(self):
+        """Check wallet balance using /api/wallet/balance endpoint"""
+        print("\n🔍 Testing wallet balance endpoint for ObjectId serialization fix...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping wallet balance test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.base_url}/api/wallet/balance",
+            headers=headers
+        )
+        
+        print(f"Wallet balance response status: {response.status_code}")
+        print(f"Wallet balance response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Wallet balance request failed with status {response.status_code}: {response.text}")
+        
+        # Verify it returns valid JSON without ObjectId serialization errors
+        try:
+            data = response.json()
+            print("✅ Response is valid JSON - no ObjectId serialization errors")
+        except json.JSONDecodeError as e:
+            self.fail(f"Response is not valid JSON: {e}")
+        
+        # Verify expected wallet fields are present
+        expected_fields = ["id", "user_id", "total_earned", "available_balance", "pending_balance", "withdrawn_balance"]
+        for field in expected_fields:
+            self.assertIn(field, data, f"Expected field '{field}' not found in wallet balance response")
+        
+        # Store balance for later use
+        self.wallet_balance = data.get("available_balance", 0.0)
+        print(f"✅ Wallet balance retrieved successfully: €{self.wallet_balance}")
+        
+        # Verify all values are properly serialized (no ObjectId objects)
+        for key, value in data.items():
+            if key != "_id":  # Skip MongoDB _id field
+                self.assertNotIsInstance(value, dict, f"Field '{key}' contains unexpected object structure")
+        
+        print("✅ All wallet balance fields are properly serialized")
+
+    def test_03_get_tournaments_list(self):
+        """Get list of tournaments to find one with higher entry fee than wallet balance"""
+        print("\n🔍 Getting tournaments list to find high entry fee tournament...")
+        
+        response = requests.get(f"{self.base_url}/api/tournaments")
+        self.assertEqual(response.status_code, 200, f"Failed to get tournaments: {response.text}")
+        
+        data = response.json()
+        tournaments = data.get("tournaments", [])
+        
+        print(f"Found {len(tournaments)} tournaments")
+        
+        # Find a tournament with entry fee higher than wallet balance
+        self.high_fee_tournament = None
+        for tournament in tournaments:
+            entry_fee = tournament.get("entry_fee", 0)
+            if entry_fee > self.wallet_balance:
+                self.high_fee_tournament = tournament
+                print(f"Found tournament with higher entry fee: '{tournament['name']}' - €{entry_fee}")
+                break
+        
+        if not self.high_fee_tournament:
+            # If no tournament has higher fee, use the highest fee tournament available
+            if tournaments:
+                self.high_fee_tournament = max(tournaments, key=lambda t: t.get("entry_fee", 0))
+                print(f"Using highest fee tournament: '{self.high_fee_tournament['name']}' - €{self.high_fee_tournament.get('entry_fee', 0)}")
+            else:
+                self.skipTest("No tournaments available for testing")
+        
+        print(f"✅ Selected tournament for testing: {self.high_fee_tournament['name']}")
+
+    def test_04_try_join_high_fee_tournament(self):
+        """Try to join tournament with entry fee higher than wallet balance"""
+        print("\n🔍 Testing tournament join with insufficient balance...")
+        
+        if not self.token or not self.high_fee_tournament:
+            self.skipTest("Token or tournament not available, skipping tournament join test")
+        
+        tournament_id = self.high_fee_tournament["id"]
+        entry_fee = self.high_fee_tournament.get("entry_fee", 0)
+        
+        print(f"Attempting to join tournament: {self.high_fee_tournament['name']}")
+        print(f"Tournament entry fee: €{entry_fee}")
+        print(f"User wallet balance: €{self.wallet_balance}")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.post(
+            f"{self.base_url}/api/tournaments/{tournament_id}/join",
+            headers=headers
+        )
+        
+        print(f"Tournament join response status: {response.status_code}")
+        print(f"Tournament join response body: {response.text}")
+        
+        # If wallet balance is sufficient, the join should succeed
+        if self.wallet_balance >= entry_fee:
+            self.assertEqual(response.status_code, 200, f"Tournament join should succeed with sufficient balance")
+            print("✅ Tournament join successful with sufficient balance")
+        else:
+            # If wallet balance is insufficient, should get error
+            self.assertIn(response.status_code, [400, 403], f"Expected 400 or 403 for insufficient balance, got {response.status_code}")
+            
+            # Verify error message mentions insufficient balance
+            try:
+                error_data = response.json()
+                error_message = error_data.get("detail", "").lower()
+                self.assertTrue(
+                    any(keyword in error_message for keyword in ["insufficient", "balance", "funds", "money"]),
+                    f"Error message should mention insufficient balance: {error_message}"
+                )
+                print(f"✅ Correct insufficient balance error returned: {error_message}")
+            except json.JSONDecodeError:
+                # If response is not JSON, check if it's a plain text error
+                error_text = response.text.lower()
+                self.assertTrue(
+                    any(keyword in error_text for keyword in ["insufficient", "balance", "funds", "money"]),
+                    f"Error response should mention insufficient balance: {error_text}"
+                )
+                print(f"✅ Correct insufficient balance error returned: {error_text}")
+
+    def test_05_verify_tournament_join_workflow(self):
+        """Verify the full tournament join workflow is working correctly"""
+        print("\n🔍 Testing full tournament join workflow...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping workflow test")
+        
+        # Get tournaments again to verify the endpoint is working
+        response = requests.get(f"{self.base_url}/api/tournaments")
+        self.assertEqual(response.status_code, 200, "Tournaments endpoint should be accessible")
+        
+        tournaments = response.json().get("tournaments", [])
+        self.assertGreater(len(tournaments), 0, "Should have tournaments available")
+        
+        # Find a tournament with low entry fee (or free) that user can join
+        low_fee_tournament = None
+        for tournament in tournaments:
+            entry_fee = tournament.get("entry_fee", 0)
+            if entry_fee <= self.wallet_balance and tournament.get("status") == "open":
+                low_fee_tournament = tournament
+                break
+        
+        if low_fee_tournament:
+            print(f"Testing join with affordable tournament: {low_fee_tournament['name']} (€{low_fee_tournament.get('entry_fee', 0)})")
+            
+            headers = {"Authorization": f"Bearer {self.token}"}
+            response = requests.post(
+                f"{self.base_url}/api/tournaments/{low_fee_tournament['id']}/join",
+                headers=headers
+            )
+            
+            print(f"Affordable tournament join response: {response.status_code}")
+            print(f"Response body: {response.text}")
+            
+            # This should either succeed or fail for other reasons (already joined, tournament full, etc.)
+            # but not due to insufficient balance
+            if response.status_code != 200:
+                try:
+                    error_data = response.json()
+                    error_message = error_data.get("detail", "").lower()
+                    # Should not be an insufficient balance error
+                    self.assertFalse(
+                        any(keyword in error_message for keyword in ["insufficient", "balance", "funds"]),
+                        f"Should not get insufficient balance error for affordable tournament: {error_message}"
+                    )
+                    print(f"✅ Got expected non-balance error: {error_message}")
+                except json.JSONDecodeError:
+                    print(f"✅ Got non-JSON response (may be expected): {response.text}")
+            else:
+                print("✅ Successfully joined affordable tournament")
+        else:
+            print("⚠️ No affordable tournaments available for join test")
+        
+        print("✅ Tournament join workflow verification completed")
+
 class WalletSystemTester(unittest.TestCase):
     base_url = "https://3d143e9e-75ad-464c-82db-c896bc1e2a10.preview.emergentagent.com"
     
