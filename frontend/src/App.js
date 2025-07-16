@@ -9824,15 +9824,6 @@ function App() {
                               {message.sender_username}
                             </span>
                             <span className="timestamp">{formatChatTime(message.timestamp)}</span>
-                            {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && !message.is_system && (
-                              <button 
-                                className="btn btn-sm btn-danger"
-                                onClick={() => deleteMessage(message.id)}
-                                title="Delete message"
-                              >
-                                🗑️
-                              </button>
-                            )}
                           </div>
                           <div className="message-text">{message.message}</div>
                         </div>
