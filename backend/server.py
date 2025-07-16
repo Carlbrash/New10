@@ -8634,7 +8634,7 @@ async def search_friends(q: str, current_user: dict = Depends(get_current_user))
         # Search users by username or full name
         users = list(users_collection.find({
             "$and": [
-                {"user_id": {"$ne": user_id}},  # Exclude self
+                {"id": {"$ne": user_id}},  # Exclude self
                 {
                     "$or": [
                         {"username": {"$regex": q, "$options": "i"}},
