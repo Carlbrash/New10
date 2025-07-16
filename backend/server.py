@@ -794,7 +794,7 @@ class ReferralStatsResponse(BaseModel):
     recent_referrals: List[dict]
     recent_commissions: List[dict]
 
-class PayoutRequest(BaseModel):
+class AffiliatePayoutRequest(BaseModel):
     affiliate_user_id: str
     amount: float
     payment_method: str
