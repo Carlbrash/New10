@@ -614,6 +614,86 @@ class PayoutRequest(BaseModel):
     payout_account: str  # Stripe account ID, PayPal email, or crypto wallet address
     metadata: Optional[Dict] = None
 
+# =============================================================================
+# SOCIAL SHARING SYSTEM MODELS
+# =============================================================================
+
+class ShareType(str, Enum):
+    TOURNAMENT_VICTORY = "tournament_victory"
+    TOURNAMENT_PARTICIPATION = "tournament_participation"
+    TEAM_FORMATION = "team_formation"
+    TEAM_ACHIEVEMENT = "team_achievement"
+    PERSONAL_ACHIEVEMENT = "personal_achievement"
+    TOURNAMENT_INVITATION = "tournament_invitation"
+    TEAM_INVITATION = "team_invitation"
+    MILESTONE = "milestone"
+    RANKING_ACHIEVEMENT = "ranking_achievement"
+
+class SocialPlatform(str, Enum):
+    FACEBOOK = "facebook"
+    TWITTER = "twitter"
+    INSTAGRAM = "instagram"
+    LINKEDIN = "linkedin"
+    DISCORD = "discord"
+    WHATSAPP = "whatsapp"
+    TELEGRAM = "telegram"
+    NATIVE = "native"  # Native share API
+
+class ShareContent(BaseModel):
+    id: str
+    user_id: str
+    share_type: ShareType
+    platform: SocialPlatform
+    title: str
+    description: str
+    image_url: Optional[str] = None
+    share_url: str
+    metadata: Optional[Dict] = None  # Additional data specific to share type
+    created_at: datetime
+    shared_at: Optional[datetime] = None
+    clicks: int = 0
+    engagement_score: float = 0.0
+    is_viral: bool = False
+
+class ShareTemplate(BaseModel):
+    id: str
+    share_type: ShareType
+    platform: SocialPlatform
+    title_template: str
+    description_template: str
+    hashtags: List[str] = []
+    call_to_action: str
+    image_template: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
+
+class ShareRequest(BaseModel):
+    share_type: ShareType
+    platform: SocialPlatform
+    reference_id: str  # Tournament ID, Team ID, etc.
+    custom_message: Optional[str] = None
+    include_image: bool = True
+
+class ShareStats(BaseModel):
+    total_shares: int
+    shares_by_platform: Dict[str, int]
+    shares_by_type: Dict[str, int]
+    total_clicks: int
+    viral_shares: int
+    engagement_rate: float
+    top_performing_content: List[str]
+
+class ViralMetrics(BaseModel):
+    share_id: str
+    original_user_id: str
+    referred_users: int = 0
+    tournament_joins: int = 0
+    team_joins: int = 0
+    conversion_rate: float = 0.0
+    revenue_generated: float = 0.0
+    viral_coefficient: float = 0.0
+
 class WalletBalance(BaseModel):
     id: str
     user_id: str
