@@ -7950,6 +7950,27 @@ def calculate_viral_coefficient(share_id: str) -> float:
         print(f"Error calculating viral coefficient: {str(e)}")
         return 0.0
 
+# =============================================================================
+# SOCIAL SHARING ENDPOINTS SETUP
+# =============================================================================
+
+# Import and setup social sharing endpoints
+try:
+    from social_sharing_endpoints import setup_social_sharing_endpoints
+    setup_social_sharing_endpoints(
+        app, verify_token, verify_admin_token,
+        social_shares_collection, share_templates_collection,
+        share_stats_collection, viral_metrics_collection,
+        share_clicks_collection, tournaments_collection,
+        tournament_participants_collection, teams_collection,
+        generate_share_content, create_share_url, track_share_click,
+        calculate_viral_coefficient, ShareRequest, ShareType,
+        SocialPlatform, PaymentStatus
+    )
+    print("✅ Social sharing endpoints loaded successfully")
+except Exception as e:
+    print(f"❌ Error loading social sharing endpoints: {str(e)}")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
