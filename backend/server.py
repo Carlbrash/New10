@@ -3372,7 +3372,7 @@ async def get_affiliate_referrals(user_id: str = Depends(verify_token), limit: i
         raise HTTPException(status_code=500, detail=f"Error fetching referrals: {str(e)}")
 
 @app.post("/api/affiliate/payout/request")
-async def request_payout(request: PayoutRequest, user_id: str = Depends(verify_token)):
+async def request_payout(request: AffiliatePayoutRequest, user_id: str = Depends(verify_token)):
     """Request a payout of affiliate earnings"""
     try:
         # Check if user is an affiliate
