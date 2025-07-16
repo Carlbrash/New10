@@ -8440,6 +8440,7 @@ async def get_friend_requests(current_user: dict = Depends(get_current_user)):
                 request["recipient_avatar_url"] = recipient.get("avatar_url", "")
         
         return CustomJSONResponse(content={
+            "requests": received_requests,
             "received_requests": received_requests,
             "sent_requests": sent_requests
         })
