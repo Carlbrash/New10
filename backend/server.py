@@ -6386,12 +6386,12 @@ async def get_user_chat_rooms(user_id: str = Depends(verify_token)):
     # Add team rooms
     user_teams = list(teams_collection.find({"$or": [{"captain_id": user_id}, {"members.user_id": user_id}]}))
     for team in user_teams:
-        room_id = f"team_{team['team_id']}"
+        room_id = f"team_{team['id']}"
         user_rooms.append({
             "id": room_id,
             "name": f"Team: {team['name']}",
             "type": "team",
-            "team_id": team['team_id'],
+            "team_id": team['id'],
             "participant_count": len(chat_manager.chat_rooms[room_id].participants) if room_id in chat_manager.chat_rooms else 0
         })
     
