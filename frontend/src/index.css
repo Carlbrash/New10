@@ -317,6 +317,63 @@ code {
   padding: 2px 4px;
   font-size: 0.6rem;
   border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn.btn-xs.btn-primary {
+  background: #ffd700;
+  color: #1a1a1a;
+}
+
+.btn.btn-xs.btn-primary:hover {
+  background: #ffed4a;
+}
+
+.btn.btn-xs.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn.btn-xs.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn.btn-sm {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn.btn-sm.btn-primary {
+  background: #ffd700;
+  color: #1a1a1a;
+}
+
+.btn.btn-sm.btn-primary:hover {
+  background: #ffed4a;
+}
+
+.btn.btn-sm.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn.btn-sm.btn-secondary:hover {
+  background: #4b5563;
+}
+
+.btn.btn-sm.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn.btn-sm.btn-danger:hover {
+  background: #dc2626;
 }
 
 /* Modal Styles */
