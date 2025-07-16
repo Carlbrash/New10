@@ -46,7 +46,7 @@ code {
   position: fixed;
   top: 70px;
   right: 10px;
-  width: 400px;
+  width: 600px;
   height: 500px;
   max-width: 90vw;
   max-height: 80vh;
@@ -60,53 +60,18 @@ code {
   overflow: hidden;
 }
 
-.chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  background: linear-gradient(135deg, #ffd700, #ffed4a);
-  color: #1a1a1a;
-  font-weight: bold;
-  border-radius: 10px 10px 0 0;
-}
-
-.chat-connection-status {
-  font-size: 0.8rem;
-  margin-left: 10px;
-}
-
-.connected {
-  color: #22c55e;
-}
-
-.disconnected {
-  color: #ef4444;
-}
-
-.chat-tabs {
-  display: flex;
-  background: #2d2d2d;
-}
-
-.chat-tab {
+.chat-content {
   flex: 1;
-  padding: 10px;
-  background: #2d2d2d;
-  color: #ffd700;
-  border: none;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
+  display: flex;
+  position: relative;
+  overflow: hidden;
 }
 
-.chat-tab:hover {
-  background: #3d3d3d;
-}
-
-.chat-tab.active {
-  background: #1a1a1a;
-  border-bottom-color: #ffd700;
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 200px;
 }
 
 .chat-room-section {
@@ -114,7 +79,6 @@ code {
   display: flex;
   flex-direction: column;
   height: 100%;
-  margin-right: 180px; /* Make space for sidebar */
 }
 
 .chat-room-selector {
@@ -140,8 +104,7 @@ code {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #ffd700 #2d2d2d;
-  min-height: 250px;
-  max-height: 300px;
+  height: 250px;
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -202,8 +165,6 @@ code {
   background: #2d2d2d;
   border-top: 1px solid #444;
   position: relative;
-  margin-right: 180px; /* Make space for sidebar */
-  border-radius: 0 0 0 10px;
 }
 
 .chat-input-row {
@@ -253,6 +214,7 @@ code {
   background: #1a1a1a;
   color: white;
   overflow-y: auto;
+  height: 300px;
 }
 
 .private-message {
@@ -264,14 +226,14 @@ code {
 }
 
 .chat-sidebar {
-  width: 170px;
+  width: 190px;
   background: #2d2d2d;
   border-left: 1px solid #444;
   padding: 10px;
   position: absolute;
   right: 0;
-  top: 110px; /* Below header and tabs */
-  bottom: 60px; /* Above input area */
+  top: 0;
+  bottom: 0;
   overflow-y: auto;
   border-radius: 0 0 10px 0;
 }
@@ -311,6 +273,13 @@ code {
 .user-actions {
   display: flex;
   gap: 2px;
+}
+
+.no-users {
+  color: #999;
+  font-style: italic;
+  padding: 10px;
+  text-align: center;
 }
 
 .btn.btn-xs {
