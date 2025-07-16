@@ -1176,6 +1176,20 @@ function App() {
     admin_notes: ''
   });
   
+  // Friend Import System States
+  const [friendsData, setFriendsData] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [friendRecommendations, setFriendRecommendations] = useState([]);
+  const [friendSearchResults, setFriendSearchResults] = useState([]);
+  const [friendSearchQuery, setFriendSearchQuery] = useState('');
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [showFriendRequestsModal, setShowFriendRequestsModal] = useState(false);
+  const [showFriendImportModal, setShowFriendImportModal] = useState(false);
+  const [friendImportProvider, setFriendImportProvider] = useState('email');
+  const [friendImportEmails, setFriendImportEmails] = useState('');
+  const [friendsLoading, setFriendsLoading] = useState(false);
+  const [friendActionLoading, setFriendActionLoading] = useState(false);
+  
   // Get current translations
   const t = translations[language];
 
