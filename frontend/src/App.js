@@ -4695,17 +4695,7 @@ function App() {
             type="button" 
             className="btn btn-primary" 
             disabled={loading}
-            onClick={async (e) => {
-              e.preventDefault();
-              console.log('🔘 Login button clicked directly');
-              alert('Login button clicked!');
-              try {
-                await handleLogin(e);
-              } catch (error) {
-                console.error('❌ Login handler error:', error);
-                alert('Login handler error: ' + error.message);
-              }
-            }}
+            onClick={handleLogin}
           >
             {loading ? t.loggingIn : t.loginBtn}
           </button>
