@@ -7403,7 +7403,7 @@ async def get_all_payments(admin_user_id: str = Depends(verify_admin_token()), l
         raise HTTPException(status_code=500, detail=f"Error fetching payments: {str(e)}")
 
 @app.post("/api/admin/payments/{payment_id}/refund")
-async def refund_payment(payment_id: str, admin_user_id: str = Depends(verify_admin_token)):
+async def refund_payment(payment_id: str, admin_user_id: str = Depends(verify_admin_token())):
     """Refund a payment"""
     try:
         # Get payment record
