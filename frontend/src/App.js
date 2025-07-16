@@ -2807,6 +2807,7 @@ function App() {
 
   // Join tournament with payment integration
   const joinTournament = async (tournamentId) => {
+    console.log('🎯 joinTournament called with:', tournamentId);
     if (!token) {
       alert(t.loginRequired || 'Please login to join tournaments');
       return;
@@ -2814,6 +2815,9 @@ function App() {
     
     // Get tournament details to check entry fee
     const tournament = tournaments.find(t => t.id === tournamentId) || selectedTournament;
+    console.log('🏆 Tournament found:', tournament);
+    console.log('💰 Entry fee:', tournament?.entry_fee);
+    
     if (!tournament) {
       alert('Tournament not found');
       return;
@@ -2821,11 +2825,13 @@ function App() {
     
     // If tournament has an entry fee, show payment modal
     if (tournament.entry_fee > 0) {
+      console.log('💳 Showing payment modal for entry fee:', tournament.entry_fee);
       setSelectedTournamentForPayment(tournament);
       setShowPaymentModal(true);
       return;
     }
     
+    console.log('🆓 Free tournament, joining directly');
     // If free tournament, join directly
     try {
       const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/join`, {
