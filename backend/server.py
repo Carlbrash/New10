@@ -6201,6 +6201,71 @@ async def get_user_chat_rooms(user_id: str = Depends(verify_token)):
     
     return CustomJSONResponse(content={"rooms": user_rooms})
 
+@app.post("/api/chat/admin/ban-user")
+async def ban_user_from_chat(
+    request: dict,
+    user_id: str = Depends(verify_token)
+):
+    """Admin endpoint to ban user from chat"""
+    # Get user details
+    user = users_collection.find_one({"user_id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check admin permissions
+    if user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    target_user_id = request.get("user_id")
+    reason = request.get("reason", "No reason provided")
+    
+    if not target_user_id:
+        raise HTTPException(status_code=400, detail="User ID required")
+    
+    # Check if user is online
+    if target_user_id not in chat_manager.online_users:
+        raise HTTPException(status_code=404, detail="User not found in chat")
+    
+    # Perform ban
+    await chat_manager.handle_admin_ban_user(user_id, {
+        "target_user_id": target_user_id,
+        "reason": reason
+    })
+    
+    return CustomJSONResponse(content={"message": "User banned successfully"})
+
+@app.get("/api/chat/stats")
+async def get_chat_statistics(user_id: str = Depends(verify_token)):
+    """Get chat statistics"""
+    # Get user details
+    user = users_collection.find_one({"user_id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check admin permissions
+    if user.get("admin_role") not in ["admin", "super_admin", "god"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    stats = {
+        "total_online_users": len(chat_manager.online_users),
+        "total_rooms": len(chat_manager.chat_rooms),
+        "rooms_by_type": {},
+        "messages_by_room": {}
+    }
+    
+    # Count rooms by type
+    for room in chat_manager.chat_rooms.values():
+        room_type = room.type
+        if room_type not in stats["rooms_by_type"]:
+            stats["rooms_by_type"][room_type] = 0
+        stats["rooms_by_type"][room_type] += 1
+    
+    # Count messages by room
+    for room_id, messages in chat_manager.room_messages.items():
+        stats["messages_by_room"][room_id] = len(messages)
+    
+    return CustomJSONResponse(content=stats)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
