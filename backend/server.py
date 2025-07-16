@@ -8307,7 +8307,7 @@ async def get_friend_recommendations(current_user: dict = Depends(get_current_us
         for team in user_teams:
             for member in team.get("members", []):
                 if member["user_id"] not in friend_ids and member["user_id"] != user_id:
-                    user_data = users_collection.find_one({"user_id": member["user_id"]})
+                    user_data = users_collection.find_one({"id": member["user_id"]})
                     if user_data:
                         recommendations.append({
                             "user_id": member["user_id"],
