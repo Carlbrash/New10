@@ -1119,6 +1119,23 @@ function App() {
     preferred_payout_method: 'bank_transfer'
   });
   
+  // Payment System States
+  const [paymentConfig, setPaymentConfig] = useState(null);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [selectedTournamentForPayment, setSelectedTournamentForPayment] = useState(null);
+  const [selectedPaymentProvider, setSelectedPaymentProvider] = useState('stripe');
+  const [paymentSession, setPaymentSession] = useState(null);
+  const [stripePromise, setStripePromise] = useState(null);
+  const [showPayoutRequestModal, setShowPayoutRequestModal] = useState(false);
+  const [payoutRequestForm, setPayoutRequestForm] = useState({
+    amount: '',
+    provider: 'stripe',
+    payout_account: '',
+    notes: ''
+  });
+  
   // Admin Financial States
   const [financialOverview, setFinancialOverview] = useState(null);
   const [adminWallets, setAdminWallets] = useState([]);
