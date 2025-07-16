@@ -6461,6 +6461,285 @@ function App() {
             </div>
           )}
 
+          {/* Affiliate Management Tab */}
+          {adminView === 'affiliates' && (
+            <div className="admin-section">
+              <h3>🤝 Affiliate Management</h3>
+              
+              {/* Affiliate Stats Overview */}
+              {adminAffiliateStats && (
+                <div className="affiliate-stats-overview">
+                  <div className="stats-cards">
+                    <div className="stat-card">
+                      <div className="stat-icon">🤝</div>
+                      <div className="stat-info">
+                        <h4>{adminAffiliateStats.total_affiliates}</h4>
+                        <p>Total Affiliates</p>
+                      </div>
+                    </div>
+                    <div className="stat-card">
+                      <div className="stat-icon">⏳</div>
+                      <div className="stat-info">
+                        <h4>{adminAffiliateStats.pending_requests}</h4>
+                        <p>Pending Requests</p>
+                      </div>
+                    </div>
+                    <div className="stat-card">
+                      <div className="stat-icon">👥</div>
+                      <div className="stat-info">
+                        <h4>{adminAffiliateStats.total_referrals}</h4>
+                        <p>Total Referrals</p>
+                      </div>
+                    </div>
+                    <div className="stat-card">
+                      <div className="stat-icon">💰</div>
+                      <div className="stat-info">
+                        <h4>€{adminAffiliateStats.total_commission_amount?.toFixed(2)}</h4>
+                        <p>Total Commissions</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Affiliate Requests */}
+              <div className="affiliate-requests-section">
+                <h4>📋 Affiliate Requests</h4>
+                
+                {adminAffiliateLoading ? (
+                  <div className="loading">Loading affiliate requests...</div>
+                ) : affiliateRequests.length === 0 ? (
+                  <p>No pending affiliate requests.</p>
+                ) : (
+                  <div className="affiliate-requests-grid">
+                    {affiliateRequests.map((request) => (
+                      <div key={request.user_id} className="affiliate-request-card">
+                        <div className="request-header">
+                          <h5>{request.user_details?.full_name || 'Unknown User'}</h5>
+                          <span className={`request-status status-${request.status}`}>
+                            {request.status}
+                          </span>
+                        </div>
+                        
+                        <div className="request-details">
+                          <p><strong>Username:</strong> {request.user_details?.username}</p>
+                          <p><strong>Email:</strong> {request.user_details?.email}</p>
+                          <p><strong>Applied:</strong> {new Date(request.created_at).toLocaleDateString()}</p>
+                          <p><strong>Website:</strong> {request.website_url || 'Not provided'}</p>
+                          <p><strong>Description:</strong> {request.description || 'No description'}</p>
+                        </div>
+                        
+                        {request.status === 'pending' && (
+                          <div className="request-actions">
+                            <button 
+                              className="btn btn-success btn-sm"
+                              onClick={() => {
+                                setSelectedAffiliateUser(request);
+                                setShowAdminAffiliateModal(true);
+                              }}
+                            >
+                              ✅ Review & Approve
+                            </button>
+                            <button 
+                              className="btn btn-danger btn-sm"
+                              onClick={() => {
+                                const reason = prompt('Enter rejection reason:');
+                                if (reason) {
+                                  rejectAffiliateRequest(request.user_id, reason);
+                                }
+                              }}
+                            >
+                              ❌ Reject
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Approved Affiliates */}
+              <div className="approved-affiliates-section">
+                <h4>👥 Approved Affiliates</h4>
+                
+                {adminAffiliateLoading ? (
+                  <div className="loading">Loading affiliates...</div>
+                ) : affiliateUsers.length === 0 ? (
+                  <p>No approved affiliates yet.</p>
+                ) : (
+                  <div className="affiliates-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>User</th>
+                          <th>Referral Code</th>
+                          <th>Referrals</th>
+                          <th>Commissions</th>
+                          <th>Total Earnings</th>
+                          <th>Bonuses</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {affiliateUsers.map((affiliate) => (
+                          <tr key={affiliate.user_id}>
+                            <td>
+                              <div className="affiliate-user-info">
+                                <strong>{affiliate.username}</strong>
+                                <small>{affiliate.email}</small>
+                              </div>
+                            </td>
+                            <td>
+                              <code>{affiliate.referral_code}</code>
+                            </td>
+                            <td>{affiliate.referral_count}</td>
+                            <td>{affiliate.commission_count}</td>
+                            <td>€{affiliate.total_earnings?.toFixed(2)}</td>
+                            <td>
+                              <div className="bonus-info">
+                                <div>Referral: €{affiliate.referral_bonus}</div>
+                                <div>Deposit: €{affiliate.deposit_bonus}</div>
+                              </div>
+                            </td>
+                            <td>
+                              <span className={`status ${affiliate.is_active ? 'active' : 'inactive'}`}>
+                                {affiliate.is_active ? 'Active' : 'Inactive'}
+                              </span>
+                            </td>
+                            <td>
+                              <button 
+                                className="btn btn-primary btn-sm"
+                                onClick={() => {
+                                  setSelectedAffiliateUser(affiliate);
+                                  setAffiliateBonusForm({
+                                    referral_bonus: affiliate.referral_bonus,
+                                    deposit_bonus: affiliate.deposit_bonus,
+                                    bonus_type: affiliate.bonus_type,
+                                    is_active: affiliate.is_active
+                                  });
+                                  setShowAdminAffiliateModal(true);
+                                }}
+                              >
+                                ⚙️ Edit
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Affiliate Bonus Modal */}
+          {showAdminAffiliateModal && selectedAffiliateUser && (
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h3>🤝 Affiliate Bonus Settings</h3>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => setShowAdminAffiliateModal(false)}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="affiliate-user-info">
+                    <h4>{selectedAffiliateUser.user_details?.full_name || selectedAffiliateUser.username}</h4>
+                    <p>Email: {selectedAffiliateUser.user_details?.email || selectedAffiliateUser.email}</p>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Referral Bonus (€)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={affiliateBonusForm.referral_bonus}
+                      onChange={(e) => setAffiliateBonusForm({
+                        ...affiliateBonusForm,
+                        referral_bonus: parseFloat(e.target.value)
+                      })}
+                      placeholder="5.00"
+                    />
+                    <small className="form-help">Bonus paid per successful referral</small>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Deposit Bonus (€)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={affiliateBonusForm.deposit_bonus}
+                      onChange={(e) => setAffiliateBonusForm({
+                        ...affiliateBonusForm,
+                        deposit_bonus: parseFloat(e.target.value)
+                      })}
+                      placeholder="10.00"
+                    />
+                    <small className="form-help">Bonus paid when referral makes first deposit</small>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Bonus Type</label>
+                    <select
+                      value={affiliateBonusForm.bonus_type}
+                      onChange={(e) => setAffiliateBonusForm({
+                        ...affiliateBonusForm,
+                        bonus_type: e.target.value
+                      })}
+                    >
+                      <option value="registration">Registration Bonus</option>
+                      <option value="deposit">Deposit Bonus</option>
+                      <option value="both">Both Bonuses</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={affiliateBonusForm.is_active}
+                        onChange={(e) => setAffiliateBonusForm({
+                          ...affiliateBonusForm,
+                          is_active: e.target.checked
+                        })}
+                      />
+                      Active Affiliate
+                    </label>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => setShowAdminAffiliateModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  {selectedAffiliateUser.status === 'pending' ? (
+                    <button 
+                      className="btn btn-success"
+                      onClick={() => approveAffiliateRequest(selectedAffiliateUser.user_id)}
+                    >
+                      ✅ Approve Affiliate
+                    </button>
+                  ) : (
+                    <button 
+                      className="btn btn-primary"
+                      onClick={() => updateAffiliateBonuses(selectedAffiliateUser.user_id, affiliateBonusForm)}
+                    >
+                      💾 Update Bonuses
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Tournament Management Tab */}
           {adminView === 'tournaments' && (
             <div className="admin-section">
