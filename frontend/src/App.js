@@ -11351,6 +11351,11 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Live Chat System */}
+      {renderChatPopup()}
+      {renderPrivateMessageModal()}
+      {renderAdminChatModal()}
     </div>
   );
 }
