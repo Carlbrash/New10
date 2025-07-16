@@ -2,7 +2,7 @@ import requests
 import unittest
 
 class LoginCredentialsTester(unittest.TestCase):
-    base_url = "https://9984d77a-659e-4322-b6c5-5fd85692930e.preview.emergentagent.com"
+    base_url = "https://3d143e9e-75ad-464c-82db-c896bc1e2a10.preview.emergentagent.com"
     
     def test_01_testuser_login(self):
         """Test login with username: testuser, password: test123"""
