@@ -9434,20 +9434,10 @@ function App() {
     if (!user || !token || chatSocket) return;
 
     // Use polling instead of WebSocket for better compatibility
-    console.log('🔄 Starting chat polling...');
+    console.log('🔄 Starting chat system...');
     
-    // Set connected state
+    // Set connected state immediately
     setIsConnectedToChat(true);
-    
-    // Initialize default rooms
-    setChatRooms([
-      {
-        id: "general",
-        name: "General Chat",
-        type: "general",
-        participant_count: 1
-      }
-    ]);
     
     // Start polling for online users
     const pollOnlineUsers = async () => {
@@ -9462,6 +9452,8 @@ function App() {
           const data = await response.json();
           console.log('👥 Online users:', data.online_users);
           setOnlineUsers(data.online_users);
+        } else {
+          console.error('Failed to fetch online users:', response.status);
         }
       } catch (error) {
         console.error('Failed to fetch online users:', error);
@@ -9481,9 +9473,29 @@ function App() {
           const data = await response.json();
           console.log('🏠 Available rooms:', data.rooms);
           setChatRooms(data.rooms);
+        } else {
+          console.error('Failed to fetch rooms:', response.status);
+          // Set default rooms if API fails
+          setChatRooms([
+            {
+              id: "general",
+              name: "General Chat",
+              type: "general",
+              participant_count: 1
+            }
+          ]);
         }
       } catch (error) {
         console.error('Failed to fetch rooms:', error);
+        // Set default rooms if API fails
+        setChatRooms([
+          {
+            id: "general",
+            name: "General Chat",
+            type: "general",
+            participant_count: 1
+          }
+        ]);
       }
     };
     
@@ -9500,6 +9512,8 @@ function App() {
           const data = await response.json();
           console.log('💬 Messages:', data.messages);
           setChatMessages(data.messages);
+        } else {
+          console.error('Failed to fetch messages:', response.status);
         }
       } catch (error) {
         console.error('Failed to fetch messages:', error);
