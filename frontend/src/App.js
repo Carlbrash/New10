@@ -9505,7 +9505,13 @@ function App() {
   // Disconnect from chat
   const disconnectFromChat = () => {
     if (chatSocket) {
-      chatSocket.close();
+      if (chatSocket.intervals) {
+        // Clear polling intervals
+        chatSocket.intervals.forEach(interval => clearInterval(interval));
+      } else if (chatSocket.close) {
+        // Close WebSocket if it's a real socket
+        chatSocket.close();
+      }
       setChatSocket(null);
     }
     setIsConnectedToChat(false);
