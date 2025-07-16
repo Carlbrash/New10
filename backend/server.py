@@ -8652,9 +8652,9 @@ async def search_friends(q: str, current_user: dict = Depends(get_current_user))
         # Filter out friends and enrich data
         search_results = []
         for user in users:
-            if user["user_id"] not in friend_ids:
+            if user["id"] not in friend_ids:
                 search_results.append({
-                    "user_id": user["user_id"],
+                    "user_id": user["id"],
                     "username": user["username"],
                     "full_name": user.get("full_name", ""),
                     "avatar_url": user.get("avatar_url", ""),
