@@ -2746,15 +2746,12 @@ function App() {
 
   // Join tournament
   const joinTournament = async (tournamentId) => {
-    console.log('🏆 joinTournament called with tournamentId:', tournamentId);
-    
     if (!token) {
       alert(t.loginRequired || 'Please login to join tournaments');
       return;
     }
     
     try {
-      console.log('🚀 Making tournament join request...');
       const response = await fetch(`${API_BASE_URL}/api/tournaments/${tournamentId}/join`, {
         method: 'POST',
         headers: {
@@ -2763,11 +2760,7 @@ function App() {
         }
       });
       
-      console.log('📬 Response status:', response.status);
-      console.log('📬 Response ok:', response.ok);
-      
       if (response.ok) {
-        console.log('✅ Tournament join successful');
         alert(t.joinSuccessful || 'Successfully joined tournament!');
         // Refresh tournament details
         if (selectedTournament && selectedTournament.id === tournamentId) {
@@ -2781,17 +2774,12 @@ function App() {
         const error = await response.json();
         const errorMessage = error.detail || 'Failed to join tournament';
         
-        console.log('🔍 Tournament join error:', errorMessage);
-        console.log('🔍 Contains insufficient?', errorMessage.toLowerCase().includes('insufficient'));
-        console.log('🔍 Contains balance?', errorMessage.toLowerCase().includes('balance'));
-        
         // Check if it's an insufficient balance error
         if (errorMessage.toLowerCase().includes('insufficient') || 
             errorMessage.toLowerCase().includes('balance') || 
             errorMessage.toLowerCase().includes('funds') ||
             errorMessage.includes('€')) {
           // Show beautiful insufficient balance modal
-          console.log('🎨 Showing insufficient balance modal');
           setInsufficientBalanceModal({
             show: true,
             message: errorMessage,
@@ -2799,12 +2787,11 @@ function App() {
           });
         } else {
           // Show regular alert for other errors
-          console.log('⚠️ Showing regular alert for error:', errorMessage);
           alert(errorMessage);
         }
       }
     } catch (error) {
-      console.error('💥 Error joining tournament:', error);
+      console.error('Error joining tournament:', error);
       alert('Error joining tournament');
     }
   };
