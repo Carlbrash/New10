@@ -393,14 +393,23 @@ code {
 /* Responsive Design */
 @media (max-width: 768px) {
   .chat-popup {
-    width: 90%;
-    height: 80%;
-    right: 5%;
-    top: 10%;
+    width: 95vw;
+    height: 70vh;
+    right: 2.5vw;
+    top: 60px;
   }
   
   .chat-sidebar {
-    width: 120px;
+    width: 100px;
+    padding: 5px;
+  }
+  
+  .chat-room-section {
+    margin-right: 110px;
+  }
+  
+  .chat-input-container {
+    margin-right: 110px;
   }
   
   .online-user {
@@ -411,5 +420,43 @@ code {
   
   .user-actions {
     align-self: flex-end;
+  }
+  
+  .username {
+    font-size: 0.6rem;
+  }
+  
+  .chat-input {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-popup {
+    width: 98vw;
+    height: 60vh;
+    right: 1vw;
+    top: 50px;
+  }
+  
+  .chat-sidebar {
+    width: 80px;
+    padding: 3px;
+  }
+  
+  .chat-room-section {
+    margin-right: 85px;
+  }
+  
+  .chat-input-container {
+    margin-right: 85px;
+  }
+  
+  .online-users h4 {
+    font-size: 0.7rem;
+  }
+  
+  .username {
+    font-size: 0.5rem;
   }
 }
