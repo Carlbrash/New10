@@ -77,6 +77,12 @@ league_assignments_collection = db.league_assignments
 match_fixtures_collection = db.match_fixtures
 team_applications_collection = db.team_applications
 
+# Payment System Collections
+payments_collection = db.payments
+payment_sessions_collection = db.payment_sessions
+payment_webhooks_collection = db.payment_webhooks
+tournament_entries_collection = db.tournament_entries
+
 app = FastAPI(title="WoBeRa - World Betting Rank API", default_response_class=CustomJSONResponse)
 
 # CORS configuration
