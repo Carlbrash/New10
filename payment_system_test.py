@@ -113,6 +113,7 @@ class PaymentSystemTester(unittest.TestCase):
         
         if open_tournament:
             PaymentSystemTester.test_tournament_id = open_tournament["id"]
+            PaymentSystemTester.test_tournament_fee = open_tournament["entry_fee"]
             print(f"  ✅ Found open tournament for testing: {open_tournament['name']}")
             print(f"    Tournament ID: {open_tournament['id']}")
             print(f"    Entry fee: ${open_tournament['entry_fee']}")
@@ -121,6 +122,7 @@ class PaymentSystemTester(unittest.TestCase):
             print("  ⚠️ No open tournaments with entry fees found")
             # Create a test tournament ID for testing error handling
             PaymentSystemTester.test_tournament_id = "test-tournament-id"
+            PaymentSystemTester.test_tournament_fee = 10.0
     
     def test_05_create_payment_session(self):
         """Test POST /api/payments/create-session - Create payment session (requires auth)"""
