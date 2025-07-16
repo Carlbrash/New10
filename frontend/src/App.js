@@ -9763,40 +9763,44 @@ function App() {
           <div className="online-users">
             <h4>Online Users ({onlineUsers.length})</h4>
             <div className="users-list">
-              {onlineUsers.map(user => (
-                <div key={user.user_id} className="online-user">
-                  <span className={`user-role ${user.admin_role}`}>
-                    {user.admin_role === 'god' ? '👑' : 
-                     user.admin_role === 'super_admin' ? '⚡' :
-                     user.admin_role === 'admin' ? '⭐' : '👤'}
-                  </span>
-                  <span className="username">{user.username}</span>
-                  <div className="user-actions">
-                    <button 
-                      className="btn btn-xs btn-primary"
-                      onClick={() => {
-                        setSelectedPrivateUser(user);
-                        setShowPrivateMessageModal(true);
-                      }}
-                      title="Send private message"
-                    >
-                      💬
-                    </button>
-                    {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && (
+              {onlineUsers.length === 0 ? (
+                <div className="no-users">No users online</div>
+              ) : (
+                onlineUsers.map(onlineUser => (
+                  <div key={onlineUser.user_id} className="online-user">
+                    <span className={`user-role ${onlineUser.admin_role}`}>
+                      {onlineUser.admin_role === 'god' ? '👑' : 
+                       onlineUser.admin_role === 'super_admin' ? '⚡' :
+                       onlineUser.admin_role === 'admin' ? '⭐' : '👤'}
+                    </span>
+                    <span className="username">{onlineUser.username}</span>
+                    <div className="user-actions">
                       <button 
-                        className="btn btn-xs btn-danger"
+                        className="btn btn-xs btn-primary"
                         onClick={() => {
-                          setSelectedUserForBan(user);
-                          setShowAdminChatModal(true);
+                          setSelectedPrivateUser(onlineUser);
+                          setShowPrivateMessageModal(true);
                         }}
-                        title="Ban user"
+                        title="Send private message"
                       >
-                        🚫
+                        💬
                       </button>
-                    )}
+                      {user && ['admin', 'super_admin', 'god'].includes(user.admin_role) && (
+                        <button 
+                          className="btn btn-xs btn-danger"
+                          onClick={() => {
+                            setSelectedUserForBan(onlineUser);
+                            setShowAdminChatModal(true);
+                          }}
+                          title="Ban user"
+                        >
+                          🚫
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
