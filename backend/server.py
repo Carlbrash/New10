@@ -8540,16 +8540,20 @@ async def get_friends_list(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Error getting friends list: {str(e)}")
 
 @app.post("/api/friends/import")
-async def import_friends(request: FriendImportRequest, current_user: dict = Depends(get_current_user)):
+async def import_friends(request: dict, current_user: dict = Depends(get_current_user)):
     """Import friends from external providers"""
     try:
         user_id = current_user["id"]
         
+        # Handle both dict and FriendImportRequest formats
+        provider = request.get("provider", "email")
+        emails = request.get("emails", [])
+        
         imported_friends = []
         
-        if request.provider == "email":
+        if provider == "email":
             # Import by email addresses
-            for email in request.emails:
+            for email in emails:
                 # Find user by email
                 user = users_collection.find_one({"email": email})
                 if user and user["id"] != user_id:
@@ -8567,7 +8571,7 @@ async def import_friends(request: FriendImportRequest, current_user: dict = Depe
                             "found": True
                         })
         
-        elif request.provider == "google":
+        elif provider == "google":
             # Mock Google import - in real implementation, this would use Google Contacts API
             return CustomJSONResponse(content={
                 "message": "Google import not yet implemented",
@@ -8575,7 +8579,7 @@ async def import_friends(request: FriendImportRequest, current_user: dict = Depe
                 "total_imported": 0
             })
         
-        elif request.provider == "discord":
+        elif provider == "discord":
             # Mock Discord import - in real implementation, this would use Discord API
             return CustomJSONResponse(content={
                 "message": "Discord import not yet implemented", 
@@ -8587,7 +8591,7 @@ async def import_friends(request: FriendImportRequest, current_user: dict = Depe
         import_record = {
             "id": str(uuid.uuid4()),
             "user_id": user_id,
-            "provider": request.provider,
+            "provider": provider,
             "imported_count": len(imported_friends),
             "created_at": datetime.utcnow()
         }
