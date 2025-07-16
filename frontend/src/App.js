@@ -3304,6 +3304,224 @@ function App() {
     }
   };
 
+  // =============================================================================
+  // FRIEND IMPORT SYSTEM FUNCTIONS
+  // =============================================================================
+
+  const fetchFriends = async () => {
+    if (!token) return;
+    
+    setFriendsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/friends/list`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setFriendsData(data.friends || []);
+      }
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    } finally {
+      setFriendsLoading(false);
+    }
+  };
+
+  const fetchFriendRequests = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/friends/requests`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setFriendRequests(data.requests || []);
+      }
+    } catch (error) {
+      console.error('Error fetching friend requests:', error);
+    }
+  };
+
+  const fetchFriendRecommendations = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/friends/recommendations`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setFriendRecommendations(data.recommendations || []);
+      }
+    } catch (error) {
+      console.error('Error fetching friend recommendations:', error);
+    }
+  };
+
+  const searchFriends = async (query) => {
+    if (!token || !query || query.length < 2) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/friends/search?q=${encodeURIComponent(query)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setFriendSearchResults(data.users || []);
+      }
+    } catch (error) {
+      console.error('Error searching friends:', error);
+    }
+  };
+
+  const sendFriendRequest = async (recipientId) => {
+    if (!token) return;
+    
+    setFriendActionLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/friends/send-request`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ recipient_id: recipientId })
+      });
+      
+      if (response.ok) {
+        alert('Friend request sent successfully!');
+        // Refresh search results
+        if (friendSearchQuery) {
+          searchFriends(friendSearchQuery);
+        }
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to send friend request');
+      }
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      alert('Error sending friend request');
+    } finally {
+      setFriendActionLoading(false);
+    }
+  };
+
+  const respondFriendRequest = async (requestId, action) => {
+    if (!token) return;
+    
+    setFriendActionLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/friends/respond-request`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ request_id: requestId, action: action })
+      });
+      
+      if (response.ok) {
+        alert(`Friend request ${action}ed successfully!`);
+        fetchFriendRequests();
+        if (action === 'accept') {
+          fetchFriends();
+        }
+      } else {
+        const error = await response.json();
+        alert(error.detail || `Failed to ${action} friend request`);
+      }
+    } catch (error) {
+      console.error('Error responding to friend request:', error);
+      alert('Error responding to friend request');
+    } finally {
+      setFriendActionLoading(false);
+    }
+  };
+
+  const importFriends = async () => {
+    if (!token) return;
+    
+    setFriendActionLoading(true);
+    try {
+      const emails = friendImportEmails
+        .split('\n')
+        .map(email => email.trim())
+        .filter(email => email && email.includes('@'));
+      
+      const response = await fetch(`${API_BASE_URL}/api/friends/import`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          provider: friendImportProvider,
+          emails: emails
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Found ${data.total_imported} friends to connect with!`);
+        setShowFriendImportModal(false);
+        setFriendImportEmails('');
+        fetchFriends();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to import friends');
+      }
+    } catch (error) {
+      console.error('Error importing friends:', error);
+      alert('Error importing friends');
+    } finally {
+      setFriendActionLoading(false);
+    }
+  };
+
+  const removeFriend = async (friendId) => {
+    if (!token) return;
+    
+    if (!confirm('Are you sure you want to remove this friend?')) return;
+    
+    setFriendActionLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/friends/remove`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ friend_id: friendId })
+      });
+      
+      if (response.ok) {
+        alert('Friend removed successfully!');
+        fetchFriends();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to remove friend');
+      }
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      alert('Error removing friend');
+    } finally {
+      setFriendActionLoading(false);
+    }
+  };
+
   // Leave tournament
   const leaveTournament = async (tournamentId) => {
     if (!token) return;
