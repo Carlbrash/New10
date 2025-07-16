@@ -10449,14 +10449,19 @@ function App() {
               <button 
                 className="nav-link chat-button"
                 onClick={() => {
-                  setShowChatPopup(!showChatPopup);
+                  if (showChatPopup) {
+                    setIsChatMinimized(!isChatMinimized);
+                  } else {
+                    setShowChatPopup(true);
+                    setIsChatMinimized(false);
+                  }
                   if (!isConnectedToChat) {
                     initializeChatSocket();
                   }
                 }}
               >
                 💬 Chat
-                {unreadMessages > 0 && (
+                {unreadMessages > 0 && !showChatPopup && (
                   <span className="unread-badge">{unreadMessages}</span>
                 )}
               </button>
