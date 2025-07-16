@@ -2881,19 +2881,24 @@ function App() {
   // Payment System Functions
   const fetchPaymentConfig = async () => {
     try {
+      console.log('🔧 Fetching payment config...');
       const response = await fetch(`${API_BASE_URL}/api/payments/config`);
       if (response.ok) {
         const config = await response.json();
+        console.log('💳 Payment config loaded:', config);
         setPaymentConfig(config);
         
         // Initialize Stripe if available
         if (config.stripe_enabled && config.stripe_public_key) {
+          console.log('🔹 Initializing Stripe...');
           const stripe = await loadStripe(config.stripe_public_key);
           setStripePromise(stripe);
         }
+      } else {
+        console.error('❌ Failed to fetch payment config:', response.status);
       }
     } catch (error) {
-      console.error('Error fetching payment config:', error);
+      console.error('❌ Error fetching payment config:', error);
     }
   };
 
