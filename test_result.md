@@ -1181,6 +1181,22 @@ agent_communication:
   - agent: "testing"
     message: "✅ NATIONAL LEAGUE SYSTEM TESTING COMPLETED: I've successfully tested the National League System backend functionality. All core endpoints are working correctly: 1) POST /api/admin/initialize-default-countries successfully created leagues for all 8 default countries (Greece, Italy, Germany, England, Spain, France, Turkey, Austria) with both Premier and League 2 divisions, 2) GET /api/national-leagues correctly returns all leagues organized by country with proper structure, 3) POST /api/admin/initialize-country-leagues correctly detects existing leagues and prevents duplication, 4) POST /api/admin/assign-team-to-league and POST /api/admin/generate-league-fixtures endpoints are implemented and functional but could not be fully tested due to no teams existing in the system. The league initialization and fixture generation systems are working correctly and ready for production use. All authentication and validation checks work as expected."
 
+  - agent: "testing"
+    message: "✅ RECENT ACTIVITY FIX FOR NEW USERS TESTING COMPLETED: I've successfully tested the Recent Activity fix for new users as requested. Created a new user account with username 'testuser_new' and password 'test123', then verified that the user has no activity data. All tests passed: 1) User profile shows 0 bets, 0 tournaments, 0 winnings, and 0 score, 2) User has no tournament participation, 3) User wallet shows 0 total earned, 0 available balance, and 0 transactions, 4) User is not an affiliate (no affiliate activity), 5) Recent Activity section is completely empty with 0 recent transactions and 0 monthly earnings across all 12 months, 6) Commission breakdown shows 0 for all commission types (registration, tournament, deposit, bonus). The Recent Activity fix is working correctly - new users with no activity see empty Recent Activity sections instead of fake activity data."
+
+backend:
+  - task: "Recent Activity Fix for New Users"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Recent Activity fix for new users is working correctly. Created new user 'testuser_new' and verified all activity endpoints return empty/zero data: user profile shows 0 bets/tournaments/winnings, tournament participation is empty, wallet shows 0 earnings/transactions, affiliate activity is non-existent, and Recent Activity section displays empty state with 0 recent transactions and 0 monthly earnings across all periods. Commission breakdown correctly shows 0 for all types. New users no longer see fake activity data."
+
   - task: "Admin Team Management - GET /api/admin/teams"
     implemented: true
     working: true
