@@ -1660,6 +1660,90 @@ backend:
         agent: "testing"
         comment: "Payment system integration working correctly. Successfully integrates with tournament system (6 tournaments available for payment testing), wallet system (user wallet balance accessible), and configuration system (payment config accessible). All payment providers (Stripe, PayPal, Coinbase) are configured as enabled. Authentication requirements properly enforced for user-specific endpoints."
 
+  - task: "Enhanced Payment Configuration Endpoint - GET /api/payments/config"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Enhanced Payment Configuration Endpoint working correctly. Returns all required fields as specified in review request: stripe_enabled: true, paypal_enabled: true, coinbase_enabled: true, supported_currencies: ['USD'], minimum_payout: $10.0. No authentication required. All payment providers are configured as enabled in the system."
+
+  - task: "Enhanced Payment Session Creation - POST /api/payments/create-session"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Enhanced Payment Session Creation endpoint has validation issue. Failing with 'Invalid entry fee amount' error when using tournament entry fee ($25.0) vs requested amount ($10.0). The endpoint requires authentication and properly validates user authentication, but has validation logic issue where it expects the payment amount to match the tournament entry fee exactly. This is a validation logic issue that needs to be addressed."
+
+  - task: "Enhanced Payment History - GET /api/payments/history"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Enhanced Payment History endpoint working correctly. Requires authentication and returns proper pagination structure with all required fields: payments (list), total (int), page (int), pages (int). Returns empty payment history with proper structure for test user as expected. Pagination information is included in response as specified in review request."
+
+  - task: "Enhanced Admin Payment Management - GET /api/admin/payments"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Enhanced Admin Payment Management endpoint working correctly. Requires admin authentication and returns proper pagination structure with all required fields: payments (list), total (int), page (int), pages (int). Returns all payments with proper admin authentication as specified in review request. No payments in test environment as expected. Security fix is working - no unauthorized access."
+
+  - task: "Enhanced Payout Request - POST /api/payments/payout"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Enhanced Payout Request endpoint has validation issues. Returns 422 validation errors for missing required fields: affiliate_user_id, payment_method, payment_details. The endpoint requires authentication but the request payload structure doesn't match the expected Pydantic model. This indicates the payout request model needs to be updated to match the expected payload structure from the review request."
+
+  - task: "Enhanced Payment System Authentication and Security"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Enhanced Payment System Authentication and Security working correctly with minor issue. All payment endpoints properly enforce authentication requirements. Payment history, create session, and payout endpoints correctly require authentication. Admin payments endpoint correctly requires admin privileges. Minor issue: some endpoints return 403 instead of expected 401 for unauthenticated requests, but this is acceptable as both indicate authentication failure."
+
+  - task: "Enhanced Payment System Integration Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Enhanced Payment System Integration Testing completed successfully. Payment system properly integrates with existing systems: tournament system (6 tournaments available), wallet system (user wallet balance accessible), configuration system (payment config accessible). All payment providers (Stripe, PayPal, Coinbase) are configured as enabled. Authentication system integration working correctly. Error handling works properly when payment gateway keys are not configured (expected for test environment)."
+
 backend:
   - task: "Tournament Join Wallet Balance Integration"
     implemented: true
