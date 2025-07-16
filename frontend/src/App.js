@@ -1363,38 +1363,67 @@ function App() {
   };
 
   const generateRecentActivity = (userData) => {
-    const activities = [
-      { 
+    // Check if user is new (no bets, no activity)
+    const isNewUser = !userData.total_bets || userData.total_bets === 0;
+    
+    // If user is new, show no activity
+    if (isNewUser) {
+      setRecentActivity([]);
+      return;
+    }
+    
+    // For users with activity, show relevant activity
+    const activities = [];
+    
+    // Only show ranking if user has participated in something
+    if (userData.total_bets > 0) {
+      activities.push({
         type: 'rank_change', 
-        message: `Your ranking updated to #${dashboardStats?.rank || 'N/A'}`, 
+        message: `Your ranking updated to #${dashboardStats?.rank || 'Unranked'}`, 
         time: '2 hours ago',
         icon: '📈'
-      },
-      { 
+      });
+    }
+    
+    // Only show achievements if user has earned them
+    if (userData.total_bets >= 1) {
+      activities.push({
         type: 'achievement', 
-        message: 'New achievement unlocked!', 
+        message: 'First bet placed!', 
         time: '1 day ago',
         icon: '🏆'
-      },
-      { 
+      });
+    }
+    
+    // Only show bet activity if user has bet history
+    if (userData.total_bets > 0 && userData.won_bets > 0) {
+      activities.push({
         type: 'bet_win', 
         message: 'Won a bet with 2.5x odds', 
         time: '2 days ago',
         icon: '🎯'
-      },
-      { 
+      });
+    }
+    
+    // Profile updates for all users (reasonable assumption)
+    if (userData.total_bets > 0) {
+      activities.push({
         type: 'profile', 
         message: 'Profile updated successfully', 
         time: '3 days ago',
         icon: '👤'
-      },
-      { 
+      });
+    }
+    
+    // Milestone only for users with actual bets
+    if (userData.total_bets > 0) {
+      activities.push({
         type: 'milestone', 
         message: `Reached ${userData.total_bets} total bets!`, 
         time: '5 days ago',
         icon: '🎯'
-      }
-    ];
+      });
+    }
     
     setRecentActivity(activities);
   };
