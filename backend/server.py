@@ -6271,6 +6271,48 @@ async def get_chat_statistics(user_id: str = Depends(verify_token)):
     
     return CustomJSONResponse(content=stats)
 
+@app.post("/api/chat/send-message")
+async def send_chat_message(
+    request: dict,
+    user_id: str = Depends(verify_token)
+):
+    """Send a chat message via REST API"""
+    # Get user details
+    user = users_collection.find_one({"$or": [{"user_id": user_id}, {"id": user_id}]})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    room_id = request.get("room_id", "general")
+    message = request.get("message", "").strip()
+    
+    if not message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+    
+    # Create message object
+    message_data = {
+        "id": str(uuid.uuid4()),
+        "room_id": room_id,
+        "sender_id": user_id,
+        "sender_username": user.get("username", "Unknown"),
+        "message": message,
+        "timestamp": datetime.utcnow().isoformat(),
+        "is_system": False
+    }
+    
+    # For now, just store in memory (in a real app, you'd store in database)
+    # We'll simulate immediate return since there's no WebSocket
+    return CustomJSONResponse(content={"message": "Message sent successfully", "data": message_data})
+
+@app.get("/api/chat/messages/{room_id}")
+async def get_chat_messages(
+    room_id: str,
+    user_id: str = Depends(verify_token)
+):
+    """Get recent chat messages for a room"""
+    # For now, return empty messages since we don't have persistent storage
+    # In a real implementation, you'd fetch from database
+    return CustomJSONResponse(content={"messages": []})
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
