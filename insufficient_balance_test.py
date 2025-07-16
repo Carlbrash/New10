@@ -28,24 +28,69 @@ class InsufficientBalanceModalTester(unittest.TestCase):
             "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
         }
 
-    def test_01_login_testuser(self):
-        """Login as testuser with password test123"""
-        print("\n🔍 Testing login as testuser for insufficient balance modal fix...")
+    def test_01_create_modal_test_user(self):
+        """Create a new user 'modal_test' with password 'test123'"""
+        print("\n🔍 Testing modal test user creation...")
         
+        # First, try to login if user already exists
+        try:
+            login_response = requests.post(
+                f"{self.base_url}/api/login",
+                json=self.test_user_credentials
+            )
+            if login_response.status_code == 200:
+                print("  ⚠️ User already exists, this is expected for testing")
+                data = login_response.json()
+                self.token = data["token"]
+                self.user_id = data["user_id"]
+                return
+        except:
+            pass
+        
+        # Create new user
         response = requests.post(
-            f"{self.base_url}/api/login",
-            json=self.test_user_credentials
+            f"{self.base_url}/api/register",
+            json=self.new_user_data
         )
         
-        self.assertEqual(response.status_code, 200, f"Login failed with status {response.status_code}: {response.text}")
-        data = response.json()
-        self.assertIn("token", data)
-        self.assertIn("user_id", data)
+        if response.status_code == 400 and "already exists" in response.text:
+            print("  ⚠️ User already exists, attempting to login instead...")
+            login_response = requests.post(
+                f"{self.base_url}/api/login",
+                json=self.test_user_credentials
+            )
+            self.assertEqual(login_response.status_code, 200)
+            data = login_response.json()
+            self.token = data["token"]
+            self.user_id = data["user_id"]
+            print(f"  ✅ Logged in existing user - User ID: {self.user_id}")
+        else:
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertIn("token", data)
+            self.assertIn("user_id", data)
+            self.token = data["token"]
+            self.user_id = data["user_id"]
+            print(f"  ✅ New user created successfully - User ID: {self.user_id}")
+
+    def test_02_login_modal_test_user(self):
+        """Login with the modal_test user"""
+        print("\n🔍 Testing login with modal_test user...")
         
-        self.token = data["token"]
-        self.user_id = data["user_id"]
+        if not self.token:
+            response = requests.post(
+                f"{self.base_url}/api/login",
+                json=self.test_user_credentials
+            )
+            self.assertEqual(response.status_code, 200, f"Login failed with status {response.status_code}: {response.text}")
+            data = response.json()
+            self.assertIn("token", data)
+            self.assertIn("user_id", data)
+            
+            self.token = data["token"]
+            self.user_id = data["user_id"]
         
-        print(f"✅ Successfully logged in as testuser - User ID: {self.user_id}")
+        print(f"✅ Successfully logged in as modal_test - User ID: {self.user_id}")
 
     def test_02_check_wallet_balance(self):
         """Check testuser's wallet balance"""
