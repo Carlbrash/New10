@@ -9516,7 +9516,14 @@ function App() {
 
   // Send chat message
   const sendChatMessage = () => {
-    if (!chatSocket || !chatMessage.trim()) return;
+    if (!chatSocket || !chatMessage.trim()) {
+      console.log('❌ Cannot send message: socket or message empty', {
+        hasSocket: !!chatSocket,
+        message: chatMessage,
+        isConnected: isConnectedToChat
+      });
+      return;
+    }
 
     const messageData = {
       type: 'room_message',
@@ -9524,6 +9531,7 @@ function App() {
       message: chatMessage.trim()
     };
 
+    console.log('📤 Sending message:', messageData);
     chatSocket.send(JSON.stringify(messageData));
     setChatMessage('');
     setShowEmojiPicker(false);
