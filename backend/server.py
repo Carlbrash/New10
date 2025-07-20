@@ -9886,6 +9886,14 @@ async def get_all_themes(admin_id: str = Depends(verify_admin_token(AdminRole.AD
     """Get all CMS themes (Admin only)"""
     try:
         themes = list(cms_themes_collection.find({}))
+        
+        # Convert datetime objects to strings for JSON serialization
+        for theme in themes:
+            if 'created_at' in theme:
+                theme['created_at'] = theme['created_at'].isoformat() if theme['created_at'] else None
+            if 'updated_at' in theme:
+                theme['updated_at'] = theme['updated_at'].isoformat() if theme['updated_at'] else None
+        
         return CustomJSONResponse(content={
             "themes": themes,
             "total": len(themes)
