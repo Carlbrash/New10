@@ -4674,12 +4674,14 @@ body {
 /* Responsive Admin Tabs */
 @media (max-width: 1200px) {
   .admin-tabs {
-    justify-content: center;
+    justify-content: flex-start;
+    padding: 0.7rem;
   }
   
   .admin-tab {
-    font-size: 0.85rem;
-    padding: 0.7rem 1rem;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.8rem;
+    gap: 0.3rem;
   }
 }
 
@@ -4689,13 +4691,15 @@ body {
   }
   
   .admin-tabs {
-    gap: 0.6rem;
-    padding: 0.8rem;
+    gap: 0.4rem;
+    padding: 0.6rem;
+    overflow-x: auto;
   }
   
   .admin-tab {
-    font-size: 0.8rem;
-    padding: 0.6rem 0.9rem;
+    font-size: 0.7rem;
+    padding: 0.5rem 0.7rem;
+    gap: 0.3rem;
   }
   
   .admin-title {
@@ -4715,17 +4719,19 @@ body {
   }
   
   .admin-tabs {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
+    flex-direction: row; /* Keep horizontal on mobile too */
+    overflow-x: auto;
+    gap: 0.3rem;
+    padding: 0.5rem;
+    justify-content: flex-start;
   }
   
   .admin-tab {
-    width: 100%;
-    text-align: center;
-    justify-content: center;
-    padding: 0.8rem 1rem;
-    font-size: 0.9rem;
+    font-size: 0.65rem;
+    padding: 0.4rem 0.6rem;
+    gap: 0.2rem;
+    min-width: auto;
+    flex-shrink: 1; /* Allow some shrinking on mobile */
   }
   
   .admin-title h1 {
@@ -4741,12 +4747,14 @@ body {
 
 @media (max-width: 480px) {
   .admin-tabs {
-    padding: 0.5rem;
+    padding: 0.4rem;
+    gap: 0.2rem;
   }
   
   .admin-tab {
-    padding: 0.7rem 0.8rem;
-    font-size: 0.85rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.6rem;
+    gap: 0.2rem;
   }
   
   .admin-title h1 {
