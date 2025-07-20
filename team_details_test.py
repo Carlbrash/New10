@@ -2,7 +2,7 @@ import requests
 import json
 
 # Base URL from frontend/.env
-base_url = "https://d41b4ad2-9fce-48b8-9d2d-ddd215aa202e.preview.emergentagent.com"
+base_url = "https://b8f460b2-9f72-45d6-94e8-1deef7e57785.preview.emergentagent.com"
 
 # Step 1: Get all teams to find a team ID
 print("Step 1: Get all teams")

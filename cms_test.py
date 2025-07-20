@@ -4,7 +4,7 @@ import unittest
 class CMSSystemTester(unittest.TestCase):
     """Test Content Management System (CMS) backend endpoints"""
     
-    base_url = "https://d41b4ad2-9fce-48b8-9d2d-ddd215aa202e.preview.emergentagent.com"
+    base_url = "https://b8f460b2-9f72-45d6-94e8-1deef7e57785.preview.emergentagent.com"
     
     # Admin credentials for CMS testing
     admin_credentials = {

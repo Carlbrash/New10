@@ -10,7 +10,7 @@ class AffiliateSystemAPITest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(AffiliateSystemAPITest, self).__init__(*args, **kwargs)
         # Use the public endpoint from frontend/.env
-        self.base_url = "https://d41b4ad2-9fce-48b8-9d2d-ddd215aa202e.preview.emergentagent.com"
+        self.base_url = "https://b8f460b2-9f72-45d6-94e8-1deef7e57785.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         self.admin_token = None
