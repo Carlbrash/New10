@@ -14596,38 +14596,38 @@ function App() {
               <div className="friends-tabs">
                 <div className="tab-buttons">
                   <button 
-                    className={`tab-btn ${currentView === 'friends' ? 'active' : ''}`}
-                    onClick={() => setCurrentView('friends')}
+                    className={`tab-btn ${friendsModalTab === 'friends' ? 'active' : ''}`}
+                    onClick={() => setFriendsModalTab('friends')}
                   >
                     👥 My Friends ({friendsData.length})
                   </button>
                   <button 
-                    className={`tab-btn ${currentView === 'friend-requests' ? 'active' : ''}`}
+                    className={`tab-btn ${friendsModalTab === 'friend-requests' ? 'active' : ''}`}
                     onClick={() => {
-                      setCurrentView('friend-requests');
+                      setFriendsModalTab('friend-requests');
                       fetchFriendRequests();
                     }}
                   >
                     📬 Requests ({friendRequests.length})
                   </button>
                   <button 
-                    className={`tab-btn ${currentView === 'friend-search' ? 'active' : ''}`}
-                    onClick={() => setCurrentView('friend-search')}
+                    className={`tab-btn ${friendsModalTab === 'friend-search' ? 'active' : ''}`}
+                    onClick={() => setFriendsModalTab('friend-search')}
                   >
                     🔍 Find Friends
                   </button>
                   <button 
-                    className={`tab-btn ${currentView === 'friend-recommendations' ? 'active' : ''}`}
+                    className={`tab-btn ${friendsModalTab === 'friend-recommendations' ? 'active' : ''}`}
                     onClick={() => {
-                      setCurrentView('friend-recommendations');
+                      setFriendsModalTab('friend-recommendations');
                       fetchFriendRecommendations();
                     }}
                   >
                     ⭐ Recommendations
                   </button>
                   <button 
-                    className={`tab-btn ${currentView === 'friend-import' ? 'active' : ''}`}
-                    onClick={() => setCurrentView('friend-import')}
+                    className={`tab-btn ${friendsModalTab === 'friend-import' ? 'active' : ''}`}
+                    onClick={() => setFriendsModalTab('friend-import')}
                   >
                     📥 Import Friends
                   </button>
