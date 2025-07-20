@@ -10042,6 +10042,244 @@ async def create_translation(request: TranslationUpdateRequest, admin_id: str = 
 
 print("✅ Content Management System endpoints loaded successfully")
 
+# Initialize default CMS content
+def initialize_default_cms_content():
+    """Initialize default CMS content items"""
+    try:
+        # Check if content already exists
+        existing_count = cms_content_collection.count_documents({})
+        if existing_count > 0:
+            print("📝 CMS content already exists, skipping initialization")
+            return
+        
+        default_content = [
+            # Navbar content
+            {
+                "id": str(uuid.uuid4()),
+                "key": "nav_home",
+                "content_type": "text",
+                "context": "navbar",
+                "default_value": "Home",
+                "current_value": "Home",
+                "description": "Navigation home link text",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "nav_rankings",
+                "content_type": "text",
+                "context": "navbar",
+                "default_value": "Rankings",
+                "current_value": "Rankings",
+                "description": "Navigation rankings link text",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "nav_tournaments",
+                "content_type": "text",
+                "context": "navbar",
+                "default_value": "Tournaments",
+                "current_value": "Tournaments",
+                "description": "Navigation tournaments link text",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "nav_teams",
+                "content_type": "text",
+                "context": "navbar",
+                "default_value": "Teams",
+                "current_value": "Teams",
+                "description": "Navigation teams link text",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "nav_guilds",
+                "content_type": "text",
+                "context": "navbar",
+                "default_value": "Guilds",
+                "current_value": "Guilds",
+                "description": "Navigation guilds link text",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "nav_affiliate",
+                "content_type": "text",
+                "context": "navbar",
+                "default_value": "Affiliate",
+                "current_value": "Affiliate",
+                "description": "Navigation affiliate link text",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "nav_wallet",
+                "content_type": "text",
+                "context": "navbar",
+                "default_value": "Wallet",
+                "current_value": "Wallet",
+                "description": "Navigation wallet link text",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            # Hero section content
+            {
+                "id": str(uuid.uuid4()),
+                "key": "hero_title",
+                "content_type": "text",
+                "context": "hero",
+                "default_value": "WoBeRa",
+                "current_value": "WoBeRa",
+                "description": "Main hero title",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "hero_subtitle",
+                "content_type": "text",
+                "context": "hero",
+                "default_value": "WORLD BETTING RANK",
+                "current_value": "WORLD BETTING RANK",
+                "description": "Hero subtitle",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "hero_description",
+                "content_type": "text",
+                "context": "hero",
+                "default_value": "Discover your position on the WoBeRa global map. Participate in competitions and conquer the top of the World Betting Rank.",
+                "current_value": "Discover your position on the WoBeRa global map. Participate in competitions and conquer the top of the World Betting Rank.",
+                "description": "Hero section description text",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            # Color scheme
+            {
+                "id": str(uuid.uuid4()),
+                "key": "color_primary",
+                "content_type": "color",
+                "context": "general",
+                "default_value": "#4fc3f7",
+                "current_value": "#4fc3f7",
+                "description": "Primary brand color",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "color_secondary",
+                "content_type": "color",
+                "context": "general",
+                "default_value": "#29b6f6",
+                "current_value": "#29b6f6",
+                "description": "Secondary brand color",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "key": "color_accent",
+                "content_type": "color",
+                "context": "general",
+                "default_value": "#ffd700",
+                "current_value": "#ffd700",
+                "description": "Accent color for highlights",
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": "system",
+                "updated_by": None
+            }
+        ]
+        
+        # Insert default content
+        cms_content_collection.insert_many(default_content)
+        
+        # Create default theme
+        default_theme = {
+            "id": str(uuid.uuid4()),
+            "name": "WoBeRa Default",
+            "colors": {
+                "primary": "#4fc3f7",
+                "secondary": "#29b6f6",
+                "accent": "#ffd700",
+                "success": "#22c55e",
+                "warning": "#f59e0b",
+                "error": "#ef4444",
+                "background": "#1a1a1a",
+                "surface": "#2a2a2a",
+                "text": "#ffffff"
+            },
+            "fonts": {
+                "primary": "Inter, sans-serif",
+                "secondary": "Roboto, sans-serif"
+            },
+            "is_active": True,
+            "is_default": True,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "created_by": "system",
+            "updated_by": None
+        }
+        
+        cms_themes_collection.insert_one(default_theme)
+        
+        print(f"✅ Initialized {len(default_content)} default CMS content items and 1 default theme")
+    
+    except Exception as e:
+        print(f"❌ Error initializing default CMS content: {str(e)}")
+
+# Initialize CMS content on startup
+initialize_default_cms_content()
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
