@@ -956,11 +956,7 @@ metadata:
   all_endpoints_working: true
 
 test_plan:
-  current_focus:
-    - "SportsDuel System - GET /api/sportsduel/leagues"
-    - "SportsDuel System - GET /api/sportsduel/teams"
-    - "SportsDuel System - GET /api/sportsduel/live-scoreboard" 
-    - "SportsDuel System - POST /api/sportsduel/teams"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
