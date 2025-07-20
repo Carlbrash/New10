@@ -6619,6 +6619,418 @@ function App() {
             </div>
           </div>
 
+          {/* Creation of National Team */}
+          <div className="organization-level national-team-level">
+            <div className="level-header">
+              <div className="level-icon">🏆</div>
+              <div className="level-content">
+                <h3>6. Creation of National Team</h3>
+                <p className="level-description">
+                  Each local WoBeRa federation conducts comprehensive player evaluations, 
+                  selecting the finest talent to represent their country on the international stage.
+                </p>
+              </div>
+            </div>
+            
+            <div className="national-team-process">
+              <div className="evaluation-system">
+                <h4>📊 Player Evaluation Process</h4>
+                <div className="evaluation-steps">
+                  <div className="eval-step">
+                    <div className="step-icon">📈</div>
+                    <div className="step-content">
+                      <h5>Statistics Analysis</h5>
+                      <p>Local federations analyze comprehensive player statistics including win rates, accuracy, consistency, and performance under pressure.</p>
+                    </div>
+                  </div>
+                  <div className="eval-step">
+                    <div className="step-icon">🎯</div>
+                    <div className="step-content">
+                      <h5>Selection Criteria</h5>
+                      <p>Players are evaluated based on skill level, tournament performance, team contribution, and ability to compete internationally.</p>
+                    </div>
+                  </div>
+                  <div className="eval-step">
+                    <div className="step-icon">🌟</div>
+                    <div className="step-content">
+                      <h5>National Squad</h5>
+                      <p>Selected players form the country's National team, representing their nation with pride and excellence in international competitions.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="international-tournaments">
+                <h4>🌍 International Championships</h4>
+                <p className="tournaments-intro">
+                  National teams compete in prestigious international tournaments that align 
+                  perfectly with major football championships, ensuring maximum excitement and engagement.
+                </p>
+                
+                <div className="tournament-schedule">
+                  <div className="tournament-card euro">
+                    <div className="tournament-header">
+                      <div className="tournament-logo">🇪🇺</div>
+                      <div className="tournament-details">
+                        <h5>WoBeRa Euro Championship</h5>
+                        <span className="tournament-year">Aligned with Euro 2024</span>
+                      </div>
+                    </div>
+                    <div className="tournament-info">
+                      <p>European national teams compete following the same fixtures and schedule as the UEFA European Championship.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="tournament-card world-cup">
+                    <div className="tournament-header">
+                      <div className="tournament-logo">🏆</div>
+                      <div className="tournament-details">
+                        <h5>WoBeRa World Cup</h5>
+                        <span className="tournament-year">Aligned with World Cup 2026</span>
+                      </div>
+                    </div>
+                    <div className="tournament-info">
+                      <p>The ultimate global tournament where national teams from around the world compete for international supremacy.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Friendly Games */}
+          <div className="organization-level friendly-games-level">
+            <div className="level-header">
+              <div className="level-icon">🤝</div>
+              <div className="level-content">
+                <h3>7. Friendly Games</h3>
+                <p className="level-description">
+                  Throughout the year, teams can arrange friendly matches through an invitation 
+                  system, fostering relationships and providing additional competitive opportunities 
+                  with customizable prize structures.
+                </p>
+              </div>
+            </div>
+            
+            <div className="friendly-system">
+              <div className="invitation-process">
+                <h4>📨 Invitation Procedure</h4>
+                <div className="process-flow">
+                  <div className="process-step">
+                    <div className="process-number">1</div>
+                    <div className="process-info">
+                      <h5>Send Invitation</h5>
+                      <p>Team A sends a friendly match invitation to Team B through the WoBeRa platform</p>
+                    </div>
+                  </div>
+                  <div className="process-arrow">→</div>
+                  <div className="process-step">
+                    <div className="process-number">2</div>
+                    <div className="process-info">
+                      <h5>Review & Accept</h5>
+                      <p>Team B reviews the invitation, match terms, and prize structure before accepting</p>
+                    </div>
+                  </div>
+                  <div className="process-arrow">→</div>
+                  <div className="process-step">
+                    <div className="process-number">3</div>
+                    <div className="process-info">
+                      <h5>Match Scheduling</h5>
+                      <p>Both teams agree on date, time, and match conditions for the friendly encounter</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="prize-system">
+                <h4>💰 Prize Structure</h4>
+                <div className="prize-features">
+                  <div className="prize-card">
+                    <div className="prize-icon">🎁</div>
+                    <div className="prize-content">
+                      <h5>Customizable Prizes</h5>
+                      <p>Teams can set monetary prizes, merchandise, or other rewards for friendly match winners</p>
+                    </div>
+                  </div>
+                  <div className="prize-card">
+                    <div className="prize-icon">🏅</div>
+                    <div className="prize-content">
+                      <h5>Achievement Rewards</h5>
+                      <p>Special achievement badges and recognition for outstanding friendly match performances</p>
+                    </div>
+                  </div>
+                  <div className="prize-card">
+                    <div className="prize-icon">📊</div>
+                    <div className="prize-content">
+                      <h5>Statistics Boost</h5>
+                      <p>Friendly match results contribute to team and player statistics and rankings</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Players' Transfer Value */}
+          <div className="organization-level transfer-value-level">
+            <div className="level-header">
+              <div className="level-icon">💎</div>
+              <div className="level-content">
+                <h3>8. Players' Transfer Value</h3>
+                <p className="level-description">
+                  WoBeRa.com hosts comprehensive player value databases, providing detailed 
+                  statistics and key data organized by nationality and league participation.
+                </p>
+              </div>
+            </div>
+            
+            <div className="value-system">
+              <div className="player-data">
+                <h4>📋 Player Information Database</h4>
+                <div className="data-categories">
+                  <div className="data-section key-data">
+                    <h5>🔑 Key Data</h5>
+                    <ul className="data-list">
+                      <li>👤 Age & Personal Information</li>
+                      <li>🏴 Nationality & Country Representation</li>
+                      <li>⚽ Current Team Affiliation</li>
+                      <li>📍 Position & Playing Style</li>
+                    </ul>
+                  </div>
+                  <div className="data-section statistics">
+                    <h5>📊 Performance Statistics</h5>
+                    <ul className="data-list">
+                      <li>🏆 Total Wins & Losses</li>
+                      <li>📈 Winning Percentage</li>
+                      <li>🏅 Achievements & Trophies</li>
+                      <li>🎯 Favorite Betting Patterns</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="organization-methods">
+                <h4>🗂️ Data Organization</h4>
+                <div className="organization-tabs">
+                  <div className="org-tab nationality-tab">
+                    <div className="tab-header">
+                      <div className="tab-icon">🌍</div>
+                      <h5>Per Nationality</h5>
+                    </div>
+                    <div className="tab-content">
+                      <p>Player information is organized by nationality, allowing easy comparison of players from the same country and facilitating national team selections.</p>
+                      <div className="nationality-examples">
+                        <span className="nationality-badge">🇬🇷 Greece</span>
+                        <span className="nationality-badge">🇬🇧 United Kingdom</span>
+                        <span className="nationality-badge">🇩🇪 Germany</span>
+                        <span className="nationality-badge">🇪🇸 Spain</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="org-tab league-tab">
+                    <div className="tab-header">
+                      <div className="tab-icon">🏟️</div>
+                      <h5>Per League</h5>
+                    </div>
+                    <div className="tab-content">
+                      <p>Information is categorized by league participation, enabling teams to scout players within their competitive tier and analyze cross-league comparisons.</p>
+                      <div className="league-examples">
+                        <span className="league-badge">🇬🇷 WoBeRa.gr</span>
+                        <span className="league-badge">🇬🇧 WoBeRa.uk</span>
+                        <span className="league-badge">🇩🇪 WoBeRa.de</span>
+                        <span className="league-badge">🇪🇸 WoBeRa.es</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Players' Transfers */}
+          <div className="organization-level transfers-level">
+            <div className="level-header">
+              <div className="level-icon">🔄</div>
+              <div className="level-content">
+                <h3>9. Players' Transfers</h3>
+                <p className="level-description">
+                  WoBeRa operates structured transfer periods throughout the year, facilitating 
+                  player movement between teams through formal agreement procedures.
+                </p>
+              </div>
+            </div>
+            
+            <div className="transfer-system">
+              <div className="transfer-periods">
+                <h4>📅 Transfer Windows</h4>
+                <div className="transfer-windows">
+                  <div className="transfer-window summer">
+                    <div className="window-icon">☀️</div>
+                    <div className="window-info">
+                      <h5>Summer Transfer Window</h5>
+                      <span className="window-period">June - August</span>
+                      <p>Primary transfer period for major player movements and team restructuring</p>
+                    </div>
+                  </div>
+                  <div className="transfer-window winter">
+                    <div className="window-icon">❄️</div>
+                    <div className="window-info">
+                      <h5>Winter Transfer Window</h5>
+                      <span className="window-period">January - February</span>
+                      <p>Mid-season transfer opportunity for strategic team reinforcements</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="transfer-process">
+                <h4>🤝 Transfer Agreement Process</h4>
+                <div className="agreement-steps">
+                  <div className="agreement-step team-agreement">
+                    <div className="agreement-icon">🏢</div>
+                    <div className="agreement-content">
+                      <h5>Team-to-Team Agreement</h5>
+                      <p>Current team and new team must reach a formal agreement regarding the player transfer, including any compensation or conditions.</p>
+                    </div>
+                  </div>
+                  <div className="plus-symbol">+</div>
+                  <div className="agreement-step player-agreement">
+                    <div className="agreement-icon">👤</div>
+                    <div className="agreement-content">
+                      <h5>Player-Team Agreement</h5>
+                      <p>Player must agree to join the new team, including contract terms, role expectations, and participation commitments.</p>
+                    </div>
+                  </div>
+                  <div className="equals-symbol">=</div>
+                  <div className="agreement-result">
+                    <div className="result-icon">✅</div>
+                    <div className="result-content">
+                      <h5>Transfer Complete</h5>
+                      <p>Successful transfer with all parties satisfied</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="free-agents">
+                <h4>🆓 Free Agent System</h4>
+                <div className="free-agent-info">
+                  <div className="free-agent-icon">🏃‍♂️</div>
+                  <div className="free-agent-content">
+                    <h5>Automatic Free Agency</h5>
+                    <p>When a team does not participate in the league, their players automatically become free agents and can continue with any other team without transfer restrictions.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Players' Tournaments */}
+          <div className="organization-level player-tournaments-level">
+            <div className="level-header">
+              <div className="level-icon">🏅</div>
+              <div className="level-content">
+                <h3>10. Players' Tournaments</h3>
+                <p className="level-description">
+                  Exclusive player-only tournaments occur throughout the year, providing 
+                  individual competition opportunities that directly impact player valuations 
+                  and career development.
+                </p>
+              </div>
+            </div>
+            
+            <div className="tournament-system">
+              <div className="tournament-types">
+                <h4>🎯 Tournament Categories</h4>
+                <div className="tournament-categories">
+                  <div className="tournament-type local">
+                    <div className="type-header">
+                      <div className="type-icon">🏠</div>
+                      <h5>Local Tournaments</h5>
+                    </div>
+                    <div className="type-content">
+                      <p>Regional competitions where players from the same country compete for local recognition and prizes.</p>
+                      <ul className="tournament-features">
+                        <li>🌍 Country-specific participation</li>
+                        <li>🏆 Regional championship titles</li>
+                        <li>📈 Local ranking improvements</li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <div className="tournament-type international">
+                    <div className="type-header">
+                      <div className="type-icon">🌏</div>
+                      <h5>International Tournaments</h5>
+                    </div>
+                    <div className="type-content">
+                      <p>Global competitions bringing together the best players from around the world for ultimate individual glory.</p>
+                      <ul className="tournament-features">
+                        <li>🌐 Worldwide participation</li>
+                        <li>👑 Global championship recognition</li>
+                        <li>💰 Significant value increases</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="tournament-rules">
+                <h4>📜 Tournament Regulations</h4>
+                <div className="rules-overview">
+                  <div className="rule-item participation">
+                    <div className="rule-icon">✅</div>
+                    <div className="rule-content">
+                      <h5>Open Participation</h5>
+                      <p>All players can participate in tournaments, regardless of their team affiliation or current league status.</p>
+                    </div>
+                  </div>
+                  <div className="rule-item compliance">
+                    <div className="rule-icon">⚖️</div>
+                    <div className="rule-content">
+                      <h5>Rule Compliance</h5>
+                      <p>Players must follow specific tournament rules, including fair play guidelines and competition formats.</p>
+                    </div>
+                  </div>
+                  <div className="rule-item value-impact">
+                    <div className="rule-icon">📊</div>
+                    <div className="rule-content">
+                      <h5>Value Impact</h5>
+                      <p>Tournament participation and results directly contribute to player value calculations and transfer market worth.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="value-contribution">
+                <h4>💎 Impact on Player Value</h4>
+                <div className="value-factors">
+                  <div className="value-factor performance">
+                    <div className="factor-icon">🎯</div>
+                    <span className="factor-label">Tournament Performance</span>
+                    <div className="factor-impact positive">+15% Value</div>
+                  </div>
+                  <div className="value-factor achievements">
+                    <div className="factor-icon">🏆</div>
+                    <span className="factor-label">Championship Wins</span>
+                    <div className="factor-impact high-positive">+25% Value</div>
+                  </div>
+                  <div className="value-factor consistency">
+                    <div className="factor-icon">📈</div>
+                    <span className="factor-label">Consistent Participation</span>
+                    <div className="factor-impact positive">+10% Value</div>
+                  </div>
+                  <div className="value-factor international">
+                    <div className="factor-icon">🌍</div>
+                    <span className="factor-label">International Success</span>
+                    <div className="factor-impact very-high">+40% Value</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Organizational Flow */}
           <div className="organizational-flow">
             <h3>🔄 How It All Works Together</h3>
@@ -6650,8 +7062,8 @@ function App() {
               <div className="flow-step">
                 <div className="step-number">4</div>
                 <div className="step-content">
-                  <h4>Scheduled Competition</h4>
-                  <p>Synchronized leagues and championship glory</p>
+                  <h4>Complete Ecosystem</h4>
+                  <p>Players, teams, tournaments, and championships unite</p>
                 </div>
               </div>
             </div>
