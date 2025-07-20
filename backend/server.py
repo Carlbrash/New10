@@ -6040,6 +6040,28 @@ async def create_guild(guild_data: GuildCreate, user_id: str = Depends(verify_to
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating guild: {str(e)}")
 
+def serialize_doc(doc):
+    """Convert MongoDB document to JSON serializable format"""
+    if doc is None:
+        return None
+    if isinstance(doc, list):
+        return [serialize_doc(item) for item in doc]
+    if isinstance(doc, dict):
+        result = {}
+        for key, value in doc.items():
+            if key == "_id":
+                continue  # Skip MongoDB _id field
+            elif hasattr(value, '__dict__'):
+                result[key] = str(value)  # Convert ObjectId and other objects to string
+            elif isinstance(value, dict):
+                result[key] = serialize_doc(value)
+            elif isinstance(value, list):
+                result[key] = serialize_doc(value)
+            else:
+                result[key] = value
+        return result
+    return doc
+
 @app.get("/api/guilds")
 async def get_all_guilds(
     country: Optional[str] = None,
