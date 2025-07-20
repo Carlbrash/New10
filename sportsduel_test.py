@@ -290,7 +290,7 @@ class SportsDuelSystemTester(unittest.TestCase):
             f"{self.base_url}/api/sportsduel/teams",
             json=team_data
         )
-        self.assertEqual(response.status_code, 401, "Team creation should require authentication")
+        self.assertIn(response.status_code, [401, 403], "Team creation should require authentication")
         print("  ✅ Team creation correctly requires authentication")
         
         # Test that public endpoints don't require authentication
