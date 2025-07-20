@@ -1979,6 +1979,313 @@ def calculate_admin_financial_overview() -> dict:
         print(f"Error calculating admin financial overview: {e}")
         return {}
 
+# =============================================================================
+# SPORTSDUEL SYSTEM HELPER FUNCTIONS
+# =============================================================================
+
+def calculate_sportsduel_match_winner(player1_coupon: dict, player2_coupon: dict) -> dict:
+    """Calculate match winner based on SportsDuel rules"""
+    try:
+        result = {
+            "winner_player_id": None,
+            "win_reason": "draw",
+            "player1_stats": {
+                "correct": player1_coupon["correct_predictions"],
+                "wrong": player1_coupon["wrong_predictions"],
+                "odds_product": player1_coupon["total_odds"],
+                "has_winning": player1_coupon["has_winning_selection"]
+            },
+            "player2_stats": {
+                "correct": player2_coupon["correct_predictions"],
+                "wrong": player2_coupon["wrong_predictions"],
+                "odds_product": player2_coupon["total_odds"],
+                "has_winning": player2_coupon["has_winning_selection"]
+            }
+        }
+        
+        # Rule 1: Must have at least 1 winning selection
+        if not player1_coupon["has_winning_selection"] and not player2_coupon["has_winning_selection"]:
+            return result  # Both disqualified, draw
+        
+        if not player1_coupon["has_winning_selection"]:
+            result["winner_player_id"] = player2_coupon["player_id"]
+            result["win_reason"] = "player1_disqualified"
+            return result
+            
+        if not player2_coupon["has_winning_selection"]:
+            result["winner_player_id"] = player1_coupon["player_id"]
+            result["win_reason"] = "player2_disqualified"
+            return result
+        
+        # Rule 2: Fewer wrong predictions wins
+        if player1_coupon["wrong_predictions"] < player2_coupon["wrong_predictions"]:
+            result["winner_player_id"] = player1_coupon["player_id"]
+            result["win_reason"] = "fewer_wrong_predictions"
+        elif player2_coupon["wrong_predictions"] < player1_coupon["wrong_predictions"]:
+            result["winner_player_id"] = player2_coupon["player_id"]
+            result["win_reason"] = "fewer_wrong_predictions"
+        else:
+            # Rule 3: Same wrong predictions, higher odds product wins
+            if player1_coupon["total_odds"] > player2_coupon["total_odds"]:
+                result["winner_player_id"] = player1_coupon["player_id"]
+                result["win_reason"] = "higher_odds_product"
+            elif player2_coupon["total_odds"] > player1_coupon["total_odds"]:
+                result["winner_player_id"] = player2_coupon["player_id"]
+                result["win_reason"] = "higher_odds_product"
+            # else: draw (same wrong predictions and same odds)
+        
+        return result
+        
+    except Exception as e:
+        print(f"Error calculating match winner: {e}")
+        return {"winner_player_id": None, "win_reason": "error"}
+
+def evaluate_sportsduel_coupon(coupon_id: str, sports_events_results: dict) -> dict:
+    """Evaluate a SportsDuel coupon against actual results"""
+    try:
+        coupon = sportsduel_coupons_collection.find_one({"id": coupon_id})
+        if not coupon:
+            return {"error": "Coupon not found"}
+        
+        correct_predictions = 0
+        wrong_predictions = 0
+        total_odds = 1.0
+        has_winning_selection = False
+        
+        # Evaluate each bet in the coupon
+        for bet in coupon["bets"]:
+            event_id = bet["event_id"]
+            selection = bet["selection"]
+            odds = bet["odds"]
+            
+            # Get actual result
+            actual_result = sports_events_results.get(event_id)
+            if actual_result is None:
+                continue  # Event not completed yet
+            
+            # Check if prediction is correct
+            is_correct = (selection == actual_result)
+            
+            if is_correct:
+                correct_predictions += 1
+                has_winning_selection = True
+                total_odds *= odds
+            else:
+                wrong_predictions += 1
+            
+            # Update bet result
+            sportsduel_bets_collection.update_one(
+                {"coupon_id": coupon_id, "event_id": event_id},
+                {"$set": {"is_correct": is_correct}}
+            )
+        
+        # Update coupon with evaluation results
+        sportsduel_coupons_collection.update_one(
+            {"id": coupon_id},
+            {
+                "$set": {
+                    "correct_predictions": correct_predictions,
+                    "wrong_predictions": wrong_predictions,
+                    "total_odds": total_odds,
+                    "has_winning_selection": has_winning_selection,
+                    "status": "evaluated",
+                    "evaluated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        return {
+            "coupon_id": coupon_id,
+            "correct_predictions": correct_predictions,
+            "wrong_predictions": wrong_predictions,
+            "total_odds": total_odds,
+            "has_winning_selection": has_winning_selection
+        }
+        
+    except Exception as e:
+        print(f"Error evaluating coupon: {e}")
+        return {"error": str(e)}
+
+def create_sportsduel_time_slots_for_day(match_date: str, league_id: str) -> list:
+    """Create default time slots for a match day"""
+    try:
+        base_date = datetime.fromisoformat(match_date)
+        time_slots = []
+        
+        # Morning Slot (9:00 AM - 12:00 PM)
+        morning_slot = {
+            "id": str(uuid.uuid4()),
+            "slot_name": "Morning Slot",
+            "start_time": base_date.replace(hour=9, minute=0),
+            "end_time": base_date.replace(hour=12, minute=0),
+            "match_day": match_date,
+            "league_id": league_id,
+            "max_concurrent_matches": 10,
+            "status": "scheduled",
+            "created_at": datetime.utcnow()
+        }
+        
+        # Afternoon Slot (1:00 PM - 4:00 PM)
+        afternoon_slot = {
+            "id": str(uuid.uuid4()),
+            "slot_name": "Afternoon Slot", 
+            "start_time": base_date.replace(hour=13, minute=0),
+            "end_time": base_date.replace(hour=16, minute=0),
+            "match_day": match_date,
+            "league_id": league_id,
+            "max_concurrent_matches": 10,
+            "status": "scheduled",
+            "created_at": datetime.utcnow()
+        }
+        
+        # Evening Slot (6:00 PM - 9:00 PM)
+        evening_slot = {
+            "id": str(uuid.uuid4()),
+            "slot_name": "Evening Slot",
+            "start_time": base_date.replace(hour=18, minute=0),
+            "end_time": base_date.replace(hour=21, minute=0),
+            "match_day": match_date,
+            "league_id": league_id,
+            "max_concurrent_matches": 10,
+            "status": "scheduled",
+            "created_at": datetime.utcnow()
+        }
+        
+        # Insert into database
+        slots_to_insert = [morning_slot, afternoon_slot, evening_slot]
+        sportsduel_time_slots_collection.insert_many(slots_to_insert)
+        time_slots.extend(slots_to_insert)
+        
+        return time_slots
+        
+    except Exception as e:
+        print(f"Error creating time slots: {e}")
+        return []
+
+def get_sportsduel_player_stats(player_id: str) -> dict:
+    """Calculate comprehensive player statistics"""
+    try:
+        player = sportsduel_players_collection.find_one({"id": player_id})
+        if not player:
+            return {}
+        
+        # Get player matches
+        matches = list(sportsduel_matches_collection.find({
+            "$or": [{"player1_id": player_id}, {"player2_id": player_id}],
+            "status": "completed"
+        }))
+        
+        stats = {
+            "player_id": player_id,
+            "nickname": player.get("nickname", ""),
+            "total_matches": len(matches),
+            "wins": 0,
+            "losses": 0,
+            "draws": 0,
+            "win_percentage": 0.0,
+            "current_streak": 0,
+            "best_streak": 0,
+            "average_odds": 0.0,
+            "total_correct_predictions": 0,
+            "total_wrong_predictions": 0,
+            "accuracy_percentage": 0.0
+        }
+        
+        # Calculate match statistics
+        current_streak = 0
+        best_streak = 0
+        total_odds = 0
+        total_predictions = 0
+        
+        for match in matches:
+            if match["winner_player_id"] == player_id:
+                stats["wins"] += 1
+                current_streak += 1
+                best_streak = max(best_streak, current_streak)
+            elif match["winner_player_id"] is None:
+                stats["draws"] += 1
+                current_streak = 0
+            else:
+                stats["losses"] += 1
+                current_streak = 0
+            
+            # Get coupon stats for this match
+            if match["player1_id"] == player_id and match["player1_coupon_id"]:
+                coupon = sportsduel_coupons_collection.find_one({"id": match["player1_coupon_id"]})
+                if coupon:
+                    stats["total_correct_predictions"] += coupon.get("correct_predictions", 0)
+                    stats["total_wrong_predictions"] += coupon.get("wrong_predictions", 0)
+                    total_odds += coupon.get("total_odds", 0)
+                    total_predictions += len(coupon.get("bets", []))
+                    
+            elif match["player2_id"] == player_id and match["player2_coupon_id"]:
+                coupon = sportsduel_coupons_collection.find_one({"id": match["player2_coupon_id"]})
+                if coupon:
+                    stats["total_correct_predictions"] += coupon.get("correct_predictions", 0)
+                    stats["total_wrong_predictions"] += coupon.get("wrong_predictions", 0)
+                    total_odds += coupon.get("total_odds", 0)
+                    total_predictions += len(coupon.get("bets", []))
+        
+        # Calculate percentages
+        if stats["total_matches"] > 0:
+            stats["win_percentage"] = (stats["wins"] / stats["total_matches"]) * 100
+            
+        if total_predictions > 0:
+            stats["accuracy_percentage"] = (stats["total_correct_predictions"] / total_predictions) * 100
+            stats["average_odds"] = total_odds / len(matches) if matches else 0
+        
+        stats["current_streak"] = current_streak
+        stats["best_streak"] = best_streak
+        
+        return stats
+        
+    except Exception as e:
+        print(f"Error calculating player stats: {e}")
+        return {}
+
+def generate_sample_sports_events(time_slot_id: str, match_date: str) -> list:
+    """Generate sample sports events for testing"""
+    try:
+        events = []
+        base_date = datetime.fromisoformat(match_date)
+        
+        # Premier League matches
+        premier_league_matches = [
+            ("Chelsea", "Arsenal", 2.10, 3.40, 3.50),
+            ("Manchester United", "Liverpool", 2.80, 3.20, 2.60),
+            ("Manchester City", "Tottenham", 1.85, 3.60, 4.20),
+            ("Newcastle", "Brighton", 2.30, 3.10, 3.40),
+            ("West Ham", "Everton", 2.20, 3.25, 3.30)
+        ]
+        
+        for i, (home_team, away_team, odds_1, odds_x, odds_2) in enumerate(premier_league_matches):
+            event = {
+                "id": str(uuid.uuid4()),
+                "event_name": f"{home_team} vs {away_team}",
+                "sport_type": "football",
+                "league": "Premier League",
+                "start_time": base_date.replace(hour=15, minute=i*30),
+                "home_team": home_team,
+                "away_team": away_team,
+                "odds_1": odds_1,
+                "odds_x": odds_x,
+                "odds_2": odds_2,
+                "total_goals_over": 2.25,
+                "total_goals_under": 1.65,
+                "status": "scheduled",
+                "time_slot_id": time_slot_id,
+                "created_at": datetime.utcnow()
+            }
+            events.append(event)
+        
+        # Insert into database
+        sportsduel_sports_events_collection.insert_many(events)
+        return events
+        
+    except Exception as e:
+        print(f"Error generating sample events: {e}")
+        return []
+
 # Routes
 @app.get("/api/health")
 async def health_check():
