@@ -13422,24 +13422,24 @@ function App() {
         timeSlot: 'TIME SLOT 19:00',
         team1: { 
           name: 'LIVERPOOL REDS', 
-          logo: '🔴', 
+          logo: 'https://images.unsplash.com/photo-1632937925343-d8d581769c8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
           score: 22,
           country: '🇬🇧',
           players: [
-            { id: 13, name: 'Neo', avatar: '🕴️', level: '5/5', wins: 312, losses: 22, accuracy: '93%' },
-            { id: 14, name: 'Morpheus', avatar: '🕶️', level: '4/6', wins: 298, losses: 34, accuracy: '90%' },
-            { id: 15, name: 'Trinity', avatar: '👩‍💻', level: '3/4', wins: 276, losses: 28, accuracy: '91%' }
+            { id: 13, name: 'Neo', avatar: 'https://images.unsplash.com/photo-1707414038523-b5d1c8294786?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', level: '5/5', wins: 312, losses: 22, accuracy: '93%' },
+            { id: 14, name: 'Morpheus', avatar: 'https://images.unsplash.com/photo-1615418674275-25cb581798e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '4/6', wins: 298, losses: 34, accuracy: '90%' },
+            { id: 15, name: 'Trinity', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '3/4', wins: 276, losses: 28, accuracy: '91%' }
           ]
         },
         team2: { 
           name: 'MANCHESTER LIONS', 
-          logo: '🦁', 
+          logo: 'https://images.unsplash.com/photo-1639895276073-5327a3ac56fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
           score: 18,
           country: '🇬🇧',
           players: [
-            { id: 16, name: 'Gandalf', avatar: '🧙‍♂️', level: '6/6', wins: 445, losses: 31, accuracy: '93%' },
-            { id: 17, name: 'Legolas', avatar: '🏹', level: '4/5', wins: 356, losses: 27, accuracy: '93%' },
-            { id: 18, name: 'Gimli', avatar: '🪓', level: '2/3', wins: 234, losses: 45, accuracy: '84%' }
+            { id: 16, name: 'Gandalf', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '6/6', wins: 445, losses: 31, accuracy: '93%' },
+            { id: 17, name: 'Legolas', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '4/5', wins: 356, losses: 27, accuracy: '93%' },
+            { id: 18, name: 'Gimli', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '2/3', wins: 234, losses: 45, accuracy: '84%' }
           ]
         }
       }
