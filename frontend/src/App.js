@@ -13836,7 +13836,7 @@ function App() {
                     <div className="team-scores-container">
                       <div className="team-score-professional">{match.team1.teamScore}</div>
                       <div className="scores-separator">-</div>
-                      <div className="team-score-professional">{match.team2.teamScore}</div>
+                      <div className="team-score-professional team2-score">{match.team2.teamScore}</div>
                     </div>
                     <div className="vs-section-professional">
                       <div className="vs-circle-static">
@@ -13850,6 +13850,7 @@ function App() {
                   
                   <div className="team-professional team2">
                     <div className="team-info-professional team2-info">
+                      <div className="team-score-before-name">{match.team2.teamScore}</div>
                       <div className="team-name-professional">{match.team2.name}</div>
                       <div className="team-country-name">{match.team2.countryName}</div>
                     </div>
