@@ -5,7 +5,7 @@ import json
 class GuildSystemTester(unittest.TestCase):
     """Test Guild Wars & Clan System backend endpoints"""
     
-    base_url = "https://9a6eca50-8db5-4e67-9b01-228d23f9a32e.preview.emergentagent.com"
+    base_url = "https://98b7db04-7f99-4bd4-b77c-3a57bf87e41f.preview.emergentagent.com"
     
     # Test user credentials
     testuser_credentials = {
