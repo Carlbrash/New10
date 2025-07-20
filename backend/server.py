@@ -9762,6 +9762,7 @@ async def create_content(request: ContentUpdateRequest, admin_id: str = Depends(
         if existing:
             raise HTTPException(status_code=400, detail="Content with this key already exists")
         
+        now = datetime.utcnow()
         content_data = {
             "id": str(uuid.uuid4()),
             "key": request.key,
@@ -9771,17 +9772,22 @@ async def create_content(request: ContentUpdateRequest, admin_id: str = Depends(
             "current_value": request.current_value,
             "description": request.description,
             "is_active": True,
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
+            "created_at": now,
+            "updated_at": now,
             "created_by": admin_id,
             "updated_by": None
         }
         
         cms_content_collection.insert_one(content_data)
         
+        # Prepare response data with serialized datetime
+        response_content = content_data.copy()
+        response_content['created_at'] = response_content['created_at'].isoformat()
+        response_content['updated_at'] = response_content['updated_at'].isoformat()
+        
         return CustomJSONResponse(content={
             "message": "Content created successfully",
-            "content": content_data
+            "content": response_content
         })
     
     except Exception as e:
