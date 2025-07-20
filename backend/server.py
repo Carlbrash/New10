@@ -6105,7 +6105,7 @@ async def get_all_guilds(
                     "season_trophies": guild_stat.get("season_trophies", 0)
                 })
         
-        return {"guilds": guilds}
+        return {"guilds": serialize_doc(guilds)}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching guilds: {str(e)}")
