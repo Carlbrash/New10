@@ -11776,6 +11776,58 @@ function App() {
             )}
           </div>
           
+          {/* Guilds Menu - only show for logged in users */}
+          {user && (
+            <div className="nav-dropdown">
+              <button 
+                className={`nav-link ${currentView.startsWith('guild') ? 'active' : ''}`}
+                onClick={() => setShowGuildsDropdown(!showGuildsDropdown)}
+              >
+                🏰 {t.guilds} {showGuildsDropdown ? '▼' : '▶'}
+              </button>
+              {showGuildsDropdown && (
+                <div className="dropdown-menu">
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('guilds', 'Browse Guilds');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    🏰 {t.browseGuilds}
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('guild-rankings', 'Guild Rankings');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    🏆 {t.guildRankings}
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('my-guild', 'My Guild');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    ⭐ {t.myGuild}
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('guild-wars', 'Guild Wars');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    ⚔️ {t.guildWars}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* Friends Menu - only show for logged in users */}
           {user && (
             <div className="nav-dropdown">
