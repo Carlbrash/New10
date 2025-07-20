@@ -9698,6 +9698,350 @@ async def search_friends(q: str, current_user: dict = Depends(get_current_user))
 
 print("✅ Friend Import System endpoints loaded successfully")
 
+# =============================================================================
+# CONTENT MANAGEMENT SYSTEM ENDPOINTS
+# =============================================================================
+
+@app.get("/api/admin/cms/content")
+async def get_all_content(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all CMS content items (Admin only)"""
+    try:
+        content_items = list(cms_content_collection.find({}))
+        
+        # Get translations for each content item
+        for item in content_items:
+            translations = list(cms_translations_collection.find({"content_id": item["id"]}))
+            item["translations"] = translations
+        
+        return CustomJSONResponse(content={
+            "content": content_items,
+            "total": len(content_items)
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching content: {str(e)}")
+
+@app.get("/api/cms/content")
+async def get_public_content():
+    """Get all active CMS content for public use (no auth required)"""
+    try:
+        content_items = list(cms_content_collection.find({"is_active": True}))
+        
+        # Create a dictionary for easy frontend access
+        content_dict = {}
+        for item in content_items:
+            content_dict[item["key"]] = {
+                "value": item["current_value"],
+                "type": item["content_type"],
+                "context": item["context"]
+            }
+        
+        return CustomJSONResponse(content=content_dict)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching content: {str(e)}")
+
+@app.post("/api/admin/cms/content")
+async def create_content(request: ContentUpdateRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Create new CMS content item (Admin only)"""
+    try:
+        # Check if content with this key already exists
+        existing = cms_content_collection.find_one({"key": request.key})
+        if existing:
+            raise HTTPException(status_code=400, detail="Content with this key already exists")
+        
+        content_data = {
+            "id": str(uuid.uuid4()),
+            "key": request.key,
+            "content_type": request.content_type.value,
+            "context": request.context.value,
+            "default_value": request.current_value,
+            "current_value": request.current_value,
+            "description": request.description,
+            "is_active": True,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "created_by": admin_id,
+            "updated_by": None
+        }
+        
+        cms_content_collection.insert_one(content_data)
+        
+        return CustomJSONResponse(content={
+            "message": "Content created successfully",
+            "content": content_data
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating content: {str(e)}")
+
+@app.put("/api/admin/cms/content/{content_id}")
+async def update_content(content_id: str, request: ContentUpdateRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Update existing CMS content item (Admin only)"""
+    try:
+        existing = cms_content_collection.find_one({"id": content_id})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Content not found")
+        
+        update_data = {
+            "current_value": request.current_value,
+            "description": request.description,
+            "updated_at": datetime.utcnow(),
+            "updated_by": admin_id
+        }
+        
+        cms_content_collection.update_one(
+            {"id": content_id},
+            {"$set": update_data}
+        )
+        
+        return CustomJSONResponse(content={
+            "message": "Content updated successfully"
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating content: {str(e)}")
+
+@app.delete("/api/admin/cms/content/{content_id}")
+async def delete_content(content_id: str, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Delete CMS content item (Admin only)"""
+    try:
+        # Delete content item
+        result = cms_content_collection.delete_one({"id": content_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Content not found")
+        
+        # Also delete all translations for this content
+        cms_translations_collection.delete_many({"content_id": content_id})
+        
+        return CustomJSONResponse(content={
+            "message": "Content deleted successfully"
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting content: {str(e)}")
+
+@app.post("/api/admin/cms/content/bulk")
+async def bulk_update_content(request: ContentBulkUpdateRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Bulk update multiple content items (Admin only)"""
+    try:
+        updated_count = 0
+        
+        for update in request.updates:
+            # Check if content exists, create if not
+            existing = cms_content_collection.find_one({"key": update.key})
+            
+            if existing:
+                # Update existing
+                cms_content_collection.update_one(
+                    {"key": update.key},
+                    {"$set": {
+                        "current_value": update.current_value,
+                        "description": update.description,
+                        "updated_at": datetime.utcnow(),
+                        "updated_by": admin_id
+                    }}
+                )
+                updated_count += 1
+            else:
+                # Create new
+                content_data = {
+                    "id": str(uuid.uuid4()),
+                    "key": update.key,
+                    "content_type": update.content_type.value,
+                    "context": update.context.value,
+                    "default_value": update.current_value,
+                    "current_value": update.current_value,
+                    "description": update.description,
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow(),
+                    "created_by": admin_id,
+                    "updated_by": None
+                }
+                cms_content_collection.insert_one(content_data)
+                updated_count += 1
+        
+        return CustomJSONResponse(content={
+            "message": f"Successfully processed {updated_count} content items"
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error bulk updating content: {str(e)}")
+
+@app.get("/api/admin/cms/themes")
+async def get_all_themes(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all CMS themes (Admin only)"""
+    try:
+        themes = list(cms_themes_collection.find({}))
+        return CustomJSONResponse(content={
+            "themes": themes,
+            "total": len(themes)
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching themes: {str(e)}")
+
+@app.get("/api/cms/theme/active")
+async def get_active_theme():
+    """Get the currently active theme (no auth required)"""
+    try:
+        active_theme = cms_themes_collection.find_one({"is_active": True})
+        
+        # If no active theme, return default colors
+        if not active_theme:
+            active_theme = {
+                "id": "default",
+                "name": "Default Theme",
+                "colors": {
+                    "primary": "#4fc3f7",
+                    "secondary": "#29b6f6",
+                    "accent": "#ffd700",
+                    "success": "#22c55e",
+                    "warning": "#f59e0b",
+                    "error": "#ef4444",
+                    "background": "#1a1a1a",
+                    "surface": "#2a2a2a",
+                    "text": "#ffffff"
+                },
+                "fonts": {
+                    "primary": "Inter, sans-serif",
+                    "secondary": "Roboto, sans-serif"
+                }
+            }
+        
+        return CustomJSONResponse(content=active_theme)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching active theme: {str(e)}")
+
+@app.post("/api/admin/cms/themes")
+async def create_theme(request: ThemeUpdateRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Create new CMS theme (Admin only)"""
+    try:
+        theme_data = {
+            "id": str(uuid.uuid4()),
+            "name": request.name,
+            "colors": request.colors,
+            "fonts": request.fonts or {},
+            "is_active": False,  # New themes are not active by default
+            "is_default": False,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "created_by": admin_id,
+            "updated_by": None
+        }
+        
+        cms_themes_collection.insert_one(theme_data)
+        
+        return CustomJSONResponse(content={
+            "message": "Theme created successfully",
+            "theme": theme_data
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating theme: {str(e)}")
+
+@app.put("/api/admin/cms/themes/{theme_id}/activate")
+async def activate_theme(theme_id: str, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Activate a theme (deactivates all others) (Admin only)"""
+    try:
+        # Check if theme exists
+        theme = cms_themes_collection.find_one({"id": theme_id})
+        if not theme:
+            raise HTTPException(status_code=404, detail="Theme not found")
+        
+        # Deactivate all themes
+        cms_themes_collection.update_many(
+            {},
+            {"$set": {"is_active": False}}
+        )
+        
+        # Activate the selected theme
+        cms_themes_collection.update_one(
+            {"id": theme_id},
+            {"$set": {
+                "is_active": True,
+                "updated_at": datetime.utcnow(),
+                "updated_by": admin_id
+            }}
+        )
+        
+        return CustomJSONResponse(content={
+            "message": "Theme activated successfully"
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error activating theme: {str(e)}")
+
+@app.get("/api/admin/cms/content/contexts")
+async def get_content_contexts(admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Get all content organized by context (Admin only)"""
+    try:
+        content_items = list(cms_content_collection.find({}))
+        
+        # Group by context
+        contexts = {}
+        for item in content_items:
+            context = item["context"]
+            if context not in contexts:
+                contexts[context] = []
+            contexts[context].append(item)
+        
+        return CustomJSONResponse(content=contexts)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching content by context: {str(e)}")
+
+@app.post("/api/admin/cms/translations")
+async def create_translation(request: TranslationUpdateRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
+    """Create or update translation for content (Admin only)"""
+    try:
+        # Check if content exists
+        content = cms_content_collection.find_one({"id": request.content_id})
+        if not content:
+            raise HTTPException(status_code=404, detail="Content not found")
+        
+        # Check if translation already exists
+        existing_translation = cms_translations_collection.find_one({
+            "content_id": request.content_id,
+            "language": request.language
+        })
+        
+        if existing_translation:
+            # Update existing translation
+            cms_translations_collection.update_one(
+                {"id": existing_translation["id"]},
+                {"$set": {
+                    "translated_value": request.translated_value,
+                    "updated_at": datetime.utcnow(),
+                    "updated_by": admin_id
+                }}
+            )
+            message = "Translation updated successfully"
+        else:
+            # Create new translation
+            translation_data = {
+                "id": str(uuid.uuid4()),
+                "content_id": request.content_id,
+                "language": request.language,
+                "translated_value": request.translated_value,
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "created_by": admin_id,
+                "updated_by": None
+            }
+            cms_translations_collection.insert_one(translation_data)
+            message = "Translation created successfully"
+        
+        return CustomJSONResponse(content={"message": message})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating/updating translation: {str(e)}")
+
+print("✅ Content Management System endpoints loaded successfully")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
