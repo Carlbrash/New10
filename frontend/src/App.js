@@ -13566,6 +13566,14 @@ function App() {
                           </div>
                           <div className="player-info-section">
                             <div className="player-name">{player.name}</div>
+                            <div className="live-score-info">
+                              <span className={`current-score ${player.trend}`}>
+                                {player.currentScore}/{player.maxScore}
+                              </span>
+                              <span className={`trend-indicator ${player.trend}`}>
+                                {player.trend === 'up' ? '📈' : player.trend === 'down' ? '📉' : '➡️'}
+                              </span>
+                            </div>
                             <div className="player-stats">
                               <span className="stat-wins">🔴 {player.wins}</span>
                               <span className="stat-losses">🟢 {player.losses}</span>
