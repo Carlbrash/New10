@@ -5413,3 +5413,100 @@ img {
     height: 100px;
   }
 }
+
+/* Responsive Design for Standings */
+@media (max-width: 768px) {
+  .standings-table {
+    font-size: 0.8rem;
+  }
+  
+  .table-header,
+  .team-row {
+    grid-template-columns: 1fr 2fr repeat(8, 1fr);
+  }
+  
+  .team-name {
+    font-size: 0.8rem;
+  }
+  
+  /* League Management Mobile */
+  .admin-league-panel {
+    padding: 1.5rem 1rem;
+  }
+  
+  .countries-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .country-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .country-info {
+    justify-content: flex-start;
+  }
+  
+  .admin-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .admin-action-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .create-league-form {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 300px;
+    margin: 2rem auto;
+  }
+  
+  .create-league-form input {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-league-panel {
+    padding: 1rem 0.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .admin-panel-header h3 {
+    font-size: 1.4rem;
+  }
+  
+  .country-section {
+    padding: 1.5rem 1rem;
+  }
+  
+  .country-name {
+    font-size: 1.2rem;
+  }
+  
+  .league-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .league-name {
+    font-size: 0.9rem;
+  }
+  
+  .create-league-btn {
+    align-self: stretch;
+    text-align: center;
+  }
+  
+  .countries-search {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+}
