@@ -1078,16 +1078,16 @@ function App() {
   const [cmsLoading, setCmsLoading] = useState(false);
   const [selectedContentContext, setSelectedContentContext] = useState('navbar');
   const [editingContent, setEditingContent] = useState(null);
-  const [showContentModal, setShowContentModal] = useState(false);
-  const [showThemeModal, setShowThemeModal] = useState(false);
-  const [contentForm, setContentForm] = useState({
+  const [showCmsContentModal, setShowCmsContentModal] = useState(false);
+  const [showCmsThemeModal, setShowCmsThemeModal] = useState(false);
+  const [cmsContentForm, setCmsContentForm] = useState({
     key: '',
     content_type: 'text',
     context: 'general',
     current_value: '',
     description: ''
   });
-  const [themeForm, setThemeForm] = useState({
+  const [cmsThemeForm, setCmsThemeForm] = useState({
     name: '',
     colors: {
       primary: '#4fc3f7',
