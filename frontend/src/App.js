@@ -2306,22 +2306,32 @@ function App() {
       setShowRankingsDropdown(!showRankingsDropdown);
       setShowTournamentsDropdown(false);
       setShowTeamsDropdown(false);
+      setShowGuildsDropdown(false);
       setShowStandingsDropdown(false);
     } else if (dropdownType === 'tournaments') {
       setShowTournamentsDropdown(!showTournamentsDropdown);
       setShowRankingsDropdown(false);
       setShowTeamsDropdown(false);
+      setShowGuildsDropdown(false);
       setShowStandingsDropdown(false);
     } else if (dropdownType === 'teams') {
       setShowTeamsDropdown(!showTeamsDropdown);
       setShowRankingsDropdown(false);
       setShowTournamentsDropdown(false);
+      setShowGuildsDropdown(false);
+      setShowStandingsDropdown(false);
+    } else if (dropdownType === 'guilds') {
+      setShowGuildsDropdown(!showGuildsDropdown);
+      setShowRankingsDropdown(false);
+      setShowTournamentsDropdown(false);
+      setShowTeamsDropdown(false);
       setShowStandingsDropdown(false);
     } else if (dropdownType === 'standings') {
       setShowStandingsDropdown(!showStandingsDropdown);
       setShowRankingsDropdown(false);
       setShowTournamentsDropdown(false);
       setShowTeamsDropdown(false);
+      setShowGuildsDropdown(false);
     }
   };
 
