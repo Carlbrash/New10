@@ -764,59 +764,21 @@ agent_communication:
   - agent: "testing"
     message: "I've completed additional testing of the Tournament Bracket System. The bracket generation endpoint correctly validates that at least 2 participants are required to generate a bracket. The endpoint returns a 400 error with appropriate message when attempting to generate a bracket for a tournament with fewer than 2 participants. This is the expected behavior to ensure fair tournament brackets."
 
-user_problem_statement: "Test the new Guild Wars & Clan System backend endpoints that were just implemented.
+user_problem_statement: "Continue fixing and refining the styling and layout of the Wallet dashboard and Affiliate system to ensure proper display of financial data and overall professional appearance.
 
-Please test the following Guild System endpoints:
+Test the Wallet and Affiliate pages to confirm that the newly applied CSS styles have fixed the layout and styling issues.
 
-1. **POST /api/guilds** - Create guild (requires authentication)
-   - Login as testuser (testuser/test123)  
-   - Create a guild with payload:
-   ```json
-   {
-     "name": "Elite Warriors",
-     "description": "Top tier competitive gaming guild",
-     "tag": "EW",
-     "colors": {
-       "primary": "#FF0000", 
-       "secondary": "#FFFFFF"
-     },
-     "recruitment_open": true,
-     "min_level": 5,
-     "country": "Greece"
-   }
-   ```
+The user reported:
+- Wallet Dashboard showed financial data in basic text format without proper styling.
+- Elements like 'Balance,' 'Earnings,' and 'Commissions' lacked proper cards and layout.
+- The top navigation bar appeared 'full' with 'too many items,' implying layout or spacing issues.
 
-2. **GET /api/guilds** - List all guilds (no authentication required)
-   - Should return list of guilds with filtering options
+Recent fixes applied:
+1. Added comprehensive CSS styles for wallet-dashboard, wallet-nav, tab-btn classes
+2. Enhanced balance cards, navigation tabs, and responsive design
+3. Fixed login functionality by adding user profile fetching after successful authentication
 
-3. **GET /api/guilds/{guild_id}** - Get guild details 
-   - Should return detailed guild information including members
-
-4. **POST /api/guilds/{guild_id}/invite** - Invite player to guild
-   - As guild leader, try to invite "admin" user to the guild
-
-5. **GET /api/guilds/my-invitations** - Get user's invitations
-   - Login as admin (admin/Kiki1999@)
-   - Should show invitation from testuser's guild
-
-6. **POST /api/guilds/invitations/{invitation_id}/accept** - Accept invitation
-   - Accept the guild invitation
-
-7. **GET /api/guilds/rankings** - Get guild rankings/leaderboard
-   - Should return ranked guilds by power rating
-
-8. **POST /api/guilds/{guild_id}/challenge** - Challenge another guild to war
-   - Create a second guild and challenge it to war
-
-Focus on testing the API structure, authentication requirements, and guild management flow. The guild system should integrate properly with the existing user and team systems.
-
-Test user credentials:
-- Username: testuser 
-- Password: test123
-
-Admin credentials:
-- Username: admin
-- Password: Kiki1999@"
+Current issue: Frontend login is not working despite backend login API functioning correctly. Need to troubleshoot and fix login flow, then test Wallet and Affiliate styling."
 
 backend:
   - task: "Guild System - POST /api/guilds (Create Guild)"
