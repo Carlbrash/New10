@@ -12937,6 +12937,12 @@ function App() {
         {currentView === 'tournament' && renderTournament()}
         {currentView === 'teams' && renderTeams()}
         {currentView.startsWith('team-') && renderTeamDetails()}
+        {currentView === 'guilds' && renderGuilds()}
+        {currentView === 'guild-rankings' && renderGuildRankings()}
+        {currentView === 'create-guild' && renderCreateGuild()}
+        {currentView === 'my-guild' && renderMyGuild()}
+        {currentView.startsWith('guild-') && renderGuildDetails()}
+        {currentView === 'guild-wars' && renderGuildWars()}
         {currentView === 'standings' && renderStandings()}
         {currentView === 'fixtures' && renderFixtures()}
         {currentView === 'affiliate' && user && renderAffiliate()}
