@@ -147,6 +147,11 @@ body {
   gap: 0.2rem;
 }
 
+/* Compact dropdowns for logged in users */
+.navbar.logged-in .nav-dropdown .nav-link {
+  padding: 0.2rem 0.35rem;
+}
+
 /* Mobile Navigation */
 @media (max-width: 1400px) {
   .navbar-menu {
