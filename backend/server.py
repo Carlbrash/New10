@@ -140,6 +140,11 @@ share_stats_collection = db.share_stats
 viral_metrics_collection = db.viral_metrics
 share_clicks_collection = db.share_clicks
 
+# Content Management System Collections
+cms_content_collection = db.cms_content
+cms_translations_collection = db.cms_translations
+cms_themes_collection = db.cms_themes
+
 app = FastAPI(title="WoBeRa - World Betting Rank API", default_response_class=CustomJSONResponse)
 
 # CORS configuration
