@@ -4565,6 +4565,10 @@ function App() {
       fetchGuilds();
     } else if (currentView === 'guild-rankings') {
       fetchGuildRankings();
+    } else if (currentView.startsWith('guild-') && currentView !== 'guilds' && currentView !== 'guild-rankings' && currentView !== 'guild-wars' && currentView !== 'create-guild' && currentView !== 'my-guild') {
+      // This is a guild details page (e.g., 'guild-123')
+      const guildId = currentView.replace('guild-', '');
+      fetchGuildDetails(guildId);
     }
   }, [currentView]);
 
