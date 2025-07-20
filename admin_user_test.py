@@ -7,7 +7,7 @@ class AdminUserTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(AdminUserTest, self).__init__(*args, **kwargs)
         # Use the public endpoint from frontend/.env
-        self.base_url = "https://b8f460b2-9f72-45d6-94e8-1deef7e57785.preview.emergentagent.com"
+        self.base_url = "https://b578ab0c-9b8e-443c-9964-de8dced10016.preview.emergentagent.com"
         self.god_token = None
         self.admin_token = None
         

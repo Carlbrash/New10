@@ -4,7 +4,7 @@ from datetime import datetime
 
 def run_team_system_tests():
     # Use the public endpoint from frontend/.env
-    base_url = "https://b8f460b2-9f72-45d6-94e8-1deef7e57785.preview.emergentagent.com"
+    base_url = "https://b578ab0c-9b8e-443c-9964-de8dced10016.preview.emergentagent.com"
     testuser_token = None
     admin_token = None
     team_id = None
