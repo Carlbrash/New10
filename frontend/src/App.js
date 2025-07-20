@@ -14675,7 +14675,7 @@ function App() {
                     </div>
                   )}
                   
-                  {currentView === 'friend-requests' && (
+                  {friendsModalTab === 'friend-requests' && (
                     <div className="friend-requests">
                       {friendRequests.length === 0 ? (
                         <div className="no-requests">
