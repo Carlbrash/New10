@@ -12407,6 +12407,244 @@ function App() {
   };
 
   // =============================================================================
+  // SPORTSDUEL SYSTEM RENDER FUNCTION
+  // =============================================================================
+  
+  const renderSportsDuel = () => {
+    return (
+      <div className="container sportsduel-container">
+        <div className="sportsduel-header">
+          <h1>⚽ SportsDuel Championship</h1>
+          <p>Real-time sports betting leagues with cafe teams and player matchups</p>
+        </div>
+
+        {/* League Selection */}
+        {sportsduelLeagues.length > 0 && (
+          <div className="league-selector">
+            <h3>🏆 Select League</h3>
+            <div className="league-cards">
+              {sportsduelLeagues.map((league) => (
+                <div 
+                  key={league.id}
+                  className={`league-card ${currentSportsduelLeague?.id === league.id ? 'active' : ''}`}
+                  onClick={() => setCurrentSportsduelLeague(league)}
+                >
+                  <h4>{league.name}</h4>
+                  <p>{league.description}</p>
+                  <div className="league-stats">
+                    <span>🏆 Season: {league.season}</span>
+                    <span>💰 Prize Pool: €{league.prize_pool}</span>
+                    <span>📊 Status: {league.status}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Live Scoreboard */}
+        {currentSportsduelLeague && (
+          <div className="sportsduel-scoreboard">
+            <h3>📊 Live Scoreboard - {currentSportsduelLeague.name}</h3>
+            
+            {sportsduelLoading ? (
+              <div className="loading">Loading scoreboard...</div>
+            ) : sportsduelScoreboard.length > 0 ? (
+              <div className="scoreboard-matches">
+                {sportsduelScoreboard.map((match) => (
+                  <div key={match.match_id} className="scoreboard-match">
+                    <div className="match-teams">
+                      {/* Team 1 */}
+                      <div className="team-section">
+                        <div className="team-info">
+                          {match.team1.logo_url && (
+                            <img src={match.team1.logo_url} alt={match.team1.name} className="team-logo" />
+                          )}
+                          <h4>{match.team1.name}</h4>
+                        </div>
+                        <div className="player-card">
+                          {match.team1.player.avatar_url && (
+                            <img src={match.team1.player.avatar_url} alt={match.team1.player.nickname} className="player-avatar" />
+                          )}
+                          <div className="player-info">
+                            <h5>{match.team1.player.nickname}</h5>
+                            <div className="player-stats">
+                              <span className="correct">✅ {match.team1.player.correct_predictions}</span>
+                              <span className="wrong">❌ {match.team1.player.wrong_predictions}</span>
+                              <span className="odds">📈 {match.team1.player.total_odds.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* VS Separator */}
+                      <div className="vs-section">
+                        <div className="vs-label">VS</div>
+                        <div className={`match-status ${match.status}`}>
+                          {match.status}
+                        </div>
+                        {match.winner_player_id && (
+                          <div className="winner-indicator">
+                            👑 Winner: {
+                              match.winner_player_id === match.team1.player.id 
+                                ? match.team1.player.nickname 
+                                : match.team2.player.nickname
+                            }
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Team 2 */}
+                      <div className="team-section">
+                        <div className="team-info">
+                          {match.team2.logo_url && (
+                            <img src={match.team2.logo_url} alt={match.team2.name} className="team-logo" />
+                          )}
+                          <h4>{match.team2.name}</h4>
+                        </div>
+                        <div className="player-card">
+                          {match.team2.player.avatar_url && (
+                            <img src={match.team2.player.avatar_url} alt={match.team2.player.nickname} className="player-avatar" />
+                          )}
+                          <div className="player-info">
+                            <h5>{match.team2.player.nickname}</h5>
+                            <div className="player-stats">
+                              <span className="correct">✅ {match.team2.player.correct_predictions}</span>
+                              <span className="wrong">❌ {match.team2.player.wrong_predictions}</span>
+                              <span className="odds">📈 {match.team2.player.total_odds.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-matches">
+                <h4>No active matches</h4>
+                <p>Check back later for live matches!</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Teams Overview */}
+        <div className="sportsduel-teams">
+          <h3>🏪 Sports Cafes</h3>
+          {sportsduelTeams.length > 0 ? (
+            <div className="teams-grid">
+              {sportsduelTeams.map((team) => (
+                <div key={team.id} className="team-card">
+                  {team.logo_url && (
+                    <img src={team.logo_url} alt={team.name} className="team-logo-large" />
+                  )}
+                  <h4>{team.name}</h4>
+                  <p className="cafe-name">{team.cafe_name}</p>
+                  <div className="team-location">
+                    📍 {team.city}, {team.country}
+                  </div>
+                  <div className="team-stats">
+                    <span className="wins">🏆 Wins: {team.wins}</span>
+                    <span className="losses">❌ Losses: {team.losses}</span>
+                    <span className="draws">🤝 Draws: {team.draws}</span>
+                    <span className="points">⭐ Points: {team.points}</span>
+                  </div>
+                  <div className="team-contact">
+                    <span>📞 {team.contact_phone}</span>
+                    <span>📧 {team.contact_email}</span>
+                  </div>
+                  {user && !myPlayerProfile && (
+                    <button 
+                      className="btn btn-primary btn-sm"
+                      onClick={() => {
+                        const nickname = prompt('Enter your player nickname:');
+                        if (nickname) {
+                          joinSportsduelTeam(team.id, { team_id: team.id, nickname });
+                        }
+                      }}
+                    >
+                      🎮 Join as Player
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="no-teams">
+              <h4>No sports cafes registered yet</h4>
+              <p>Be the first to register your sports cafe!</p>
+              {user && (
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    const teamName = prompt('Enter your team name:');
+                    const cafeName = prompt('Enter your cafe name:');
+                    const city = prompt('Enter your city:');
+                    const country = prompt('Enter your country:');
+                    const phone = prompt('Enter contact phone:');
+                    const email = prompt('Enter contact email:');
+                    
+                    if (teamName && cafeName && city && country && phone && email) {
+                      createSportsduelTeam({
+                        name: teamName,
+                        cafe_name: cafeName,
+                        location: `${city}, ${country}`,
+                        country,
+                        city,
+                        contact_phone: phone,
+                        contact_email: email
+                      });
+                    }
+                  }}
+                >
+                  🏪 Register Sports Cafe
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* User Authentication Prompt */}
+        {!user && (
+          <div className="auth-prompt">
+            <h3>🔒 Join SportsDuel</h3>
+            <p>Login to participate in SportsDuel matches and manage your sports cafe!</p>
+            <button 
+              className="btn btn-primary"
+              onClick={() => setCurrentView('home')}
+            >
+              Login / Register
+            </button>
+          </div>
+        )}
+
+        {/* My Player Profile */}
+        {user && myPlayerProfile && (
+          <div className="my-player-profile">
+            <h3>👤 My Player Profile</h3>
+            <div className="player-profile-card">
+              {myPlayerProfile.avatar_url && (
+                <img src={myPlayerProfile.avatar_url} alt={myPlayerProfile.nickname} className="profile-avatar" />
+              )}
+              <div className="profile-info">
+                <h4>{myPlayerProfile.nickname}</h4>
+                <p>⭐ Skill Rating: {myPlayerProfile.skill_rating}</p>
+                <div className="profile-stats">
+                  <span>🏆 Wins: {myPlayerProfile.wins}</span>
+                  <span>❌ Losses: {myPlayerProfile.losses}</span>
+                  <span>🤝 Draws: {myPlayerProfile.draws}</span>
+                  <span>📊 Accuracy: {myPlayerProfile.average_accuracy}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // =============================================================================
   // LIVE CHAT SYSTEM FUNCTIONS
   // =============================================================================
 
