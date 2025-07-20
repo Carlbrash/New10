@@ -7965,19 +7965,112 @@ img {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Players Section */
+/* Players Section Enhanced */
 .players-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   padding: 2rem;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
 }
 
-.team-players {
+.live-players-section,
+.upcoming-players-section {
+  margin-bottom: 1.5rem;
+}
+
+.players-section-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border-left: 4px solid;
+}
+
+.live-players-section .players-section-header {
+  border-left-color: #ef4444;
+}
+
+.upcoming-players-section .players-section-header {
+  border-left-color: #f59e0b;
+}
+
+.live-indicator-small {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid #ef4444;
+}
+
+.upcoming-indicator-small {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid #f59e0b;
+}
+
+.section-title {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.team-players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.upcoming-player {
+  opacity: 0.7;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.upcoming-player:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Next Round Separator */
+.next-round-separator {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.8));
+  color: #000;
+  text-align: center;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  border: 2px solid rgba(245, 158, 11, 0.5);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.next-round-time {
+  font-weight: 700;
+  font-size: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Team Logo Circle Adjustments */
+.team-logo-circle {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Player Row */
