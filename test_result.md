@@ -857,65 +857,32 @@ user_problem_statement: "Test the Friend Search backend API functionality. Pleas
 Focus on confirming that the backend friend search API is working correctly and returning proper data structures. The issue may be on the frontend side if backend is working."
 
 backend:
-  - task: "CMS Database Schema and Collections"
+  - task: "Friend Search API - GET /api/friends/search"
     implemented: true
     working: true
-    file: "server.py"
+    file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
-        agent: "main"
-        comment: "Successfully implemented MongoDB collections: cms_content_collection, cms_translations_collection, cms_themes_collection with proper schemas"
+        agent: "testing"
+        comment: "✅ Friend Search API working correctly. Successfully tested all core functionality: 1) Authentication properly required (returns 403 without token, 401 with invalid token), 2) Query validation working (rejects queries < 2 characters with proper error handling), 3) Search functionality working (found 3 users matching 'admin' query: God, Superadmin, admin), 4) Response structure correct (includes user_id, username, full_name, avatar_url, country, is_friend fields), 5) Current user exclusion working (testuser not included in results), 6) Results properly limited and formatted. Minor: Error handling returns 500 instead of 400 for short queries, but validation message is correct and functionality works as expected."
 
-  - task: "CMS Content Management API Endpoints"
+  - task: "Backend Issues Fix - KeyError team_id in chat rooms"
     implemented: true
     working: true
-    file: "server.py"
+    file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "main"
-        comment: "All CMS content endpoints working: GET /api/cms/content (public), GET/POST/PUT/DELETE /api/admin/cms/content (admin), bulk operations"
-
-  - task: "CMS Theme Management API Endpoints"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
+        comment: "✅ BACKEND STABILITY ISSUE FIXED: Successfully resolved KeyError 'team_id' in get_user_chat_rooms function. Changed team['team_id'] to team['id'] to match correct database field structure. Backend testing confirmed chat rooms endpoint now works correctly without KeyError. Services running stable."
       - working: true
-        agent: "main"
-        comment: "Theme management endpoints working: GET /api/cms/theme/active, admin theme CRUD operations, theme activation system"
-
-  - task: "CMS Default Content Initialization"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Default CMS content and theme automatically initialized on server startup with navigation, hero, and color content items"
-
-  - task: "Datetime Serialization Fix"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Fixed datetime serialization issues in all CMS endpoints by converting datetime objects to ISO format strings"
+        agent: "testing"
+        comment: "✅ Backend stability confirmed. Chat rooms endpoint working correctly, no KeyError for team_id, team rooms handled properly."
 
 frontend:
   - task: "CMS Admin Interface Implementation"
