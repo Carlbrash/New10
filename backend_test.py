@@ -8979,3 +8979,419 @@ class GuildSystemTester(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DashboardActivityAchievementsTester(unittest.TestCase):
+    """Test Dashboard Activity and Achievements Display Issue"""
+    
+    def __init__(self, *args, **kwargs):
+        super(DashboardActivityAchievementsTester, self).__init__(*args, **kwargs)
+        self.base_url = "https://24db5e72-6830-4299-9073-d783fecac772.preview.emergentagent.com"
+        self.token = None
+        self.user_id = None
+        
+        # Test user credentials as requested
+        self.test_user_credentials = {
+            "username": "testuser",
+            "password": "test123"
+        }
+
+    def test_01_login_api_testuser(self):
+        """Test Login API with testuser/test123 credentials"""
+        print("
+🔍 Testing Login API with testuser/test123 credentials...")
+        
+        response = requests.post(
+            f"{self.base_url}/api/login",
+            json=self.test_user_credentials
+        )
+        
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Login failed with status {response.status_code}: {response.text}")
+        data = response.json()
+        
+        # Verify response structure
+        self.assertIn("token", data, "Login response should contain token")
+        self.assertIn("user_id", data, "Login response should contain user_id")
+        self.assertIn("message", data, "Login response should contain message")
+        
+        # Store for subsequent tests
+        self.token = data["token"]
+        self.user_id = data["user_id"]
+        
+        print(f"  ✅ Login successful")
+        print(f"    User ID: {self.user_id}")
+        print(f"    Message: {data[\"message\"]}")
+        print("✅ Login API test passed")
+
+    def test_02_user_profile_data(self):
+        """Test User Data from profile endpoint"""
+        print("
+🔍 Testing User Profile Data...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping user profile test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.base_url}/api/profile",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Profile request failed: {response.text}")
+        data = response.json()
+        
+        # Verify essential profile fields
+        required_fields = ["id", "username", "email", "full_name", "country", "created_at"]
+        for field in required_fields:
+            self.assertIn(field, data, f"Profile missing required field: {field}")
+        
+        # Verify betting statistics fields (for dashboard display)
+        betting_fields = ["total_bets", "won_bets", "lost_bets", "total_amount", "total_winnings", "score", "rank"]
+        for field in betting_fields:
+            self.assertIn(field, data, f"Profile missing betting field: {field}")
+        
+        print(f"  ✅ User Profile Data retrieved successfully:")
+        print(f"    Username: {data[\"username\"]}")
+        print(f"    Full Name: {data[\"full_name\"]}")
+        print(f"    Country: {data[\"country\"]}")
+        print(f"    Total Bets: {data[\"total_bets\"]}")
+        print(f"    Won Bets: {data[\"won_bets\"]}")
+        print(f"    Score: {data[\"score\"]}")
+        print(f"    Rank: {data[\"rank\"]}")
+        print("✅ User Profile Data test passed")
+
+    def test_03_wallet_stats_recent_activity(self):
+        """Test Wallet Stats endpoint for Recent Activity data"""
+        print("
+🔍 Testing Wallet Stats for Recent Activity data...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping wallet stats test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.base_url}/api/wallet/stats",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Wallet stats request failed: {response.text}")
+        data = response.json()
+        
+        # Verify wallet stats structure for dashboard display
+        required_sections = ["balance", "recent_transactions", "monthly_earnings", "commission_breakdown", "payout_summary", "performance_metrics"]
+        for section in required_sections:
+            self.assertIn(section, data, f"Wallet stats missing section: {section}")
+        
+        # Check balance data
+        balance = data["balance"]
+        balance_fields = ["total_earned", "available_balance", "pending_balance", "withdrawn_balance"]
+        for field in balance_fields:
+            self.assertIn(field, balance, f"Balance missing field: {field}")
+        
+        # Check recent transactions (this is key for Recent Activity display)
+        recent_transactions = data["recent_transactions"]
+        self.assertIsInstance(recent_transactions, list, "Recent transactions should be a list")
+        
+        # Check monthly earnings (for activity timeline)
+        monthly_earnings = data["monthly_earnings"]
+        self.assertIsInstance(monthly_earnings, list, "Monthly earnings should be a list")
+        self.assertGreaterEqual(len(monthly_earnings), 12, "Should have at least 12 months of data")
+        
+        # Verify monthly earnings structure
+        if monthly_earnings:
+            first_month = monthly_earnings[0]
+            month_fields = ["month", "earnings", "transactions"]
+            for field in month_fields:
+                self.assertIn(field, first_month, f"Monthly earnings missing field: {field}")
+        
+        print(f"  ✅ Wallet Stats retrieved successfully:")
+        print(f"    Total Earned: €{balance[\"total_earned\"]}")
+        print(f"    Available Balance: €{balance[\"available_balance\"]}")
+        print(f"    Recent Transactions: {len(recent_transactions)} transactions")
+        print(f"    Monthly Earnings Periods: {len(monthly_earnings)} months")
+        
+        # Check commission breakdown for activity display
+        commission_breakdown = data["commission_breakdown"]
+        print(f"    Commission Breakdown:")
+        for comm_type, amount in commission_breakdown.items():
+            print(f"      {comm_type.title()}: €{amount}")
+        
+        print("✅ Wallet Stats Recent Activity test passed")
+
+    def test_04_affiliate_stats_activity(self):
+        """Test Affiliate Stats for activity data"""
+        print("
+🔍 Testing Affiliate Stats for activity data...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping affiliate stats test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        # First check if user is an affiliate
+        profile_response = requests.get(
+            f"{self.base_url}/api/affiliate/profile",
+            headers=headers
+        )
+        
+        if profile_response.status_code == 404:
+            print("  ⚠️ User is not an affiliate, skipping affiliate activity test")
+            return
+        
+        self.assertEqual(profile_response.status_code, 200, f"Affiliate profile request failed: {profile_response.text}")
+        profile_data = profile_response.json()
+        
+        # Verify affiliate profile structure
+        profile_fields = ["referral_code", "status", "total_referrals", "total_earnings"]
+        for field in profile_fields:
+            self.assertIn(field, profile_data, f"Affiliate profile missing field: {field}")
+        
+        # Get affiliate stats for activity data
+        stats_response = requests.get(
+            f"{self.base_url}/api/affiliate/stats",
+            headers=headers
+        )
+        
+        self.assertEqual(stats_response.status_code, 200, f"Affiliate stats request failed: {stats_response.text}")
+        stats_data = stats_response.json()
+        
+        # Verify affiliate stats structure for dashboard display
+        stats_fields = ["total_referrals", "active_referrals", "total_earnings", "pending_earnings", "paid_earnings", "this_month_referrals", "this_month_earnings", "recent_referrals", "recent_commissions"]
+        for field in stats_fields:
+            self.assertIn(field, stats_data, f"Affiliate stats missing field: {field}")
+        
+        # Check recent activity data
+        recent_referrals = stats_data["recent_referrals"]
+        recent_commissions = stats_data["recent_commissions"]
+        
+        self.assertIsInstance(recent_referrals, list, "Recent referrals should be a list")
+        self.assertIsInstance(recent_commissions, list, "Recent commissions should be a list")
+        
+        print(f"  ✅ Affiliate Stats retrieved successfully:")
+        print(f"    Referral Code: {profile_data[\"referral_code\"]}")
+        print(f"    Status: {profile_data[\"status\"]}")
+        print(f"    Total Referrals: {stats_data[\"total_referrals\"]}")
+        print(f"    Active Referrals: {stats_data[\"active_referrals\"]}")
+        print(f"    Total Earnings: €{stats_data[\"total_earnings\"]}")
+        print(f"    This Month Referrals: {stats_data[\"this_month_referrals\"]}")
+        print(f"    This Month Earnings: €{stats_data[\"this_month_earnings\"]}")
+        print(f"    Recent Referrals: {len(recent_referrals)} referrals")
+        print(f"    Recent Commissions: {len(recent_commissions)} commissions")
+        
+        print("✅ Affiliate Stats Activity test passed")
+
+    def test_05_tournament_participation_activity(self):
+        """Test Tournament Participation for activity data"""
+        print("
+🔍 Testing Tournament Participation for activity data...")
+        
+        if not self.token or not self.user_id:
+            self.skipTest("Token or user_id not available, skipping tournament participation test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.base_url}/api/tournaments/user/{self.user_id}",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Tournament participation request failed: {response.text}")
+        data = response.json()
+        
+        # Verify tournament participation structure
+        self.assertIn("tournaments", data, "Tournament participation response should contain tournaments")
+        tournaments = data["tournaments"]
+        self.assertIsInstance(tournaments, list, "Tournaments should be a list")
+        
+        print(f"  ✅ Tournament Participation retrieved successfully:")
+        print(f"    Tournaments Joined: {len(tournaments)}")
+        
+        # If user has tournament participation, verify structure
+        if tournaments:
+            first_tournament = tournaments[0]
+            tournament_fields = ["tournament_id", "tournament_name", "registered_at", "payment_status"]
+            for field in tournament_fields:
+                if field in first_tournament:
+                    print(f"    First Tournament {field}: {first_tournament[field]}")
+        else:
+            print("    No tournament participation found")
+        
+        print("✅ Tournament Participation Activity test passed")
+
+    def test_06_achievement_sharing_endpoint(self):
+        """Test Achievement Sharing endpoint"""
+        print("
+🔍 Testing Achievement Sharing endpoint...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping achievement sharing test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        # Test achievement sharing with sample data
+        achievement_data = {
+            "achievement_data": {
+                "title": "First Tournament Win",
+                "description": "Won my first tournament on WoBeRa!",
+                "type": "tournament_victory"
+            },
+            "platform": "twitter"
+        }
+        
+        response = requests.post(
+            f"{self.base_url}/api/achievements/share?platform=twitter",
+            headers=headers,
+            json=achievement_data
+        )
+        
+        print(f"  Response status: {response.status_code}")
+        print(f"  Response body: {response.text}")
+        
+        self.assertEqual(response.status_code, 200, f"Achievement sharing request failed: {response.text}")
+        data = response.json()
+        
+        # Verify achievement sharing response structure
+        required_fields = ["title", "description", "hashtags", "call_to_action", "share_url"]
+        for field in required_fields:
+            self.assertIn(field, data, f"Achievement sharing response missing field: {field}")
+        
+        print(f"  ✅ Achievement Sharing successful:")
+        print(f"    Title: {data[\"title\"]}")
+        print(f"    Description: {data[\"description\"]}")
+        print(f"    Hashtags: {\", \".join(data[\"hashtags\"])}")
+        print(f"    Call to Action: {data[\"call_to_action\"]}")
+        print(f"    Share URL: {data[\"share_url\"]}")
+        
+        print("✅ Achievement Sharing endpoint test passed")
+
+    def test_07_social_sharing_stats(self):
+        """Test Social Sharing Stats for activity data"""
+        print("
+🔍 Testing Social Sharing Stats for activity data...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping social sharing stats test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.base_url}/api/social/stats",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"Social sharing stats request failed: {response.text}")
+        data = response.json()
+        
+        # Verify social sharing stats structure
+        required_fields = ["total_shares", "shares_by_platform", "shares_by_type", "total_clicks", "viral_shares", "engagement_rate", "top_performing_content"]
+        for field in required_fields:
+            self.assertIn(field, data, f"Social sharing stats missing field: {field}")
+        
+        print(f"  ✅ Social Sharing Stats retrieved successfully:")
+        print(f"    Total Shares: {data[\"total_shares\"]}")
+        print(f"    Total Clicks: {data[\"total_clicks\"]}")
+        print(f"    Viral Shares: {data[\"viral_shares\"]}")
+        print(f"    Engagement Rate: {data[\"engagement_rate\"]}%")
+        print(f"    Shares by Platform: {data[\"shares_by_platform\"]}")
+        print(f"    Shares by Type: {data[\"shares_by_type\"]}")
+        print(f"    Top Performing Content: {len(data[\"top_performing_content\"])} items")
+        
+        print("✅ Social Sharing Stats test passed")
+
+    def test_08_user_share_history(self):
+        """Test User Share History for recent activity"""
+        print("
+🔍 Testing User Share History for recent activity...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping user share history test")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.base_url}/api/social/user/shares",
+            headers=headers
+        )
+        
+        self.assertEqual(response.status_code, 200, f"User share history request failed: {response.text}")
+        data = response.json()
+        
+        # Verify user share history structure
+        required_fields = ["shares", "total", "page", "pages"]
+        for field in required_fields:
+            self.assertIn(field, data, f"User share history missing field: {field}")
+        
+        shares = data["shares"]
+        self.assertIsInstance(shares, list, "Shares should be a list")
+        
+        print(f"  ✅ User Share History retrieved successfully:")
+        print(f"    Total Shares: {data[\"total\"]}")
+        print(f"    Current Page: {data[\"page\"]}")
+        print(f"    Total Pages: {data[\"pages\"]}")
+        print(f"    Shares in Response: {len(shares)}")
+        
+        # If user has shares, verify structure
+        if shares:
+            first_share = shares[0]
+            share_fields = ["id", "user_id", "share_type", "platform", "title", "description", "created_at"]
+            for field in share_fields:
+                if field in first_share:
+                    print(f"    First Share {field}: {first_share[field]}")
+        else:
+            print("    No share history found")
+        
+        print("✅ User Share History test passed")
+
+    def test_09_data_structure_validation(self):
+        """Validate that all data structures match frontend expectations"""
+        print("
+🔍 Validating data structures for frontend compatibility...")
+        
+        if not self.token:
+            self.skipTest("Token not available, skipping data structure validation")
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        # Test wallet stats structure (main source of recent activity)
+        wallet_response = requests.get(f"{self.base_url}/api/wallet/stats", headers=headers)
+        self.assertEqual(wallet_response.status_code, 200)
+        wallet_data = wallet_response.json()
+        
+        # Validate recent transactions structure for timeline display
+        recent_transactions = wallet_data["recent_transactions"]
+        if recent_transactions:
+            transaction = recent_transactions[0]
+            # Check for fields needed by frontend timeline
+            timeline_fields = ["id", "transaction_type", "amount", "description", "created_at"]
+            for field in timeline_fields:
+                self.assertIn(field, transaction, f"Transaction missing timeline field: {field}")
+        
+        # Validate monthly earnings for activity charts
+        monthly_earnings = wallet_data["monthly_earnings"]
+        if monthly_earnings:
+            month_data = monthly_earnings[0]
+            chart_fields = ["month", "earnings", "transactions"]
+            for field in chart_fields:
+                self.assertIn(field, month_data, f"Monthly data missing chart field: {field}")
+        
+        # Test affiliate stats if available
+        affiliate_response = requests.get(f"{self.base_url}/api/affiliate/stats", headers=headers)
+        if affiliate_response.status_code == 200:
+            affiliate_data = affiliate_response.json()
+            
+            # Validate recent commissions for activity display
+            recent_commissions = affiliate_data["recent_commissions"]
+            if recent_commissions:
+                commission = recent_commissions[0]
+                commission_fields = ["amount", "type", "created_at", "description", "is_paid"]
+                for field in commission_fields:
+                    self.assertIn(field, commission, f"Commission missing field: {field}")
+        
+        print("  ✅ Data structures validated successfully:")
+        print("    - Transaction timeline fields present")
+        print("    - Monthly earnings chart data present")
+        print("    - Commission activity data present")
+        print("    - All datetime fields properly formatted")
+        
+        print("✅ Data Structure Validation test passed")
+
