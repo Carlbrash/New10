@@ -1417,6 +1417,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "GET /api/wallet/stats endpoint is working correctly. Returns comprehensive wallet statistics including balance, recent transactions, monthly earnings, commission breakdown, payout summary, and performance metrics. The endpoint properly requires user authentication."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED: GET /api/wallet/stats endpoint confirmed working correctly. Returns comprehensive statistics with all required fields: balance (dict), recent_transactions (0 items), monthly_earnings (12 periods), commission_breakdown (4 types: registration, tournament, deposit, bonus), payout_summary (dict), performance_metrics (5 metrics). Authentication properly required. Endpoint test passed."
 
   - task: "Wallet System - GET /api/wallet/transactions"
     implemented: true
