@@ -8,7 +8,7 @@ class InsufficientBalanceModalTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(InsufficientBalanceModalTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://98b7db04-7f99-4bd4-b77c-3a57bf87e41f.preview.emergentagent.com"
+        self.base_url = "https://24db5e72-6830-4299-9073-d783fecac772.preview.emergentagent.com"
         self.token = None
         self.user_id = None
         
