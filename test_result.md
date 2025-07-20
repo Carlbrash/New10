@@ -764,7 +764,182 @@ agent_communication:
   - agent: "testing"
     message: "I've completed additional testing of the Tournament Bracket System. The bracket generation endpoint correctly validates that at least 2 participants are required to generate a bracket. The endpoint returns a 400 error with appropriate message when attempting to generate a bracket for a tournament with fewer than 2 participants. This is the expected behavior to ensure fair tournament brackets."
 
-user_problem_statement: "Test the new Social Sharing System backend endpoints that were just implemented.
+user_problem_statement: "Test the new Guild Wars & Clan System backend endpoints that were just implemented.
+
+Please test the following Guild System endpoints:
+
+1. **POST /api/guilds** - Create guild (requires authentication)
+   - Login as testuser (testuser/test123)  
+   - Create a guild with payload:
+   ```json
+   {
+     "name": "Elite Warriors",
+     "description": "Top tier competitive gaming guild",
+     "tag": "EW",
+     "colors": {
+       "primary": "#FF0000", 
+       "secondary": "#FFFFFF"
+     },
+     "recruitment_open": true,
+     "min_level": 5,
+     "country": "Greece"
+   }
+   ```
+
+2. **GET /api/guilds** - List all guilds (no authentication required)
+   - Should return list of guilds with filtering options
+
+3. **GET /api/guilds/{guild_id}** - Get guild details 
+   - Should return detailed guild information including members
+
+4. **POST /api/guilds/{guild_id}/invite** - Invite player to guild
+   - As guild leader, try to invite "admin" user to the guild
+
+5. **GET /api/guilds/my-invitations** - Get user's invitations
+   - Login as admin (admin/Kiki1999@)
+   - Should show invitation from testuser's guild
+
+6. **POST /api/guilds/invitations/{invitation_id}/accept** - Accept invitation
+   - Accept the guild invitation
+
+7. **GET /api/guilds/rankings** - Get guild rankings/leaderboard
+   - Should return ranked guilds by power rating
+
+8. **POST /api/guilds/{guild_id}/challenge** - Challenge another guild to war
+   - Create a second guild and challenge it to war
+
+Focus on testing the API structure, authentication requirements, and guild management flow. The guild system should integrate properly with the existing user and team systems.
+
+Test user credentials:
+- Username: testuser 
+- Password: test123
+
+Admin credentials:
+- Username: admin
+- Password: Kiki1999@"
+
+backend:
+  - task: "Guild System - POST /api/guilds (Create Guild)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ GUILD SYSTEM CORE IMPLEMENTED: Successfully implemented comprehensive Guild Wars & Clan System with core APIs: 1) Guild creation and management, 2) Guild member system with roles (Leader, Officer, Member), 3) Guild invitation system, 4) Guild rankings and leaderboards, 5) Guild wars system with challenges and objectives, 6) Guild tournaments system. All endpoints include proper authentication, data validation, and error handling. Ready for testing."
+
+  - task: "Guild System - GET /api/guilds (List Guilds)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented guild listing endpoint with filtering options (country, recruitment status, search). Includes guild stats and member count aggregation."
+
+  - task: "Guild System - GET /api/guilds/{guild_id} (Guild Details)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented guild details endpoint with complete member information, guild stats, and recent wars history."
+
+  - task: "Guild System - POST /api/guilds/{guild_id}/invite (Invite Player)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented guild invitation system with proper permission checks (Leader/Officer only) and capacity validation."
+
+  - task: "Guild System - GET /api/guilds/my-invitations (Get Invitations)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented user invitations endpoint to retrieve pending guild invitations."
+
+  - task: "Guild System - POST /api/guilds/invitations/{invitation_id}/accept (Accept Invitation)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented invitation acceptance system with proper validation and guild membership updates."
+
+  - task: "Guild System - GET /api/guilds/rankings (Guild Rankings)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented guild rankings/leaderboard system with multiple ranking types (power_rating, trophies, wars_won) and country filtering."
+
+  - task: "Guild Wars - POST /api/guilds/{guild_id}/challenge (Challenge Guild)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented guild war challenge system with different war types (classic, blitz) and objective-based scoring system."
+
+  - task: "Guild Wars - GET /api/guilds/{guild_id}/wars (Get Guild Wars)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented guild wars history endpoint with status filtering."
+
+  - task: "Guild Tournaments - POST /api/guilds/{guild_id}/tournaments (Create Guild Tournament)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented guild-exclusive tournament creation system for internal guild competitions."
+
+frontend:
 
 Please test the following Social Sharing System endpoints:
 
