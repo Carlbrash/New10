@@ -2379,6 +2379,38 @@ function App() {
         { label: 'Teams', view: 'teams' },
         { label: 'Team Details', view: currentView }
       ]);
+    } else if (currentView === 'guilds') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Guilds', view: 'guilds' }
+      ]);
+    } else if (currentView === 'guild-rankings') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Guild Rankings', view: 'guild-rankings' }
+      ]);
+    } else if (currentView === 'create-guild') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Guilds', view: 'guilds' },
+        { label: 'Create Guild', view: 'create-guild' }
+      ]);
+    } else if (currentView === 'my-guild') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'My Guild', view: 'my-guild' }
+      ]);
+    } else if (currentView.startsWith('guild-')) {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Guilds', view: 'guilds' },
+        { label: 'Guild Details', view: currentView }
+      ]);
+    } else if (currentView === 'guild-wars') {
+      updateBreadcrumb([
+        { label: 'Home', view: 'home' },
+        { label: 'Guild Wars', view: 'guild-wars' }
+      ]);
     } else if (currentView === 'admin') {
       updateBreadcrumb([
         { label: 'Home', view: 'home' },
