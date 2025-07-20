@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Dashboard Test - WoBeRa</title>
+    <link rel="stylesheet" href="../src/App.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="wallet-dashboard">
+            <div class="wallet-header">
+                <h2>💰 Wallet Dashboard</h2>
+                <div class="wallet-balance-summary">
+                    <div class="balance-card">
+                        <div class="balance-main">
+                            <span class="balance-label">Available Balance</span>
+                            <span class="balance-amount">€1,245.50</span>
+                        </div>
+                        <div class="balance-details">
+                            <span>Total Earned: €3,200.00</span>
+                            <span>Withdrawn Balance: €1,954.50</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wallet Navigation -->
+            <div class="wallet-nav">
+                <button class="tab-btn active">
+                    📊 Dashboard
+                </button>
+                <button class="tab-btn">
+                    📋 Transaction History
+                </button>
+                <button class="tab-btn">
+                    💳 Payments
+                </button>
+                <button class="tab-btn">
+                    ⚙️ Wallet Settings
+                </button>
+            </div>
+
+            <!-- Dashboard View -->
+            <div class="wallet-content">
+                <!-- Balance Breakdown -->
+                <div class="balance-breakdown">
+                    <h3>💼 Balance Recent Activity</h3>
+                    <div class="balance-grid">
+                        <div class="balance-item">
+                            <h4>Tournament Winnings</h4>
+                            <div class="amount">€850.00</div>
+                            <div class="trend positive">+12.5% this month</div>
+                        </div>
+                        <div class="balance-item">
+                            <h4>Affiliate Commissions</h4>
+                            <div class="amount">€395.50</div>
+                            <div class="trend positive">+8.2% this month</div>
+                        </div>
+                        <div class="balance-item">
+                            <h4>Pending Payouts</h4>
+                            <div class="amount">€125.00</div>
+                            <div class="trend neutral">Processing...</div>
+                        </div>
+                        <div class="balance-item">
+                            <h4>Monthly Earnings</h4>
+                            <div class="amount">€2,150.00</div>
+                            <div class="trend positive">+18.3% vs last month</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="performance-metrics">
+                    <h3>📈 Performance Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value">95.2%</div>
+                            <div class="metric-label">Success Rate</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">€45.30</div>
+                            <div class="metric-label">Avg Transaction</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">127</div>
+                            <div class="metric-label">Total Transactions</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">4.8</div>
+                            <div class="metric-label">Monthly Growth</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">€50.00</div>
+                            <div class="metric-label">Min Payout</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
