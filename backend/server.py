@@ -6033,7 +6033,7 @@ async def create_guild(guild_data: GuildCreate, user_id: str = Depends(verify_to
         }
         guild_stats_collection.insert_one(guild_stats)
         
-        return {"message": "Guild created successfully", "guild_id": guild_id, "guild": new_guild}
+        return {"message": "Guild created successfully", "guild_id": guild_id, "guild": serialize_doc(new_guild)}
         
     except HTTPException:
         raise
