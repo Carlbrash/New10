@@ -6156,7 +6156,7 @@ async def get_guild_details(guild_id: str):
         guild["member_count"] = len(members)
         guild["recent_wars"] = recent_wars
         
-        return {"guild": guild}
+        return {"guild": serialize_doc(guild)}
         
     except HTTPException:
         raise
