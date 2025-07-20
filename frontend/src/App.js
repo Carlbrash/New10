@@ -13830,21 +13830,26 @@ function App() {
                       <div className="team-name-professional">{match.team1.name}</div>
                       <div className="team-country-name">{match.team1.countryName}</div>
                     </div>
-                    <div className="team-score-professional">{match.team1.teamScore}</div>
                   </div>
                   
-                  <div className="vs-section-professional">
-                    <div className="vs-circle">
-                      <span className="vs-text">VS</span>
+                  <div className="scores-section-professional">
+                    <div className="team-scores-container">
+                      <div className="team-score-professional">{match.team1.teamScore}</div>
+                      <div className="scores-separator">-</div>
+                      <div className="team-score-professional">{match.team2.teamScore}</div>
                     </div>
-                    <div className="match-progress">
-                      <div className="progress-text">{match.team1.teamScore + match.team2.teamScore}/{match.team1.totalMatches}</div>
+                    <div className="vs-section-professional">
+                      <div className="vs-circle-static">
+                        <span className="vs-text">VS</span>
+                      </div>
+                      <div className="match-progress">
+                        <div className="progress-text">{match.team1.teamScore + match.team2.teamScore}/{match.team1.totalMatches}</div>
+                      </div>
                     </div>
                   </div>
                   
                   <div className="team-professional team2">
-                    <div className="team-score-professional">{match.team2.teamScore}</div>
-                    <div className="team-info-professional">
+                    <div className="team-info-professional team2-info">
                       <div className="team-name-professional">{match.team2.name}</div>
                       <div className="team-country-name">{match.team2.countryName}</div>
                     </div>
