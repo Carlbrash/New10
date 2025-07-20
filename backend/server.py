@@ -9708,9 +9708,21 @@ async def get_all_content(admin_id: str = Depends(verify_admin_token(AdminRole.A
     try:
         content_items = list(cms_content_collection.find({}))
         
+        # Convert datetime objects to strings for JSON serialization
+        for item in content_items:
+            if 'created_at' in item:
+                item['created_at'] = item['created_at'].isoformat() if item['created_at'] else None
+            if 'updated_at' in item:
+                item['updated_at'] = item['updated_at'].isoformat() if item['updated_at'] else None
+        
         # Get translations for each content item
         for item in content_items:
             translations = list(cms_translations_collection.find({"content_id": item["id"]}))
+            for translation in translations:
+                if 'created_at' in translation:
+                    translation['created_at'] = translation['created_at'].isoformat() if translation['created_at'] else None
+                if 'updated_at' in translation:
+                    translation['updated_at'] = translation['updated_at'].isoformat() if translation['updated_at'] else None
             item["translations"] = translations
         
         return CustomJSONResponse(content={
