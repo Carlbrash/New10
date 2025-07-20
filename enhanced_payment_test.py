@@ -4,7 +4,7 @@ import unittest
 class EnhancedPaymentSystemTester(unittest.TestCase):
     """Test Enhanced Payment System backend endpoints after frontend integration"""
     
-    base_url = "https://b578ab0c-9b8e-443c-9964-de8dced10016.preview.emergentagent.com"
+    base_url = "https://8bac144b-1667-48c8-ab7b-40efd021e91b.preview.emergentagent.com"
     
     # Test user credentials
     test_user_credentials = {

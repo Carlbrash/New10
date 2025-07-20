@@ -3,7 +3,7 @@ import json
 
 def test_tournament_wallet_balance():
     """Test tournament join wallet balance functionality step by step"""
-    base_url = "https://b578ab0c-9b8e-443c-9964-de8dced10016.preview.emergentagent.com"
+    base_url = "https://8bac144b-1667-48c8-ab7b-40efd021e91b.preview.emergentagent.com"
     
     # Test user as requested
     test_user = {

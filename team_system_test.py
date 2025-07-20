@@ -7,7 +7,7 @@ class TeamSystemAPITest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TeamSystemAPITest, self).__init__(*args, **kwargs)
         # Use the public endpoint from frontend/.env
-        self.base_url = "https://b578ab0c-9b8e-443c-9964-de8dced10016.preview.emergentagent.com"
+        self.base_url = "https://8bac144b-1667-48c8-ab7b-40efd021e91b.preview.emergentagent.com"
         self.testuser_token = None
         self.admin_token = None
         self.team_id = None
