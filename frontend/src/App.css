@@ -8207,10 +8207,10 @@ img {
 .live-indicator-small {
   width: 8px;
   height: 8px;
-  background: #ff0000;
+  background: #00ff00;
   border-radius: 50%;
   animation: pulse-professional 2s infinite;
-  box-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
 }
 
 .section-text {
