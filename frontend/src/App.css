@@ -7688,8 +7688,8 @@ img {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(255, 0, 0, 0.2);
-  border: 1px solid rgba(255, 0, 0, 0.5);
+  background: rgba(0, 255, 0, 0.2);
+  border: 1px solid rgba(0, 255, 0, 0.5);
   border-radius: 25px;
   padding: 0.8rem 1.5rem;
 }
@@ -7697,10 +7697,10 @@ img {
 .live-pulse {
   width: 12px;
   height: 12px;
-  background: #ff0000;
+  background: #00ff00;
   border-radius: 50%;
   animation: pulse-professional 2s infinite;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
 }
 
 @keyframes pulse-professional {
@@ -7710,14 +7710,14 @@ img {
 }
 
 .live-text {
-  color: #ff0000;
+  color: #00ff00;
   font-weight: bold;
   font-size: 1rem;
-  text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
 }
 
 .live-count {
-  background: #ff0000;
+  background: #00ff00;
   color: white;
   padding: 0.3rem 0.8rem;
   border-radius: 15px;
