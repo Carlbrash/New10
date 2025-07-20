@@ -4931,6 +4931,179 @@ function App() {
   }, [user, token]);
 
   // =============================================================================
+  // SPORTSDUEL SYSTEM FUNCTIONS
+  // =============================================================================
+
+  // Fetch all SportsDuel leagues
+  const fetchSportsduelLeagues = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sportsduel/leagues`);
+      if (response.ok) {
+        const data = await response.json();
+        setSportsduelLeagues(data.leagues);
+        if (data.leagues.length > 0 && !currentSportsduelLeague) {
+          setCurrentSportsduelLeague(data.leagues[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching SportsDuel leagues:', error);
+    }
+  };
+
+  // Fetch SportsDuel teams for current league
+  const fetchSportsduelTeams = async (leagueId = null) => {
+    try {
+      const leagueParam = leagueId || (currentSportsduelLeague ? currentSportsduelLeague.id : '');
+      const response = await fetch(`${API_BASE_URL}/api/sportsduel/teams?league_id=${leagueParam}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSportsduelTeams(data.teams);
+      }
+    } catch (error) {
+      console.error('Error fetching SportsDuel teams:', error);
+    }
+  };
+
+  // Fetch SportsDuel matches
+  const fetchSportsduelMatches = async (leagueId = null) => {
+    try {
+      setSportsduelLoading(true);
+      const leagueParam = leagueId || (currentSportsduelLeague ? currentSportsduelLeague.id : '');
+      const response = await fetch(`${API_BASE_URL}/api/sportsduel/matches?league_id=${leagueParam}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSportsduelMatches(data.matches);
+      }
+    } catch (error) {
+      console.error('Error fetching SportsDuel matches:', error);
+    } finally {
+      setSportsduelLoading(false);
+    }
+  };
+
+  // Fetch SportsDuel scoreboard
+  const fetchSportsduelScoreboard = async (leagueId = null) => {
+    try {
+      setSportsduelLoading(true);
+      const leagueParam = leagueId || (currentSportsduelLeague ? currentSportsduelLeague.id : '');
+      const response = await fetch(`${API_BASE_URL}/api/sportsduel/scoreboard/${leagueParam}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSportsduelScoreboard(data.scoreboard);
+      }
+    } catch (error) {
+      console.error('Error fetching SportsDuel scoreboard:', error);
+    } finally {
+      setSportsduelLoading(false);
+    }
+  };
+
+  // Create SportsDuel team (Sports Cafe)
+  const createSportsduelTeam = async (teamData) => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sportsduel/teams`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(teamData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast('Sports Cafe team created successfully!', 'success');
+        fetchSportsduelTeams();
+        return data.team;
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to create sports cafe team', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating SportsDuel team:', error);
+      showToast('Error creating sports cafe team', 'error');
+    }
+    return null;
+  };
+
+  // Join SportsDuel team as player
+  const joinSportsduelTeam = async (teamId, playerData) => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sportsduel/teams/${teamId}/players`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(playerData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast('Successfully joined team!', 'success');
+        setMyPlayerProfile(data.player);
+        return data.player;
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to join team', 'error');
+      }
+    } catch (error) {
+      console.error('Error joining SportsDuel team:', error);
+      showToast('Error joining team', 'error');
+    }
+    return null;
+  };
+
+  // Create SportsDuel coupon
+  const createSportsduelCoupon = async (matchId, bets) => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sportsduel/coupons`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          match_id: matchId,
+          bets: bets
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast('Coupon created successfully!', 'success');
+        fetchSportsduelMatches(); // Refresh matches to show updated coupon status
+        return data.coupon;
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to create coupon', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating SportsDuel coupon:', error);
+      showToast('Error creating coupon', 'error');
+    }
+    return null;
+  };
+
+  // Load SportsDuel data when view changes to sportsduel
+  useEffect(() => {
+    if (currentView === 'sportsduel') {
+      fetchSportsduelLeagues();
+      fetchSportsduelTeams();
+      fetchSportsduelMatches();
+      fetchSportsduelScoreboard();
+    }
+  }, [currentView, currentSportsduelLeague]);
+
+  // =============================================================================
   // AFFILIATE SYSTEM FUNCTIONS
   // =============================================================================
   
