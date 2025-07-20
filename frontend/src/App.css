@@ -474,6 +474,333 @@ body {
   font-size: 1rem;
 }
 
+/* League Participation Structure */
+.league-participation-structure {
+  margin-top: 2.5rem;
+}
+
+.league-participation-structure h4 {
+  color: #4fc3f7;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.structure-description {
+  color: #ddd;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.league-examples-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.league-example-card {
+  background: rgba(79, 195, 247, 0.05);
+  border: 2px solid rgba(79, 195, 247, 0.2);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.league-example-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(79, 195, 247, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.league-example-card:hover::before {
+  left: 100%;
+}
+
+.league-example-card:hover {
+  border-color: rgba(79, 195, 247, 0.4);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(79, 195, 247, 0.2);
+}
+
+.league-flag {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.league-details h5 {
+  color: #4fc3f7;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.team-count {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.count-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ffd700;
+  line-height: 1;
+}
+
+.count-label {
+  display: block;
+  color: #ddd;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.wobera-equivalent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wobera-domain {
+  color: #4fc3f7;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.wobera-count {
+  color: #22c55e;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Player Participation Rules */
+.player-participation-rules {
+  margin-top: 3rem;
+}
+
+.player-participation-rules h4 {
+  color: #4fc3f7;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.rule-card {
+  background: rgba(30, 30, 30, 0.6);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.rule-card.unlimited-players {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.rule-card.unlimited-players:hover {
+  border-color: rgba(34, 197, 94, 0.5);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.2);
+}
+
+.rule-card.match-day-limit {
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+.rule-card.match-day-limit:hover {
+  border-color: rgba(79, 195, 247, 0.5);
+  box-shadow: 0 8px 25px rgba(79, 195, 247, 0.2);
+}
+
+.rule-card.player-slots {
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.rule-card.player-slots:hover {
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.2);
+}
+
+.rule-card.one-account-policy {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.rule-card.one-account-policy:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.2);
+}
+
+.rule-card:hover {
+  transform: translateY(-3px);
+}
+
+.rule-icon {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #4fc3f7;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+}
+
+.rule-card.unlimited-players .rule-icon {
+  color: #22c55e;
+}
+
+.rule-card.player-slots .rule-icon {
+  color: #fbbf24;
+}
+
+.rule-card.one-account-policy .rule-icon {
+  color: #ef4444;
+}
+
+.rule-content h5 {
+  color: #4fc3f7;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.rule-content p {
+  color: #ddd;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Alpha Planet Network */
+.alpha-planet-network {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.alpha-planet-network h4 {
+  color: #4fc3f7;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.network-description {
+  background: rgba(79, 195, 247, 0.03);
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  border-radius: 15px;
+  padding: 2rem;
+}
+
+.network-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.branch-hub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: rgba(79, 195, 247, 0.05);
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  border-radius: 12px;
+  min-width: 120px;
+}
+
+.hub-icon {
+  font-size: 2rem;
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.branch-hub span {
+  color: #4fc3f7;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.connection-line {
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #4fc3f7, #29b6f6);
+  border-radius: 1px;
+}
+
+.network-description p {
+  color: #ddd;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Teams Structure Level Specific Styles */
+.teams-structure-level {
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(50, 50, 50, 0.8));
+  border: 2px solid rgba(79, 195, 247, 0.3);
+}
+
+.teams-structure-level::before {
+  background: linear-gradient(90deg, #22c55e, #4fc3f7, #fbbf24);
+}
+
+/* Responsive Design for Teams Section */
+@media (max-width: 768px) {
+  .league-examples-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .rules-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .network-visual {
+    flex-direction: column;
+  }
+  
+  .connection-line {
+    width: 2px;
+    height: 30px;
+    transform: rotate(90deg);
+  }
+  
+  .flow-diagram {
+    flex-direction: column;
+  }
+  
+  .flow-arrow {
+    transform: rotate(90deg);
+    font-size: 1.5rem;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .hero-title {
