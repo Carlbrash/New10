@@ -13960,11 +13960,8 @@ function App() {
                                   </div>
                                 </div>
                               </div>
-                              <div className="player-avatar-professional">
+                              <div className={`player-avatar-professional ${player2Leading ? 'winning-border' : player1Leading ? 'losing-border' : 'tied-border'}`}>
                                 <img src={playerMatch.player2.avatar} alt={playerMatch.player2.name} />
-                                <div className={`status-indicator ${player2Leading ? 'winning' : player1Leading ? 'losing' : 'tied'}`}>
-                                  {player2Leading ? '🟢' : player1Leading ? '🔴' : '🟡'}
-                                </div>
                               </div>
                             </div>
                           </div>
