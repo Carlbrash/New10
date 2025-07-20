@@ -13615,145 +13615,291 @@ function App() {
     };
 
     return (
-      <div className="sportsduel-container">
-        {/* SportsDuel Header */}
-        <div className="sportsduel-header">
-          <div className="header-content">
-            <h1>⚽ WoBeRa SportsDuel Live Championship</h1>
-            <div className="header-stats">
-              <div className="live-indicator">
-                <span className="live-dot"></span>
-                <span>LIVE</span>
+      <div className="sportsduel-container-professional">
+        {/* Professional SportsDuel Header */}
+        <div className="sportsduel-header-professional">
+          <div className="header-main-content">
+            <div className="header-left">
+              <div className="platform-brand">
+                <div className="brand-icon">⚽</div>
+                <div className="brand-text">
+                  <h1>WoBeRa SportsDuel</h1>
+                  <div className="platform-subtitle">Live Championship Network</div>
+                </div>
               </div>
-              <div className="matches-count">{filteredMatches.length} Team Matches</div>
+            </div>
+            <div className="header-right">
+              <div className="live-status-professional">
+                <div className="live-pulse"></div>
+                <span className="live-text">LIVE</span>
+                <div className="live-count">{filteredMatches.length}</div>
+              </div>
+              <div className="last-updated-professional">
+                <div className="update-icon">🔄</div>
+                <div className="update-text">Updated: {new Date().toLocaleTimeString()}</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="sportsduel-search">
-          <div className="search-container">
-            <input
-              type="text"
-              placeholder="🔍 Search teams or players..."
-              value={sportsduelSearch}
-              onChange={(e) => setSportsduelSearch(e.target.value)}
-              className="search-input"
-            />
+        {/* Advanced Search and Filters */}
+        <div className="sportsduel-controls-professional">
+          <div className="search-section-professional">
+            <div className="search-input-wrapper">
+              <div className="search-icon">🔍</div>
+              <input
+                type="text"
+                placeholder="Search teams, players, tournaments..."
+                value={sportsduelSearch}
+                onChange={(e) => setSportsduelSearch(e.target.value)}
+                className="search-input-professional"
+              />
+              {sportsduelSearch && (
+                <button 
+                  className="clear-search-professional"
+                  onClick={() => setSportsduelSearch('')}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <button 
+              className={`filters-toggle-professional ${sportsduelFilters.showFilters ? 'active' : ''}`}
+              onClick={() => setSportsduelFilters({...sportsduelFilters, showFilters: !sportsduelFilters.showFilters})}
+            >
+              <span className="filter-icon">⚙️</span>
+              <span className="filter-text">Filters</span>
+              <span className="filter-arrow">{sportsduelFilters.showFilters ? '▲' : '▼'}</span>
+            </button>
           </div>
-        </div>
 
-        {/* Compact Live Scoreboard */}
-        <div className="live-scoreboard">
-          <div className="scoreboard-header">
-            <h2>🏆 Live Championship Matches</h2>
-            <div className="refresh-controls">
-              <button className="refresh-btn" onClick={() => window.location.reload()}>
-                🔄 Refresh
+          {/* Expandable Filters */}
+          {sportsduelFilters.showFilters && (
+            <div className="filters-panel-professional">
+              <div className="filter-group">
+                <label className="filter-label">Country:</label>
+                <select 
+                  value={sportsduelFilters.country}
+                  onChange={(e) => setSportsduelFilters({...sportsduelFilters, country: e.target.value})}
+                  className="filter-select-professional"
+                >
+                  {availableCountries.map(country => (
+                    <option key={country} value={country}>
+                      {country === 'all' ? 'All Countries' : country}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="filter-group">
+                <label className="filter-label">Tournament:</label>
+                <select 
+                  value={sportsduelFilters.tournament}
+                  onChange={(e) => setSportsduelFilters({...sportsduelFilters, tournament: e.target.value})}
+                  className="filter-select-professional"
+                >
+                  {availableTournaments.map(tournament => (
+                    <option key={tournament} value={tournament}>
+                      {tournament === 'all' ? 'All Tournaments' : tournament}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="filter-group">
+                <label className="filter-label">Status:</label>
+                <select 
+                  value={sportsduelFilters.status}
+                  onChange={(e) => setSportsduelFilters({...sportsduelFilters, status: e.target.value})}
+                  className="filter-select-professional"
+                >
+                  {availableStatuses.map(status => (
+                    <option key={status} value={status}>
+                      {status === 'all' ? 'All Statuses' : status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button 
+                className="clear-filters-professional"
+                onClick={() => setSportsduelFilters({
+                  country: 'all',
+                  tournament: 'all',
+                  status: 'all',
+                  showFilters: true
+                })}
+              >
+                Clear All Filters
               </button>
-              <div className="last-updated">Updated: {new Date().toLocaleTimeString()}</div>
             </div>
-          </div>
+          )}
+        </div>
 
-          <div className="compact-matches-grid">
-            {filteredMatches.map(match => (
-              <div key={match.id} className="compact-match-card">
-                {/* Team vs Team Header */}
-                <div className="match-header">
-                  <div className="tournament-badge">{match.tournament}</div>
-                  <div className="match-status">{match.status}</div>
-                  <div className="time-remaining">{match.timeRemaining}</div>
+        {/* Professional Match Cards Grid */}
+        <div className="professional-matches-grid">
+          {filteredMatches.map(match => {
+            return (
+              <div key={match.id} className="professional-match-card">
+                {/* Tournament Header */}
+                <div className="tournament-header-professional">
+                  <div className="tournament-info">
+                    <div className="tournament-name">{match.tournament.name}</div>
+                    <div className="tournament-details">
+                      <span className="tournament-category">{match.tournament.category}</span>
+                      <span className="tournament-separator">•</span>
+                      <span className="tournament-country">{match.tournament.country}</span>
+                      <span className="tournament-separator">•</span>
+                      <span className="tournament-prize">{match.tournament.prize}</span>
+                    </div>
+                  </div>
+                  <div className="match-timing">
+                    <div className={`match-status-professional status-${match.status.toLowerCase()}`}>{match.status}</div>
+                    <div className="match-time">{match.matchTime}</div>
+                    <div className="time-remaining">{match.timeRemaining}</div>
+                  </div>
                 </div>
 
-                {/* Team Score Display */}
-                <div className="team-scoreboard">
-                  {/* Team 1 */}
-                  <div className="team-display">
-                    <div className="team-info">
-                      <img src={match.team1.logo} alt={match.team1.name} className="team-logo" />
-                      <div className="team-flag">{match.team1.country}</div>
+                {/* Team vs Team Section */}
+                <div className="teams-section-professional">
+                  <div className="team-professional team1">
+                    <div className="team-visual">
+                      <img src={match.team1.logo} alt={match.team1.name} className="team-logo-professional" />
+                      <div className="team-country-flag">{match.team1.country}</div>
                     </div>
-                    <div className="team-name">{match.team1.name}</div>
-                    <div className="team-score">{match.team1.teamScore}</div>
+                    <div className="team-info-professional">
+                      <div className="team-name-professional">{match.team1.name}</div>
+                      <div className="team-country-name">{match.team1.countryName}</div>
+                    </div>
+                    <div className="team-score-professional">{match.team1.teamScore}</div>
                   </div>
-
-                  {/* VS Divider */}
-                  <div className="vs-divider">
-                    <div className="vs-text">VS</div>
+                  
+                  <div className="vs-section-professional">
+                    <div className="vs-circle">
+                      <span className="vs-text">VS</span>
+                    </div>
+                    <div className="match-progress">
+                      <div className="progress-text">{match.team1.teamScore + match.team2.teamScore}/{match.team1.totalMatches}</div>
+                    </div>
                   </div>
-
-                  {/* Team 2 */}
-                  <div className="team-display team2">
-                    <div className="team-score">{match.team2.teamScore}</div>
-                    <div className="team-name">{match.team2.name}</div>
-                    <div className="team-info">
-                      <div className="team-flag">{match.team2.country}</div>
-                      <img src={match.team2.logo} alt={match.team2.name} className="team-logo" />
+                  
+                  <div className="team-professional team2">
+                    <div className="team-score-professional">{match.team2.teamScore}</div>
+                    <div className="team-info-professional">
+                      <div className="team-name-professional">{match.team2.name}</div>
+                      <div className="team-country-name">{match.team2.countryName}</div>
+                    </div>
+                    <div className="team-visual">
+                      <div className="team-country-flag">{match.team2.country}</div>
+                      <img src={match.team2.logo} alt={match.team2.name} className="team-logo-professional" />
                     </div>
                   </div>
                 </div>
 
                 {/* Active 1v1 Matches */}
                 {match.activeMatches.length > 0 && (
-                  <div className="active-matches">
-                    <div className="section-title">🔴 Live 1v1 Matches</div>
-                    <div className="player-matches">
+                  <div className="active-matches-professional">
+                    <div className="matches-header-professional">
+                      <div className="section-title-professional">
+                        <span className="live-indicator-small"></span>
+                        <span className="section-text">Live 1v1 Matches</span>
+                        <span className="matches-count-small">({match.activeMatches.length})</span>
+                      </div>
+                    </div>
+                    
+                    <div className="player-matches-grid-professional">
                       {match.activeMatches.map((playerMatch, index) => {
                         const progress1 = calculateProgress(playerMatch.player1.currentScore, playerMatch.player1.maxScore);
                         const progress2 = calculateProgress(playerMatch.player2.currentScore, playerMatch.player2.maxScore);
                         
+                        // Determine winner/loser indicators
+                        const player1Leading = playerMatch.player1.currentScore > playerMatch.player2.currentScore;
+                        const player2Leading = playerMatch.player2.currentScore > playerMatch.player1.currentScore;
+                        
                         return (
-                          <div key={index} className="player-match">
+                          <div key={index} className="player-match-professional">
                             {/* Player 1 */}
-                            <div className="player-card">
-                              <div className="player-avatar">
+                            <div className="player-section-professional">
+                              <div className="player-avatar-professional">
                                 <img src={playerMatch.player1.avatar} alt={playerMatch.player1.name} />
-                              </div>
-                              <div className="player-details">
-                                <div className="player-name">{playerMatch.player1.name}</div>
-                                <div className="player-score">
-                                  <span className="score-text">{playerMatch.player1.currentScore}/{playerMatch.player1.maxScore}</span>
-                                  <span className={`trend-arrow ${playerMatch.player1.trend}`}>
-                                    {playerMatch.player1.trend === 'up' ? '📈' : playerMatch.player1.trend === 'down' ? '📉' : '➡️'}
-                                  </span>
+                                <div className={`status-indicator ${player1Leading ? 'winning' : player2Leading ? 'losing' : 'tied'}`}>
+                                  {player1Leading ? '🟢' : player2Leading ? '🔴' : '🟡'}
                                 </div>
-                                <div className="progress-bar">
+                              </div>
+                              <div className="player-details-professional">
+                                <div className="player-name-professional">{playerMatch.player1.name}</div>
+                                <div className="player-rank-professional">{playerMatch.player1.rank}</div>
+                                <div className="score-display-professional">
+                                  <span className="current-score">{playerMatch.player1.currentScore}</span>
+                                  <span className="score-separator">/</span>
+                                  <span className="max-score">{playerMatch.player1.maxScore}</span>
+                                  <span className="percentage-professional">({progress1.percentage}%)</span>
+                                </div>
+                                <div className="progress-bar-professional">
                                   <div 
-                                    className="progress-fill" 
+                                    className="progress-fill-professional" 
                                     style={{
                                       width: `${progress1.percentage}%`,
                                       backgroundColor: progress1.color
                                     }}
                                   ></div>
                                 </div>
+                                <div className="player-records-professional">
+                                  <div className="overall-record">
+                                    <span className="record-label">Overall:</span>
+                                    <span className="record-value">{playerMatch.player1.record.wins}W-{playerMatch.player1.record.losses}L</span>
+                                  </div>
+                                  <div className="series-record">
+                                    <span className="record-label">Series:</span>
+                                    <span className="record-value">{playerMatch.player1.seriesRecord.wins}-{playerMatch.player1.seriesRecord.losses}</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
-                            {/* VS */}
-                            <div className="player-vs">VS</div>
+                            {/* VS Divider */}
+                            <div className="vs-divider-professional">
+                              <div className="vs-text-small">VS</div>
+                              <div className="match-trend">
+                                {playerMatch.player1.trend === 'up' && playerMatch.player2.trend === 'up' ? '📈📈' :
+                                 playerMatch.player1.trend === 'down' && playerMatch.player2.trend === 'down' ? '📉📉' :
+                                 '⚡'}
+                              </div>
+                            </div>
 
                             {/* Player 2 */}
-                            <div className="player-card">
-                              <div className="player-details player2-details">
-                                <div className="player-name">{playerMatch.player2.name}</div>
-                                <div className="player-score">
-                                  <span className={`trend-arrow ${playerMatch.player2.trend}`}>
-                                    {playerMatch.player2.trend === 'up' ? '📈' : playerMatch.player2.trend === 'down' ? '📉' : '➡️'}
-                                  </span>
-                                  <span className="score-text">{playerMatch.player2.currentScore}/{playerMatch.player2.maxScore}</span>
+                            <div className="player-section-professional">
+                              <div className="player-details-professional player2-details">
+                                <div className="player-name-professional">{playerMatch.player2.name}</div>
+                                <div className="player-rank-professional">{playerMatch.player2.rank}</div>
+                                <div className="score-display-professional">
+                                  <span className="percentage-professional">({progress2.percentage}%)</span>
+                                  <span className="current-score">{playerMatch.player2.currentScore}</span>
+                                  <span className="score-separator">/</span>
+                                  <span className="max-score">{playerMatch.player2.maxScore}</span>
                                 </div>
-                                <div className="progress-bar">
+                                <div className="progress-bar-professional">
                                   <div 
-                                    className="progress-fill" 
+                                    className="progress-fill-professional" 
                                     style={{
                                       width: `${progress2.percentage}%`,
                                       backgroundColor: progress2.color
                                     }}
                                   ></div>
                                 </div>
+                                <div className="player-records-professional">
+                                  <div className="overall-record">
+                                    <span className="record-label">Overall:</span>
+                                    <span className="record-value">{playerMatch.player2.record.wins}W-{playerMatch.player2.record.losses}L</span>
+                                  </div>
+                                  <div className="series-record">
+                                    <span className="record-label">Series:</span>
+                                    <span className="record-value">{playerMatch.player2.seriesRecord.wins}-{playerMatch.player2.seriesRecord.losses}</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="player-avatar">
+                              <div className="player-avatar-professional">
                                 <img src={playerMatch.player2.avatar} alt={playerMatch.player2.name} />
+                                <div className={`status-indicator ${player2Leading ? 'winning' : player1Leading ? 'losing' : 'tied'}`}>
+                                  {player2Leading ? '🟢' : player1Leading ? '🔴' : '🟡'}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -13765,80 +13911,80 @@ function App() {
 
                 {/* No Active Matches */}
                 {match.activeMatches.length === 0 && (
-                  <div className="no-active-matches">
-                    <span className="completion-badge">✅ Tournament Complete</span>
+                  <div className="no-matches-professional">
+                    <div className="completion-badge-professional">✅ Tournament Complete</div>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-
-          {/* No Results */}
-          {filteredMatches.length === 0 && sportsduelSearch && (
-            <div className="no-results">
-              <div className="no-results-content">
-                <div className="no-results-icon">🔍</div>
-                <div className="no-results-text">No matches found for "{sportsduelSearch}"</div>
-                <button 
-                  className="clear-search-btn"
-                  onClick={() => setSportsduelSearch('')}
-                >
-                  Clear Search
-                </button>
-              </div>
-            </div>
-          )}
+            );
+          })}
         </div>
 
-        {/* Enhanced League Statistics */}
-        <div className="enhanced-league-statistics">
-          <h3>📊 Championship Statistics</h3>
-          <div className="stats-grid-enhanced">
-            <div className="stat-item-enhanced">
-              <div className="stat-icon-large">🏆</div>
-              <div className="stat-details">
-                <div className="stat-value-large">{teamMatches.length}</div>
-                <div className="stat-label-enhanced">Team Competitions</div>
+        {/* No Results State */}
+        {filteredMatches.length === 0 && (
+          <div className="no-results-professional">
+            <div className="no-results-icon-professional">🔍</div>
+            <div className="no-results-title">No matches found</div>
+            <div className="no-results-subtitle">
+              {sportsduelSearch ? `No results for "${sportsduelSearch}"` : 'No matches match your current filters'}
+            </div>
+            <button 
+              className="reset-filters-professional"
+              onClick={() => {
+                setSportsduelSearch('');
+                setSportsduelFilters({
+                  country: 'all',
+                  tournament: 'all',
+                  status: 'all',
+                  showFilters: false
+                });
+              }}
+            >
+              Reset All Filters
+            </button>
+          </div>
+        )}
+
+        {/* Enhanced Statistics Dashboard */}
+        <div className="statistics-dashboard-professional">
+          <div className="stats-header-professional">
+            <h3>📊 Live Tournament Statistics</h3>
+            <div className="stats-refresh">
+              <button className="refresh-stats" onClick={() => window.location.reload()}>
+                🔄 Refresh
+              </button>
+            </div>
+          </div>
+          <div className="stats-grid-professional">
+            <div className="stat-card-professional">
+              <div className="stat-icon-professional">🏆</div>
+              <div className="stat-data">
+                <div className="stat-value">{teamMatches.length}</div>
+                <div className="stat-label">Active Tournaments</div>
               </div>
             </div>
-            <div className="stat-item-enhanced">
-              <div className="stat-icon-large">⚔️</div>
-              <div className="stat-details">
-                <div className="stat-value-large">{teamMatches.reduce((total, match) => total + match.activeMatches.length, 0)}</div>
-                <div className="stat-label-enhanced">Live 1v1 Matches</div>
+            <div className="stat-card-professional">
+              <div className="stat-icon-professional">⚔️</div>
+              <div className="stat-data">
+                <div className="stat-value">{teamMatches.reduce((total, match) => total + match.activeMatches.length, 0)}</div>
+                <div className="stat-label">Live 1v1 Battles</div>
               </div>
             </div>
-            <div className="stat-item-enhanced">
-              <div className="stat-icon-large">👥</div>
-              <div className="stat-details">
-                <div className="stat-value-large">{teamMatches.reduce((total, match) => total + match.activeMatches.length * 2, 0)}</div>
-                <div className="stat-label-enhanced">Active Players</div>
+            <div className="stat-card-professional">
+              <div className="stat-icon-professional">👥</div>
+              <div className="stat-data">
+                <div className="stat-value">{teamMatches.reduce((total, match) => total + match.activeMatches.length * 2, 0)}</div>
+                <div className="stat-label">Active Players</div>
               </div>
             </div>
-            <div className="stat-item-enhanced">
-              <div className="stat-icon-large">🎯</div>
-              <div className="stat-details">
-                <div className="stat-value-large">87%</div>
-                <div className="stat-label-enhanced">Avg Accuracy</div>
+            <div className="stat-card-professional">
+              <div className="stat-icon-professional">💰</div>
+              <div className="stat-data">
+                <div className="stat-value">€{teamMatches.reduce((total, match) => total + parseInt(match.tournament.prize.replace(/[€,]/g, '')), 0).toLocaleString()}</div>
+                <div className="stat-label">Total Prize Pool</div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="enhanced-quick-actions">
-          <button className="enhanced-quick-btn championship" onClick={() => setCurrentView('tournaments')}>
-            🏆 View All Championships
-          </button>
-          <button className="enhanced-quick-btn rankings" onClick={() => setCurrentView('rankings')}>
-            📊 Elite Rankings
-          </button>
-          <button className="enhanced-quick-btn teams" onClick={() => setCurrentView('teams')}>
-            🏪 Sports Cafes
-          </button>
-          <button className="enhanced-quick-btn profile" onClick={() => alert('Player profiles coming soon!')}>
-            👤 My Elite Profile
-          </button>
         </div>
       </div>
     );
