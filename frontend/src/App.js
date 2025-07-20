@@ -13344,106 +13344,105 @@ function App() {
   // SPORTSDUEL SYSTEM RENDER FUNCTION
   // =============================================================================
   
+  // Add search state
+  const [sportsduelSearch, setSportsduelSearch] = useState('');
+
   const renderSportsDuel = () => {
-    // Enhanced mock live matches data with detailed player information
-    const liveMatches = [
+    // Updated mock data for 1v1 matches with proper team structure
+    const teamMatches = [
       {
         id: 1,
         tournament: 'ELITE WoBeRa Championship',
-        round: '🏆 ROUND 1',
-        status: 'FINAL SCORE',
-        startTime: 'STARTED FRI 20 AUG 15:00',
-        endTime: 'END SAT 21 AUG 18:30',
-        timeRemaining: 'TIME REMAINING: 2h 15m',
-        timeSlot: 'TIME SLOT 15:00',
+        status: 'LIVE',
+        timeRemaining: '2h 15m',
         team1: { 
           name: 'CHELSEA WIZARDS', 
           logo: 'https://images.unsplash.com/photo-1577223618563-3d858655ab86?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwxfHxzb2NjZXIlMjBsb2dvc3xlbnwwfHx8fDE3NTMwMjc2NDZ8MA&ixlib=rb-4.1.0&q=85', 
-          score: 15,
           country: '🇬🇧',
-          players: [
-            { id: 1, name: 'LiLinGeo', avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/5', wins: 128, losses: 25, accuracy: '85%', currentScore: '2.30', maxScore: '5.20', trend: 'up' },
-            { id: 2, name: 'Emma', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '2/5', wins: 156, losses: 30, accuracy: '79%', currentScore: '1.85', maxScore: '4.60', trend: 'down' },
-            { id: 3, name: 'John Snow', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '1/6', wins: 119, losses: 37, accuracy: '76%', currentScore: '3.10', maxScore: '6.80', trend: 'up' }
-          ]
+          teamScore: 15 // Won individual matches
         },
         team2: { 
           name: 'GLYFADA SHARKS', 
           logo: 'https://images.unsplash.com/photo-1707414038523-b5d1c8294786?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', 
-          score: 19,
           country: '🇬🇷',
-          players: [
-            { id: 4, name: 'CarlBrash', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '6/6', wins: 213, losses: 13, accuracy: '94%', currentScore: '4.80', maxScore: '5.20', trend: 'up' },
-            { id: 5, name: 'MPC', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '4/4', wins: 196, losses: 26, accuracy: '88%', currentScore: '3.60', maxScore: '4.10', trend: 'stable' },
-            { id: 6, name: 'Martyn', avatar: 'https://images.unsplash.com/photo-1707414038545-d7885c0efb7b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', level: '1/2', wins: 155, losses: 18, accuracy: '90%', currentScore: '2.95', maxScore: '3.40', trend: 'up' }
-          ]
-        }
+          teamScore: 19 // Won individual matches
+        },
+        // Current 1v1 active matches
+        activeMatches: [
+          {
+            player1: { name: 'LiLinGeo', avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', team: 'team1', currentScore: 2.30, maxScore: 5.20, trend: 'up' },
+            player2: { name: 'CarlBrash', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', team: 'team2', currentScore: 4.80, maxScore: 5.20, trend: 'up' }
+          },
+          {
+            player1: { name: 'Emma', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', team: 'team1', currentScore: 1.85, maxScore: 4.60, trend: 'down' },
+            player2: { name: 'MPC', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', team: 'team2', currentScore: 3.60, maxScore: 4.10, trend: 'stable' }
+          }
+        ]
       },
       {
         id: 2,
         tournament: 'EUROPA WoBeRa League',
-        round: '⚡ SEMI-FINAL',
         status: 'LIVE',
-        startTime: 'STARTED SAT 21 AUG 13:30',
-        endTime: 'END SAT 21 AUG 16:45',
-        timeRemaining: 'TIME REMAINING: 1h 32m',
-        timeSlot: 'TIME SLOT 13:30',
+        timeRemaining: '1h 32m',
         team1: { 
           name: 'MADRID EAGLES', 
           logo: 'https://images.unsplash.com/photo-1640182837698-d1dee88748b1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwyfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
-          score: 8,
           country: '🇪🇸',
-          players: [
-            { id: 7, name: 'Wall-e', avatar: 'https://images.unsplash.com/photo-1615418674275-25cb581798e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/2', wins: 146, losses: 24, accuracy: '86%' },
-            { id: 8, name: 'Arya Stark', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/4', wins: 233, losses: 60, accuracy: '79%' },
-            { id: 9, name: 'Spiderman', avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/3', wins: 195, losses: 34, accuracy: '85%' }
-          ]
+          teamScore: 8
         },
         team2: { 
           name: 'BARCELONA WOLVES', 
           logo: 'https://images.unsplash.com/photo-1577223597229-2a83f97def38?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxzb2NjZXIlMjBsb2dvc3xlbnwwfHx8fDE3NTMwMjc2NDZ8MA&ixlib=rb-4.1.0&q=85', 
-          score: 12,
           country: '🇪🇸',
-          players: [
-            { id: 10, name: 'Superman', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '1/3', wins: 189, losses: 19, accuracy: '91%' },
-            { id: 11, name: 'Thor', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '2/4', wins: 267, losses: 43, accuracy: '86%' },
-            { id: 12, name: 'Hulk', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '3/5', wins: 201, losses: 31, accuracy: '87%' }
-          ]
-        }
+          teamScore: 12
+        },
+        activeMatches: [
+          {
+            player1: { name: 'Wall-e', avatar: 'https://images.unsplash.com/photo-1615418674275-25cb581798e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', team: 'team1', currentScore: 1.75, maxScore: 3.20, trend: 'up' },
+            player2: { name: 'Superman', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', team: 'team2', currentScore: 2.65, maxScore: 3.85, trend: 'stable' }
+          }
+        ]
       },
       {
         id: 3,
         tournament: 'CHAMPIONS WoBeRa Cup',
-        round: '🔥 FINAL',
-        status: 'LIVE',
-        startTime: 'STARTED SAT 21 AUG 19:00',
-        endTime: 'END SAT 21 AUG 22:30',
-        timeRemaining: 'TIME REMAINING: 45m',
-        timeSlot: 'TIME SLOT 19:00',
+        status: 'FINAL',
+        timeRemaining: 'COMPLETED',
         team1: { 
           name: 'LIVERPOOL REDS', 
           logo: 'https://images.unsplash.com/photo-1632937925343-d8d581769c8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
-          score: 22,
           country: '🇬🇧',
-          players: [
-            { id: 13, name: 'Neo', avatar: 'https://images.unsplash.com/photo-1707414038523-b5d1c8294786?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', level: '5/5', wins: 312, losses: 22, accuracy: '93%' },
-            { id: 14, name: 'Morpheus', avatar: 'https://images.unsplash.com/photo-1615418674275-25cb581798e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '4/6', wins: 298, losses: 34, accuracy: '90%' },
-            { id: 15, name: 'Trinity', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '3/4', wins: 276, losses: 28, accuracy: '91%' }
-          ]
+          teamScore: 22
         },
         team2: { 
           name: 'MANCHESTER LIONS', 
           logo: 'https://images.unsplash.com/photo-1639895276073-5327a3ac56fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
-          score: 18,
           country: '🇬🇧',
-          players: [
-            { id: 16, name: 'Gandalf', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '6/6', wins: 445, losses: 31, accuracy: '93%' },
-            { id: 17, name: 'Legolas', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '4/5', wins: 356, losses: 27, accuracy: '93%' },
-            { id: 18, name: 'Gimli', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '2/3', wins: 234, losses: 45, accuracy: '84%' }
-          ]
-        }
+          teamScore: 18
+        },
+        activeMatches: [] // No active matches, tournament complete
       }
     ];
+
+    // Filter matches based on search
+    const filteredMatches = teamMatches.filter(match => 
+      match.team1.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
+      match.team2.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
+      match.tournament.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
+      match.activeMatches.some(activeMatch => 
+        activeMatch.player1.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
+        activeMatch.player2.name.toLowerCase().includes(sportsduelSearch.toLowerCase())
+      )
+    );
+
+    // Helper function to calculate percentage and get progress bar color
+    const calculateProgress = (current, max) => {
+      const percentage = Math.round((current / max) * 100);
+      let color = '#ef4444'; // Red for low
+      if (percentage > 70) color = '#22c55e'; // Green for high
+      else if (percentage > 40) color = '#f59e0b'; // Yellow for medium
+      return { percentage, color };
+    };
 
     return (
       <div className="sportsduel-container">
