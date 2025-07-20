@@ -13455,12 +13455,25 @@ function App() {
                 <span className="live-dot"></span>
                 <span>LIVE</span>
               </div>
-              <div className="matches-count">{liveMatches.length} Active Matches</div>
+              <div className="matches-count">{filteredMatches.length} Team Matches</div>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Live Scoreboard */}
+        {/* Search Bar */}
+        <div className="sportsduel-search">
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="🔍 Search teams or players..."
+              value={sportsduelSearch}
+              onChange={(e) => setSportsduelSearch(e.target.value)}
+              className="search-input"
+            />
+          </div>
+        </div>
+
+        {/* Compact Live Scoreboard */}
         <div className="live-scoreboard">
           <div className="scoreboard-header">
             <h2>🏆 Live Championship Matches</h2>
@@ -13472,220 +13485,139 @@ function App() {
             </div>
           </div>
 
-          <div className="enhanced-matches-grid">
-            {liveMatches.map(match => (
-              <div key={match.id} className="enhanced-match-card">
-                {/* Tournament Header */}
-                <div className="tournament-header">
-                  <div className="tournament-info">
-                    <div className="start-info">{match.startTime}</div>
-                    <div className="end-info">{match.endTime}</div>
-                  </div>
-                  
-                  <div className="tournament-center">
-                    <div className="tournament-badge">⭐ {match.tournament.toUpperCase()} ⭐</div>
-                    <div className="round-badge">{match.round}</div>
-                  </div>
-                  
-                  <div className="tournament-timing">
-                    <div className="time-remaining">{match.timeRemaining}</div>
-                  </div>
+          <div className="compact-matches-grid">
+            {filteredMatches.map(match => (
+              <div key={match.id} className="compact-match-card">
+                {/* Team vs Team Header */}
+                <div className="match-header">
+                  <div className="tournament-badge">{match.tournament}</div>
+                  <div className="match-status">{match.status}</div>
+                  <div className="time-remaining">{match.timeRemaining}</div>
                 </div>
 
-                {/* Main Scoreboard */}
-                <div className="main-scoreboard">
-                  <div className="scoreboard-title">SCOREBOARD</div>
-                  
-                  <div className="teams-score-section">
-                    {/* Team 1 Logo & Score */}
-                    <div className="team-score-display">
-                      <div className="team-logo-circle">
-                        <div className="team-badge">
-                          <img src={match.team1.logo} alt={match.team1.name} className="team-logo-image" />
-                          <span className="team-country">{match.team1.country}</span>
-                        </div>
-                      </div>
-                      <div className="team-score-large">{match.team1.score}</div>
+                {/* Team Score Display */}
+                <div className="team-scoreboard">
+                  {/* Team 1 */}
+                  <div className="team-display">
+                    <div className="team-info">
+                      <img src={match.team1.logo} alt={match.team1.name} className="team-logo" />
+                      <div className="team-flag">{match.team1.country}</div>
                     </div>
-
-                    {/* Center VS & Status */}
-                    <div className="center-vs-section">
-                      <div className="match-status-center">{match.status}</div>
-                    </div>
-
-                    {/* Team 2 Logo & Score */}
-                    <div className="team-score-display">
-                      <div className="team-score-large">{match.team2.score}</div>
-                      <div className="team-logo-circle">
-                        <div className="team-badge">
-                          <img src={match.team2.logo} alt={match.team2.name} className="team-logo-image" />
-                          <span className="team-country">{match.team2.country}</span>
-                        </div>
-                      </div>
-                    </div>
+                    <div className="team-name">{match.team1.name}</div>
+                    <div className="team-score">{match.team1.teamScore}</div>
                   </div>
 
-                  {/* Team Names Bar */}
-                  <div className="team-names-bar">
-                    <div className="team-name-section team1">
-                      <span className="team-country-flag">{match.team1.country}</span>
-                      <span className="team-name">{match.team1.name}</span>
-                    </div>
-                    <div className="vs-divider-center">VS</div>
-                    <div className="team-name-section team2">
-                      <span className="team-name">{match.team2.name}</span>
-                      <span className="team-country-flag">{match.team2.country}</span>
+                  {/* VS Divider */}
+                  <div className="vs-divider">
+                    <div className="vs-text">VS</div>
+                  </div>
+
+                  {/* Team 2 */}
+                  <div className="team-display team2">
+                    <div className="team-score">{match.team2.teamScore}</div>
+                    <div className="team-name">{match.team2.name}</div>
+                    <div className="team-info">
+                      <div className="team-flag">{match.team2.country}</div>
+                      <img src={match.team2.logo} alt={match.team2.name} className="team-logo" />
                     </div>
                   </div>
                 </div>
 
-                {/* Time Slot Separator */}
-                <div className="time-slot-separator">
-                  {match.timeSlot}
-                </div>
-
-                {/* Players Section */}
-                <div className="players-section">
-                  {/* Live Players Section */}
-                  <div className="live-players-section">
-                    <div className="players-section-header">
-                      <span className="live-indicator-small">🔴 LIVE</span>
-                      <span className="section-title">Active Players</span>
-                    </div>
-                    
-                    {/* Team 1 Live Players */}
-                    <div className="team-players team1-players">
-                      {match.team1.players.slice(0, 2).map((player, index) => (
-                        <div key={player.id} className="player-row">
-                          <div className="player-avatar-section">
-                            <div className="player-avatar">
-                              <img src={player.avatar} alt={player.name} className="player-photo" />
-                            </div>
-                            <div className="player-level">{player.level}</div>
-                          </div>
-                          <div className="player-info-section">
-                            <div className="player-name">{player.name}</div>
-                            <div className="live-score-info">
-                              <span className={`current-score ${player.trend}`}>
-                                {player.currentScore}/{player.maxScore}
-                              </span>
-                              <span className={`trend-indicator ${player.trend}`}>
-                                {player.trend === 'up' ? '📈' : player.trend === 'down' ? '📉' : '➡️'}
-                              </span>
-                            </div>
-                            <div className="player-stats">
-                              <span className="stat-wins">🔴 {player.wins}</span>
-                              <span className="stat-losses">🟢 {player.losses}</span>
-                              <span className="stat-accuracy">{player.accuracy}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Team 2 Live Players */}
-                    <div className="team-players team2-players">
-                      {match.team2.players.slice(0, 2).map((player, index) => (
-                        <div key={player.id} className="player-row team2-row">
-                          <div className="player-info-section team2-info">
-                            <div className="player-name">{player.name}</div>
-                            <div className="live-score-info team2-score">
-                              <span className={`trend-indicator ${player.trend}`}>
-                                {player.trend === 'up' ? '📈' : player.trend === 'down' ? '📉' : '➡️'}
-                              </span>
-                              <span className={`current-score ${player.trend}`}>
-                                {player.currentScore}/{player.maxScore}
-                              </span>
-                            </div>
-                            <div className="player-stats">
-                              <span className="stat-accuracy">{player.accuracy}</span>
-                              <span className="stat-losses">🟢 {player.losses}</span>
-                              <span className="stat-wins">🔴 {player.wins}</span>
-                            </div>
-                          </div>
-                          <div className="player-avatar-section">
-                            <div className="player-level">{player.level}</div>
-                            <div className="player-avatar">
-                              <img src={player.avatar} alt={player.name} className="player-photo" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Next Round Time Separator */}
-                  <div className="next-round-separator">
-                    <div className="next-round-time">⏰ NEXT ROUND STARTS AT {
-                      match.id === 1 ? '15:30' : match.id === 2 ? '14:30' : '20:30'
-                    }</div>
-                  </div>
-
-                  {/* Upcoming Players Section */}
-                  <div className="upcoming-players-section">
-                    <div className="players-section-header">
-                      <span className="upcoming-indicator-small">⏳ UPCOMING</span>
-                      <span className="section-title">Next Round Players</span>
-                    </div>
-
-                    <div className="upcoming-players-grid">
-                      {/* Team 1 Upcoming Players */}
-                      <div className="team-players team1-players">
-                        {match.team1.players.slice(2).map((player, index) => (
-                          <div key={player.id} className="player-row upcoming-player">
-                            <div className="player-avatar-section">
+                {/* Active 1v1 Matches */}
+                {match.activeMatches.length > 0 && (
+                  <div className="active-matches">
+                    <div className="section-title">🔴 Live 1v1 Matches</div>
+                    <div className="player-matches">
+                      {match.activeMatches.map((playerMatch, index) => {
+                        const progress1 = calculateProgress(playerMatch.player1.currentScore, playerMatch.player1.maxScore);
+                        const progress2 = calculateProgress(playerMatch.player2.currentScore, playerMatch.player2.maxScore);
+                        
+                        return (
+                          <div key={index} className="player-match">
+                            {/* Player 1 */}
+                            <div className="player-card">
                               <div className="player-avatar">
-                                <img src={player.avatar} alt={player.name} className="player-photo" />
+                                <img src={playerMatch.player1.avatar} alt={playerMatch.player1.name} />
                               </div>
-                              <div className="player-level">{player.level}</div>
-                            </div>
-                            <div className="player-info-section">
-                              <div className="player-name">{player.name}</div>
-                              <div className="player-stats">
-                                <span className="stat-wins">🔴 {player.wins}</span>
-                                <span className="stat-losses">🟢 {player.losses}</span>
-                                <span className="stat-accuracy">{player.accuracy}</span>
+                              <div className="player-details">
+                                <div className="player-name">{playerMatch.player1.name}</div>
+                                <div className="player-score">
+                                  <span className="score-text">{playerMatch.player1.currentScore}/{playerMatch.player1.maxScore}</span>
+                                  <span className={`trend-arrow ${playerMatch.player1.trend}`}>
+                                    {playerMatch.player1.trend === 'up' ? '📈' : playerMatch.player1.trend === 'down' ? '📉' : '➡️'}
+                                  </span>
+                                </div>
+                                <div className="progress-bar">
+                                  <div 
+                                    className="progress-fill" 
+                                    style={{
+                                      width: `${progress1.percentage}%`,
+                                      backgroundColor: progress1.color
+                                    }}
+                                  ></div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
 
-                      {/* Team 2 Upcoming Players */}
-                      <div className="team-players team2-players">
-                        {match.team2.players.slice(2).map((player, index) => (
-                          <div key={player.id} className="player-row team2-row upcoming-player">
-                            <div className="player-info-section team2-info">
-                              <div className="player-name">{player.name}</div>
-                              <div className="player-stats">
-                                <span className="stat-accuracy">{player.accuracy}</span>
-                                <span className="stat-losses">🟢 {player.losses}</span>
-                                <span className="stat-wins">🔴 {player.wins}</span>
+                            {/* VS */}
+                            <div className="player-vs">VS</div>
+
+                            {/* Player 2 */}
+                            <div className="player-card">
+                              <div className="player-details player2-details">
+                                <div className="player-name">{playerMatch.player2.name}</div>
+                                <div className="player-score">
+                                  <span className={`trend-arrow ${playerMatch.player2.trend}`}>
+                                    {playerMatch.player2.trend === 'up' ? '📈' : playerMatch.player2.trend === 'down' ? '📉' : '➡️'}
+                                  </span>
+                                  <span className="score-text">{playerMatch.player2.currentScore}/{playerMatch.player2.maxScore}</span>
+                                </div>
+                                <div className="progress-bar">
+                                  <div 
+                                    className="progress-fill" 
+                                    style={{
+                                      width: `${progress2.percentage}%`,
+                                      backgroundColor: progress2.color
+                                    }}
+                                  ></div>
+                                </div>
                               </div>
-                            </div>
-                            <div className="player-avatar-section">
-                              <div className="player-level">{player.level}</div>
                               <div className="player-avatar">
-                                <img src={player.avatar} alt={player.name} className="player-photo" />
+                                <img src={playerMatch.player2.avatar} alt={playerMatch.player2.name} />
                               </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
+                        );
+                      })}
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Match Actions */}
-                <div className="enhanced-match-actions">
-                  <button className="action-btn detailed-view">📊 Detailed View</button>
-                  <button className="action-btn place-prediction">🎯 Place Prediction</button>
-                  <button className="action-btn watch-live">📺 Watch Live</button>
-                  <button className="action-btn join-match">⚔️ Join Next Round</button>
-                </div>
+                {/* No Active Matches */}
+                {match.activeMatches.length === 0 && (
+                  <div className="no-active-matches">
+                    <span className="completion-badge">✅ Tournament Complete</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
+
+          {/* No Results */}
+          {filteredMatches.length === 0 && sportsduelSearch && (
+            <div className="no-results">
+              <div className="no-results-content">
+                <div className="no-results-icon">🔍</div>
+                <div className="no-results-text">No matches found for "{sportsduelSearch}"</div>
+                <button 
+                  className="clear-search-btn"
+                  onClick={() => setSportsduelSearch('')}
+                >
+                  Clear Search
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Enhanced League Statistics */}
@@ -13695,22 +13627,22 @@ function App() {
             <div className="stat-item-enhanced">
               <div className="stat-icon-large">🏆</div>
               <div className="stat-details">
-                <div className="stat-value-large">3</div>
-                <div className="stat-label-enhanced">Active Tournaments</div>
+                <div className="stat-value-large">{teamMatches.length}</div>
+                <div className="stat-label-enhanced">Team Competitions</div>
               </div>
             </div>
             <div className="stat-item-enhanced">
               <div className="stat-icon-large">⚔️</div>
               <div className="stat-details">
-                <div className="stat-value-large">54</div>
-                <div className="stat-label-enhanced">Total Predictions</div>
+                <div className="stat-value-large">{teamMatches.reduce((total, match) => total + match.activeMatches.length, 0)}</div>
+                <div className="stat-label-enhanced">Live 1v1 Matches</div>
               </div>
             </div>
             <div className="stat-item-enhanced">
               <div className="stat-icon-large">👥</div>
               <div className="stat-details">
-                <div className="stat-value-large">18</div>
-                <div className="stat-label-enhanced">Elite Players</div>
+                <div className="stat-value-large">{teamMatches.reduce((total, match) => total + match.activeMatches.length * 2, 0)}</div>
+                <div className="stat-label-enhanced">Active Players</div>
               </div>
             </div>
             <div className="stat-item-enhanced">
