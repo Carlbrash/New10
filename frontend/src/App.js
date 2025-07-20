@@ -1070,6 +1070,37 @@ function App() {
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [siteMessages, setSiteMessages] = useState([]);
   const [adminActions, setAdminActions] = useState([]);
+  
+  // CMS States
+  const [cmsContent, setCmsContent] = useState([]);
+  const [cmsThemes, setCmsThemes] = useState([]);
+  const [activeTheme, setActiveTheme] = useState(null);
+  const [cmsLoading, setCmsLoading] = useState(false);
+  const [selectedContentContext, setSelectedContentContext] = useState('navbar');
+  const [editingContent, setEditingContent] = useState(null);
+  const [showContentModal, setShowContentModal] = useState(false);
+  const [showThemeModal, setShowThemeModal] = useState(false);
+  const [contentForm, setContentForm] = useState({
+    key: '',
+    content_type: 'text',
+    context: 'general',
+    current_value: '',
+    description: ''
+  });
+  const [themeForm, setThemeForm] = useState({
+    name: '',
+    colors: {
+      primary: '#4fc3f7',
+      secondary: '#29b6f6',
+      accent: '#ffd700',
+      success: '#22c55e',
+      warning: '#f59e0b',
+      error: '#ef4444',
+      background: '#1a1a1a',
+      surface: '#2a2a2a',
+      text: '#ffffff'
+    }
+  });
   const [adminLoading, setAdminLoading] = useState(false);
   const [top100Users, setTop100Users] = useState([]);
   const [showTop100, setShowTop100] = useState(false);
