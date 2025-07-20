@@ -138,12 +138,13 @@ body {
 
 /* Compact navigation for logged in users */
 .navbar.logged-in .navbar-menu {
-  gap: 0.5rem;
+  gap: 0.3rem;
 }
 
 .navbar.logged-in .nav-link {
-  padding: 0.3rem 0.5rem;
-  font-size: 0.8rem;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.75rem;
+  gap: 0.2rem;
 }
 
 /* Mobile Navigation */
