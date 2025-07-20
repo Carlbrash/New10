@@ -1102,6 +1102,262 @@ body {
 }
 
 /* =============================================================================
+   WORLD MAP & COUNTRIES SYSTEM STYLES
+============================================================================= */
+
+.countries-container {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.9));
+  min-height: 100vh;
+}
+
+.countries-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.countries-header h2 {
+  color: #4fc3f7;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.countries-list {
+  padding: 2rem 1rem;
+}
+
+.countries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.country-item {
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.8), rgba(50, 50, 50, 0.6));
+  border-radius: 12px;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.country-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(79, 195, 247, 0.3);
+  border-color: rgba(79, 195, 247, 0.5);
+}
+
+.country-flag {
+  font-size: 2rem;
+  min-width: 40px;
+  text-align: center;
+}
+
+.country-info {
+  flex: 1;
+}
+
+.country-info h3 {
+  color: #4fc3f7;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.user-count {
+  color: #dddddd;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Country Search */
+.search-container {
+  position: relative;
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+.country-search {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border-radius: 12px;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  background: rgba(30, 30, 30, 0.8) !important;
+  color: white !important;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.country-search:focus {
+  outline: none;
+  border-color: #4fc3f7;
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+  background: rgba(30, 30, 30, 0.9) !important;
+}
+
+.country-search::placeholder {
+  color: #999 !important;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4fc3f7;
+  font-size: 1.2rem;
+}
+
+/* Country Details & Rankings */
+.country-details {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.country-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.country-flag-large {
+  font-size: 4rem;
+}
+
+.country-title {
+  flex: 1;
+}
+
+.country-title h2 {
+  color: #4fc3f7;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.country-subtitle {
+  color: #dddddd;
+  font-size: 1.1rem;
+}
+
+.country-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.country-stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-number {
+  color: #4fc3f7;
+  font-size: 2rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: #dddddd;
+  font-size: 0.9rem;
+}
+
+/* Navigation & Back Buttons */
+.back-button {
+  background: rgba(79, 195, 247, 0.1);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  color: #4fc3f7;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.back-button:hover {
+  background: rgba(79, 195, 247, 0.2);
+  border-color: rgba(79, 195, 247, 0.5);
+}
+
+/* Swipe Navigation */
+.swipe-hint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(79, 195, 247, 0.1);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  color: #4fc3f7;
+  padding: 0.8rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .countries-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .countries-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .country-item {
+    padding: 1rem;
+  }
+  
+  .country-flag {
+    font-size: 1.5rem;
+  }
+  
+  .country-info h3 {
+    font-size: 1rem;
+  }
+  
+  .country-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .country-flag-large {
+    font-size: 3rem;
+  }
+  
+  .country-title h2 {
+    font-size: 2rem;
+  }
+  
+  .country-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* =============================================================================
    GUILD SYSTEM STYLES
 ============================================================================= */
 
