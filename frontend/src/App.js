@@ -13345,49 +13345,103 @@ function App() {
   // =============================================================================
   
   const renderSportsDuel = () => {
-    // Mock live matches data for demonstration
+    // Enhanced mock live matches data with detailed player information
     const liveMatches = [
       {
         id: 1,
-        status: 'LIVE',
-        minute: 75,
-        team1: { name: 'Chelsea Sharks', logo: '🦈', score: 2, players: 18, predictions: 15 },
-        team2: { name: 'Arsenal Lions', logo: '🦁', score: 1, players: 20, predictions: 12 }
+        tournament: 'ELITE WoBeRa Championship',
+        round: '🏆 ROUND 1',
+        status: 'FINAL SCORE',
+        startTime: 'STARTED FRI 20 AUG 15:00',
+        endTime: 'END SAT 21 AUG 18:30',
+        timeRemaining: 'TIME REMAINING: 2h 15m',
+        timeSlot: 'TIME SLOT 15:00',
+        team1: { 
+          name: 'CHELSEA WIZARDS', 
+          logo: '🧙‍♂️', 
+          score: 15,
+          country: '🇬🇧',
+          players: [
+            { id: 1, name: 'LiLinGeo', avatar: '👨‍💼', level: '1/5', wins: 128, losses: 25, accuracy: '85%' },
+            { id: 2, name: 'Emma', avatar: '👩‍🦳', level: '2/5', wins: 156, losses: 30, accuracy: '79%' },
+            { id: 3, name: 'John Snow', avatar: '🧑‍🎤', level: '1/6', wins: 119, losses: 37, accuracy: '76%' }
+          ]
+        },
+        team2: { 
+          name: 'GLYFADA SHARKS', 
+          logo: '🦈', 
+          score: 19,
+          country: '🇬🇷',
+          players: [
+            { id: 4, name: 'CarlBrash', avatar: '👨‍💻', level: '6/6', wins: 213, losses: 13, accuracy: '94%' },
+            { id: 5, name: 'MPC', avatar: '👩‍🔬', level: '4/4', wins: 196, losses: 26, accuracy: '88%' },
+            { id: 6, name: 'Martyn', avatar: '🧑‍🚀', level: '1/2', wins: 155, losses: 18, accuracy: '90%' }
+          ]
+        }
       },
       {
         id: 2,
+        tournament: 'EUROPA WoBeRa League',
+        round: '⚡ SEMI-FINAL',
         status: 'LIVE',
-        minute: 42,
-        team1: { name: 'Madrid Eagles', logo: '🦅', score: 0, players: 19, predictions: 8 },
-        team2: { name: 'Barcelona Wolves', logo: '🐺', score: 3, players: 17, predictions: 18 }
+        startTime: 'STARTED SAT 21 AUG 13:30',
+        endTime: 'END SAT 21 AUG 16:45',
+        timeRemaining: 'TIME REMAINING: 1h 32m',
+        timeSlot: 'TIME SLOT 13:30',
+        team1: { 
+          name: 'MADRID EAGLES', 
+          logo: '🦅', 
+          score: 8,
+          country: '🇪🇸',
+          players: [
+            { id: 7, name: 'Wall-e', avatar: '🤖', level: '1/2', wins: 146, losses: 24, accuracy: '86%' },
+            { id: 8, name: 'Arya Stark', avatar: '⚔️', level: '1/4', wins: 233, losses: 60, accuracy: '79%' },
+            { id: 9, name: 'Spiderman', avatar: '🕷️', level: '1/3', wins: 195, losses: 34, accuracy: '85%' }
+          ]
+        },
+        team2: { 
+          name: 'BARCELONA WOLVES', 
+          logo: '🐺', 
+          score: 12,
+          country: '🇪🇸',
+          players: [
+            { id: 10, name: 'Superman', avatar: '🦸‍♂️', level: '1/3', wins: 189, losses: 19, accuracy: '91%' },
+            { id: 11, name: 'Thor', avatar: '⚡', level: '2/4', wins: 267, losses: 43, accuracy: '86%' },
+            { id: 12, name: 'Hulk', avatar: '💚', level: '3/5', wins: 201, losses: 31, accuracy: '87%' }
+          ]
+        }
       },
       {
         id: 3,
+        tournament: 'CHAMPIONS WoBeRa Cup',
+        round: '🔥 FINAL',
         status: 'LIVE',
-        minute: 88,
-        team1: { name: 'Liverpool Reds', logo: '🔴', score: 4, players: 20, predictions: 20 },
-        team2: { name: 'City Blues', logo: '🔵', score: 2, players: 16, predictions: 14 }
-      },
-      {
-        id: 4,
-        status: 'HT',
-        minute: 45,
-        team1: { name: 'United Devils', logo: '😈', score: 1, players: 18, predictions: 11 },
-        team2: { name: 'Tottenham Spurs', logo: '⚡', score: 1, players: 19, predictions: 13 }
-      },
-      {
-        id: 5,
-        status: 'LIVE',
-        minute: 67,
-        team1: { name: 'PSG Stars', logo: '⭐', score: 2, players: 20, predictions: 17 },
-        team2: { name: 'Bayern Tigers', logo: '🐅', score: 0, players: 15, predictions: 9 }
-      },
-      {
-        id: 6,
-        status: 'LIVE',
-        minute: 23,
-        team1: { name: 'Juventus Bulls', logo: '🐂', score: 1, players: 17, predictions: 14 },
-        team2: { name: 'Inter Snakes', logo: '🐍', score: 0, players: 18, predictions: 10 }
+        startTime: 'STARTED SAT 21 AUG 19:00',
+        endTime: 'END SAT 21 AUG 22:30',
+        timeRemaining: 'TIME REMAINING: 45m',
+        timeSlot: 'TIME SLOT 19:00',
+        team1: { 
+          name: 'LIVERPOOL REDS', 
+          logo: '🔴', 
+          score: 22,
+          country: '🇬🇧',
+          players: [
+            { id: 13, name: 'Neo', avatar: '🕴️', level: '5/5', wins: 312, losses: 22, accuracy: '93%' },
+            { id: 14, name: 'Morpheus', avatar: '🕶️', level: '4/6', wins: 298, losses: 34, accuracy: '90%' },
+            { id: 15, name: 'Trinity', avatar: '👩‍💻', level: '3/4', wins: 276, losses: 28, accuracy: '91%' }
+          ]
+        },
+        team2: { 
+          name: 'MANCHESTER LIONS', 
+          logo: '🦁', 
+          score: 18,
+          country: '🇬🇧',
+          players: [
+            { id: 16, name: 'Gandalf', avatar: '🧙‍♂️', level: '6/6', wins: 445, losses: 31, accuracy: '93%' },
+            { id: 17, name: 'Legolas', avatar: '🏹', level: '4/5', wins: 356, losses: 27, accuracy: '93%' },
+            { id: 18, name: 'Gimli', avatar: '🪓', level: '2/3', wins: 234, losses: 45, accuracy: '84%' }
+          ]
+        }
       }
     ];
 
@@ -13396,7 +13450,7 @@ function App() {
         {/* SportsDuel Header */}
         <div className="sportsduel-header">
           <div className="header-content">
-            <h1>⚽ SportsDuel Live Scoreboard</h1>
+            <h1>⚽ WoBeRa SportsDuel Live Championship</h1>
             <div className="header-stats">
               <div className="live-indicator">
                 <span className="live-dot"></span>
@@ -13407,10 +13461,10 @@ function App() {
           </div>
         </div>
 
-        {/* Live Scoreboard */}
+        {/* Enhanced Live Scoreboard */}
         <div className="live-scoreboard">
           <div className="scoreboard-header">
-            <h2>🏆 Live Matches</h2>
+            <h2>🏆 Live Championship Matches</h2>
             <div className="refresh-controls">
               <button className="refresh-btn" onClick={() => window.location.reload()}>
                 🔄 Refresh
@@ -13419,143 +13473,181 @@ function App() {
             </div>
           </div>
 
-          <div className="matches-grid">
+          <div className="enhanced-matches-grid">
             {liveMatches.map(match => (
-              <div key={match.id} className="match-card">
-                {/* Match Status Bar */}
-                <div className="match-status-bar">
-                  <div className={`status-badge ${match.status.toLowerCase()}`}>
-                    {match.status}
+              <div key={match.id} className="enhanced-match-card">
+                {/* Tournament Header */}
+                <div className="tournament-header">
+                  <div className="tournament-info">
+                    <div className="start-info">{match.startTime}</div>
+                    <div className="end-info">{match.endTime}</div>
                   </div>
-                  <div className="match-time">
-                    {match.status === 'LIVE' ? `${match.minute}'` : 
-                     match.status === 'HT' ? 'Half Time' : match.minute}
+                  
+                  <div className="tournament-center">
+                    <div className="tournament-badge">⭐ {match.tournament.toUpperCase()} ⭐</div>
+                    <div className="round-badge">{match.round}</div>
                   </div>
-                  <div className="competition-badge">
-                    WoBeRa League
-                  </div>
-                </div>
-
-                {/* Teams Section */}
-                <div className="teams-section">
-                  {/* Team 1 */}
-                  <div className="team team-home">
-                    <div className="team-logo">
-                      <span className="logo-emoji">{match.team1.logo}</span>
-                    </div>
-                    <div className="team-info">
-                      <h3 className="team-name">{match.team1.name}</h3>
-                      <div className="team-stats">
-                        <span className="players">👥 {match.team1.players} Players</span>
-                        <span className="predictions">🎯 {match.team1.predictions} Predictions</span>
-                      </div>
-                    </div>
-                    <div className="team-score">
-                      {match.team1.score}
-                    </div>
-                  </div>
-
-                  {/* VS Divider */}
-                  <div className="vs-divider">
-                    <span className="vs-text">VS</span>
-                  </div>
-
-                  {/* Team 2 */}
-                  <div className="team team-away">
-                    <div className="team-score">
-                      {match.team2.score}
-                    </div>
-                    <div className="team-info">
-                      <h3 className="team-name">{match.team2.name}</h3>
-                      <div className="team-stats">
-                        <span className="players">👥 {match.team2.players} Players</span>
-                        <span className="predictions">🎯 {match.team2.predictions} Predictions</span>
-                      </div>
-                    </div>
-                    <div className="team-logo">
-                      <span className="logo-emoji">{match.team2.logo}</span>
-                    </div>
+                  
+                  <div className="tournament-timing">
+                    <div className="time-remaining">{match.timeRemaining}</div>
                   </div>
                 </div>
 
-                {/* Match Progress */}
-                <div className="match-progress">
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill" 
-                      style={{ width: `${(match.minute / 90) * 100}%` }}
-                    ></div>
+                {/* Main Scoreboard */}
+                <div className="main-scoreboard">
+                  <div className="scoreboard-title">SCOREBOARD</div>
+                  
+                  <div className="teams-score-section">
+                    {/* Team 1 Logo & Score */}
+                    <div className="team-score-display">
+                      <div className="team-logo-circle">
+                        <div className="team-badge">
+                          <span className="team-emoji">{match.team1.logo}</span>
+                          <span className="team-country">{match.team1.country}</span>
+                        </div>
+                      </div>
+                      <div className="team-score-large">{match.team1.score}</div>
+                    </div>
+
+                    {/* Center VS & Status */}
+                    <div className="center-vs-section">
+                      <div className="match-status-center">{match.status}</div>
+                    </div>
+
+                    {/* Team 2 Logo & Score */}
+                    <div className="team-score-display">
+                      <div className="team-score-large">{match.team2.score}</div>
+                      <div className="team-logo-circle">
+                        <div className="team-badge">
+                          <span className="team-emoji">{match.team2.logo}</span>
+                          <span className="team-country">{match.team2.country}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="progress-info">
-                    <span>Match Progress: {Math.round((match.minute / 90) * 100)}%</span>
+
+                  {/* Team Names Bar */}
+                  <div className="team-names-bar">
+                    <div className="team-name-section team1">
+                      <span className="team-country-flag">{match.team1.country}</span>
+                      <span className="team-name">{match.team1.name}</span>
+                    </div>
+                    <div className="vs-divider-center">VS</div>
+                    <div className="team-name-section team2">
+                      <span className="team-name">{match.team2.name}</span>
+                      <span className="team-country-flag">{match.team2.country}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Time Slot Separator */}
+                <div className="time-slot-separator">
+                  {match.timeSlot}
+                </div>
+
+                {/* Players Section */}
+                <div className="players-section">
+                  {/* Team 1 Players */}
+                  <div className="team-players team1-players">
+                    {match.team1.players.map((player, index) => (
+                      <div key={player.id} className="player-row">
+                        <div className="player-avatar-section">
+                          <div className="player-avatar">{player.avatar}</div>
+                          <div className="player-level">{player.level}</div>
+                        </div>
+                        <div className="player-info-section">
+                          <div className="player-name">{player.name}</div>
+                          <div className="player-stats">
+                            <span className="stat-wins">🔴 {player.wins}</span>
+                            <span className="stat-losses">🟢 {player.losses}</span>
+                            <span className="stat-accuracy">{player.accuracy}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Team 2 Players */}
+                  <div className="team-players team2-players">
+                    {match.team2.players.map((player, index) => (
+                      <div key={player.id} className="player-row team2-row">
+                        <div className="player-info-section team2-info">
+                          <div className="player-name">{player.name}</div>
+                          <div className="player-stats">
+                            <span className="stat-accuracy">{player.accuracy}</span>
+                            <span className="stat-losses">🟢 {player.losses}</span>
+                            <span className="stat-wins">🔴 {player.wins}</span>
+                          </div>
+                        </div>
+                        <div className="player-avatar-section">
+                          <div className="player-level">{player.level}</div>
+                          <div className="player-avatar">{player.avatar}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 {/* Match Actions */}
-                <div className="match-actions">
-                  <button className="action-btn view-details">
-                    📊 View Details
-                  </button>
-                  <button className="action-btn place-bet">
-                    🎲 Place Bet
-                  </button>
-                  <button className="action-btn watch-live">
-                    📺 Watch Live
-                  </button>
+                <div className="enhanced-match-actions">
+                  <button className="action-btn detailed-view">📊 Detailed View</button>
+                  <button className="action-btn place-prediction">🎯 Place Prediction</button>
+                  <button className="action-btn watch-live">📺 Watch Live</button>
+                  <button className="action-btn join-match">⚔️ Join Next Round</button>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* League Statistics */}
-        <div className="league-statistics">
-          <h3>📈 League Statistics</h3>
-          <div className="stats-grid">
-            <div className="stat-item">
-              <div className="stat-icon">⚽</div>
-              <div className="stat-info">
-                <div className="stat-value">24</div>
-                <div className="stat-label">Total Goals</div>
+        {/* Enhanced League Statistics */}
+        <div className="enhanced-league-statistics">
+          <h3>📊 Championship Statistics</h3>
+          <div className="stats-grid-enhanced">
+            <div className="stat-item-enhanced">
+              <div className="stat-icon-large">🏆</div>
+              <div className="stat-details">
+                <div className="stat-value-large">3</div>
+                <div className="stat-label-enhanced">Active Tournaments</div>
               </div>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon">👥</div>
-              <div className="stat-info">
-                <div className="stat-value">112</div>
-                <div className="stat-label">Active Players</div>
+            <div className="stat-item-enhanced">
+              <div className="stat-icon-large">⚔️</div>
+              <div className="stat-details">
+                <div className="stat-value-large">54</div>
+                <div className="stat-label-enhanced">Total Predictions</div>
               </div>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon">🎯</div>
-              <div className="stat-info">
-                <div className="stat-value">89</div>
-                <div className="stat-label">Predictions</div>
+            <div className="stat-item-enhanced">
+              <div className="stat-icon-large">👥</div>
+              <div className="stat-details">
+                <div className="stat-value-large">18</div>
+                <div className="stat-label-enhanced">Elite Players</div>
               </div>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon">🏆</div>
-              <div className="stat-info">
-                <div className="stat-value">6</div>
-                <div className="stat-label">Live Matches</div>
+            <div className="stat-item-enhanced">
+              <div className="stat-icon-large">🎯</div>
+              <div className="stat-details">
+                <div className="stat-value-large">87%</div>
+                <div className="stat-label-enhanced">Avg Accuracy</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="quick-actions">
-          <button className="quick-action-btn" onClick={() => setCurrentView('teams')}>
-            🏪 View All Teams
+        <div className="enhanced-quick-actions">
+          <button className="enhanced-quick-btn championship" onClick={() => setCurrentView('tournaments')}>
+            🏆 View All Championships
           </button>
-          <button className="quick-action-btn" onClick={() => setCurrentView('rankings')}>
-            🏆 League Rankings
+          <button className="enhanced-quick-btn rankings" onClick={() => setCurrentView('rankings')}>
+            📊 Elite Rankings
           </button>
-          <button className="quick-action-btn" onClick={() => alert('Coming soon!')}>
-            🎮 Join Match
+          <button className="enhanced-quick-btn teams" onClick={() => setCurrentView('teams')}>
+            🏪 Sports Cafes
           </button>
-          <button className="quick-action-btn" onClick={() => alert('Coming soon!')}>
-            📊 My Statistics
+          <button className="enhanced-quick-btn profile" onClick={() => alert('Player profiles coming soon!')}>
+            👤 My Elite Profile
           </button>
         </div>
       </div>
