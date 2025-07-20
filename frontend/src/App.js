@@ -5564,11 +5564,11 @@ function App() {
               {t.loginBtn}
             </button>
           </div>
-        </div>
-        
-        {/* Motto positioned separately */}
-        <div className="federation-motto">
-          <span className="motto-text">"Are You Ready to Prove ?"</span>
+          
+          {/* Motto centered below buttons */}
+          <div className="hero-motto">
+            <span className="motto-text">"Are You Ready to Prove ?"</span>
+          </div>
         </div>
       </div>
       
