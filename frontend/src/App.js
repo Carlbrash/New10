@@ -13090,7 +13090,7 @@ function App() {
         {/* Mobile Navigation Indicator */}
         <div className="mobile-nav-indicator">
           <div className="nav-dots">
-            {['home', 'rankings', 'worldmap', 'tournament', 'teams', user && 'dashboard', user && user.affiliate_id && 'affiliate', user && 'wallet', isAdmin && 'admin'].filter(Boolean).map((view) => (
+            {['home', 'rankings', 'worldmap', 'tournament', 'teams', user && 'guilds', user && 'dashboard', user && user.affiliate_id && 'affiliate', user && 'wallet', isAdmin && 'admin'].filter(Boolean).map((view) => (
               <div 
                 key={view}
                 className={`nav-dot ${currentView === view ? 'active' : ''}`}
