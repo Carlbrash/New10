@@ -13362,9 +13362,9 @@ function App() {
           score: 15,
           country: '🇬🇧',
           players: [
-            { id: 1, name: 'LiLinGeo', avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/5', wins: 128, losses: 25, accuracy: '85%' },
-            { id: 2, name: 'Emma', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '2/5', wins: 156, losses: 30, accuracy: '79%' },
-            { id: 3, name: 'John Snow', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '1/6', wins: 119, losses: 37, accuracy: '76%' }
+            { id: 1, name: 'LiLinGeo', avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/5', wins: 128, losses: 25, accuracy: '85%', currentScore: '2.30', maxScore: '5.20', trend: 'up' },
+            { id: 2, name: 'Emma', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '2/5', wins: 156, losses: 30, accuracy: '79%', currentScore: '1.85', maxScore: '4.60', trend: 'down' },
+            { id: 3, name: 'John Snow', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '1/6', wins: 119, losses: 37, accuracy: '76%', currentScore: '3.10', maxScore: '6.80', trend: 'up' }
           ]
         },
         team2: { 
