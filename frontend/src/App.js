@@ -13552,7 +13552,9 @@ function App() {
                     {match.team1.players.map((player, index) => (
                       <div key={player.id} className="player-row">
                         <div className="player-avatar-section">
-                          <div className="player-avatar">{player.avatar}</div>
+                          <div className="player-avatar">
+                            <img src={player.avatar} alt={player.name} className="player-photo" />
+                          </div>
                           <div className="player-level">{player.level}</div>
                         </div>
                         <div className="player-info-section">
