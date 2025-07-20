@@ -13583,7 +13583,9 @@ function App() {
                         </div>
                         <div className="player-avatar-section">
                           <div className="player-level">{player.level}</div>
-                          <div className="player-avatar">{player.avatar}</div>
+                          <div className="player-avatar">
+                            <img src={player.avatar} alt={player.name} className="player-photo" />
+                          </div>
                         </div>
                       </div>
                     ))}
