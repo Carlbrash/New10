@@ -13345,235 +13345,219 @@ function App() {
   // =============================================================================
   
   const renderSportsDuel = () => {
-    return (
-      <div className="container sportsduel-container">
-        <div className="sportsduel-header">
-          <h1>⚽ SportsDuel Championship</h1>
-          <p>Real-time sports betting leagues with cafe teams and player matchups</p>
-        </div>
+    // Mock live matches data for demonstration
+    const liveMatches = [
+      {
+        id: 1,
+        status: 'LIVE',
+        minute: 75,
+        team1: { name: 'Chelsea Sharks', logo: '🦈', score: 2, players: 18, predictions: 15 },
+        team2: { name: 'Arsenal Lions', logo: '🦁', score: 1, players: 20, predictions: 12 }
+      },
+      {
+        id: 2,
+        status: 'LIVE',
+        minute: 42,
+        team1: { name: 'Madrid Eagles', logo: '🦅', score: 0, players: 19, predictions: 8 },
+        team2: { name: 'Barcelona Wolves', logo: '🐺', score: 3, players: 17, predictions: 18 }
+      },
+      {
+        id: 3,
+        status: 'LIVE',
+        minute: 88,
+        team1: { name: 'Liverpool Reds', logo: '🔴', score: 4, players: 20, predictions: 20 },
+        team2: { name: 'City Blues', logo: '🔵', score: 2, players: 16, predictions: 14 }
+      },
+      {
+        id: 4,
+        status: 'HT',
+        minute: 45,
+        team1: { name: 'United Devils', logo: '😈', score: 1, players: 18, predictions: 11 },
+        team2: { name: 'Tottenham Spurs', logo: '⚡', score: 1, players: 19, predictions: 13 }
+      },
+      {
+        id: 5,
+        status: 'LIVE',
+        minute: 67,
+        team1: { name: 'PSG Stars', logo: '⭐', score: 2, players: 20, predictions: 17 },
+        team2: { name: 'Bayern Tigers', logo: '🐅', score: 0, players: 15, predictions: 9 }
+      },
+      {
+        id: 6,
+        status: 'LIVE',
+        minute: 23,
+        team1: { name: 'Juventus Bulls', logo: '🐂', score: 1, players: 17, predictions: 14 },
+        team2: { name: 'Inter Snakes', logo: '🐍', score: 0, players: 18, predictions: 10 }
+      }
+    ];
 
-        {/* League Selection */}
-        {sportsduelLeagues.length > 0 && (
-          <div className="league-selector">
-            <h3>🏆 Select League</h3>
-            <div className="league-cards">
-              {sportsduelLeagues.map((league) => (
-                <div 
-                  key={league.id}
-                  className={`league-card ${currentSportsduelLeague?.id === league.id ? 'active' : ''}`}
-                  onClick={() => setCurrentSportsduelLeague(league)}
-                >
-                  <h4>{league.name}</h4>
-                  <p>{league.description}</p>
-                  <div className="league-stats">
-                    <span>🏆 Season: {league.season}</span>
-                    <span>💰 Prize Pool: €{league.prize_pool}</span>
-                    <span>📊 Status: {league.status}</span>
-                  </div>
-                </div>
-              ))}
+    return (
+      <div className="sportsduel-container">
+        {/* SportsDuel Header */}
+        <div className="sportsduel-header">
+          <div className="header-content">
+            <h1>⚽ SportsDuel Live Scoreboard</h1>
+            <div className="header-stats">
+              <div className="live-indicator">
+                <span className="live-dot"></span>
+                <span>LIVE</span>
+              </div>
+              <div className="matches-count">{liveMatches.length} Active Matches</div>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Live Scoreboard */}
-        {currentSportsduelLeague && (
-          <div className="sportsduel-scoreboard">
-            <h3>📊 Live Scoreboard - {currentSportsduelLeague.name}</h3>
-            
-            {sportsduelLoading ? (
-              <div className="loading">Loading scoreboard...</div>
-            ) : sportsduelScoreboard.length > 0 ? (
-              <div className="scoreboard-matches">
-                {sportsduelScoreboard.map((match) => (
-                  <div key={match.match_id} className="scoreboard-match">
-                    <div className="match-teams">
-                      {/* Team 1 */}
-                      <div className="team-section">
-                        <div className="team-info">
-                          {match.team1.logo_url && (
-                            <img src={match.team1.logo_url} alt={match.team1.name} className="team-logo" />
-                          )}
-                          <h4>{match.team1.name}</h4>
-                        </div>
-                        <div className="player-card">
-                          {match.team1.player.avatar_url && (
-                            <img src={match.team1.player.avatar_url} alt={match.team1.player.nickname} className="player-avatar" />
-                          )}
-                          <div className="player-info">
-                            <h5>{match.team1.player.nickname}</h5>
-                            <div className="player-stats">
-                              <span className="correct">✅ {match.team1.player.correct_predictions}</span>
-                              <span className="wrong">❌ {match.team1.player.wrong_predictions}</span>
-                              <span className="odds">📈 {match.team1.player.total_odds.toFixed(2)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+        <div className="live-scoreboard">
+          <div className="scoreboard-header">
+            <h2>🏆 Live Matches</h2>
+            <div className="refresh-controls">
+              <button className="refresh-btn" onClick={() => window.location.reload()}>
+                🔄 Refresh
+              </button>
+              <div className="last-updated">Updated: {new Date().toLocaleTimeString()}</div>
+            </div>
+          </div>
 
-                      {/* VS Separator */}
-                      <div className="vs-section">
-                        <div className="vs-label">VS</div>
-                        <div className={`match-status ${match.status}`}>
-                          {match.status}
-                        </div>
-                        {match.winner_player_id && (
-                          <div className="winner-indicator">
-                            👑 Winner: {
-                              match.winner_player_id === match.team1.player.id 
-                                ? match.team1.player.nickname 
-                                : match.team2.player.nickname
-                            }
-                          </div>
-                        )}
-                      </div>
+          <div className="matches-grid">
+            {liveMatches.map(match => (
+              <div key={match.id} className="match-card">
+                {/* Match Status Bar */}
+                <div className="match-status-bar">
+                  <div className={`status-badge ${match.status.toLowerCase()}`}>
+                    {match.status}
+                  </div>
+                  <div className="match-time">
+                    {match.status === 'LIVE' ? `${match.minute}'` : 
+                     match.status === 'HT' ? 'Half Time' : match.minute}
+                  </div>
+                  <div className="competition-badge">
+                    WoBeRa League
+                  </div>
+                </div>
 
-                      {/* Team 2 */}
-                      <div className="team-section">
-                        <div className="team-info">
-                          {match.team2.logo_url && (
-                            <img src={match.team2.logo_url} alt={match.team2.name} className="team-logo" />
-                          )}
-                          <h4>{match.team2.name}</h4>
-                        </div>
-                        <div className="player-card">
-                          {match.team2.player.avatar_url && (
-                            <img src={match.team2.player.avatar_url} alt={match.team2.player.nickname} className="player-avatar" />
-                          )}
-                          <div className="player-info">
-                            <h5>{match.team2.player.nickname}</h5>
-                            <div className="player-stats">
-                              <span className="correct">✅ {match.team2.player.correct_predictions}</span>
-                              <span className="wrong">❌ {match.team2.player.wrong_predictions}</span>
-                              <span className="odds">📈 {match.team2.player.total_odds.toFixed(2)}</span>
-                            </div>
-                          </div>
-                        </div>
+                {/* Teams Section */}
+                <div className="teams-section">
+                  {/* Team 1 */}
+                  <div className="team team-home">
+                    <div className="team-logo">
+                      <span className="logo-emoji">{match.team1.logo}</span>
+                    </div>
+                    <div className="team-info">
+                      <h3 className="team-name">{match.team1.name}</h3>
+                      <div className="team-stats">
+                        <span className="players">👥 {match.team1.players} Players</span>
+                        <span className="predictions">🎯 {match.team1.predictions} Predictions</span>
                       </div>
                     </div>
+                    <div className="team-score">
+                      {match.team1.score}
+                    </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="no-matches">
-                <h4>No active matches</h4>
-                <p>Check back later for live matches!</p>
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Teams Overview */}
-        <div className="sportsduel-teams">
-          <h3>🏪 Sports Cafes</h3>
-          {sportsduelTeams.length > 0 ? (
-            <div className="teams-grid">
-              {sportsduelTeams.map((team) => (
-                <div key={team.id} className="team-card">
-                  {team.logo_url && (
-                    <img src={team.logo_url} alt={team.name} className="team-logo-large" />
-                  )}
-                  <h4>{team.name}</h4>
-                  <p className="cafe-name">{team.cafe_name}</p>
-                  <div className="team-location">
-                    📍 {team.city}, {team.country}
+                  {/* VS Divider */}
+                  <div className="vs-divider">
+                    <span className="vs-text">VS</span>
                   </div>
-                  <div className="team-stats">
-                    <span className="wins">🏆 Wins: {team.wins}</span>
-                    <span className="losses">❌ Losses: {team.losses}</span>
-                    <span className="draws">🤝 Draws: {team.draws}</span>
-                    <span className="points">⭐ Points: {team.points}</span>
+
+                  {/* Team 2 */}
+                  <div className="team team-away">
+                    <div className="team-score">
+                      {match.team2.score}
+                    </div>
+                    <div className="team-info">
+                      <h3 className="team-name">{match.team2.name}</h3>
+                      <div className="team-stats">
+                        <span className="players">👥 {match.team2.players} Players</span>
+                        <span className="predictions">🎯 {match.team2.predictions} Predictions</span>
+                      </div>
+                    </div>
+                    <div className="team-logo">
+                      <span className="logo-emoji">{match.team2.logo}</span>
+                    </div>
                   </div>
-                  <div className="team-contact">
-                    <span>📞 {team.contact_phone}</span>
-                    <span>📧 {team.contact_email}</span>
-                  </div>
-                  {user && !myPlayerProfile && (
-                    <button 
-                      className="btn btn-primary btn-sm"
-                      onClick={() => {
-                        const nickname = prompt('Enter your player nickname:');
-                        if (nickname) {
-                          joinSportsduelTeam(team.id, { team_id: team.id, nickname });
-                        }
-                      }}
-                    >
-                      🎮 Join as Player
-                    </button>
-                  )}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-teams">
-              <h4>No sports cafes registered yet</h4>
-              <p>Be the first to register your sports cafe!</p>
-              {user && (
-                <button 
-                  className="btn btn-primary"
-                  onClick={() => {
-                    const teamName = prompt('Enter your team name:');
-                    const cafeName = prompt('Enter your cafe name:');
-                    const city = prompt('Enter your city:');
-                    const country = prompt('Enter your country:');
-                    const phone = prompt('Enter contact phone:');
-                    const email = prompt('Enter contact email:');
-                    
-                    if (teamName && cafeName && city && country && phone && email) {
-                      createSportsduelTeam({
-                        name: teamName,
-                        cafe_name: cafeName,
-                        location: `${city}, ${country}`,
-                        country,
-                        city,
-                        contact_phone: phone,
-                        contact_email: email
-                      });
-                    }
-                  }}
-                >
-                  🏪 Register Sports Cafe
-                </button>
-              )}
-            </div>
-          )}
+
+                {/* Match Progress */}
+                <div className="match-progress">
+                  <div className="progress-bar">
+                    <div 
+                      className="progress-fill" 
+                      style={{ width: `${(match.minute / 90) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="progress-info">
+                    <span>Match Progress: {Math.round((match.minute / 90) * 100)}%</span>
+                  </div>
+                </div>
+
+                {/* Match Actions */}
+                <div className="match-actions">
+                  <button className="action-btn view-details">
+                    📊 View Details
+                  </button>
+                  <button className="action-btn place-bet">
+                    🎲 Place Bet
+                  </button>
+                  <button className="action-btn watch-live">
+                    📺 Watch Live
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* User Authentication Prompt */}
-        {!user && (
-          <div className="auth-prompt">
-            <h3>🔒 Join SportsDuel</h3>
-            <p>Login to participate in SportsDuel matches and manage your sports cafe!</p>
-            <button 
-              className="btn btn-primary"
-              onClick={() => setCurrentView('home')}
-            >
-              Login / Register
-            </button>
-          </div>
-        )}
-
-        {/* My Player Profile */}
-        {user && myPlayerProfile && (
-          <div className="my-player-profile">
-            <h3>👤 My Player Profile</h3>
-            <div className="player-profile-card">
-              {myPlayerProfile.avatar_url && (
-                <img src={myPlayerProfile.avatar_url} alt={myPlayerProfile.nickname} className="profile-avatar" />
-              )}
-              <div className="profile-info">
-                <h4>{myPlayerProfile.nickname}</h4>
-                <p>⭐ Skill Rating: {myPlayerProfile.skill_rating}</p>
-                <div className="profile-stats">
-                  <span>🏆 Wins: {myPlayerProfile.wins}</span>
-                  <span>❌ Losses: {myPlayerProfile.losses}</span>
-                  <span>🤝 Draws: {myPlayerProfile.draws}</span>
-                  <span>📊 Accuracy: {myPlayerProfile.average_accuracy}%</span>
-                </div>
+        {/* League Statistics */}
+        <div className="league-statistics">
+          <h3>📈 League Statistics</h3>
+          <div className="stats-grid">
+            <div className="stat-item">
+              <div className="stat-icon">⚽</div>
+              <div className="stat-info">
+                <div className="stat-value">24</div>
+                <div className="stat-label">Total Goals</div>
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-icon">👥</div>
+              <div className="stat-info">
+                <div className="stat-value">112</div>
+                <div className="stat-label">Active Players</div>
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-icon">🎯</div>
+              <div className="stat-info">
+                <div className="stat-value">89</div>
+                <div className="stat-label">Predictions</div>
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-icon">🏆</div>
+              <div className="stat-info">
+                <div className="stat-value">6</div>
+                <div className="stat-label">Live Matches</div>
               </div>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="quick-actions">
+          <button className="quick-action-btn" onClick={() => setCurrentView('teams')}>
+            🏪 View All Teams
+          </button>
+          <button className="quick-action-btn" onClick={() => setCurrentView('rankings')}>
+            🏆 League Rankings
+          </button>
+          <button className="quick-action-btn" onClick={() => alert('Coming soon!')}>
+            🎮 Join Match
+          </button>
+          <button className="quick-action-btn" onClick={() => alert('Coming soon!')}>
+            📊 My Statistics
+          </button>
+        </div>
       </div>
     );
   };
