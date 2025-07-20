@@ -6409,7 +6409,7 @@ async def get_guild_rankings(
         for i, guild in enumerate(rankings):
             guild["rank"] = i + 1
         
-        return {"rankings": rankings, "ranking_type": ranking_type}
+        return {"rankings": serialize_doc(rankings), "ranking_type": ranking_type, "total": len(rankings)}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching guild rankings: {str(e)}")
