@@ -7718,23 +7718,26 @@ img {
   opacity: 0.8;
 }
 
-/* Enhanced Matches Grid */
+/* Enhanced Matches Grid - Compact Design */
 .enhanced-matches-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(800px, 1fr));
-  gap: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Enhanced Match Card */
+/* Enhanced Match Card - Smaller and More Beautiful */
 .enhanced-match-card {
   background: linear-gradient(135deg, #1e40af, #2563eb, #1d4ed8);
   border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 25px;
+  border-radius: 20px;
   padding: 0;
   position: relative;
   overflow: hidden;
   transition: all 0.4s ease;
-  box-shadow: 0 12px 35px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+  max-width: 650px;
 }
 
 .enhanced-match-card::before {
