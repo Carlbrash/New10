@@ -9935,6 +9935,12 @@ async def get_active_theme():
                     "secondary": "Roboto, sans-serif"
                 }
             }
+        else:
+            # Convert datetime objects to strings for JSON serialization
+            if 'created_at' in active_theme:
+                active_theme['created_at'] = active_theme['created_at'].isoformat() if active_theme['created_at'] else None
+            if 'updated_at' in active_theme:
+                active_theme['updated_at'] = active_theme['updated_at'].isoformat() if active_theme['updated_at'] else None
         
         return CustomJSONResponse(content=active_theme)
     
