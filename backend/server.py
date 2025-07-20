@@ -1050,6 +1050,87 @@ class ManualAdjustmentRequest(BaseModel):
     reason: str
     admin_notes: Optional[str] = None
 
+# =============================================================================
+# CONTENT MANAGEMENT SYSTEM MODELS
+# =============================================================================
+
+class ContentType(str, Enum):
+    TEXT = "text"
+    COLOR = "color"
+    IMAGE = "image"
+    THEME = "theme"
+
+class ContentContext(str, Enum):
+    NAVBAR = "navbar"
+    HERO = "hero"
+    FEATURES = "features"
+    FOOTER = "footer"
+    DASHBOARD = "dashboard"
+    TOURNAMENT = "tournament"
+    AFFILIATE = "affiliate"
+    WALLET = "wallet"
+    TEAM = "team"
+    GUILD = "guild"
+    GENERAL = "general"
+
+class CMSContent(BaseModel):
+    id: str
+    key: str  # Unique identifier for content (e.g., "hero_title", "nav_login_text")
+    content_type: ContentType
+    context: ContentContext
+    default_value: str  # Original/default value
+    current_value: str  # Current customized value
+    description: Optional[str] = None  # Description for admin users
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
+    created_by: str  # Admin user ID who created this
+    updated_by: Optional[str] = None  # Admin user ID who last updated
+
+class CMSTranslation(BaseModel):
+    id: str
+    content_id: str  # Reference to CMSContent
+    language: str  # 'en', 'gr'
+    translated_value: str
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
+    created_by: str
+    updated_by: Optional[str] = None
+
+class CMSTheme(BaseModel):
+    id: str
+    name: str  # Theme name
+    colors: Dict[str, str]  # Color mappings (e.g., {"primary": "#4fc3f7", "secondary": "#29b6f6"})
+    fonts: Dict[str, str]  # Font mappings (e.g., {"primary": "Inter", "secondary": "Roboto"})
+    is_active: bool = True
+    is_default: bool = False
+    created_at: datetime
+    updated_at: datetime
+    created_by: str
+    updated_by: Optional[str] = None
+
+# Request/Response Models for CMS
+class ContentUpdateRequest(BaseModel):
+    key: str
+    content_type: ContentType
+    context: ContentContext
+    current_value: str
+    description: Optional[str] = None
+
+class ContentBulkUpdateRequest(BaseModel):
+    updates: List[ContentUpdateRequest]
+
+class ThemeUpdateRequest(BaseModel):
+    name: str
+    colors: Dict[str, str]
+    fonts: Optional[Dict[str, str]] = {}
+
+class TranslationUpdateRequest(BaseModel):
+    content_id: str
+    language: str
+    translated_value: str
+
 # Helper functions
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
