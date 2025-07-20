@@ -136,6 +136,16 @@ body {
   color: #4fc3f7;
 }
 
+/* Compact navigation for logged in users */
+.navbar.logged-in .navbar-menu {
+  gap: 0.5rem;
+}
+
+.navbar.logged-in .nav-link {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+}
+
 /* Mobile Navigation */
 @media (max-width: 1400px) {
   .navbar-menu {
