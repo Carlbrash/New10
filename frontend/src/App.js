@@ -617,7 +617,32 @@ const translations = {
     processAdjustment: 'Process Adjustment',
     bulkPayout: 'Bulk Payout',
     selectPayouts: 'Select Payouts',
-    processBulkPayout: 'Process Bulk Payout'
+    processBulkPayout: 'Process Bulk Payout',
+    
+    // Guild System
+    guildsTitle: 'Guild System',
+    createGuild: 'Create Guild',
+    joinGuild: 'Join Guild',
+    myGuild: 'My Guild',
+    browseGuilds: 'Browse Guilds',
+    guildRankings: 'Guild Rankings',
+    guildWars: 'Guild Wars',
+    guildName: 'Guild Name',
+    guildTag: 'Guild Tag',
+    guildDescription: 'Guild Description',
+    guildLeader: 'Guild Leader',
+    guildMembers: 'Guild Members',
+    guildLevel: 'Guild Level',
+    guildPowerRating: 'Power Rating',
+    guildTrophies: 'Guild Trophies',
+    recruitmentOpen: 'Open Recruitment',
+    inviteToGuild: 'Invite to Guild',
+    acceptInvitation: 'Accept Invitation',
+    declineInvitation: 'Decline Invitation',
+    challengeGuild: 'Challenge Guild',
+    guildWar: 'Guild War',
+    warObjectives: 'War Objectives',
+    warScore: 'War Score'
   }
 };
 
