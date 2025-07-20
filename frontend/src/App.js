@@ -8539,6 +8539,186 @@ function App() {
                       ))}
                     </div>
                   </div>
+
+                  {/* CMS Content Management Section */}
+                  <div className="tab-section">
+                    <h4>🎨 Dynamic Content & Theme Management</h4>
+                    <div className="content-actions">
+                      <button 
+                        className="btn btn-primary"
+                        onClick={() => {
+                          fetchCmsContent();
+                          fetchCmsThemes();
+                          fetchActiveTheme();
+                        }}
+                        disabled={cmsLoading}
+                      >
+                        🔄 Refresh CMS
+                      </button>
+                      <button 
+                        className="btn btn-success"
+                        onClick={() => openContentEditor()}
+                      >
+                        ➕ Add Content
+                      </button>
+                      <button 
+                        className="btn btn-purple"
+                        onClick={() => setShowCmsThemeModal(true)}
+                      >
+                        🎨 Create Theme
+                      </button>
+                    </div>
+
+                    {cmsLoading && (
+                      <div className="loading-indicator">
+                        <p>Loading CMS data...</p>
+                      </div>
+                    )}
+
+                    {/* Theme Management */}
+                    <div className="cms-section">
+                      <h5>🎨 Theme Management</h5>
+                      {activeTheme && (
+                        <div className="active-theme-indicator">
+                          <h6>Current Active Theme: {activeTheme.name}</h6>
+                          <div className="theme-colors">
+                            {Object.entries(activeTheme.colors || {}).map(([key, color]) => (
+                              <div key={key} className="color-indicator">
+                                <span className="color-name">{key}:</span>
+                                <span 
+                                  className="color-box"
+                                  style={{ backgroundColor: color }}
+                                ></span>
+                                <span className="color-value">{color}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="themes-grid">
+                        {cmsThemes.map(theme => (
+                          <div key={theme.id} className={`theme-card ${theme.is_active ? 'active' : ''}`}>
+                            <div className="theme-header">
+                              <h6>{theme.name}</h6>
+                              {theme.is_active && <span className="active-badge">✅ Active</span>}
+                            </div>
+                            <div className="theme-preview">
+                              {Object.entries(theme.colors || {}).slice(0, 5).map(([key, color]) => (
+                                <span 
+                                  key={key}
+                                  className="color-preview"
+                                  style={{ backgroundColor: color }}
+                                  title={`${key}: ${color}`}
+                                ></span>
+                              ))}
+                            </div>
+                            {!theme.is_active && (
+                              <button 
+                                className="btn btn-small btn-primary"
+                                onClick={() => handleActivateTheme(theme.id)}
+                                disabled={cmsLoading}
+                              >
+                                Activate
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Content Management by Context */}
+                    <div className="cms-section">
+                      <h5>📝 Content Management</h5>
+                      <div className="context-selector">
+                        <label>Filter by Context:</label>
+                        <select 
+                          value={selectedContentContext} 
+                          onChange={(e) => setSelectedContentContext(e.target.value)}
+                        >
+                          <option value="">All Contexts</option>
+                          <option value="navbar">Navigation Bar</option>
+                          <option value="hero">Hero Section</option>
+                          <option value="features">Features</option>
+                          <option value="dashboard">Dashboard</option>
+                          <option value="tournament">Tournament</option>
+                          <option value="affiliate">Affiliate</option>
+                          <option value="wallet">Wallet</option>
+                          <option value="team">Team</option>
+                          <option value="guild">Guild</option>
+                          <option value="general">General</option>
+                        </select>
+                      </div>
+
+                      <div className="cms-content-grid">
+                        {cmsContent
+                          .filter(item => !selectedContentContext || item.context === selectedContentContext)
+                          .map(content => (
+                          <div key={content.id} className="cms-content-card">
+                            <div className="content-header">
+                              <h6>{content.key}</h6>
+                              <div className="content-badges">
+                                <span className={`content-type-badge ${content.content_type}`}>
+                                  {content.content_type === 'text' ? '📝' : 
+                                   content.content_type === 'color' ? '🎨' : 
+                                   content.content_type === 'image' ? '🖼️' : '⚙️'}
+                                  {content.content_type}
+                                </span>
+                                <span className="context-badge">{content.context}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="content-preview">
+                              {content.content_type === 'color' ? (
+                                <div className="color-preview-large">
+                                  <span 
+                                    className="color-box-large"
+                                    style={{ backgroundColor: content.current_value }}
+                                  ></span>
+                                  <span className="color-value">{content.current_value}</span>
+                                </div>
+                              ) : (
+                                <div className="text-preview">
+                                  {content.current_value.length > 100 
+                                    ? content.current_value.substring(0, 100) + '...'
+                                    : content.current_value
+                                  }
+                                </div>
+                              )}
+                            </div>
+                            
+                            {content.description && (
+                              <div className="content-description">
+                                <small>{content.description}</small>
+                              </div>
+                            )}
+                            
+                            <div className="content-actions">
+                              <button 
+                                className="btn btn-small btn-secondary"
+                                onClick={() => openContentEditor(content)}
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button 
+                                className="btn btn-small btn-danger"
+                                onClick={() => handleDeleteContent(content.id)}
+                                disabled={cmsLoading}
+                              >
+                                🗑️ Delete
+                              </button>
+                            </div>
+                            
+                            <div className="content-meta">
+                              <small>
+                                Updated: {new Date(content.updated_at).toLocaleDateString()}
+                              </small>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Content Edit Modal */}
