@@ -10256,6 +10256,411 @@ function App() {
   };
 
   // =============================================================================
+  // GUILD SYSTEM RENDER FUNCTIONS
+  // =============================================================================
+
+  const renderGuilds = () => {
+    return (
+      <motion.div 
+        className="guilds-page"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="container">
+          <div className="guilds-header">
+            <h1>🏰 {t.guildsTitle}</h1>
+            <p>Join or create powerful guilds to compete in epic wars!</p>
+            
+            {user && (
+              <div className="guild-actions">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setCurrentView('create-guild')}
+                >
+                  🛡️ {t.createGuild}
+                </button>
+                <button 
+                  className="btn btn-outline"
+                  onClick={() => setCurrentView('guild-rankings')}
+                >
+                  🏆 {t.guildRankings}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {guildsLoading ? (
+            <div className="loading">Loading guilds...</div>
+          ) : (
+            <div className="guilds-grid">
+              {guilds.map((guild) => (
+                <motion.div
+                  key={guild.id}
+                  className="guild-card"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="guild-header">
+                    {guild.logo_url && (
+                      <img src={guild.logo_url} alt={guild.name} className="guild-logo" />
+                    )}
+                    <div className="guild-info">
+                      <h3 className="guild-name">{guild.name}</h3>
+                      <span className="guild-tag">[{guild.tag}]</span>
+                    </div>
+                  </div>
+                  
+                  <div className="guild-description">
+                    {guild.description}
+                  </div>
+                  
+                  <div className="guild-stats">
+                    <div className="stat">
+                      <span className="stat-label">Members:</span>
+                      <span className="stat-value">{guild.member_count}/50</span>
+                    </div>
+                    <div className="stat">
+                      <span className="stat-label">Level:</span>
+                      <span className="stat-value">{guild.level || 1}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="stat-label">Power:</span>
+                      <span className="stat-value">{guild.power_rating || 1000}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="stat-label">Country:</span>
+                      <span className="stat-value">{guild.country || 'International'}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="guild-recruitment">
+                    {guild.recruitment_open ? (
+                      <span className="recruitment-open">🟢 Open Recruitment</span>
+                    ) : (
+                      <span className="recruitment-closed">🔴 Invitation Only</span>
+                    )}
+                  </div>
+                  
+                  <div className="guild-actions">
+                    <button 
+                      className="btn btn-outline"
+                      onClick={() => navigateWithBreadcrumb(`guild-${guild.id}`, guild.name)}
+                    >
+                      👁️ View Details
+                    </button>
+                    {user && guild.recruitment_open && (
+                      <button 
+                        className="btn btn-primary"
+                        onClick={() => {
+                          // Request to join guild logic
+                          inviteToGuild(guild.id, user.username, 'I would like to join your guild!');
+                        }}
+                      >
+                        🗡️ Request to Join
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {guilds.length === 0 && !guildsLoading && (
+            <div className="empty-state">
+              <h3>No guilds found</h3>
+              <p>Be the first to create a guild!</p>
+              {user && (
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setCurrentView('create-guild')}
+                >
+                  🛡️ Create Guild
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
+
+  const renderGuildRankings = () => {
+    return (
+      <div className="guild-rankings-page">
+        <div className="container">
+          <div className="rankings-header">
+            <h1>🏆 {t.guildRankings}</h1>
+            <p>Top performing guilds across all regions</p>
+          </div>
+
+          <div className="rankings-table">
+            <div className="table-header">
+              <div className="rank-col">Rank</div>
+              <div className="guild-col">Guild</div>
+              <div className="members-col">Members</div>
+              <div className="power-col">Power Rating</div>
+              <div className="wars-col">Wars Won</div>
+              <div className="trophies-col">Trophies</div>
+            </div>
+            
+            {guildRankings.map((guild) => (
+              <div key={guild.id} className="table-row">
+                <div className="rank-col">#{guild.rank}</div>
+                <div className="guild-col">
+                  <div className="guild-info">
+                    {guild.logo_url && (
+                      <img src={guild.logo_url} alt={guild.name} className="guild-logo-small" />
+                    )}
+                    <div>
+                      <div className="guild-name">{guild.name}</div>
+                      <div className="guild-tag">[{guild.tag}]</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="members-col">{guild.member_count}</div>
+                <div className="power-col">{guild.power_rating || 1000}</div>
+                <div className="wars-col">{guild.wars_won || 0}</div>
+                <div className="trophies-col">{guild.season_trophies || 0}</div>
+              </div>
+            ))}
+          </div>
+
+          {guildRankings.length === 0 && (
+            <div className="empty-state">
+              <h3>No rankings available</h3>
+              <p>Guilds will appear here once they start competing</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderCreateGuild = () => {
+    if (!user) {
+      return (
+        <div className="login-prompt">
+          <h2>Login Required</h2>
+          <p>Please login to create a guild</p>
+          <button 
+            className="btn btn-primary"
+            onClick={() => setCurrentView('login')}
+          >
+            Login
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="create-guild-page">
+        <div className="container">
+          <div className="create-guild-header">
+            <h1>🛡️ {t.createGuild}</h1>
+            <p>Establish your guild and gather warriors for epic battles!</p>
+          </div>
+
+          <div className="guild-form">
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              const guildData = {
+                name: formData.get('name'),
+                tag: formData.get('tag').toUpperCase(),
+                description: formData.get('description'),
+                colors: {
+                  primary: formData.get('primary_color'),
+                  secondary: formData.get('secondary_color')
+                },
+                recruitment_open: formData.get('recruitment_open') === 'on',
+                min_level: parseInt(formData.get('min_level')) || 1,
+                country: formData.get('country')
+              };
+
+              const result = await createGuild(guildData);
+              if (result) {
+                setCurrentView('guilds');
+              }
+            }}>
+              <div className="form-group">
+                <label>{t.guildName}</label>
+                <input type="text" name="name" required maxLength="50" />
+              </div>
+              
+              <div className="form-group">
+                <label>{t.guildTag}</label>
+                <input type="text" name="tag" required maxLength="5" placeholder="3-5 characters" />
+                <small>Short identifier for your guild (3-5 characters)</small>
+              </div>
+              
+              <div className="form-group">
+                <label>{t.guildDescription}</label>
+                <textarea name="description" maxLength="200" placeholder="Describe your guild's mission and values"></textarea>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Primary Color</label>
+                  <input type="color" name="primary_color" defaultValue="#FF0000" />
+                </div>
+                <div className="form-group">
+                  <label>Secondary Color</label>
+                  <input type="color" name="secondary_color" defaultValue="#FFFFFF" />
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Country</label>
+                <select name="country">
+                  <option value="">International</option>
+                  <option value="Greece">Greece</option>
+                  <option value="USA">USA</option>
+                  <option value="UK">UK</option>
+                  <option value="Germany">Germany</option>
+                  <option value="France">France</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Minimum Level</label>
+                <input type="number" name="min_level" min="1" max="100" defaultValue="1" />
+              </div>
+              
+              <div className="form-group checkbox">
+                <input type="checkbox" name="recruitment_open" id="recruitment" defaultChecked />
+                <label htmlFor="recruitment">{t.recruitmentOpen}</label>
+              </div>
+              
+              <div className="form-actions">
+                <button type="submit" className="btn btn-primary">
+                  🛡️ Create Guild
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={() => setCurrentView('guilds')}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderMyGuild = () => {
+    if (!user) {
+      return (
+        <div className="login-prompt">
+          <h2>Login Required</h2>
+          <p>Please login to view your guild</p>
+          <button 
+            className="btn btn-primary"
+            onClick={() => setCurrentView('login')}
+          >
+            Login
+          </button>
+        </div>
+      );
+    }
+
+    if (!myGuild) {
+      return (
+        <div className="no-guild">
+          <div className="container">
+            <h2>⚔️ You're not in a guild yet</h2>
+            <p>Join an existing guild or create your own to start your guild adventure!</p>
+            
+            <div className="guild-options">
+              <button 
+                className="btn btn-primary"
+                onClick={() => setCurrentView('guilds')}
+              >
+                🏰 Browse Guilds
+              </button>
+              <button 
+                className="btn btn-outline"
+                onClick={() => setCurrentView('create-guild')}
+              >
+                🛡️ Create Guild
+              </button>
+            </div>
+            
+            {guildInvitations.length > 0 && (
+              <div className="guild-invitations">
+                <h3>📬 Guild Invitations ({guildInvitations.length})</h3>
+                {guildInvitations.map((invitation) => (
+                  <div key={invitation.id} className="invitation-card">
+                    <div className="invitation-info">
+                      <h4>{invitation.guild_name} [{invitation.guild_tag}]</h4>
+                      <p>Invited by: {invitation.inviter_username}</p>
+                      {invitation.message && <p className="invitation-message">"{invitation.message}"</p>}
+                    </div>
+                    <div className="invitation-actions">
+                      <button 
+                        className="btn btn-primary btn-sm"
+                        onClick={() => acceptGuildInvitation(invitation.id)}
+                      >
+                        ✅ Accept
+                      </button>
+                      <button 
+                        className="btn btn-outline btn-sm"
+                        onClick={() => declineGuildInvitation(invitation.id)}
+                      >
+                        ❌ Decline
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="my-guild-page">
+        <div className="container">
+          <div className="guild-overview">
+            <div className="guild-banner">
+              {myGuild.logo_url && (
+                <img src={myGuild.logo_url} alt={myGuild.name} className="guild-logo-large" />
+              )}
+              <div className="guild-title">
+                <h1>{myGuild.name}</h1>
+                <span className="guild-tag">[{myGuild.tag}]</span>
+              </div>
+            </div>
+            
+            <div className="guild-stats-overview">
+              <div className="stat-card">
+                <div className="stat-value">{myGuild.member_count}/50</div>
+                <div className="stat-label">Members</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{myGuild.level || 1}</div>
+                <div className="stat-label">Level</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{myGuild.power_rating || 1000}</div>
+                <div className="stat-label">Power Rating</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{myGuild.total_wars || 0}</div>
+                <div className="stat-label">Wars</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // =============================================================================
   // AFFILIATE SYSTEM RENDER FUNCTION
   // =============================================================================
   
