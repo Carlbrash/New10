@@ -13569,16 +13569,41 @@ function App() {
       }
     ];
 
-    // Filter matches based on search
-    const filteredMatches = teamMatches.filter(match => 
-      match.team1.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
-      match.team2.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
-      match.tournament.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
-      match.activeMatches.some(activeMatch => 
-        activeMatch.player1.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
-        activeMatch.player2.name.toLowerCase().includes(sportsduelSearch.toLowerCase())
-      )
-    );
+    // Advanced filtering logic
+    const filteredMatches = teamMatches.filter(match => {
+      // Search filter
+      const searchMatch = !sportsduelSearch || 
+        match.team1.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
+        match.team2.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
+        match.tournament.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
+        match.activeMatches.some(activeMatch => 
+          activeMatch.player1.name.toLowerCase().includes(sportsduelSearch.toLowerCase()) ||
+          activeMatch.player2.name.toLowerCase().includes(sportsduelSearch.toLowerCase())
+        );
+      
+      // Country filter
+      const countryMatch = sportsduelFilters.country === 'all' || 
+        match.tournament.country.includes(sportsduelFilters.country) ||
+        match.team1.countryName === sportsduelFilters.country ||
+        match.team2.countryName === sportsduelFilters.country;
+      
+      // Tournament filter
+      const tournamentMatch = sportsduelFilters.tournament === 'all' || 
+        match.tournament.category === sportsduelFilters.tournament;
+      
+      // Status filter
+      const statusMatch = sportsduelFilters.status === 'all' || 
+        match.status.toLowerCase() === sportsduelFilters.status.toLowerCase();
+      
+      return searchMatch && countryMatch && tournamentMatch && statusMatch;
+    });
+
+    // Get available filter options
+    const availableCountries = ['all', ...new Set(teamMatches.flatMap(match => [
+      match.team1.countryName, match.team2.countryName
+    ]))];
+    const availableTournaments = ['all', ...new Set(teamMatches.map(match => match.tournament.category))];
+    const availableStatuses = ['all', ...new Set(teamMatches.map(match => match.status))];
 
     // Helper function to calculate percentage and get progress bar color
     const calculateProgress = (current, max) => {
