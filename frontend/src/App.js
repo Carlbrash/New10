@@ -1133,10 +1133,9 @@ function App() {
   const [siteMessages, setSiteMessages] = useState([]);
   const [adminActions, setAdminActions] = useState([]);
   
-  // CMS States
-  const [cmsContent, setCmsContent] = useState([]);
+  // CMS Admin States (for admin panel management)
+  const [adminCmsContent, setAdminCmsContent] = useState([]);
   const [cmsThemes, setCmsThemes] = useState([]);
-  const [activeTheme, setActiveTheme] = useState(null);
   const [cmsLoading, setCmsLoading] = useState(false);
   const [selectedContentContext, setSelectedContentContext] = useState('navbar');
   const [editingContent, setEditingContent] = useState(null);
