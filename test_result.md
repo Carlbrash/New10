@@ -102,43 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the new Team System backend endpoints that were just implemented.
-
-Please test the following Team System endpoints:
-
-1. Test GET /api/teams (list all teams - should be empty initially)
-
-2. Test POST /api/teams (create team) with testuser credentials:
-   - Login as testuser (testuser/test123)
-   - Create a team with payload:
-   ```json
-   {
-     "name": "Test Warriors",
-     "logo_url": "https://example.com/logo.png",
-     "colors": {
-       "primary": "#FF0000",
-       "secondary": "#FFFFFF"
-     },
-     "city": "Athens",
-     "country": "Greece", 
-     "phone": "+30123456789",
-     "email": "testwarriors@example.com"
-   }
-   ```
-
-3. Test GET /api/teams again to see the created team
-
-4. Test GET /api/teams/{team_id} to get team details
-
-5. Test POST /api/teams/{team_id}/invite (invite player):
-   - Try to invite "admin" user to the team
-
-6. Test with admin user:
-   - Login as admin (admin/Kiki1999@)
-   - GET /api/teams/my-invitations (should show invitation from testuser)
-   - POST /api/teams/invitations/{invitation_id}/accept (accept the invitation)
-
-This will test the core team creation, invitation, and acceptance flow."
+user_problem_statement: "SportsDuel System 1v1 Fix: Updated the SportsDuel scoreboard to properly display 1v1 matches instead of showing teams with multiple players side by side. Fixed the progress bar display to show actual percentage (e.g., 2.30/5.20 = 44% filled) instead of showing full green progress. Made the match cards more compact for handling hundreds of matches simultaneously, and added search functionality to find specific teams or players. The system now correctly shows team scores as the number of individual 1v1 matches won by each team."
 
 backend:
   - task: "Backend Issues Fix - KeyError team_id in chat rooms"
