@@ -6269,6 +6269,154 @@ function App() {
             </div>
           </div>
 
+          {/* Teams Structure Section */}
+          <div className="organization-level teams-structure-level">
+            <div className="level-header">
+              <div className="level-icon">🏪</div>
+              <div className="level-content">
+                <h3>Teams - The Heart of Competition</h3>
+                <p className="level-description">
+                  The teams are sports cafes that have entered into agreements with WoBeRa and 
+                  have secured the right to participate in local leagues, which are carried out 
+                  through the <strong>Alpha Planet branch network</strong>. This innovative 
+                  partnership model brings competitive gaming directly to local communities.
+                </p>
+              </div>
+            </div>
+            
+            {/* League Participation Structure */}
+            <div className="league-participation-structure">
+              <h4>🏟️ League Participation Structure</h4>
+              <p className="structure-description">
+                The number of teams participating in each local league is determined by the 
+                number of teams that participate in the respective country's professional 
+                football league, ensuring authentic regional representation.
+              </p>
+              
+              <div className="league-examples-grid">
+                <div className="league-example-card">
+                  <div className="league-flag">🇬🇷</div>
+                  <div className="league-details">
+                    <h5>Greek Super League</h5>
+                    <div className="team-count">
+                      <span className="count-number">14</span>
+                      <span className="count-label">Professional Teams</span>
+                    </div>
+                    <div className="wobera-equivalent">
+                      <span className="wobera-domain">WoBeRa.gr</span>
+                      <span className="wobera-count">14 Sports Cafe Teams</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="league-example-card">
+                  <div className="league-flag">🇬🇧</div>
+                  <div className="league-details">
+                    <h5>English Premier League</h5>
+                    <div className="team-count">
+                      <span className="count-number">20</span>
+                      <span className="count-label">Professional Teams</span>
+                    </div>
+                    <div className="wobera-equivalent">
+                      <span className="wobera-domain">WoBeRa.uk</span>
+                      <span className="wobera-count">20 Sports Cafe Teams</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="league-example-card">
+                  <div className="league-flag">🇩🇪</div>
+                  <div className="league-details">
+                    <h5>German Bundesliga</h5>
+                    <div className="team-count">
+                      <span className="count-number">18</span>
+                      <span className="count-label">Professional Teams</span>
+                    </div>
+                    <div className="wobera-equivalent">
+                      <span className="wobera-domain">WoBeRa.de</span>
+                      <span className="wobera-count">18 Sports Cafe Teams</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Player Participation Rules */}
+            <div className="player-participation-rules">
+              <h4>👥 Player Participation Rules</h4>
+              <div className="rules-grid">
+                <div className="rule-card unlimited-players">
+                  <div className="rule-icon">∞</div>
+                  <div className="rule-content">
+                    <h5>Unlimited Team Composition</h5>
+                    <p>Each team may have an <strong>unlimited number of players</strong> 
+                       in its composition, allowing sports cafes to accommodate all their 
+                       customers who wish to participate.</p>
+                  </div>
+                </div>
+                
+                <div className="rule-card match-day-limit">
+                  <div className="rule-icon">20</div>
+                  <div className="rule-content">
+                    <h5>Match Day Participation</h5>
+                    <p>On each match day, <strong>up to 20 players per team</strong> 
+                       can participate, ensuring strategic team selection and 
+                       competitive balance.</p>
+                  </div>
+                </div>
+                
+                <div className="rule-card player-slots">
+                  <div className="rule-icon">5</div>
+                  <div className="rule-content">
+                    <h5>Player Slot System</h5>
+                    <p>Each player can play <strong>up to 5 times (slots)</strong> 
+                       in the same match day, providing multiple opportunities to 
+                       contribute to their team's success.</p>
+                  </div>
+                </div>
+                
+                <div className="rule-card one-account-policy">
+                  <div className="rule-icon">🚫</div>
+                  <div className="rule-content">
+                    <h5>One Account Policy</h5>
+                    <p>Players are <strong>forbidden to have more than one account</strong>. 
+                       To avoid this, comprehensive <strong>identification processes</strong> 
+                       will be implemented to ensure fair play and integrity.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Alpha Planet Branch Network */}
+            <div className="alpha-planet-network">
+              <h4>🏢 Alpha Planet Branch Network</h4>
+              <div className="network-description">
+                <div className="network-visual">
+                  <div className="branch-hub">
+                    <div className="hub-icon">🏪</div>
+                    <span>Sports Cafe</span>
+                  </div>
+                  <div className="connection-line"></div>
+                  <div className="branch-hub">
+                    <div className="hub-icon">🌐</div>
+                    <span>Alpha Planet</span>
+                  </div>
+                  <div className="connection-line"></div>
+                  <div className="branch-hub">
+                    <div className="hub-icon">🏆</div>
+                    <span>WoBeRa League</span>
+                  </div>
+                </div>
+                <p>
+                  Sports cafes operate through the Alpha Planet branch network, creating 
+                  a seamless connection between local businesses and the global WoBeRa 
+                  competitive ecosystem. This partnership ensures standardized operations, 
+                  technical support, and authentic tournament experiences.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Organizational Flow */}
           <div className="organizational-flow">
             <h3>🔄 How It All Works Together</h3>
@@ -6292,8 +6440,8 @@ function App() {
               <div className="flow-step">
                 <div className="step-number">3</div>
                 <div className="step-content">
-                  <h4>Team & Player Network</h4>
-                  <p>Local leagues and competitions flourish</p>
+                  <h4>Sports Cafe Teams</h4>
+                  <p>Alpha Planet network enables local competition</p>
                 </div>
               </div>
               <div className="flow-arrow">→</div>
