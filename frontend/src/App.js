@@ -5436,6 +5436,25 @@ function App() {
         console.log('Login successful:', data);
         setToken(data.token);
         localStorage.setItem('token', data.token);
+        
+        // Fetch user profile after successful login
+        try {
+          const profileResponse = await fetch(`${API_BASE_URL}/api/profile`, {
+            headers: {
+              'Authorization': `Bearer ${data.token}`
+            }
+          });
+          if (profileResponse.ok) {
+            const userData = await profileResponse.json();
+            setUser(userData);
+            console.log('User profile loaded:', userData);
+          } else {
+            console.error('Failed to fetch user profile');
+          }
+        } catch (profileError) {
+          console.error('Error fetching profile:', profileError);
+        }
+        
         setCurrentView('dashboard');
         setLoginForm({ username: '', password: '' });
       } else {
