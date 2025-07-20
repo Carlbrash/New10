@@ -14634,7 +14634,7 @@ function App() {
                 </div>
                 
                 <div className="tab-content">
-                  {currentView === 'friends' && (
+                  {friendsModalTab === 'friends' && (
                     <div className="friends-list">
                       {friendsLoading ? (
                         <div className="loading">Loading friends...</div>
