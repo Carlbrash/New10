@@ -2342,6 +2342,7 @@ function App() {
         setShowRankingsDropdown(false);
         setShowTournamentsDropdown(false);
         setShowTeamsDropdown(false);
+        setShowGuildsDropdown(false);
       }
     };
 
