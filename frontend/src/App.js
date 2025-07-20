@@ -13590,6 +13590,14 @@ function App() {
                         <div key={player.id} className="player-row team2-row">
                           <div className="player-info-section team2-info">
                             <div className="player-name">{player.name}</div>
+                            <div className="live-score-info team2-score">
+                              <span className={`trend-indicator ${player.trend}`}>
+                                {player.trend === 'up' ? '📈' : player.trend === 'down' ? '📉' : '➡️'}
+                              </span>
+                              <span className={`current-score ${player.trend}`}>
+                                {player.currentScore}/{player.maxScore}
+                              </span>
+                            </div>
                             <div className="player-stats">
                               <span className="stat-accuracy">{player.accuracy}</span>
                               <span className="stat-losses">🟢 {player.losses}</span>
