@@ -6417,6 +6417,208 @@ function App() {
             </div>
           </div>
 
+          {/* Championship Schedule Section */}
+          <div className="organization-level championship-schedule-level">
+            <div className="level-header">
+              <div className="level-icon">📅</div>
+              <div className="level-content">
+                <h3>Championship Schedule</h3>
+                <p className="level-description">
+                  WoBeRa implements an innovative scheduling system that aligns perfectly with 
+                  professional football leagues, ensuring seamless integration and familiar 
+                  competition rhythms for teams and players worldwide.
+                </p>
+              </div>
+            </div>
+            
+            {/* Random Match System */}
+            <div className="random-match-system">
+              <h4>🎲 Pre-Season Random Pairing</h4>
+              <p className="system-description">
+                Before the start of each league, a <strong>random match</strong> between 
+                professional football teams and WoBeRa teams takes place. This innovative 
+                pairing system determines the complete season structure.
+              </p>
+              
+              <div className="match-examples">
+                <div className="match-example-card">
+                  <div className="vs-matchup">
+                    <div className="professional-team">
+                      <div className="team-badge">🔴</div>
+                      <span className="team-name">Olympiakos</span>
+                      <span className="team-type">Professional Team</span>
+                    </div>
+                    <div className="vs-symbol">VS</div>
+                    <div className="wobera-team">
+                      <div className="team-badge">🦈</div>
+                      <span className="team-name">Glyfada Sharks</span>
+                      <span className="team-type">WoBeRa Team</span>
+                    </div>
+                  </div>
+                  <div className="match-purpose">
+                    <p>This pairing ensures WoBeRa leagues follow the same program 
+                       and fixtures as the local professional league</p>
+                  </div>
+                </div>
+                
+                <div className="match-example-card">
+                  <div className="vs-matchup">
+                    <div className="professional-team">
+                      <div className="team-badge">🔵</div>
+                      <span className="team-name">Chelsea FC</span>
+                      <span className="team-type">Premier League</span>
+                    </div>
+                    <div className="vs-symbol">VS</div>
+                    <div className="wobera-team">
+                      <div className="team-badge">⚡</div>
+                      <span className="team-name">London Thunder</span>
+                      <span className="team-type">WoBeRa.uk Team</span>
+                    </div>
+                  </div>
+                  <div className="match-purpose">
+                    <p>European competitions follow the same systematic 
+                       pairing for Champions League, Europa, and Challenge matches</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Schedule Benefits */}
+            <div className="schedule-benefits">
+              <h4>📊 System Benefits</h4>
+              <p className="benefits-intro">
+                This systematic approach to scheduling provides multiple advantages 
+                for teams, players, and the overall competition structure:
+              </p>
+              
+              <div className="benefits-grid">
+                <div className="benefit-card awareness">
+                  <div className="benefit-icon">🔍</div>
+                  <div className="benefit-content">
+                    <h5>Pre-Season Awareness</h5>
+                    <p>All teams are aware of their rivals and match days 
+                       <strong>before the start of the league</strong>, allowing 
+                       for strategic planning and preparation.</p>
+                  </div>
+                </div>
+                
+                <div className="benefit-card local-schedule">
+                  <div className="benefit-icon">📅</div>
+                  <div className="benefit-content">
+                    <h5>Local League Schedule</h5>
+                    <p>The main bulk of WoBeRa local league games take place on 
+                       <strong>Friday, Saturday, Sunday, and Monday</strong>, 
+                       perfectly complementing weekend football viewing.</p>
+                  </div>
+                </div>
+                
+                <div className="benefit-card european-schedule">
+                  <div className="benefit-icon">🌍</div>
+                  <div className="benefit-content">
+                    <h5>European Competition Schedule</h5>
+                    <p>WoBeRa European leagues (Champions League, Europa, Challenge) 
+                       games take place on <strong>Tuesday, Wednesday, and Thursday</strong>, 
+                       mirroring UEFA competition days.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Match Day Structure */}
+            <div className="match-day-structure">
+              <h4>🗓️ Weekly Match Structure</h4>
+              <div className="weekly-calendar">
+                <div className="calendar-section local-games">
+                  <h5>🏠 Local League Games</h5>
+                  <div className="match-days">
+                    <div className="match-day friday">
+                      <span className="day-name">Friday</span>
+                      <span className="day-focus">Evening Matches</span>
+                    </div>
+                    <div className="match-day saturday">
+                      <span className="day-name">Saturday</span>
+                      <span className="day-focus">Prime Time</span>
+                    </div>
+                    <div className="match-day sunday">
+                      <span className="day-name">Sunday</span>
+                      <span className="day-focus">Weekend Final</span>
+                    </div>
+                    <div className="match-day monday">
+                      <span className="day-name">Monday</span>
+                      <span className="day-focus">Week Opener</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="calendar-section european-games">
+                  <h5>🌍 European Competitions</h5>
+                  <div className="match-days">
+                    <div className="match-day tuesday">
+                      <span className="day-name">Tuesday</span>
+                      <span className="day-focus">Champions League</span>
+                    </div>
+                    <div className="match-day wednesday">
+                      <span className="day-name">Wednesday</span>
+                      <span className="day-focus">Europa League</span>
+                    </div>
+                    <div className="match-day thursday">
+                      <span className="day-name">Thursday</span>
+                      <span className="day-focus">Challenge Cup</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Points System */}
+            <div className="points-system">
+              <h4>⚽ Teams Points System</h4>
+              <p className="points-intro">
+                WoBeRa follows the internationally recognized football points system, 
+                ensuring familiarity and competitive balance across all leagues:
+              </p>
+              
+              <div className="points-breakdown">
+                <div className="points-card win">
+                  <div className="points-value">3</div>
+                  <div className="points-details">
+                    <span className="points-label">Points</span>
+                    <span className="points-condition">For a Win</span>
+                    <div className="points-icon">🏆</div>
+                  </div>
+                </div>
+                
+                <div className="points-card draw">
+                  <div className="points-value">1</div>
+                  <div className="points-details">
+                    <span className="points-label">Point</span>
+                    <span className="points-condition">For a Draw</span>
+                    <div className="points-icon">🤝</div>
+                  </div>
+                </div>
+                
+                <div className="points-card loss">
+                  <div className="points-value">0</div>
+                  <div className="points-details">
+                    <span className="points-label">Points</span>
+                    <span className="points-condition">For a Loss</span>
+                    <div className="points-icon">❌</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="points-explanation">
+                <p>This standardized points system ensures:</p>
+                <ul className="points-benefits">
+                  <li>🎯 Consistent competition across all WoBeRa leagues</li>
+                  <li>📈 Fair ranking and league table progression</li>
+                  <li>🏅 Meaningful rewards for victories and draws</li>
+                  <li>⚖️ Balanced competitive environment</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           {/* Organizational Flow */}
           <div className="organizational-flow">
             <h3>🔄 How It All Works Together</h3>
@@ -6448,8 +6650,8 @@ function App() {
               <div className="flow-step">
                 <div className="step-number">4</div>
                 <div className="step-content">
-                  <h4>International Glory</h4>
-                  <p>National teams compete globally</p>
+                  <h4>Scheduled Competition</h4>
+                  <p>Synchronized leagues and championship glory</p>
                 </div>
               </div>
             </div>
