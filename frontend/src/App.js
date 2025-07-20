@@ -1845,6 +1845,249 @@ function App() {
     }
   };
 
+  // CMS Functions
+  const fetchCmsContent = async () => {
+    setCmsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/cms/content`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCmsContent(data.content || []);
+      }
+    } catch (error) {
+      console.error('Error fetching CMS content:', error);
+    }
+    setCmsLoading(false);
+  };
+
+  const fetchCmsThemes = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/cms/themes`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCmsThemes(data.themes || []);
+      }
+    } catch (error) {
+      console.error('Error fetching CMS themes:', error);
+    }
+  };
+
+  const fetchActiveTheme = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/cms/theme/active`);
+      if (response.ok) {
+        const data = await response.json();
+        setActiveTheme(data);
+      }
+    } catch (error) {
+      console.error('Error fetching active theme:', error);
+    }
+  };
+
+  const handleCreateContent = async (e) => {
+    e.preventDefault();
+    setCmsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/cms/content`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(cmsContentForm)
+      });
+      
+      if (response.ok) {
+        showToast('Content created successfully!', 'success');
+        fetchCmsContent();
+        setShowCmsContentModal(false);
+        setCmsContentForm({
+          key: '',
+          content_type: 'text',
+          context: 'general',
+          current_value: '',
+          description: ''
+        });
+      } else {
+        const errorData = await response.json();
+        showToast(errorData.detail || 'Error creating content', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating content:', error);
+      showToast('Error creating content', 'error');
+    }
+    
+    setCmsLoading(false);
+  };
+
+  const handleUpdateContent = async (contentId, updatedData) => {
+    setCmsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/cms/content/${contentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedData)
+      });
+      
+      if (response.ok) {
+        showToast('Content updated successfully!', 'success');
+        fetchCmsContent();
+      } else {
+        const errorData = await response.json();
+        showToast(errorData.detail || 'Error updating content', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating content:', error);
+      showToast('Error updating content', 'error');
+    }
+    
+    setCmsLoading(false);
+  };
+
+  const handleDeleteContent = async (contentId) => {
+    if (!confirm('Are you sure you want to delete this content item?')) {
+      return;
+    }
+
+    setCmsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/cms/content/${contentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        showToast('Content deleted successfully!', 'success');
+        fetchCmsContent();
+      } else {
+        const errorData = await response.json();
+        showToast(errorData.detail || 'Error deleting content', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      showToast('Error deleting content', 'error');
+    }
+    
+    setCmsLoading(false);
+  };
+
+  const handleCreateTheme = async (e) => {
+    e.preventDefault();
+    setCmsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/cms/themes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(cmsThemeForm)
+      });
+      
+      if (response.ok) {
+        showToast('Theme created successfully!', 'success');
+        fetchCmsThemes();
+        setShowCmsThemeModal(false);
+        setCmsThemeForm({
+          name: '',
+          colors: {
+            primary: '#4fc3f7',
+            secondary: '#29b6f6',
+            accent: '#ffd700',
+            success: '#22c55e',
+            warning: '#f59e0b',
+            error: '#ef4444',
+            background: '#1a1a1a',
+            surface: '#2a2a2a',
+            text: '#ffffff'
+          }
+        });
+      } else {
+        const errorData = await response.json();
+        showToast(errorData.detail || 'Error creating theme', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating theme:', error);
+      showToast('Error creating theme', 'error');
+    }
+    
+    setCmsLoading(false);
+  };
+
+  const handleActivateTheme = async (themeId) => {
+    setCmsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/cms/themes/${themeId}/activate`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        showToast('Theme activated successfully!', 'success');
+        fetchCmsThemes();
+        fetchActiveTheme();
+      } else {
+        const errorData = await response.json();
+        showToast(errorData.detail || 'Error activating theme', 'error');
+      }
+    } catch (error) {
+      console.error('Error activating theme:', error);
+      showToast('Error activating theme', 'error');
+    }
+    
+    setCmsLoading(false);
+  };
+
+  const openContentEditor = (content = null) => {
+    if (content) {
+      setEditingContent(content);
+      setCmsContentForm({
+        key: content.key,
+        content_type: content.content_type,
+        context: content.context,
+        current_value: content.current_value,
+        description: content.description || ''
+      });
+    } else {
+      setEditingContent(null);
+      setCmsContentForm({
+        key: '',
+        content_type: 'text',
+        context: 'general',
+        current_value: '',
+        description: ''
+      });
+    }
+    setShowCmsContentModal(true);
+  };
+
+  const getContentByContext = () => {
+    const contexts = {};
+    cmsContent.forEach(item => {
+      if (!contexts[item.context]) {
+        contexts[item.context] = [];
+      }
+      contexts[item.context].push(item);
+    });
+    return contexts;
+  };
+
   // Form states
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
