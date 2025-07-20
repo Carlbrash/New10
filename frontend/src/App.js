@@ -13346,6 +13346,14 @@ function App() {
   
   // Add search state
   const [sportsduelSearch, setSportsduelSearch] = useState('');
+  
+  // Advanced filtering states for SportsDuel
+  const [sportsduelFilters, setSportsduelFilters] = useState({
+    country: 'all',
+    tournament: 'all', 
+    status: 'all',
+    showFilters: false
+  });
 
   const renderSportsDuel = () => {
     // Professional SportsDuel data with enhanced structure
