@@ -12366,7 +12366,7 @@ function App() {
 
   return (
     <div className="App">
-      <nav className="navbar">
+      <nav className={`navbar ${user ? 'logged-in' : ''}`}>
         <div className="navbar-brand">
           <h1>WoBeRa</h1>
           <span className="brand-subtitle">World Betting Rank</span>
