@@ -8723,6 +8723,162 @@ img {
     text-align: center;
   }
 }
+/* Team Score Positioning */
+.team-score-before-name {
+  color: #00ffff;
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin-right: 0.8rem;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  display: inline-block;
+}
+
+.team2-score {
+  order: -1;
+}
+
+.team2-info {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+}
+
+.team2-info .team-name-professional {
+  text-align: right;
+}
+
+.team2-info .team-country-name {
+  text-align: right;
+}
+
+/* Upcoming Tournament Styles */
+.upcoming-tournament-professional {
+  background: linear-gradient(135deg, rgba(255, 165, 0, 0.15), rgba(255, 215, 0, 0.1));
+  border: 2px solid rgba(255, 165, 0, 0.4);
+  border-radius: 20px;
+  padding: 2rem;
+  margin: 1rem 0;
+  backdrop-filter: blur(10px);
+  animation: upcoming-glow 3s infinite;
+}
+
+.upcoming-header-professional {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.upcoming-indicator {
+  font-size: 1.2rem;
+  animation: pulse 2s infinite;
+}
+
+.time-until-start {
+  background: linear-gradient(45deg, #ff6b00, #ffaa00);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+}
+
+.upcoming-details-professional {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.upcoming-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.upcoming-status {
+  color: #ffaa00;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.participants-ready {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.ready-icon {
+  font-size: 1.2rem;
+}
+
+.tournament-preview {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid rgba(255, 165, 0, 0.2);
+}
+
+.preview-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.team-preview {
+  color: #00ffff;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+}
+
+.vs-preview {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.3rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.preview-prize {
+  text-align: center;
+  color: #ffaa00;
+  font-size: 1rem;
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(255, 170, 0, 0.3);
+}
+
+@keyframes upcoming-glow {
+  0% { box-shadow: 0 0 20px rgba(255, 165, 0, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(255, 165, 0, 0.5); }
+  100% { box-shadow: 0 0 20px rgba(255, 165, 0, 0.3); }
+}
+
+/* Static VS Circle (no animation) */
+.vs-circle-static {
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
+  color: #333333;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.9rem;
+  border: 3px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
 
 .header-content {
   display: flex;
