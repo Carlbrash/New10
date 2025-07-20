@@ -15013,6 +15013,217 @@ function App() {
         </div>
       )}
 
+      {/* CMS Content Modal */}
+      {showCmsContentModal && (
+        <div className="modal-overlay">
+          <div className="modal modal-large">
+            <div className="modal-header">
+              <h3>{editingContent ? 'Edit Content' : 'Create New Content'}</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowCmsContentModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-content">
+              <form onSubmit={editingContent ? (e) => {
+                e.preventDefault();
+                handleUpdateContent(editingContent.id, cmsContentForm);
+              } : handleCreateContent}>
+                <div className="form-group">
+                  <label>Content Key:</label>
+                  <input 
+                    type="text" 
+                    value={cmsContentForm.key}
+                    onChange={(e) => setCmsContentForm({...cmsContentForm, key: e.target.value})}
+                    className="form-input"
+                    placeholder="e.g., hero_title, nav_home"
+                    required
+                    disabled={editingContent} // Don't allow editing key for existing content
+                  />
+                  <small className="form-hint">
+                    Unique identifier for this content item
+                  </small>
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Content Type:</label>
+                    <select 
+                      value={cmsContentForm.content_type}
+                      onChange={(e) => setCmsContentForm({...cmsContentForm, content_type: e.target.value})}
+                      className="form-input"
+                      required
+                    >
+                      <option value="text">Text</option>
+                      <option value="color">Color</option>
+                      <option value="image">Image</option>
+                      <option value="theme">Theme</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Context:</label>
+                    <select 
+                      value={cmsContentForm.context}
+                      onChange={(e) => setCmsContentForm({...cmsContentForm, context: e.target.value})}
+                      className="form-input"
+                      required
+                    >
+                      <option value="general">General</option>
+                      <option value="navbar">Navigation Bar</option>
+                      <option value="hero">Hero Section</option>
+                      <option value="features">Features</option>
+                      <option value="dashboard">Dashboard</option>
+                      <option value="tournament">Tournament</option>
+                      <option value="affiliate">Affiliate</option>
+                      <option value="wallet">Wallet</option>
+                      <option value="team">Team</option>
+                      <option value="guild">Guild</option>
+                      <option value="footer">Footer</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Content Value:</label>
+                  {cmsContentForm.content_type === 'color' ? (
+                    <div className="color-input-group">
+                      <input 
+                        type="color" 
+                        value={cmsContentForm.current_value || '#4fc3f7'}
+                        onChange={(e) => setCmsContentForm({...cmsContentForm, current_value: e.target.value})}
+                        className="color-picker"
+                      />
+                      <input 
+                        type="text" 
+                        value={cmsContentForm.current_value}
+                        onChange={(e) => setCmsContentForm({...cmsContentForm, current_value: e.target.value})}
+                        className="form-input color-text-input"
+                        placeholder="#4fc3f7"
+                        pattern="^#[0-9A-Fa-f]{6}$"
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <textarea 
+                      value={cmsContentForm.current_value}
+                      onChange={(e) => setCmsContentForm({...cmsContentForm, current_value: e.target.value})}
+                      className="form-textarea"
+                      rows={cmsContentForm.content_type === 'text' ? 3 : 1}
+                      placeholder="Enter content value..."
+                      required
+                    />
+                  )}
+                </div>
+                
+                <div className="form-group">
+                  <label>Description (Optional):</label>
+                  <textarea 
+                    value={cmsContentForm.description}
+                    onChange={(e) => setCmsContentForm({...cmsContentForm, description: e.target.value})}
+                    className="form-textarea"
+                    rows={2}
+                    placeholder="Description for admin users..."
+                  />
+                </div>
+                
+                <div className="modal-actions">
+                  <button type="submit" className="btn btn-primary" disabled={cmsLoading}>
+                    {cmsLoading ? '⏳ Saving...' : (editingContent ? '💾 Update Content' : '✨ Create Content')}
+                  </button>
+                  <button 
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowCmsContentModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CMS Theme Modal */}
+      {showCmsThemeModal && (
+        <div className="modal-overlay">
+          <div className="modal modal-large">
+            <div className="modal-header">
+              <h3>Create New Theme</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowCmsThemeModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-content">
+              <form onSubmit={handleCreateTheme}>
+                <div className="form-group">
+                  <label>Theme Name:</label>
+                  <input 
+                    type="text" 
+                    value={cmsThemeForm.name}
+                    onChange={(e) => setCmsThemeForm({...cmsThemeForm, name: e.target.value})}
+                    className="form-input"
+                    placeholder="e.g., WoBeRa Dark, Ocean Blue"
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Theme Colors:</label>
+                  <div className="color-grid">
+                    {Object.entries(cmsThemeForm.colors).map(([colorKey, colorValue]) => (
+                      <div key={colorKey} className="color-input-item">
+                        <label className="color-label">{colorKey}:</label>
+                        <div className="color-input-group">
+                          <input 
+                            type="color" 
+                            value={colorValue}
+                            onChange={(e) => setCmsThemeForm({
+                              ...cmsThemeForm,
+                              colors: {...cmsThemeForm.colors, [colorKey]: e.target.value}
+                            })}
+                            className="color-picker-small"
+                          />
+                          <input 
+                            type="text" 
+                            value={colorValue}
+                            onChange={(e) => setCmsThemeForm({
+                              ...cmsThemeForm,
+                              colors: {...cmsThemeForm.colors, [colorKey]: e.target.value}
+                            })}
+                            className="form-input color-text-input-small"
+                            pattern="^#[0-9A-Fa-f]{6}$"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="modal-actions">
+                  <button type="submit" className="btn btn-primary" disabled={cmsLoading}>
+                    {cmsLoading ? '⏳ Creating...' : '🎨 Create Theme'}
+                  </button>
+                  <button 
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowCmsThemeModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Live Chat System */}
       {renderChatPopup()}
       {renderPrivateMessageModal()}
