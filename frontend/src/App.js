@@ -13885,11 +13885,8 @@ function App() {
                           <div key={index} className="player-match-professional">
                             {/* Player 1 */}
                             <div className="player-section-professional">
-                              <div className="player-avatar-professional">
+                              <div className={`player-avatar-professional ${player1Leading ? 'winning-border' : player2Leading ? 'losing-border' : 'tied-border'}`}>
                                 <img src={playerMatch.player1.avatar} alt={playerMatch.player1.name} />
-                                <div className={`status-indicator ${player1Leading ? 'winning' : player2Leading ? 'losing' : 'tied'}`}>
-                                  {player1Leading ? '🟢' : player2Leading ? '🔴' : '🟡'}
-                                </div>
                               </div>
                               <div className="player-details-professional">
                                 <div className="player-name-professional">{playerMatch.player1.name}</div>
