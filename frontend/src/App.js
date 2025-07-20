@@ -1063,6 +1063,68 @@ function App() {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
+  // CMS and Dynamic Content States
+  const [cmsContent, setCmsContent] = useState({});
+  const [activeTheme, setActiveTheme] = useState(null);
+  const [cmsLoaded, setCmsLoaded] = useState(false);
+
+  // Load CMS content on app startup
+  const loadCmsContent = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/cms/content`);
+      if (response.ok) {
+        const content = await response.json();
+        setCmsContent(content);
+      }
+    } catch (error) {
+      console.error('Error loading CMS content:', error);
+    }
+  };
+
+  // Load active theme
+  const loadActiveTheme = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/cms/theme/active`);
+      if (response.ok) {
+        const theme = await response.json();
+        setActiveTheme(theme);
+        
+        // Apply theme colors to CSS variables
+        if (theme.colors) {
+          const root = document.documentElement;
+          Object.entries(theme.colors).forEach(([key, value]) => {
+            root.style.setProperty(`--color-${key}`, value);
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading active theme:', error);
+    }
+  };
+
+  // Helper function to get CMS content value
+  const getCmsContent = (key, defaultValue = '') => {
+    return cmsContent[key]?.value || defaultValue;
+  };
+
+  // Helper function to get CMS color
+  const getCmsColor = (key) => {
+    return cmsContent[key]?.value || (activeTheme?.colors?.[key]) || '';
+  };
+
+  // Load CMS content on app startup
+  useEffect(() => {
+    const initializeCms = async () => {
+      await Promise.all([
+        loadCmsContent(),
+        loadActiveTheme()
+      ]);
+      setCmsLoaded(true);
+    };
+    
+    initializeCms();
+  }, []);
+
   // Admin Panel States
   const [adminView, setAdminView] = useState('users');
   const [allUsers, setAllUsers] = useState([]);
