@@ -58,11 +58,9 @@ body {
 .navbar-menu {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1.5rem;
   flex: 1;
   justify-content: flex-end;
-  flex-wrap: nowrap;
-  overflow-x: auto;
 }
 
 .nav-dropdown {
