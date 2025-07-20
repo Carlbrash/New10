@@ -450,6 +450,7 @@ const translations = {
     tournament: 'Tournament',
     teams: 'Teams',
     tournaments: 'Tournaments',
+    guilds: 'Guilds',  // Added guild
     tournamentTitle: 'Available Tournaments',
     joinTournament: 'Join Tournament',
     leaveTournament: 'Leave Tournament',
