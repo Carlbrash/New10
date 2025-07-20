@@ -14720,7 +14720,7 @@ function App() {
                     </div>
                   )}
                   
-                  {currentView === 'friend-search' && (
+                  {friendsModalTab === 'friend-search' && (
                     <div className="friend-search">
                       <div className="search-box">
                         <input 
