@@ -13348,79 +13348,216 @@ function App() {
   const [sportsduelSearch, setSportsduelSearch] = useState('');
 
   const renderSportsDuel = () => {
-    // Updated mock data for 1v1 matches with proper team structure
+    // Professional SportsDuel data with enhanced structure
     const teamMatches = [
       {
         id: 1,
-        tournament: 'ELITE WoBeRa Championship',
+        tournament: { 
+          name: 'ELITE WoBeRa Championship 2024', 
+          category: 'Premier League', 
+          season: 'Spring 2024',
+          country: '🇪🇺 Europe',
+          prize: '€50,000'
+        },
         status: 'LIVE',
         timeRemaining: '2h 15m',
+        matchTime: '15:30 - 17:45',
+        duration: '2h 15m',
         team1: { 
           name: 'CHELSEA WIZARDS', 
           logo: 'https://images.unsplash.com/photo-1577223618563-3d858655ab86?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwxfHxzb2NjZXIlMjBsb2dvc3xlbnwwfHx8fDE3NTMwMjc2NDZ8MA&ixlib=rb-4.1.0&q=85', 
           country: '🇬🇧',
-          teamScore: 15 // Won individual matches
+          countryName: 'United Kingdom',
+          teamScore: 15, // Won individual matches
+          totalMatches: 34
         },
         team2: { 
           name: 'GLYFADA SHARKS', 
           logo: 'https://images.unsplash.com/photo-1707414038523-b5d1c8294786?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', 
           country: '🇬🇷',
-          teamScore: 19 // Won individual matches
+          countryName: 'Greece',
+          teamScore: 19, // Won individual matches
+          totalMatches: 34
         },
-        // Current 1v1 active matches
+        // Current 1v1 active matches with detailed player info
         activeMatches: [
           {
-            player1: { name: 'LiLinGeo', avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', team: 'team1', currentScore: 2.30, maxScore: 5.20, trend: 'up' },
-            player2: { name: 'CarlBrash', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', team: 'team2', currentScore: 4.80, maxScore: 5.20, trend: 'up' }
+            player1: { 
+              name: 'LiLinGeo', 
+              avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', 
+              team: 'team1', 
+              currentScore: 2.30, 
+              maxScore: 5.20, 
+              trend: 'up',
+              record: { wins: 18, losses: 12 },
+              seriesRecord: { wins: 3, losses: 1 },
+              rank: '#6'
+            },
+            player2: { 
+              name: 'CarlBrash', 
+              avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', 
+              team: 'team2', 
+              currentScore: 4.80, 
+              maxScore: 5.20, 
+              trend: 'up',
+              record: { wins: 22, losses: 8 },
+              seriesRecord: { wins: 2, losses: 2 },
+              rank: '#3'
+            }
           },
           {
-            player1: { name: 'Emma', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', team: 'team1', currentScore: 1.85, maxScore: 4.60, trend: 'down' },
-            player2: { name: 'MPC', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', team: 'team2', currentScore: 3.60, maxScore: 4.10, trend: 'stable' }
+            player1: { 
+              name: 'Emma', 
+              avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', 
+              team: 'team1', 
+              currentScore: 1.85, 
+              maxScore: 4.60, 
+              trend: 'down',
+              record: { wins: 15, losses: 15 },
+              seriesRecord: { wins: 1, losses: 3 },
+              rank: '#12'
+            },
+            player2: { 
+              name: 'MPC', 
+              avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', 
+              team: 'team2', 
+              currentScore: 3.60, 
+              maxScore: 4.10, 
+              trend: 'stable',
+              record: { wins: 20, losses: 10 },
+              seriesRecord: { wins: 2, losses: 2 },
+              rank: '#4'
+            }
+          },
+          {
+            player1: { 
+              name: 'John Snow', 
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw0fHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', 
+              team: 'team1', 
+              currentScore: 1.19, 
+              maxScore: 6.30, 
+              trend: 'down',
+              record: { wins: 12, losses: 18 },
+              seriesRecord: { wins: 0, losses: 4 },
+              rank: '#18'
+            },
+            player2: { 
+              name: 'Martyn', 
+              avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHw0fHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', 
+              team: 'team2', 
+              currentScore: 1.15, 
+              maxScore: 4.18, 
+              trend: 'stable',
+              record: { wins: 16, losses: 14 },
+              seriesRecord: { wins: 1, losses: 3 },
+              rank: '#9'
+            }
+          },
+          {
+            player1: { 
+              name: 'Wall-e', 
+              avatar: 'https://images.unsplash.com/photo-1615418674275-25cb581798e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', 
+              team: 'team1', 
+              currentScore: 1.46, 
+              maxScore: 4.26, 
+              trend: 'up',
+              record: { wins: 14, losses: 16 },
+              seriesRecord: { wins: 2, losses: 2 },
+              rank: '#15'
+            },
+            player2: { 
+              name: 'Eve', 
+              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b0e0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw1fHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', 
+              team: 'team2', 
+              currentScore: 3.60, 
+              maxScore: 3.95, 
+              trend: 'stable',
+              record: { wins: 19, losses: 11 },
+              seriesRecord: { wins: 3, losses: 1 },
+              rank: '#5'
+            }
+          },
+          {
+            player1: { 
+              name: 'Arya Stark', 
+              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw2fHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', 
+              team: 'team1', 
+              currentScore: 2.23, 
+              maxScore: 5.60, 
+              trend: 'up',
+              record: { wins: 17, losses: 13 },
+              seriesRecord: { wins: 2, losses: 2 },
+              rank: '#8'
+            },
+            player2: { 
+              name: 'Jaime', 
+              avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHw1fHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', 
+              team: 'team2', 
+              currentScore: 1.76, 
+              maxScore: 8.13, 
+              trend: 'down',
+              record: { wins: 13, losses: 17 },
+              seriesRecord: { wins: 1, losses: 3 },
+              rank: '#16'
+            }
           }
         ]
       },
       {
         id: 2,
-        tournament: 'EUROPA WoBeRa League',
+        tournament: { 
+          name: 'EUROPA WoBeRa League 2024', 
+          category: 'Europa Conference', 
+          season: 'Spring 2024',
+          country: '🇪🇺 Europe',
+          prize: '€25,000'
+        },
         status: 'LIVE',
         timeRemaining: '1h 32m',
+        matchTime: '16:00 - 17:30',
+        duration: '1h 30m',
         team1: { 
           name: 'MADRID EAGLES', 
           logo: 'https://images.unsplash.com/photo-1640182837698-d1dee88748b1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwyfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
           country: '🇪🇸',
-          teamScore: 8
+          countryName: 'Spain',
+          teamScore: 8,
+          totalMatches: 20
         },
         team2: { 
           name: 'BARCELONA WOLVES', 
           logo: 'https://images.unsplash.com/photo-1577223597229-2a83f97def38?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxzb2NjZXIlMjBsb2dvc3xlbnwwfHx8fDE3NTMwMjc2NDZ8MA&ixlib=rb-4.1.0&q=85', 
           country: '🇪🇸',
-          teamScore: 12
+          countryName: 'Spain',
+          teamScore: 12,
+          totalMatches: 20
         },
         activeMatches: [
           {
-            player1: { name: 'Wall-e', avatar: 'https://images.unsplash.com/photo-1615418674275-25cb581798e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', team: 'team1', currentScore: 1.75, maxScore: 3.20, trend: 'up' },
-            player2: { name: 'Superman', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', team: 'team2', currentScore: 2.65, maxScore: 3.85, trend: 'stable' }
+            player1: { 
+              name: 'Spiderman', 
+              avatar: 'https://images.unsplash.com/photo-1566753323558-f4e0952af115?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw3fHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', 
+              team: 'team1', 
+              currentScore: 1.85, 
+              maxScore: 3.64, 
+              trend: 'up',
+              record: { wins: 11, losses: 9 },
+              seriesRecord: { wins: 1, losses: 2 },
+              rank: '#10'
+            },
+            player2: { 
+              name: 'Superman', 
+              avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', 
+              team: 'team2', 
+              currentScore: 1.80, 
+              maxScore: 1.90, 
+              trend: 'stable',
+              record: { wins: 13, losses: 7 },
+              seriesRecord: { wins: 2, losses: 1 },
+              rank: '#7'
+            }
           }
         ]
-      },
-      {
-        id: 3,
-        tournament: 'CHAMPIONS WoBeRa Cup',
-        status: 'FINAL',
-        timeRemaining: 'COMPLETED',
-        team1: { 
-          name: 'LIVERPOOL REDS', 
-          logo: 'https://images.unsplash.com/photo-1632937925343-d8d581769c8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
-          country: '🇬🇧',
-          teamScore: 22
-        },
-        team2: { 
-          name: 'MANCHESTER LIONS', 
-          logo: 'https://images.unsplash.com/photo-1639895276073-5327a3ac56fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
-          country: '🇬🇧',
-          teamScore: 18
-        },
-        activeMatches: [] // No active matches, tournament complete
       }
     ];
 
