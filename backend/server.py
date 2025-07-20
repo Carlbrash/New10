@@ -10808,6 +10808,462 @@ def initialize_default_cms_content():
 # Initialize CMS content on startup
 initialize_default_cms_content()
 
+# =============================================================================
+# SPORTSDUEL API ENDPOINTS
+# =============================================================================
+
+# SportsDuel League Management
+@app.get("/api/sportsduel/leagues")
+async def get_sportsduel_leagues():
+    """Get all SportsDuel leagues"""
+    try:
+        leagues = list(sportsduel_leagues_collection.find({}))
+        
+        # Convert ObjectId to string for JSON serialization
+        for league in leagues:
+            if "_id" in league:
+                league["_id"] = str(league["_id"])
+            
+            # Convert datetime objects
+            for field in ["start_date", "end_date", "created_at", "updated_at"]:
+                if field in league and league[field]:
+                    league[field] = league[field].isoformat() if isinstance(league[field], datetime) else league[field]
+        
+        return CustomJSONResponse(content={"leagues": leagues, "total": len(leagues)})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching leagues: {str(e)}")
+
+@app.post("/api/admin/sportsduel/leagues")
+async def create_sportsduel_league(league_data: SportsDuelLeagueCreate, current_user: dict = Depends(get_current_user)):
+    """Create new SportsDuel league (Admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        league_id = str(uuid.uuid4())
+        league = {
+            "id": league_id,
+            "name": league_data.name,
+            "description": league_data.description,
+            "season": league_data.season,
+            "max_teams": league_data.max_teams,
+            "status": "active",
+            "entry_fee": league_data.entry_fee,
+            "prize_pool": league_data.prize_pool,
+            "start_date": league_data.start_date,
+            "end_date": league_data.end_date,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        sportsduel_leagues_collection.insert_one(league)
+        
+        # Convert datetime for response
+        for field in ["start_date", "end_date", "created_at", "updated_at"]:
+            if field in league and league[field]:
+                league[field] = league[field].isoformat()
+        
+        return CustomJSONResponse(content={"message": "League created successfully", "league": league})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating league: {str(e)}")
+
+# SportsDuel Team Management (Sports Cafes)
+@app.get("/api/sportsduel/teams")
+async def get_sportsduel_teams(league_id: str = None):
+    """Get all SportsDuel teams (Sports Cafes)"""
+    try:
+        query = {}
+        if league_id:
+            query["league_id"] = league_id
+            
+        teams = list(sportsduel_teams_collection.find(query))
+        
+        for team in teams:
+            if "_id" in team:
+                team["_id"] = str(team["_id"])
+            
+            # Convert datetime objects
+            for field in ["created_at", "updated_at"]:
+                if field in team and team[field]:
+                    team[field] = team[field].isoformat() if isinstance(team[field], datetime) else team[field]
+        
+        return CustomJSONResponse(content={"teams": teams, "total": len(teams)})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching teams: {str(e)}")
+
+@app.post("/api/sportsduel/teams")
+async def create_sportsduel_team(team_data: SportsDuelTeamCreate, current_user: dict = Depends(get_current_user)):
+    """Create new SportsDuel team (Sports Cafe)"""
+    try:
+        # Check if user already owns a team
+        existing_team = sportsduel_teams_collection.find_one({"owner_user_id": current_user["id"]})
+        if existing_team:
+            raise HTTPException(status_code=400, detail="You already own a sports cafe team")
+        
+        team_id = str(uuid.uuid4())
+        team = {
+            "id": team_id,
+            "name": team_data.name,
+            "cafe_name": team_data.cafe_name,
+            "location": team_data.location,
+            "country": team_data.country,
+            "city": team_data.city,
+            "logo_url": team_data.logo_url,
+            "owner_user_id": current_user["id"],
+            "contact_email": team_data.contact_email,
+            "contact_phone": team_data.contact_phone,
+            "league_id": None,
+            "status": "active",
+            "wins": 0,
+            "losses": 0,
+            "draws": 0,
+            "points": 0,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        sportsduel_teams_collection.insert_one(team)
+        
+        # Convert datetime for response
+        for field in ["created_at", "updated_at"]:
+            if field in team and team[field]:
+                team[field] = team[field].isoformat()
+        
+        return CustomJSONResponse(content={"message": "Sports Cafe team created successfully", "team": team})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating team: {str(e)}")
+
+# SportsDuel Player Management
+@app.get("/api/sportsduel/teams/{team_id}/players")
+async def get_team_players(team_id: str):
+    """Get all players for a specific team"""
+    try:
+        players = list(sportsduel_players_collection.find({"team_id": team_id}))
+        
+        for player in players:
+            if "_id" in player:
+                player["_id"] = str(player["_id"])
+                
+            # Convert datetime objects  
+            for field in ["joined_at", "last_match_at"]:
+                if field in player and player[field]:
+                    player[field] = player[field].isoformat() if isinstance(player[field], datetime) else player[field]
+        
+        return CustomJSONResponse(content={"players": players, "total": len(players)})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching players: {str(e)}")
+
+@app.post("/api/sportsduel/teams/{team_id}/players")
+async def join_sportsduel_team(team_id: str, player_data: SportsDuelPlayerCreate, current_user: dict = Depends(get_current_user)):
+    """Join a SportsDuel team as player"""
+    try:
+        # Check if team exists
+        team = sportsduel_teams_collection.find_one({"id": team_id})
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        # Check if user is already a player in any team
+        existing_player = sportsduel_players_collection.find_one({"user_id": current_user["id"]})
+        if existing_player:
+            raise HTTPException(status_code=400, detail="You are already registered as a player")
+        
+        player_id = str(uuid.uuid4())
+        player = {
+            "id": player_id,
+            "user_id": current_user["id"],
+            "team_id": team_id,
+            "nickname": player_data.nickname,
+            "avatar_url": player_data.avatar_url or current_user.get("avatar_url"),
+            "skill_rating": 1000.0,
+            "wins": 0,
+            "losses": 0,
+            "draws": 0,
+            "total_matches": 0,
+            "average_accuracy": 0.0,
+            "best_streak": 0,
+            "current_streak": 0,
+            "status": "active",
+            "joined_at": datetime.utcnow(),
+            "last_match_at": None
+        }
+        
+        sportsduel_players_collection.insert_one(player)
+        
+        # Convert datetime for response
+        if player["joined_at"]:
+            player["joined_at"] = player["joined_at"].isoformat()
+        
+        return CustomJSONResponse(content={"message": "Successfully joined team", "player": player})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error joining team: {str(e)}")
+
+# SportsDuel Time Slots & Events
+@app.get("/api/sportsduel/time-slots")
+async def get_sportsduel_time_slots(match_date: str = None, league_id: str = None):
+    """Get SportsDuel time slots for a specific date"""
+    try:
+        query = {}
+        if match_date:
+            query["match_day"] = match_date
+        if league_id:
+            query["league_id"] = league_id
+            
+        time_slots = list(sportsduel_time_slots_collection.find(query))
+        
+        for slot in time_slots:
+            if "_id" in slot:
+                slot["_id"] = str(slot["_id"])
+                
+            # Convert datetime objects
+            for field in ["start_time", "end_time", "created_at"]:
+                if field in slot and slot[field]:
+                    slot[field] = slot[field].isoformat() if isinstance(slot[field], datetime) else slot[field]
+        
+        return CustomJSONResponse(content={"time_slots": time_slots, "total": len(time_slots)})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching time slots: {str(e)}")
+
+@app.get("/api/sportsduel/events/{time_slot_id}")
+async def get_sports_events_for_slot(time_slot_id: str):
+    """Get all sports events for a specific time slot"""
+    try:
+        events = list(sportsduel_sports_events_collection.find({"time_slot_id": time_slot_id}))
+        
+        for event in events:
+            if "_id" in event:
+                event["_id"] = str(event["_id"])
+                
+            # Convert datetime objects
+            for field in ["start_time", "created_at", "updated_at"]:
+                if field in event and event[field]:
+                    event[field] = event[field].isoformat() if isinstance(event[field], datetime) else event[field]
+        
+        return CustomJSONResponse(content={"events": events, "total": len(events)})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching events: {str(e)}")
+
+# SportsDuel Match System
+@app.get("/api/sportsduel/matches")
+async def get_sportsduel_matches(league_id: str = None, time_slot_id: str = None, current_user: dict = Depends(get_current_user)):
+    """Get SportsDuel matches"""
+    try:
+        query = {}
+        if league_id:
+            query["league_id"] = league_id
+        if time_slot_id:
+            query["time_slot_id"] = time_slot_id
+            
+        matches = list(sportsduel_matches_collection.find(query))
+        
+        # Get additional data for each match
+        for match in matches:
+            if "_id" in match:
+                match["_id"] = str(match["_id"])
+            
+            # Get team and player info
+            team1 = sportsduel_teams_collection.find_one({"id": match["team1_id"]})
+            team2 = sportsduel_teams_collection.find_one({"id": match["team2_id"]})
+            player1 = sportsduel_players_collection.find_one({"id": match["player1_id"]})
+            player2 = sportsduel_players_collection.find_one({"id": match["player2_id"]})
+            
+            match["team1_name"] = team1["name"] if team1 else "Unknown"
+            match["team2_name"] = team2["name"] if team2 else "Unknown"
+            match["player1_nickname"] = player1["nickname"] if player1 else "Unknown"
+            match["player2_nickname"] = player2["nickname"] if player2 else "Unknown"
+            
+            # Convert datetime objects
+            for field in ["scheduled_at", "started_at", "completed_at", "created_at"]:
+                if field in match and match[field]:
+                    match[field] = match[field].isoformat() if isinstance(match[field], datetime) else match[field]
+        
+        return CustomJSONResponse(content={"matches": matches, "total": len(matches)})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching matches: {str(e)}")
+
+# SportsDuel Coupon System
+@app.post("/api/sportsduel/coupons")
+async def create_sportsduel_coupon(coupon_data: SportsDuelCouponCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new SportsDuel coupon"""
+    try:
+        # Get player info
+        player = sportsduel_players_collection.find_one({"user_id": current_user["id"]})
+        if not player:
+            raise HTTPException(status_code=404, detail="You must be registered as a player first")
+        
+        # Validate bet count (1-3 bets allowed)
+        if not coupon_data.bets or len(coupon_data.bets) > 3:
+            raise HTTPException(status_code=400, detail="Coupon must have between 1 and 3 bets")
+        
+        # Check if match exists
+        match = sportsduel_matches_collection.find_one({"id": coupon_data.match_id})
+        if not match:
+            raise HTTPException(status_code=404, detail="Match not found")
+        
+        # Check if player is part of this match
+        if match["player1_id"] != player["id"] and match["player2_id"] != player["id"]:
+            raise HTTPException(status_code=403, detail="You are not part of this match")
+        
+        # Check if player already has a coupon for this match
+        existing_coupon = sportsduel_coupons_collection.find_one({
+            "player_id": player["id"],
+            "match_id": coupon_data.match_id
+        })
+        if existing_coupon:
+            raise HTTPException(status_code=400, detail="You already have a coupon for this match")
+        
+        coupon_id = str(uuid.uuid4())
+        total_odds = 1.0
+        bets = []
+        
+        # Process each bet
+        for bet_data in coupon_data.bets:
+            bet_id = str(uuid.uuid4())
+            bet = {
+                "id": bet_id,
+                "event_id": bet_data["event_id"],
+                "selection": bet_data["selection"],
+                "odds": bet_data["odds"],
+                "is_correct": None,
+                "created_at": datetime.utcnow()
+            }
+            bets.append(bet)
+            total_odds *= bet["odds"]
+        
+        coupon = {
+            "id": coupon_id,
+            "player_id": player["id"],
+            "match_id": coupon_data.match_id,
+            "time_slot_id": match["time_slot_id"],
+            "bets": bets,
+            "max_bets": 3,
+            "total_odds": total_odds,
+            "correct_predictions": 0,
+            "wrong_predictions": 0,
+            "has_winning_selection": False,
+            "is_winner": None,
+            "status": "pending",
+            "created_at": datetime.utcnow(),
+            "evaluated_at": None
+        }
+        
+        sportsduel_coupons_collection.insert_one(coupon)
+        
+        # Update match with coupon ID
+        if match["player1_id"] == player["id"]:
+            sportsduel_matches_collection.update_one(
+                {"id": coupon_data.match_id},
+                {"$set": {"player1_coupon_id": coupon_id}}
+            )
+        else:
+            sportsduel_matches_collection.update_one(
+                {"id": coupon_data.match_id},
+                {"$set": {"player2_coupon_id": coupon_id}}
+            )
+        
+        # Convert datetime for response
+        coupon["created_at"] = coupon["created_at"].isoformat()
+        for bet in coupon["bets"]:
+            bet["created_at"] = bet["created_at"].isoformat()
+        
+        return CustomJSONResponse(content={"message": "Coupon created successfully", "coupon": coupon})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating coupon: {str(e)}")
+
+@app.get("/api/sportsduel/scoreboard/{league_id}")
+async def get_sportsduel_scoreboard(league_id: str):
+    """Get live SportsDuel scoreboard for a league"""
+    try:
+        # Get active matches for the league
+        matches = list(sportsduel_matches_collection.find({
+            "league_id": league_id,
+            "status": {"$in": ["active", "completed"]}
+        }))
+        
+        scoreboard_data = []
+        
+        for match in matches:
+            if "_id" in match:
+                match["_id"] = str(match["_id"])
+            
+            # Get team info
+            team1 = sportsduel_teams_collection.find_one({"id": match["team1_id"]})
+            team2 = sportsduel_teams_collection.find_one({"id": match["team2_id"]})
+            
+            # Get player info
+            player1 = sportsduel_players_collection.find_one({"id": match["player1_id"]})
+            player2 = sportsduel_players_collection.find_one({"id": match["player2_id"]})
+            
+            # Get coupon info if available
+            player1_coupon = None
+            player2_coupon = None
+            
+            if match.get("player1_coupon_id"):
+                player1_coupon = sportsduel_coupons_collection.find_one({"id": match["player1_coupon_id"]})
+            
+            if match.get("player2_coupon_id"):
+                player2_coupon = sportsduel_coupons_collection.find_one({"id": match["player2_coupon_id"]})
+            
+            match_data = {
+                "match_id": match["id"],
+                "status": match["status"],
+                "team1": {
+                    "id": team1["id"] if team1 else None,
+                    "name": team1["name"] if team1 else "Unknown",
+                    "logo_url": team1.get("logo_url") if team1 else None,
+                    "player": {
+                        "id": player1["id"] if player1 else None,
+                        "nickname": player1["nickname"] if player1 else "Unknown",
+                        "avatar_url": player1.get("avatar_url") if player1 else None,
+                        "coupon_status": player1_coupon["status"] if player1_coupon else "pending",
+                        "correct_predictions": player1_coupon["correct_predictions"] if player1_coupon else 0,
+                        "wrong_predictions": player1_coupon["wrong_predictions"] if player1_coupon else 0,
+                        "total_odds": player1_coupon["total_odds"] if player1_coupon else 0,
+                        "has_winning": player1_coupon["has_winning_selection"] if player1_coupon else False
+                    }
+                },
+                "team2": {
+                    "id": team2["id"] if team2 else None,
+                    "name": team2["name"] if team2 else "Unknown", 
+                    "logo_url": team2.get("logo_url") if team2 else None,
+                    "player": {
+                        "id": player2["id"] if player2 else None,
+                        "nickname": player2["nickname"] if player2 else "Unknown",
+                        "avatar_url": player2.get("avatar_url") if player2 else None,
+                        "coupon_status": player2_coupon["status"] if player2_coupon else "pending",
+                        "correct_predictions": player2_coupon["correct_predictions"] if player2_coupon else 0,
+                        "wrong_predictions": player2_coupon["wrong_predictions"] if player2_coupon else 0,
+                        "total_odds": player2_coupon["total_odds"] if player2_coupon else 0,
+                        "has_winning": player2_coupon["has_winning_selection"] if player2_coupon else False
+                    }
+                },
+                "winner_player_id": match.get("winner_player_id"),
+                "match_result": match.get("match_result")
+            }
+            
+            # Convert datetime objects
+            for field in ["scheduled_at", "started_at", "completed_at"]:
+                if field in match and match[field]:
+                    match_data[field] = match[field].isoformat() if isinstance(match[field], datetime) else match[field]
+            
+            scoreboard_data.append(match_data)
+        
+        return CustomJSONResponse(content={"scoreboard": scoreboard_data, "total": len(scoreboard_data)})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching scoreboard: {str(e)}")
+
+print("✅ SportsDuel API endpoints loaded successfully")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
