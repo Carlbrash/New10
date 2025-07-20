@@ -957,7 +957,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Friend Search API - GET /api/friends/search"
+    - "SportsDuel System - GET /api/sportsduel/leagues"
+    - "SportsDuel System - GET /api/sportsduel/teams"
+    - "SportsDuel System - GET /api/sportsduel/live-scoreboard" 
+    - "SportsDuel System - POST /api/sportsduel/teams"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
