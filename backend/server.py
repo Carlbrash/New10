@@ -6240,7 +6240,7 @@ async def get_my_guild_invitations(user_id: str = Depends(verify_token)):
             "expires_at": {"$gt": datetime.utcnow()}
         }))
         
-        return {"invitations": invitations}
+        return {"invitations": serialize_doc(invitations)}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching guild invitations: {str(e)}")
