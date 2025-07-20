@@ -8712,7 +8712,7 @@ function App() {
                       </div>
 
                       <div className="cms-content-grid">
-                        {cmsContent
+                        {adminCmsContent
                           .filter(item => !selectedContentContext || item.context === selectedContentContext)
                           .map(content => (
                           <div key={content.id} className="cms-content-card">
