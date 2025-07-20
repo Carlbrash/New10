@@ -744,6 +744,7 @@ function App() {
   const [showRankingsDropdown, setShowRankingsDropdown] = useState(false);
   const [showTournamentsDropdown, setShowTournamentsDropdown] = useState(false);
   const [showTeamsDropdown, setShowTeamsDropdown] = useState(false);
+  const [showGuildsDropdown, setShowGuildsDropdown] = useState(false);  // Added guild dropdown
   const [showStandingsDropdown, setShowStandingsDropdown] = useState(false);
   
   // National League States
