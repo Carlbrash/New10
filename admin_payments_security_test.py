@@ -6,7 +6,7 @@ import unittest
 class AdminPaymentsSecurityTester(unittest.TestCase):
     """Test CRITICAL SECURITY FIX for admin payments endpoint"""
     
-    base_url = "https://24db5e72-6830-4299-9073-d783fecac772.preview.emergentagent.com"
+    base_url = "https://70207b9b-0145-4362-8fed-9388d761a5cc.preview.emergentagent.com"
     
     # Test credentials
     test_user_credentials = {
