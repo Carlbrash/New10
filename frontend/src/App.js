@@ -315,7 +315,34 @@ const translations = {
     processAdjustment: 'Επεξεργασία Προσαρμογής',
     bulkPayout: 'Μαζική Πληρωμή',
     selectPayouts: 'Επιλογή Πληρωμών',
-    processBulkPayout: 'Επεξεργασία Μαζικής Πληρωμής'
+    processBulkPayout: 'Επεξεργασία Μαζικής Πληρωμής',
+    
+    // Guild System
+    guildsTitle: 'Guild System',
+    createGuild: 'Δημιουργία Guild',
+    joinGuild: 'Συμμετοχή σε Guild',
+    myGuild: 'Το Guild μου',
+    browseGuilds: 'Περιήγηση Guilds',
+    guildRankings: 'Κατατάξεις Guild',
+    guildWars: 'Guild Wars',
+    guildName: 'Όνομα Guild',
+    guildTag: 'Tag Guild',
+    guildDescription: 'Περιγραφή Guild',
+    guildLeader: 'Guild Leader',
+    guildMembers: 'Μέλη Guild',
+    guildLevel: 'Επίπεδο Guild',
+    guildPowerRating: 'Power Rating',
+    guildTrophies: 'Τρόπαια Guild',
+    recruitmentOpen: 'Ανοιχτή Στρατολόγηση',
+    inviteToGuild: 'Πρόσκληση στο Guild',
+    acceptInvitation: 'Αποδοχή Πρόσκλησης',
+    declineInvitation: 'Απόρριψη Πρόσκλησης',
+    challengeGuild: 'Πρόκληση Guild',
+    guildWar: 'Guild War',
+    warObjectives: 'Στόχοι Πολέμου',
+    warScore: 'Βαθμολογία Πολέμου',
+    
+    // Payments
   },
   en: {
     // Navbar
