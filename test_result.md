@@ -1607,7 +1607,9 @@ test_plan:
     - "Guild System - POST /api/guilds/invitations/{invitation_id}/accept (Accept Invitation)"
     - "Guild System - GET /api/guilds/rankings (Guild Rankings)"
     - "Guild Wars - POST /api/guilds/{guild_id}/challenge (Challenge Guild)"
-  stuck_tasks: []
+    - "CMS Theme Management - GET /api/cms/theme/active (Public Active Theme)" # Needs datetime serialization fix
+  stuck_tasks: 
+    - "CMS Theme Management - GET /api/cms/theme/active (Public Active Theme)" # Datetime serialization issue
   test_all: true
   test_priority: "high_first"
 
