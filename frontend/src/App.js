@@ -10660,6 +10660,111 @@ function App() {
     );
   };
 
+  const renderGuildDetails = () => {
+    const guildId = currentView.replace('guild-', '');
+    
+    if (!selectedGuild) {
+      // Auto-fetch guild details if not loaded
+      useEffect(() => {
+        fetchGuildDetails(guildId);
+      }, [guildId]);
+      
+      return <div className="loading">Loading guild details...</div>;
+    }
+
+    return (
+      <div className="guild-details-page">
+        <div className="container">
+          <div className="guild-header">
+            <button 
+              className="btn btn-outline"
+              onClick={() => setCurrentView('guilds')}
+            >
+              ← Back to Guilds
+            </button>
+            
+            <div className="guild-banner">
+              {selectedGuild.logo_url && (
+                <img src={selectedGuild.logo_url} alt={selectedGuild.name} className="guild-logo-large" />
+              )}
+              <div className="guild-title">
+                <h1>{selectedGuild.name}</h1>
+                <span className="guild-tag">[{selectedGuild.tag}]</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="guild-content">
+            <div className="guild-description">
+              <h3>About This Guild</h3>
+              <p>{selectedGuild.description || 'No description provided.'}</p>
+            </div>
+            
+            <div className="guild-stats">
+              <h3>Guild Statistics</h3>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <span className="stat-value">{selectedGuild.member_count}/50</span>
+                  <span className="stat-label">Members</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-value">{selectedGuild.level || 1}</span>
+                  <span className="stat-label">Level</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-value">{selectedGuild.power_rating || 1000}</span>
+                  <span className="stat-label">Power Rating</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-value">{selectedGuild.total_wars || 0}</span>
+                  <span className="stat-label">Total Wars</span>
+                </div>
+              </div>
+            </div>
+            
+            {selectedGuild.members && (
+              <div className="guild-members">
+                <h3>Guild Members ({selectedGuild.members.length})</h3>
+                <div className="members-list">
+                  {selectedGuild.members.map((member) => (
+                    <div key={member.user_id} className="member-card">
+                      <div className="member-info">
+                        <h4>{member.username}</h4>
+                        <span className="member-role">{member.role}</span>
+                      </div>
+                      <div className="member-stats">
+                        <span>Contributions: {member.contributions}</span>
+                        <span>Joined: {new Date(member.joined_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderGuildWars = () => {
+    return (
+      <div className="guild-wars-page">
+        <div className="container">
+          <div className="wars-header">
+            <h1>⚔️ {t.guildWars}</h1>
+            <p>Epic battles between guilds for glory and rewards!</p>
+          </div>
+
+          <div className="wars-content">
+            <h3>Coming Soon!</h3>
+            <p>Guild Wars feature will be available soon. Prepare your guild for epic battles!</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // =============================================================================
   // AFFILIATE SYSTEM RENDER FUNCTION
   // =============================================================================
