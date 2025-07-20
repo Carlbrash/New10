@@ -8724,13 +8724,24 @@ img {
   }
 }
 /* Team Score Positioning */
+.team-name-with-score {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.team-score-after-name {
+  color: #00ffff;
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
 .team-score-before-name {
   color: #00ffff;
   font-size: 1.8rem;
   font-weight: 900;
-  margin-right: 0.8rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-  display: inline-block;
 }
 
 .team2-score {
@@ -8739,7 +8750,11 @@ img {
 
 .team2-info {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.team2-info .team-name-with-score {
   flex-direction: row-reverse;
 }
 
