@@ -14802,7 +14802,7 @@ function App() {
                     </div>
                   )}
                   
-                  {currentView === 'friend-import' && (
+                  {friendsModalTab === 'friend-import' && (
                     <div className="friend-import">
                       <div className="import-method">
                         <h4>Import Friends</h4>
