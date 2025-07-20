@@ -622,6 +622,125 @@ class PayoutRequest(BaseModel):
     metadata: Optional[Dict] = None
 
 # =============================================================================
+# GUILD SYSTEM MODELS
+# =============================================================================
+
+class GuildRole(str, Enum):
+    LEADER = "leader"
+    OFFICER = "officer" 
+    MEMBER = "member"
+
+class GuildStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    DISBANDED = "disbanded"
+
+class GuildWarStatus(str, Enum):
+    PENDING = "pending"
+    ACTIVE = "active"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class GuildCreate(BaseModel):
+    name: str
+    description: str = ""
+    logo_url: str = None
+    tag: str  # 3-5 character guild tag
+    colors: TeamColors
+    recruitment_open: bool = True
+    min_level: int = 1
+    country: Optional[str] = None
+
+class GuildUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    logo_url: Optional[str] = None
+    tag: Optional[str] = None
+    colors: Optional[TeamColors] = None
+    recruitment_open: Optional[bool] = None
+    min_level: Optional[int] = None
+    country: Optional[str] = None
+
+class GuildMember(BaseModel):
+    user_id: str
+    username: str
+    role: GuildRole = GuildRole.MEMBER
+    joined_at: datetime
+    contributions: int = 0
+    last_active: datetime
+
+class GuildInvite(BaseModel):
+    username: str
+    message: str = ""
+
+class GuildApplication(BaseModel):
+    user_id: str
+    username: str
+    message: str
+    applied_at: datetime
+    status: str = "pending"  # pending, accepted, rejected
+
+class GuildWar(BaseModel):
+    id: str
+    guild_1_id: str
+    guild_1_name: str
+    guild_2_id: str
+    guild_2_name: str
+    status: GuildWarStatus = GuildWarStatus.PENDING
+    war_type: str = "classic"  # classic, blitz, tournament
+    start_time: datetime
+    end_time: datetime
+    objectives: List[dict] = []
+    guild_1_score: int = 0
+    guild_2_score: int = 0
+    winner_guild_id: Optional[str] = None
+    created_at: datetime
+    created_by: str
+
+class GuildWarObjective(BaseModel):
+    id: str
+    name: str
+    description: str
+    points: int
+    completed_by: Optional[str] = None  # guild_id
+    completed_at: Optional[datetime] = None
+
+class GuildStats(BaseModel):
+    guild_id: str
+    level: int = 1
+    experience: int = 0
+    power_rating: int = 1000
+    total_wars: int = 0
+    wars_won: int = 0
+    wars_lost: int = 0
+    tournament_victories: int = 0
+    total_trophies: int = 0
+    season_trophies: int = 0
+    contributions_this_season: int = 0
+    updated_at: datetime
+
+class GuildTournament(BaseModel):
+    id: str
+    name: str
+    description: str
+    guild_id: str
+    entry_fee: float = 0.0
+    max_participants: int = 16
+    participants: List[str] = []  # user_ids
+    status: str = "upcoming"
+    start_time: datetime
+    end_time: Optional[datetime] = None
+    prizes: List[dict] = []
+    created_at: datetime
+
+class GuildBenefit(BaseModel):
+    benefit_type: str  # xp_boost, tournament_discount, special_access
+    description: str
+    value: float  # percentage or fixed amount
+    duration_hours: int = 24
+    active: bool = True
+
+# =============================================================================
 # SOCIAL SHARING SYSTEM MODELS
 # =============================================================================
 
