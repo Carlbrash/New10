@@ -6392,6 +6392,346 @@ async def get_guild_rankings(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching guild rankings: {str(e)}")
 
+# =============================================================================
+# GUILD WARS SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.post("/api/guilds/{guild_id}/challenge")
+async def challenge_guild_to_war(
+    guild_id: str, 
+    target_guild_data: dict,
+    user_id: str = Depends(verify_token)
+):
+    """Challenge another guild to war (Leader/Officer only)"""
+    try:
+        # Verify challenging guild exists and user has permission
+        guild = guilds_collection.find_one({"id": guild_id})
+        if not guild:
+            raise HTTPException(status_code=404, detail="Guild not found")
+        
+        member = guild_members_collection.find_one({"guild_id": guild_id, "user_id": user_id})
+        if not member or member["role"] not in [GuildRole.LEADER, GuildRole.OFFICER]:
+            raise HTTPException(status_code=403, detail="Only guild leaders and officers can challenge other guilds")
+        
+        # Verify target guild exists
+        target_guild_id = target_guild_data.get("target_guild_id")
+        target_guild = guilds_collection.find_one({"id": target_guild_id})
+        if not target_guild:
+            raise HTTPException(status_code=404, detail="Target guild not found")
+        
+        if guild_id == target_guild_id:
+            raise HTTPException(status_code=400, detail="Cannot challenge your own guild")
+        
+        # Check if there's already an active war between these guilds
+        existing_war = guild_wars_collection.find_one({
+            "$or": [
+                {"guild_1_id": guild_id, "guild_2_id": target_guild_id, "status": {"$in": [GuildWarStatus.PENDING, GuildWarStatus.ACTIVE]}},
+                {"guild_1_id": target_guild_id, "guild_2_id": guild_id, "status": {"$in": [GuildWarStatus.PENDING, GuildWarStatus.ACTIVE]}}
+            ]
+        })
+        if existing_war:
+            raise HTTPException(status_code=400, detail="There is already an active war with this guild")
+        
+        # Create war challenge
+        war_id = str(uuid.uuid4())
+        war_type = target_guild_data.get("war_type", "classic")
+        start_time = datetime.utcnow() + timedelta(hours=24)  # War starts 24h after challenge
+        end_time = start_time + timedelta(days=3)  # War lasts 3 days
+        
+        # Define objectives based on war type
+        objectives = []
+        if war_type == "classic":
+            objectives = [
+                {"id": str(uuid.uuid4()), "name": "Tournament Wins", "description": "Win tournament matches", "points": 10},
+                {"id": str(uuid.uuid4()), "name": "Member Activity", "description": "Guild members stay active", "points": 5},
+                {"id": str(uuid.uuid4()), "name": "Recruitment", "description": "Successfully recruit new members", "points": 15}
+            ]
+        elif war_type == "blitz":
+            objectives = [
+                {"id": str(uuid.uuid4()), "name": "Quick Victories", "description": "Win quick tournaments", "points": 20},
+                {"id": str(uuid.uuid4()), "name": "Speed Challenge", "description": "Complete objectives fast", "points": 25}
+            ]
+        
+        guild_war = {
+            "id": war_id,
+            "guild_1_id": guild_id,
+            "guild_1_name": guild["name"],
+            "guild_2_id": target_guild_id,
+            "guild_2_name": target_guild["name"],
+            "status": GuildWarStatus.PENDING,
+            "war_type": war_type,
+            "start_time": start_time,
+            "end_time": end_time,
+            "objectives": objectives,
+            "guild_1_score": 0,
+            "guild_2_score": 0,
+            "winner_guild_id": None,
+            "created_at": datetime.utcnow(),
+            "created_by": user_id
+        }
+        
+        guild_wars_collection.insert_one(guild_war)
+        
+        return {"message": f"War challenge sent to {target_guild['name']}", "war_id": war_id, "war": guild_war}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating guild war challenge: {str(e)}")
+
+@app.get("/api/guilds/{guild_id}/wars")
+async def get_guild_wars(guild_id: str, status: Optional[str] = None):
+    """Get guild wars"""
+    try:
+        # Build query
+        query = {
+            "$or": [{"guild_1_id": guild_id}, {"guild_2_id": guild_id}]
+        }
+        if status:
+            query["status"] = status
+        
+        wars = list(guild_wars_collection.find(query).sort("created_at", -1))
+        
+        return {"wars": wars}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching guild wars: {str(e)}")
+
+@app.post("/api/guild-wars/{war_id}/accept")
+async def accept_guild_war(war_id: str, user_id: str = Depends(verify_token)):
+    """Accept a guild war challenge (Leader/Officer only)"""
+    try:
+        # Get war
+        war = guild_wars_collection.find_one({"id": war_id})
+        if not war:
+            raise HTTPException(status_code=404, detail="War not found")
+        
+        if war["status"] != GuildWarStatus.PENDING:
+            raise HTTPException(status_code=400, detail="War is no longer pending")
+        
+        # Verify user has permission in the target guild
+        member = guild_members_collection.find_one({"guild_id": war["guild_2_id"], "user_id": user_id})
+        if not member or member["role"] not in [GuildRole.LEADER, GuildRole.OFFICER]:
+            raise HTTPException(status_code=403, detail="Only guild leaders and officers can accept war challenges")
+        
+        # Activate the war
+        guild_wars_collection.update_one(
+            {"id": war_id},
+            {"$set": {"status": GuildWarStatus.ACTIVE, "accepted_at": datetime.utcnow()}}
+        )
+        
+        # Update guild stats
+        guild_stats_collection.update_one(
+            {"guild_id": war["guild_1_id"]},
+            {"$inc": {"total_wars": 1}}
+        )
+        guild_stats_collection.update_one(
+            {"guild_id": war["guild_2_id"]},
+            {"$inc": {"total_wars": 1}}
+        )
+        
+        return {"message": "Guild war accepted and activated", "war_id": war_id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error accepting guild war: {str(e)}")
+
+@app.post("/api/guild-wars/{war_id}/decline")
+async def decline_guild_war(war_id: str, user_id: str = Depends(verify_token)):
+    """Decline a guild war challenge"""
+    try:
+        # Get war
+        war = guild_wars_collection.find_one({"id": war_id})
+        if not war:
+            raise HTTPException(status_code=404, detail="War not found")
+        
+        if war["status"] != GuildWarStatus.PENDING:
+            raise HTTPException(status_code=400, detail="War is no longer pending")
+        
+        # Verify user has permission in the target guild
+        member = guild_members_collection.find_one({"guild_id": war["guild_2_id"], "user_id": user_id})
+        if not member or member["role"] not in [GuildRole.LEADER, GuildRole.OFFICER]:
+            raise HTTPException(status_code=403, detail="Only guild leaders and officers can decline war challenges")
+        
+        # Cancel the war
+        guild_wars_collection.update_one(
+            {"id": war_id},
+            {"$set": {"status": GuildWarStatus.CANCELLED, "declined_at": datetime.utcnow()}}
+        )
+        
+        return {"message": "Guild war challenge declined"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error declining guild war: {str(e)}")
+
+@app.get("/api/guild-wars/active")
+async def get_active_guild_wars():
+    """Get all active guild wars"""
+    try:
+        wars = list(guild_wars_collection.find({"status": GuildWarStatus.ACTIVE}).sort("start_time", 1))
+        
+        return {"active_wars": wars}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching active guild wars: {str(e)}")
+
+@app.post("/api/guild-wars/{war_id}/complete-objective")
+async def complete_war_objective(
+    war_id: str, 
+    objective_data: dict,
+    user_id: str = Depends(verify_token)
+):
+    """Complete a war objective (automated by system events)"""
+    try:
+        # Get war
+        war = guild_wars_collection.find_one({"id": war_id})
+        if not war:
+            raise HTTPException(status_code=404, detail="War not found")
+        
+        if war["status"] != GuildWarStatus.ACTIVE:
+            raise HTTPException(status_code=400, detail="War is not active")
+        
+        objective_id = objective_data.get("objective_id")
+        guild_id = objective_data.get("guild_id")
+        
+        # Verify guild is part of this war
+        if guild_id not in [war["guild_1_id"], war["guild_2_id"]]:
+            raise HTTPException(status_code=400, detail="Guild is not part of this war")
+        
+        # Find and update the objective
+        objectives = war.get("objectives", [])
+        objective_found = False
+        points_awarded = 0
+        
+        for obj in objectives:
+            if obj["id"] == objective_id and not obj.get("completed_by"):
+                obj["completed_by"] = guild_id
+                obj["completed_at"] = datetime.utcnow()
+                points_awarded = obj["points"]
+                objective_found = True
+                break
+        
+        if not objective_found:
+            raise HTTPException(status_code=400, detail="Objective not found or already completed")
+        
+        # Update war scores
+        update_data = {"objectives": objectives}
+        if guild_id == war["guild_1_id"]:
+            update_data["guild_1_score"] = war["guild_1_score"] + points_awarded
+        else:
+            update_data["guild_2_score"] = war["guild_2_score"] + points_awarded
+        
+        guild_wars_collection.update_one({"id": war_id}, {"$set": update_data})
+        
+        return {"message": "Objective completed", "points_awarded": points_awarded}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error completing war objective: {str(e)}")
+
+# =============================================================================
+# GUILD TOURNAMENTS SYSTEM API ENDPOINTS  
+# =============================================================================
+
+@app.post("/api/guilds/{guild_id}/tournaments")
+async def create_guild_tournament(
+    guild_id: str,
+    tournament_data: dict,
+    user_id: str = Depends(verify_token)
+):
+    """Create a guild-exclusive tournament (Leader/Officer only)"""
+    try:
+        # Verify guild and permissions
+        guild = guilds_collection.find_one({"id": guild_id})
+        if not guild:
+            raise HTTPException(status_code=404, detail="Guild not found")
+        
+        member = guild_members_collection.find_one({"guild_id": guild_id, "user_id": user_id})
+        if not member or member["role"] not in [GuildRole.LEADER, GuildRole.OFFICER]:
+            raise HTTPException(status_code=403, detail="Only guild leaders and officers can create guild tournaments")
+        
+        # Create tournament
+        tournament_id = str(uuid.uuid4())
+        guild_tournament = {
+            "id": tournament_id,
+            "name": tournament_data.get("name"),
+            "description": tournament_data.get("description", ""),
+            "guild_id": guild_id,
+            "guild_name": guild["name"],
+            "entry_fee": tournament_data.get("entry_fee", 0.0),
+            "max_participants": tournament_data.get("max_participants", 16),
+            "participants": [],
+            "status": "upcoming",
+            "start_time": datetime.fromisoformat(tournament_data.get("start_time")),
+            "end_time": None,
+            "prizes": tournament_data.get("prizes", []),
+            "created_at": datetime.utcnow(),
+            "created_by": user_id
+        }
+        
+        guild_tournaments_collection.insert_one(guild_tournament)
+        
+        return {"message": "Guild tournament created successfully", "tournament_id": tournament_id, "tournament": guild_tournament}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating guild tournament: {str(e)}")
+
+@app.get("/api/guilds/{guild_id}/tournaments")
+async def get_guild_tournaments(guild_id: str):
+    """Get all tournaments for a guild"""
+    try:
+        tournaments = list(guild_tournaments_collection.find({"guild_id": guild_id}).sort("created_at", -1))
+        
+        return {"tournaments": tournaments}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching guild tournaments: {str(e)}")
+
+@app.post("/api/guild-tournaments/{tournament_id}/join")
+async def join_guild_tournament(tournament_id: str, user_id: str = Depends(verify_token)):
+    """Join a guild tournament (guild members only)"""
+    try:
+        # Get tournament
+        tournament = guild_tournaments_collection.find_one({"id": tournament_id})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+        
+        # Verify user is a member of the guild
+        member = guild_members_collection.find_one({"guild_id": tournament["guild_id"], "user_id": user_id})
+        if not member:
+            raise HTTPException(status_code=403, detail="Only guild members can join guild tournaments")
+        
+        # Check if tournament is open for registration
+        if tournament["status"] != "upcoming":
+            raise HTTPException(status_code=400, detail="Tournament is not open for registration")
+        
+        # Check if user is already registered
+        if user_id in tournament["participants"]:
+            raise HTTPException(status_code=400, detail="You are already registered for this tournament")
+        
+        # Check capacity
+        if len(tournament["participants"]) >= tournament["max_participants"]:
+            raise HTTPException(status_code=400, detail="Tournament is full")
+        
+        # Add user to participants
+        guild_tournaments_collection.update_one(
+            {"id": tournament_id},
+            {"$addToSet": {"participants": user_id}}
+        )
+        
+        return {"message": "Successfully joined guild tournament"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error joining guild tournament: {str(e)}")
+
 # ============================================================================
 # LIVE CHAT SYSTEM - WEBSOCKET IMPLEMENTATION
 # ============================================================================
