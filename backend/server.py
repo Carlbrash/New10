@@ -1142,6 +1142,178 @@ class TranslationUpdateRequest(BaseModel):
     language: str
     translated_value: str
 
+# ===== SPORTSDUEL SYSTEM MODELS =====
+
+class SportsDuelLeague(BaseModel):
+    id: Optional[str] = None
+    name: str
+    description: Optional[str] = None
+    season: str
+    max_teams: int = 16
+    status: str = "active"  # active, inactive, completed
+    entry_fee: Optional[float] = None
+    prize_pool: Optional[float] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+class SportsDuelTeam(BaseModel):  # Sports Cafe
+    id: Optional[str] = None
+    name: str
+    cafe_name: str
+    location: str
+    country: str
+    city: str
+    logo_url: Optional[str] = None
+    owner_user_id: str  # Cafe owner
+    contact_email: str
+    contact_phone: str
+    league_id: Optional[str] = None
+    status: str = "active"  # active, inactive, suspended
+    wins: int = 0
+    losses: int = 0
+    draws: int = 0
+    points: int = 0
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+class SportsDuelPlayer(BaseModel):  # Cafe Customer
+    id: Optional[str] = None
+    user_id: str  # Reference to main user system
+    team_id: str
+    nickname: str
+    avatar_url: Optional[str] = None
+    skill_rating: float = 1000.0
+    wins: int = 0
+    losses: int = 0
+    draws: int = 0
+    total_matches: int = 0
+    average_accuracy: float = 0.0
+    best_streak: int = 0
+    current_streak: int = 0
+    status: str = "active"  # active, inactive, suspended
+    joined_at: Optional[datetime] = None
+    last_match_at: Optional[datetime] = None
+
+class SportsDuelTimeSlot(BaseModel):
+    id: Optional[str] = None
+    slot_name: str  # e.g., "Morning Slot", "Evening Slot"
+    start_time: datetime
+    end_time: datetime
+    match_day: str  # e.g., "2024-01-15"
+    max_concurrent_matches: int = 10
+    status: str = "scheduled"  # scheduled, active, completed, cancelled
+    created_at: Optional[datetime] = None
+
+class SportsDuelSportsEvent(BaseModel):
+    id: Optional[str] = None
+    event_name: str  # e.g., "Chelsea vs Arsenal"
+    sport_type: str  # football, basketball, tennis, etc.
+    league: str  # e.g., "Premier League", "NBA"
+    start_time: datetime
+    home_team: str
+    away_team: str
+    odds_1: float  # Home win
+    odds_x: Optional[float] = None  # Draw (if applicable)
+    odds_2: float  # Away win
+    total_goals_over: Optional[float] = None
+    total_goals_under: Optional[float] = None
+    status: str = "scheduled"  # scheduled, live, completed, cancelled
+    result: Optional[str] = None  # "1", "X", "2", "over", "under"
+    time_slot_id: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+class SportsDuelBet(BaseModel):
+    id: Optional[str] = None
+    event_id: str
+    selection: str  # "1", "X", "2", "over", "under"
+    odds: float
+    is_correct: Optional[bool] = None
+    created_at: Optional[datetime] = None
+
+class SportsDuelCoupon(BaseModel):
+    id: Optional[str] = None
+    player_id: str
+    match_id: str
+    time_slot_id: str
+    bets: List[SportsDuelBet] = []
+    max_bets: int = 3  # 1 to 3 bets allowed
+    total_odds: float = 1.0  # Product of all odds
+    correct_predictions: int = 0
+    wrong_predictions: int = 0
+    has_winning_selection: bool = False  # Must have at least 1 correct
+    is_winner: Optional[bool] = None
+    status: str = "pending"  # pending, evaluated, disqualified
+    created_at: Optional[datetime] = None
+    evaluated_at: Optional[datetime] = None
+
+class SportsDuelMatch(BaseModel):  # 1v1 Player Match
+    id: Optional[str] = None
+    league_id: str
+    time_slot_id: str
+    team1_id: str
+    team2_id: str
+    player1_id: str
+    player2_id: str
+    player1_coupon_id: Optional[str] = None
+    player2_coupon_id: Optional[str] = None
+    winner_player_id: Optional[str] = None
+    match_result: Optional[str] = None  # "player1", "player2", "draw"
+    status: str = "scheduled"  # scheduled, active, completed, cancelled
+    scheduled_at: datetime
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+
+class SportsDuelMatchResult(BaseModel):
+    id: Optional[str] = None
+    match_id: str
+    player1_id: str
+    player2_id: str
+    player1_correct: int
+    player1_wrong: int
+    player1_odds_product: float
+    player1_has_winning: bool
+    player2_correct: int
+    player2_wrong: int
+    player2_odds_product: float
+    player2_has_winning: bool
+    winner_player_id: Optional[str] = None
+    win_reason: str  # "fewer_wrong", "higher_odds", "disqualified"
+    created_at: Optional[datetime] = None
+
+# SportsDuel Request Models
+class SportsDuelLeagueCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    season: str
+    max_teams: int = 16
+    entry_fee: Optional[float] = None
+    prize_pool: Optional[float] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+
+class SportsDuelTeamCreate(BaseModel):
+    name: str
+    cafe_name: str
+    location: str
+    country: str
+    city: str
+    contact_email: str
+    contact_phone: str
+    logo_url: Optional[str] = None
+
+class SportsDuelPlayerCreate(BaseModel):
+    team_id: str
+    nickname: str
+    avatar_url: Optional[str] = None
+
+class SportsDuelCouponCreate(BaseModel):
+    match_id: str
+    bets: List[Dict[str, Any]]  # event_id, selection, odds
+
 # Helper functions
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
