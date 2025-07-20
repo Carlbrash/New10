@@ -7,7 +7,7 @@ class LiveChatSystemTester(unittest.TestCase):
     
     def __init__(self, *args, **kwargs):
         super(LiveChatSystemTester, self).__init__(*args, **kwargs)
-        self.base_url = "https://70207b9b-0145-4362-8fed-9388d761a5cc.preview.emergentagent.com"
+        self.base_url = "https://42b9aa62-6128-4581-a652-e6679123b102.preview.emergentagent.com"
         
         # Test credentials
         self.admin_credentials = {"username": "admin", "password": "Kiki1999@"}

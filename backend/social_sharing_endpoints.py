@@ -118,7 +118,7 @@ def setup_social_sharing_endpoints(app, verify_token, verify_admin_token,
                 raise HTTPException(status_code=404, detail="Share not found")
             
             # Determine redirect URL based on share type
-            redirect_url = "https://70207b9b-0145-4362-8fed-9388d761a5cc.preview.emergentagent.com"
+            redirect_url = "https://42b9aa62-6128-4581-a652-e6679123b102.preview.emergentagent.com"
             
             if share["share_type"] == ShareType.TOURNAMENT_VICTORY:
                 redirect_url += f"/tournament/{share['metadata']['tournament_id']}"

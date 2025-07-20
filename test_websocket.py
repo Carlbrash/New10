@@ -7,7 +7,7 @@ import requests
 async def test_websocket():
     # First, get a token by logging in
     login_response = requests.post(
-        "https://70207b9b-0145-4362-8fed-9388d761a5cc.preview.emergentagent.com/api/login",
+        "https://42b9aa62-6128-4581-a652-e6679123b102.preview.emergentagent.com/api/login",
         json={"username": "alex", "password": "alex123"}
     )
     
