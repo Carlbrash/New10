@@ -1721,3 +1721,150 @@ body {
     align-items: center;
   }
 }
+
+/* Rankings Table Layout */
+.rankings-table {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  overflow: hidden;
+}
+
+.table-header {
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  color: white;
+  font-weight: bold;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 150px 100px;
+  gap: 1rem;
+  align-items: center;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 150px 100px;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.table-row:hover {
+  background: rgba(79, 195, 247, 0.1);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row.current-user {
+  background: rgba(79, 195, 247, 0.15);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+}
+
+.table-row.top-3 {
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.rank-col {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+  color: #4fc3f7;
+}
+
+.player-col {
+  display: flex;
+  align-items: center;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.player-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.player-name {
+  color: #dddddd;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.username {
+  color: #4fc3f7;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.country-col {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dddddd;
+}
+
+.country-flag {
+  font-size: 1.2rem;
+}
+
+.stats-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.9rem;
+  color: #dddddd;
+}
+
+.score-col {
+  color: #4fc3f7;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-align: right;
+}
+
+.medal {
+  font-size: 1.2rem;
+}
+
+.you-badge {
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 60px 1fr 80px;
+    font-size: 0.9rem;
+  }
+  
+  .country-col,
+  .stats-col {
+    display: none;
+  }
+  
+  .player-info {
+    gap: 0.8rem;
+  }
+}
