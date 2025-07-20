@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliate Dashboard Test - WoBeRa</title>
+    <link rel="stylesheet" href="../src/App.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="affiliate-dashboard">
+            <div class="affiliate-header">
+                <h2>💰 Affiliate Dashboard</h2>
+                <div class="affiliate-status">
+                    <span class="status-badge active">
+                        ✅ Active
+                    </span>
+                </div>
+            </div>
+
+            <!-- Affiliate Navigation -->
+            <div class="affiliate-nav">
+                <button class="tab-btn active">
+                    📊 Dashboard
+                </button>
+                <button class="tab-btn">
+                    💰 Commissions
+                </button>
+                <button class="tab-btn">
+                    👥 Referrals
+                </button>
+                <button class="tab-btn">
+                    📈 Analytics
+                </button>
+            </div>
+
+            <!-- Referral Code Section -->
+            <div class="referral-code-section">
+                <h3>🔗 Your Referral Code</h3>
+                <div class="referral-code">
+                    DEMO2024
+                </div>
+                <button class="copy-button">
+                    📋 Copy Link
+                </button>
+            </div>
+
+            <!-- Affiliate Stats -->
+            <div class="affiliate-stats">
+                <div class="affiliate-stat-card">
+                    <div class="stat-number">47</div>
+                    <div class="stat-label">Total Referrals</div>
+                </div>
+                <div class="affiliate-stat-card">
+                    <div class="stat-number">32</div>
+                    <div class="stat-label">Active Referrals</div>
+                </div>
+                <div class="affiliate-stat-card">
+                    <div class="stat-number">€1,485.50</div>
+                    <div class="stat-label">Total Earnings</div>
+                </div>
+                <div class="affiliate-stat-card">
+                    <div class="stat-number">€287.30</div>
+                    <div class="stat-label">This Month</div>
+                </div>
+            </div>
+
+            <!-- Commission Breakdown -->
+            <div class="commission-breakdown">
+                <h3>💸 Commission Breakdown</h3>
+                <div class="commission-types">
+                    <div class="commission-item">
+                        <span class="commission-type">Registration Bonus</span>
+                        <span class="commission-amount">€5.00 per signup</span>
+                    </div>
+                    <div class="commission-item">
+                        <span class="commission-type">Tournament Commission</span>
+                        <span class="commission-amount">10% of entry fees</span>
+                    </div>
+                    <div class="commission-item">
+                        <span class="commission-type">Deposit Commission</span>
+                        <span class="commission-amount">3% of deposits</span>
+                    </div>
+                    <div class="commission-item">
+                        <span class="commission-type">Monthly Bonus</span>
+                        <span class="commission-amount">€50.00 (5+ active refs)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
