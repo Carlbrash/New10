@@ -13818,6 +13818,7 @@ function App() {
         {currentView === 'fixtures' && renderFixtures()}
         {currentView === 'affiliate' && user && renderAffiliate()}
         {currentView === 'wallet' && user && renderWallet()}
+        {currentView === 'sportsduel' && renderSportsDuel()}
         {currentView === 'admin' && isAdmin && renderAdminPanel()}
         {currentView === 'download' && <DownloadBackup />}
         
