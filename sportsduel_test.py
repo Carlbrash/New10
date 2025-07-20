@@ -205,19 +205,20 @@ class SportsDuelSystemTester(unittest.TestCase):
         if response.status_code == 200:
             data = response.json()
             self.assertIn("message", data, "Response should contain success message")
-            self.assertIn("team_id", data, "Response should contain team_id")
+            self.assertIn("team", data, "Response should contain team data")
             
-            SportsDuelSystemTester.created_team_id = data["team_id"]
+            team_data = data["team"]
+            SportsDuelSystemTester.created_team_id = team_data["id"]
             
             print(f"  ✅ SportsDuel team created successfully:")
-            print(f"    Team ID: {data['team_id']}")
+            print(f"    Team ID: {team_data['id']}")
             print(f"    Message: {data['message']}")
             
             # Verify team data
             expected_fields = ["name", "cafe_name", "location", "country", "city", "contact_phone", "contact_email"]
             for field in expected_fields:
-                if field in data:
-                    print(f"    {field}: {data[field]}")
+                if field in team_data:
+                    print(f"    {field}: {team_data[field]}")
         
         elif response.status_code == 400:
             # Check if user already has a team or other validation error
