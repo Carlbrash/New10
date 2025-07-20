@@ -742,6 +742,300 @@ body {
 }
 
 /* =============================================================================
+   RANKINGS SYSTEM STYLES
+============================================================================= */
+
+.rankings-container {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.9));
+  min-height: 100vh;
+}
+
+.rankings-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.rankings-header h2 {
+  color: #4fc3f7;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.user-profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.user-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #4fc3f7;
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+}
+
+.user-profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-avatar-large {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+}
+
+.avatar-placeholder {
+  font-size: 2rem;
+  color: white;
+}
+
+.user-nickname {
+  color: #4fc3f7;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.my-position-card {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.my-position-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.my-position-header h3 {
+  color: #4fc3f7;
+  font-size: 1.3rem;
+}
+
+.position-badge {
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.my-position-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.position-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.stat-label {
+  color: #dddddd;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  color: #4fc3f7;
+  font-weight: 600;
+}
+
+.top-players-section-rankings {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.top-players-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.top-players-header h3 {
+  color: #4fc3f7;
+  font-size: 1.5rem;
+}
+
+.top-players-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.top-players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+}
+
+.top-players-group {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.top-players-group h4 {
+  color: #4fc3f7;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.top-player-item {
+  display: grid;
+  grid-template-columns: 60px 50px 1fr 120px 100px;
+  align-items: center;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  gap: 1rem;
+}
+
+.top-player-item:hover {
+  background: rgba(79, 195, 247, 0.1);
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+.player-rank {
+  color: #4fc3f7;
+  font-weight: bold;
+  text-align: center;
+}
+
+.player-flag {
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.player-name {
+  color: #dddddd;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-username {
+  color: #4fc3f7;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.player-score {
+  color: #4fc3f7;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Position search section */
+.position-search-section {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.search-container {
+  position: relative;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 1rem;
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: #4fc3f7;
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .rankings-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .rankings-header {
+    padding: 1rem;
+  }
+  
+  .rankings-header h2 {
+    font-size: 2rem;
+  }
+  
+  .top-players-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .top-player-item {
+    grid-template-columns: 50px 40px 1fr 80px;
+    font-size: 0.9rem;
+    gap: 0.5rem;
+  }
+  
+  .player-username {
+    display: none;
+  }
+  
+  .top-players-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .my-position-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =============================================================================
    GUILD SYSTEM STYLES
 ============================================================================= */
 
