@@ -109,6 +109,17 @@ teams_collection = db.teams
 team_members_collection = db.team_members
 team_invitations_collection = db.team_invitations
 
+# Guild System Collections
+guilds_collection = db.guilds
+guild_members_collection = db.guild_members
+guild_invitations_collection = db.guild_invitations
+guild_applications_collection = db.guild_applications
+guild_wars_collection = db.guild_wars
+guild_stats_collection = db.guild_stats
+guild_tournaments_collection = db.guild_tournaments
+guild_benefits_collection = db.guild_benefits
+guild_war_objectives_collection = db.guild_war_objectives
+
 # National League System Collections
 national_leagues_collection = db.national_leagues
 team_standings_collection = db.team_standings
