@@ -2244,6 +2244,10 @@ function App() {
     } else if (adminView === 'content' && token && isAdmin) {
       fetchContentPages();
       fetchMenuItems();
+      // Also fetch CMS content and themes
+      fetchCmsContent();
+      fetchCmsThemes();
+      fetchActiveTheme();
     }
   }, [adminView, token, isAdmin]);
 
