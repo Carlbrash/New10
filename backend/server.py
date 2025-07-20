@@ -11264,6 +11264,166 @@ async def get_sportsduel_scoreboard(league_id: str):
 
 print("✅ SportsDuel API endpoints loaded successfully")
 
+# =============================================================================
+# SPORTSDUEL SAMPLE DATA INITIALIZATION
+# =============================================================================
+
+def initialize_sportsduel_sample_data():
+    """Initialize SportsDuel with sample data for testing"""
+    try:
+        # Check if already initialized
+        if sportsduel_leagues_collection.count_documents({}) > 0:
+            return  # Already initialized
+        
+        # Create sample league
+        league_id = str(uuid.uuid4())
+        sample_league = {
+            "id": league_id,
+            "name": "SportsDuel Championship 2024",
+            "description": "Professional Sports Cafe Championship",
+            "season": "2024",
+            "max_teams": 16,
+            "status": "active",
+            "entry_fee": 100.0,
+            "prize_pool": 1600.0,
+            "start_date": datetime.utcnow(),
+            "end_date": datetime.utcnow() + timedelta(days=90),
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        sportsduel_leagues_collection.insert_one(sample_league)
+        
+        # Create sample teams (Sports Cafes)
+        sample_teams = [
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Chelsea Wizards",
+                "cafe_name": "Blue Moon Sports Cafe",
+                "location": "London, UK",
+                "country": "UK",
+                "city": "London",
+                "logo_url": "https://via.placeholder.com/100x100/0055A4/FFFFFF?text=CW",
+                "owner_user_id": "demo_owner_1",
+                "contact_email": "info@bluemoon.cafe",
+                "contact_phone": "+44-123-456-789",
+                "league_id": league_id,
+                "status": "active",
+                "wins": 5,
+                "losses": 2,
+                "draws": 1,
+                "points": 16,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Arsenal Legends",
+                "cafe_name": "The Gunners Den",
+                "location": "North London, UK",
+                "country": "UK", 
+                "city": "London",
+                "logo_url": "https://via.placeholder.com/100x100/EF0107/FFFFFF?text=AL",
+                "owner_user_id": "demo_owner_2",
+                "contact_email": "info@gunnersden.cafe",
+                "contact_phone": "+44-987-654-321",
+                "league_id": league_id,
+                "status": "active",
+                "wins": 4,
+                "losses": 3,
+                "draws": 1,
+                "points": 13,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+        ]
+        
+        sportsduel_teams_collection.insert_many(sample_teams)
+        
+        # Create sample players
+        sample_players = [
+            {
+                "id": str(uuid.uuid4()),
+                "user_id": "demo_player_1",
+                "team_id": sample_teams[0]["id"],
+                "nickname": "BlueStriker",
+                "avatar_url": "https://via.placeholder.com/80x80/0055A4/FFFFFF?text=BS",
+                "skill_rating": 1250.0,
+                "wins": 8,
+                "losses": 3,
+                "draws": 1,
+                "total_matches": 12,
+                "average_accuracy": 75.5,
+                "best_streak": 5,
+                "current_streak": 2,
+                "status": "active",
+                "joined_at": datetime.utcnow() - timedelta(days=30),
+                "last_match_at": datetime.utcnow() - timedelta(hours=2)
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "user_id": "demo_player_2", 
+                "team_id": sample_teams[1]["id"],
+                "nickname": "CannonBall",
+                "avatar_url": "https://via.placeholder.com/80x80/EF0107/FFFFFF?text=CB",
+                "skill_rating": 1180.0,
+                "wins": 6,
+                "losses": 5,
+                "draws": 2,
+                "total_matches": 13,
+                "average_accuracy": 68.2,
+                "best_streak": 3,
+                "current_streak": 1,
+                "status": "active",
+                "joined_at": datetime.utcnow() - timedelta(days=25),
+                "last_match_at": datetime.utcnow() - timedelta(hours=1)
+            }
+        ]
+        
+        sportsduel_players_collection.insert_many(sample_players)
+        
+        # Create today's time slots
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+        create_sportsduel_time_slots_for_day(today, league_id)
+        
+        # Create sample sports events for the afternoon slot
+        afternoon_slot = sportsduel_time_slots_collection.find_one({
+            "match_day": today,
+            "slot_name": "Afternoon Slot"
+        })
+        
+        if afternoon_slot:
+            generate_sample_sports_events(afternoon_slot["id"], today)
+            
+            # Create a sample match
+            match_id = str(uuid.uuid4())
+            sample_match = {
+                "id": match_id,
+                "league_id": league_id,
+                "time_slot_id": afternoon_slot["id"],
+                "team1_id": sample_teams[0]["id"],
+                "team2_id": sample_teams[1]["id"],
+                "player1_id": sample_players[0]["id"],
+                "player2_id": sample_players[1]["id"],
+                "player1_coupon_id": None,
+                "player2_coupon_id": None,
+                "winner_player_id": None,
+                "match_result": None,
+                "status": "scheduled",
+                "scheduled_at": datetime.utcnow() + timedelta(hours=1),
+                "started_at": None,
+                "completed_at": None,
+                "created_at": datetime.utcnow()
+            }
+            sportsduel_matches_collection.insert_one(sample_match)
+        
+        print("✅ SportsDuel sample data initialized successfully")
+        
+    except Exception as e:
+        print(f"❌ Error initializing SportsDuel sample data: {e}")
+
+# Initialize SportsDuel sample data on startup
+initialize_sportsduel_sample_data()
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
