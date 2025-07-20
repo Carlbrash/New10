@@ -3723,3 +3723,240 @@ body {
 /* =============================================================================
    GUILD SYSTEM STYLES
 ============================================================================= */
+
+/* =============================================================================
+   ACTIVITY & ACHIEVEMENTS STYLES
+============================================================================= */
+
+.activity-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border: 1px solid rgba(79, 195, 247, 0.1);
+}
+
+.activity-section h3 {
+  color: #4fc3f7;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.activity-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  background: rgba(79, 195, 247, 0.05);
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+  background: rgba(79, 195, 247, 0.08);
+  border-color: rgba(79, 195, 247, 0.2);
+  transform: translateX(5px);
+}
+
+.activity-item .icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  min-width: 2rem;
+  text-align: center;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-content h4 {
+  margin: 0 0 0.3rem 0;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.activity-content p {
+  margin: 0;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+.activity-time {
+  color: #888888;
+  font-size: 0.8rem;
+  text-align: right;
+  min-width: 80px;
+}
+
+/* Recent Activity Grid */
+.recent-activity {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border: 1px solid rgba(79, 195, 247, 0.1);
+}
+
+.recent-activity h3 {
+  color: #4fc3f7;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.activity-card {
+  background: rgba(79, 195, 247, 0.05);
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.activity-card:hover {
+  background: rgba(79, 195, 247, 0.08);
+  border-color: rgba(79, 195, 247, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Achievements Section */
+.achievements-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.achievements-section h3 {
+  color: #ffd700;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.achievement-badge {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.achievement-badge:hover {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.08));
+  border-color: rgba(255, 215, 0, 0.3);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+}
+
+.achievement-badge .icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.achievement-badge h4 {
+  color: #ffd700;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.achievement-badge p {
+  color: #cccccc;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Scrollbar Styles */
+.activity-timeline::-webkit-scrollbar,
+.activity-grid::-webkit-scrollbar,
+.achievements-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.activity-timeline::-webkit-scrollbar-track,
+.activity-grid::-webkit-scrollbar-track,
+.achievements-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.activity-timeline::-webkit-scrollbar-thumb,
+.activity-grid::-webkit-scrollbar-thumb,
+.achievements-grid::-webkit-scrollbar-thumb {
+  background: rgba(79, 195, 247, 0.3);
+  border-radius: 3px;
+}
+
+.activity-timeline::-webkit-scrollbar-thumb:hover,
+.activity-grid::-webkit-scrollbar-thumb:hover,
+.achievements-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 195, 247, 0.5);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .activity-section,
+  .recent-activity,
+  .achievements-section {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .activity-timeline,
+  .activity-grid,
+  .achievements-grid {
+    max-height: 300px;
+  }
+  
+  .activity-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .achievements-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .activity-item {
+    padding: 0.8rem;
+  }
+  
+  .activity-item .icon {
+    font-size: 1.3rem;
+    margin-right: 0.8rem;
+    min-width: 1.5rem;
+  }
+}
