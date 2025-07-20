@@ -13519,7 +13519,7 @@ function App() {
                       <div className="team-score-large">{match.team2.score}</div>
                       <div className="team-logo-circle">
                         <div className="team-badge">
-                          <span className="team-emoji">{match.team2.logo}</span>
+                          <img src={match.team2.logo} alt={match.team2.name} className="team-logo-image" />
                           <span className="team-country">{match.team2.country}</span>
                         </div>
                       </div>
