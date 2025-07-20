@@ -1347,6 +1347,17 @@ function App() {
   const [guildsLoading, setGuildsLoading] = useState(false);
   const [selectedGuild, setSelectedGuild] = useState(null);
   
+  // SportsDuel System States
+  const [sportsduelLeagues, setSportsduelLeagues] = useState([]);
+  const [sportsduelTeams, setSportsduelTeams] = useState([]);
+  const [sportsduelMatches, setSportsduelMatches] = useState([]);
+  const [sportsduelScoreboard, setSportsduelScoreboard] = useState([]);
+  const [currentSportsduelLeague, setCurrentSportsduelLeague] = useState(null);
+  const [myPlayerProfile, setMyPlayerProfile] = useState(null);
+  const [sportsduelTimeSlots, setSportsduelTimeSlots] = useState([]);
+  const [sportsduelEvents, setSportsduelEvents] = useState([]);
+  const [sportsduelLoading, setSportsduelLoading] = useState(false);
+  
   // Get current translations
   const t = translations[language];
 
