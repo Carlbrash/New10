@@ -9945,6 +9945,7 @@ async def get_active_theme():
 async def create_theme(request: ThemeUpdateRequest, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
     """Create new CMS theme (Admin only)"""
     try:
+        now = datetime.utcnow()
         theme_data = {
             "id": str(uuid.uuid4()),
             "name": request.name,
@@ -9952,17 +9953,22 @@ async def create_theme(request: ThemeUpdateRequest, admin_id: str = Depends(veri
             "fonts": request.fonts or {},
             "is_active": False,  # New themes are not active by default
             "is_default": False,
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
+            "created_at": now,
+            "updated_at": now,
             "created_by": admin_id,
             "updated_by": None
         }
         
         cms_themes_collection.insert_one(theme_data)
         
+        # Prepare response data with serialized datetime
+        response_theme = theme_data.copy()
+        response_theme['created_at'] = response_theme['created_at'].isoformat()
+        response_theme['updated_at'] = response_theme['updated_at'].isoformat()
+        
         return CustomJSONResponse(content={
             "message": "Theme created successfully",
-            "theme": theme_data
+            "theme": response_theme
         })
     
     except Exception as e:
