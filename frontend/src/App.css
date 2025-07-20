@@ -3614,18 +3614,34 @@ body {
   margin-bottom: 2rem;
 }
 
+.performance-metrics h3 {
+  color: #4fc3f7;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 
-.metric-item {
+.metric-item,
+.metric-card {
   background: rgba(30, 30, 30, 0.8);
   border-radius: 12px;
   border: 1px solid rgba(79, 195, 247, 0.2);
   padding: 1.5rem;
   text-align: center;
+  transition: all 0.3s ease;
+}
+
+.metric-item:hover,
+.metric-card:hover {
+  background: rgba(40, 40, 40, 0.8);
+  border-color: rgba(79, 195, 247, 0.3);
+  transform: translateY(-2px);
 }
 
 .metric-value {
@@ -3638,6 +3654,141 @@ body {
 .metric-label {
   color: #ccc;
   font-size: 0.9rem;
+}
+
+.metric-icon {
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+/* Monthly Earnings Chart */
+.monthly-earnings {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.monthly-earnings h3 {
+  color: #4fc3f7;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.earnings-chart {
+  min-height: 200px;
+  position: relative;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  height: 150px;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.earnings-bar {
+  background: linear-gradient(to top, rgba(79, 195, 247, 0.8), rgba(79, 195, 247, 0.4));
+  border-radius: 4px 4px 0 0;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  min-width: 30px;
+  flex: 1;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.earnings-bar:hover {
+  background: linear-gradient(to top, rgba(79, 195, 247, 1), rgba(79, 195, 247, 0.6));
+  border-color: rgba(79, 195, 247, 0.8);
+  transform: scale(1.05);
+}
+
+.bar-label {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: #999;
+  white-space: nowrap;
+}
+
+.bar-value {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: #4fc3f7;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.earnings-bar:hover .bar-value {
+  opacity: 1;
+}
+
+.no-earnings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Payout Summary */
+.payout-summary {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.payout-summary h3 {
+  color: #4fc3f7;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.payout-info {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.payout-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.payout-stat {
+  background: rgba(79, 195, 247, 0.05);
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  color: #4fc3f7;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 /* Affiliate Dashboard Layout */
