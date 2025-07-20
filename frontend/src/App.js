@@ -13364,7 +13364,7 @@ function App() {
           name: 'ELITE WoBeRa Championship 2024', 
           category: 'Premier League', 
           season: 'Spring 2024',
-          country: '🇪🇺 Europe',
+          country: '10η Αγωνιστική',
           prize: '€50,000'
         },
         status: 'LIVE',
@@ -13517,7 +13517,7 @@ function App() {
           name: 'EUROPA WoBeRa League 2024', 
           category: 'Europa Conference', 
           season: 'Spring 2024',
-          country: '🇪🇺 Europe',
+          country: '5η Αγωνιστική',
           prize: '€25,000'
         },
         status: 'LIVE',
@@ -13566,6 +13566,68 @@ function App() {
             }
           }
         ]
+      },
+      {
+        id: 3,
+        tournament: { 
+          name: 'CHAMPIONS WoBeRa Cup 2024', 
+          category: 'Championship Final', 
+          season: 'Spring 2024',
+          country: '15η Αγωνιστική',
+          prize: '€100,000'
+        },
+        status: 'UPCOMING',
+        timeRemaining: '45 minutes until start',
+        matchTime: '19:00 - 21:15',
+        duration: '2h 15m',
+        team1: { 
+          name: 'LIVERPOOL REDS', 
+          logo: 'https://images.unsplash.com/photo-1632937925343-d8d581769c8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
+          country: '🇬🇧',
+          countryName: 'United Kingdom',
+          teamScore: 0,
+          totalMatches: 30
+        },
+        team2: { 
+          name: 'MANCHESTER LIONS', 
+          logo: 'https://images.unsplash.com/photo-1639895276073-5327a3ac56fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
+          country: '🇬🇧',
+          countryName: 'United Kingdom',
+          teamScore: 0,
+          totalMatches: 30
+        },
+        activeMatches: [] // No active matches, upcoming tournament
+      },
+      {
+        id: 4,
+        tournament: { 
+          name: 'BUNDESLIGA WoBeRa Championship', 
+          category: 'German League', 
+          season: 'Spring 2024',
+          country: '8η Αγωνιστική',
+          prize: '€35,000'
+        },
+        status: 'UPCOMING',
+        timeRemaining: '2 hours until start',
+        matchTime: '20:30 - 22:45',
+        duration: '2h 15m',
+        team1: { 
+          name: 'BERLIN THUNDER', 
+          logo: 'https://images.unsplash.com/photo-1577223618563-3d858655ab86?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwxfHxzb2NjZXIlMjBsb2dvc3xlbnwwfHx8fDE3NTMwMjc2NDZ8MA&ixlib=rb-4.1.0&q=85', 
+          country: '🇩🇪',
+          countryName: 'Germany',
+          teamScore: 0,
+          totalMatches: 25
+        },
+        team2: { 
+          name: 'MUNICH WARRIORS', 
+          logo: 'https://images.unsplash.com/photo-1707414038523-b5d1c8294786?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', 
+          country: '🇩🇪',
+          countryName: 'Germany',
+          teamScore: 0,
+          totalMatches: 25
+        },
+        activeMatches: [] // No active matches, upcoming tournament
       }
     ];
 
