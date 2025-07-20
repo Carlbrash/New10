@@ -13390,24 +13390,24 @@ function App() {
         timeSlot: 'TIME SLOT 13:30',
         team1: { 
           name: 'MADRID EAGLES', 
-          logo: '🦅', 
+          logo: 'https://images.unsplash.com/photo-1640182837698-d1dee88748b1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwyfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
           score: 8,
           country: '🇪🇸',
           players: [
-            { id: 7, name: 'Wall-e', avatar: '🤖', level: '1/2', wins: 146, losses: 24, accuracy: '86%' },
-            { id: 8, name: 'Arya Stark', avatar: '⚔️', level: '1/4', wins: 233, losses: 60, accuracy: '79%' },
-            { id: 9, name: 'Spiderman', avatar: '🕷️', level: '1/3', wins: 195, losses: 34, accuracy: '85%' }
+            { id: 7, name: 'Wall-e', avatar: 'https://images.unsplash.com/photo-1615418674275-25cb581798e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/2', wins: 146, losses: 24, accuracy: '86%' },
+            { id: 8, name: 'Arya Stark', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/4', wins: 233, losses: 60, accuracy: '79%' },
+            { id: 9, name: 'Spiderman', avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/3', wins: 195, losses: 34, accuracy: '85%' }
           ]
         },
         team2: { 
           name: 'BARCELONA WOLVES', 
-          logo: '🐺', 
+          logo: 'https://images.unsplash.com/photo-1577223597229-2a83f97def38?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxzb2NjZXIlMjBsb2dvc3xlbnwwfHx8fDE3NTMwMjc2NDZ8MA&ixlib=rb-4.1.0&q=85', 
           score: 12,
           country: '🇪🇸',
           players: [
-            { id: 10, name: 'Superman', avatar: '🦸‍♂️', level: '1/3', wins: 189, losses: 19, accuracy: '91%' },
-            { id: 11, name: 'Thor', avatar: '⚡', level: '2/4', wins: 267, losses: 43, accuracy: '86%' },
-            { id: 12, name: 'Hulk', avatar: '💚', level: '3/5', wins: 201, losses: 31, accuracy: '87%' }
+            { id: 10, name: 'Superman', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '1/3', wins: 189, losses: 19, accuracy: '91%' },
+            { id: 11, name: 'Thor', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '2/4', wins: 267, losses: 43, accuracy: '86%' },
+            { id: 12, name: 'Hulk', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '3/5', wins: 201, losses: 31, accuracy: '87%' }
           ]
         }
       },
