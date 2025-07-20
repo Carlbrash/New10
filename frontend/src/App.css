@@ -7977,23 +7977,23 @@ img {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 2rem;
+  padding: 1.5rem;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
 }
 
 .live-players-section,
 .upcoming-players-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .players-section-header {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 0.8rem 1.5rem;
+  margin-bottom: 0.8rem;
+  padding: 0.6rem 1.2rem;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 10px;
   border-left: 4px solid;
 }
 
@@ -8008,9 +8008,9 @@ img {
 .live-indicator-small {
   background: rgba(239, 68, 68, 0.2);
   color: #ef4444;
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   border: 1px solid #ef4444;
 }
@@ -8018,24 +8018,29 @@ img {
 .upcoming-indicator-small {
   background: rgba(245, 158, 11, 0.2);
   color: #f59e0b;
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   border: 1px solid #f59e0b;
 }
 
 .section-title {
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
 }
 
 .team-players {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.upcoming-players-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 1.5rem;
 }
 
 .upcoming-player {
@@ -8048,21 +8053,169 @@ img {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 
+/* Player Row - More Compact */
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.player-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.team2-row {
+  flex-direction: row-reverse;
+}
+
+.player-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 60px;
+}
+
+.player-avatar {
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.player-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.player-level {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.player-info-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.team2-info {
+  text-align: right;
+}
+
+.player-name {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+/* Live Score Info - CRITICAL NEW FEATURE */
+.live-score-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.team2-score {
+  justify-content: flex-end;
+}
+
+.current-score {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.2);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.current-score.up {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.current-score.down {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.current-score.stable {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.trend-indicator {
+  font-size: 0.8rem;
+}
+
+.player-stats {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.7rem;
+}
+
+.team2-info .player-stats {
+  justify-content: flex-end;
+}
+
+.stat-wins {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.stat-losses {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.stat-accuracy {
+  color: #ffd700;
+  font-weight: 600;
+}
+
 /* Next Round Separator */
 .next-round-separator {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.8));
   color: #000;
   text-align: center;
-  padding: 1rem;
-  margin: 1.5rem 0;
-  border-radius: 12px;
+  padding: 0.8rem;
+  margin: 1rem 0;
+  border-radius: 10px;
   border: 2px solid rgba(245, 158, 11, 0.5);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
 }
 
 .next-round-time {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
