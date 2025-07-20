@@ -6136,6 +6136,178 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Who We Are Section */}
+      <div className="who-we-are-section">
+        <div className="container">
+          <h2 className="section-title">🌟 Who We Are</h2>
+          
+          {/* Global Authority */}
+          <div className="organization-level global-level">
+            <div className="level-header">
+              <div className="level-icon">🏛️</div>
+              <div className="level-content">
+                <h3>WoBeRa Global Authority</h3>
+                <p className="level-description">
+                  WoBeRa is the global organizational authority for the game. We are responsible for the 
+                  management and organization of the game worldwide, ensuring standardized rules, 
+                  fair play, and competitive integrity across all regions.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Country Domain System */}
+          <div className="organization-level country-level">
+            <div className="level-header">
+              <div className="level-icon">🏴</div>
+              <div className="level-content">
+                <h3>Country Domain Partnerships</h3>
+                <p className="level-description">
+                  WoBeRa reaches agreements with qualified persons or companies, granting them 
+                  exclusive management and operation rights for their respective countries. 
+                  For example, <strong>WoBeRa.uk</strong> operates as the official local 
+                  organization for the United Kingdom, ensuring the game's growth and proper 
+                  administration in that region.
+                </p>
+              </div>
+            </div>
+            
+            <div className="country-examples">
+              <div className="country-card">
+                <span className="country-flag">🇬🇧</span>
+                <div className="country-info">
+                  <h4>WoBeRa.uk</h4>
+                  <p>United Kingdom Authority</p>
+                </div>
+              </div>
+              <div className="country-card">
+                <span className="country-flag">🇬🇷</span>
+                <div className="country-info">
+                  <h4>WoBeRa.gr</h4>
+                  <p>Greece Authority</p>
+                </div>
+              </div>
+              <div className="country-card">
+                <span className="country-flag">🇩🇪</span>
+                <div className="country-info">
+                  <h4>WoBeRa.de</h4>
+                  <p>Germany Authority</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Local Federation Structure */}
+          <div className="organization-level federation-level">
+            <div className="level-header">
+              <div className="level-icon">⚽</div>
+              <div className="level-content">
+                <h3>Local Federation Operations</h3>
+                <p className="level-description">
+                  Each country federation serves as the local organizational authority. 
+                  Authority members include teams and players participating in local leagues. 
+                  The local federation is responsible for:
+                </p>
+                <ul className="responsibility-list">
+                  <li>🏟️ Smooth operation of the game and local leagues</li>
+                  <li>📊 Managing team registrations and player memberships</li>
+                  <li>🏆 Organizing regional and national competitions</li>
+                  <li>🌍 Creating and managing national teams for international competition</li>
+                  <li>📈 Maintaining ranking systems and statistics</li>
+                  <li>🏪 Overseeing Alpha Planets retail shop establishments</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* International Competition Structure */}
+          <div className="organization-level competition-level">
+            <div className="level-header">
+              <div className="level-icon">🏅</div>
+              <div className="level-content">
+                <h3>International Championships</h3>
+                <p className="level-description">
+                  National teams created by local federations compete in prestigious 
+                  international tournaments organized by WoBeRa Global Authority:
+                </p>
+                <div className="championship-grid">
+                  <div className="championship-card">
+                    <div className="championship-icon">🇪🇺</div>
+                    <h4>European WoBeRa Championship</h4>
+                    <p>Continental competition featuring the best national teams from Europe</p>
+                  </div>
+                  <div className="championship-card">
+                    <div className="championship-icon">🌍</div>
+                    <h4>World WoBeRa Championship</h4>
+                    <p>The ultimate global tournament where nations compete for world supremacy</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Alpha Planets Retail Network */}
+          <div className="organization-level retail-level">
+            <div className="level-header">
+              <div className="level-icon">🛍️</div>
+              <div className="level-content">
+                <h3>Alpha Planets Retail Network</h3>
+                <p className="level-description">
+                  WoBeRa grants the creation and establishment of Alpha Planets retail shops 
+                  worldwide. These premium retail locations serve as official WoBeRa 
+                  merchandise and gaming centers, providing players and fans with:
+                </p>
+                <ul className="retail-features">
+                  <li>🎮 Official WoBeRa gaming equipment and accessories</li>
+                  <li>👕 Licensed team jerseys and fan merchandise</li>
+                  <li>📱 Technology solutions and gaming peripherals</li>
+                  <li>🎯 Tournament registration and local event hosting</li>
+                  <li>🏆 Exclusive collectibles and championship memorabilia</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Organizational Flow */}
+          <div className="organizational-flow">
+            <h3>🔄 How It All Works Together</h3>
+            <div className="flow-diagram">
+              <div className="flow-step">
+                <div className="step-number">1</div>
+                <div className="step-content">
+                  <h4>Global Authority</h4>
+                  <p>WoBeRa sets global standards and regulations</p>
+                </div>
+              </div>
+              <div className="flow-arrow">→</div>
+              <div className="flow-step">
+                <div className="step-number">2</div>
+                <div className="step-content">
+                  <h4>Country Partnerships</h4>
+                  <p>Local authorities manage national operations</p>
+                </div>
+              </div>
+              <div className="flow-arrow">→</div>
+              <div className="flow-step">
+                <div className="step-number">3</div>
+                <div className="step-content">
+                  <h4>Team & Player Network</h4>
+                  <p>Local leagues and competitions flourish</p>
+                </div>
+              </div>
+              <div className="flow-arrow">→</div>
+              <div className="flow-step">
+                <div className="step-number">4</div>
+                <div className="step-content">
+                  <h4>International Glory</h4>
+                  <p>National teams compete globally</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
