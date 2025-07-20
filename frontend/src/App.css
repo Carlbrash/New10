@@ -6154,3 +6154,367 @@ img {
     padding: 2rem;
   }
 }
+
+/* =============================================================================
+   WHO WE ARE SECTION STYLES
+============================================================================= */
+
+.who-we-are-section {
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(20, 20, 20, 0.95));
+  padding: 5rem 0;
+  border-top: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.who-we-are-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.who-we-are-section .section-title {
+  text-align: center;
+  font-size: 3rem;
+  color: #4fc3f7;
+  margin-bottom: 4rem;
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+/* Organization Level Cards */
+.organization-level {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 2.5rem;
+  margin-bottom: 2.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.organization-level::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4fc3f7, #29b6f6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.organization-level:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(79, 195, 247, 0.2);
+  border-color: rgba(79, 195, 247, 0.4);
+}
+
+.organization-level:hover::before {
+  opacity: 1;
+}
+
+.level-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.level-icon {
+  font-size: 3rem;
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 25px rgba(79, 195, 247, 0.3);
+}
+
+.level-content h3 {
+  color: #4fc3f7;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.level-description {
+  color: #ddd;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsibility List */
+.responsibility-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.responsibility-list li {
+  color: #ddd;
+  font-size: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.responsibility-list li:hover {
+  color: #4fc3f7;
+  padding-left: 1rem;
+}
+
+.responsibility-list li:last-child {
+  border-bottom: none;
+}
+
+/* Retail Features List */
+.retail-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.retail-features li {
+  background: rgba(79, 195, 247, 0.05);
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  border-radius: 12px;
+  padding: 1.2rem;
+  color: #ddd;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.retail-features li:hover {
+  background: rgba(79, 195, 247, 0.1);
+  border-color: rgba(79, 195, 247, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Country Examples */
+.country-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.country-card {
+  background: rgba(79, 195, 247, 0.05);
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.country-card:hover {
+  background: rgba(79, 195, 247, 0.1);
+  border-color: rgba(79, 195, 247, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(79, 195, 247, 0.2);
+}
+
+.country-flag {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.country-info h4 {
+  color: #4fc3f7;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.country-info p {
+  color: #999;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Championship Grid */
+.championship-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.championship-card {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border: 2px solid rgba(79, 195, 247, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.championship-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(79, 195, 247, 0.1), transparent);
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+  opacity: 0;
+}
+
+.championship-card:hover::before {
+  opacity: 1;
+  transform: rotate(45deg) translate(50%, 50%);
+}
+
+.championship-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(79, 195, 247, 0.3);
+  border-color: rgba(79, 195, 247, 0.5);
+}
+
+.championship-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.championship-card h4 {
+  color: #4fc3f7;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.championship-card p {
+  color: #ddd;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+/* Organizational Flow */
+.organizational-flow {
+  background: rgba(79, 195, 247, 0.02);
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  border-radius: 20px;
+  padding: 3rem;
+  margin-top: 3rem;
+}
+
+.organizational-flow h3 {
+  color: #4fc3f7;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.flow-step {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+  position: relative;
+}
+
+.step-number {
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 8px 25px rgba(79, 195, 247, 0.3);
+}
+
+.step-content h4 {
+  color: #4fc3f7;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.step-content p {
+  color: #ddd;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.flow-arrow {
+  color: #4fc3f7;
+  font-size: 2rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .who-we-are-section .section-title {
+    font-size: 2.2rem;
+  }
+  
+  .level-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .level-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+  
+  .level-content h3 {
+    font-size: 1.4rem;
+  }
+  
+  .country-examples {
+    grid-template-columns: 1fr;
+  }
+  
+  .championship-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .flow-diagram {
+    flex-direction: column;
+  }
+  
+  .flow-arrow {
+    transform: rotate(90deg);
+    font-size: 1.5rem;
+  }
+  
+  .retail-features {
+    grid-template-columns: 1fr;
+  }
+}
