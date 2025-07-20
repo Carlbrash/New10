@@ -6710,7 +6710,7 @@ async def get_guild_tournaments(guild_id: str):
     try:
         tournaments = list(guild_tournaments_collection.find({"guild_id": guild_id}).sort("created_at", -1))
         
-        return {"tournaments": tournaments}
+        return {"tournaments": serialize_doc(tournaments)}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching guild tournaments: {str(e)}")
