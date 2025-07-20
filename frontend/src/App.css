@@ -3019,3 +3019,373 @@ body {
     padding: 0.8rem;
   }
 }
+
+/* =============================================================================
+   WALLET SYSTEM STYLES
+============================================================================= */
+
+.wallet-container {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.9));
+  min-height: 100vh;
+}
+
+.wallet-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.wallet-header h2 {
+  color: #4fc3f7;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.wallet-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 12px;
+  padding: 0.5rem;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.wallet-tab {
+  flex: 1;
+  padding: 1rem;
+  background: transparent;
+  color: #999;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.wallet-tab.active {
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  color: white;
+  box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
+}
+
+.wallet-tab:hover:not(.active) {
+  background: rgba(79, 195, 247, 0.1);
+  color: #4fc3f7;
+}
+
+.balance-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.balance-card {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.balance-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(79, 195, 247, 0.2);
+  border-color: rgba(79, 195, 247, 0.5);
+}
+
+.balance-card h3 {
+  color: #4fc3f7;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.balance-amount {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.balance-change {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.balance-positive {
+  color: #22c55e;
+}
+
+.balance-negative {
+  color: #ef4444;
+}
+
+.balance-neutral {
+  color: #9ca3af;
+}
+
+.wallet-section {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.wallet-section h3 {
+  color: #4fc3f7;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.transaction-item:hover {
+  background: rgba(79, 195, 247, 0.1);
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+.transaction-info {
+  flex: 1;
+}
+
+.transaction-type {
+  color: #4fc3f7;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.transaction-date {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.transaction-amount {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.earnings-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.earnings-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.earnings-label {
+  color: #999;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.earnings-value {
+  color: #4fc3f7;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+/* =============================================================================
+   AFFILIATE SYSTEM STYLES
+============================================================================= */
+
+.affiliate-container {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.9));
+  min-height: 100vh;
+}
+
+.affiliate-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.affiliate-header h2 {
+  color: #4fc3f7;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.referral-code-section {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05));
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.referral-code-section h3 {
+  color: #22c55e;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.referral-code {
+  background: rgba(30, 30, 30, 0.8);
+  border: 2px solid #22c55e;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #22c55e;
+  letter-spacing: 2px;
+  margin: 1rem 0;
+  display: inline-block;
+}
+
+.copy-button {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-left: 1rem;
+}
+
+.copy-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+}
+
+.affiliate-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.affiliate-stat-card {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.affiliate-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(79, 195, 247, 0.2);
+}
+
+.stat-number {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.stat-label {
+  color: #4fc3f7;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.commission-breakdown {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 2rem;
+}
+
+.commission-breakdown h3 {
+  color: #4fc3f7;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.commission-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.commission-type {
+  color: #dddddd;
+  font-weight: 500;
+}
+
+.commission-amount {
+  color: #22c55e;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .balance-overview,
+  .affiliate-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .wallet-tabs {
+    flex-direction: column;
+  }
+  
+  .transaction-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .earnings-breakdown {
+    grid-template-columns: 1fr;
+  }
+  
+  .referral-code-section {
+    padding: 1rem;
+  }
+  
+  .referral-code {
+    font-size: 1.2rem;
+    padding: 0.8rem 1.5rem;
+  }
+}
+
+/* =============================================================================
+   GUILD SYSTEM STYLES
+============================================================================= */
