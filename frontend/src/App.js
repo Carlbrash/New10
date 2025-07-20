@@ -13824,20 +13824,18 @@ function App() {
                   <div className="team-professional team1">
                     <div className="team-visual">
                       <img src={match.team1.logo} alt={match.team1.name} className="team-logo-professional" />
-                      <div className="team-country-flag">{match.team1.country}</div>
+                      <div className="team-country-flag">{match.team1.country.toUpperCase()}</div>
                     </div>
                     <div className="team-info-professional">
-                      <div className="team-name-professional">{match.team1.name}</div>
+                      <div className="team-name-with-score">
+                        <span className="team-name-professional">{match.team1.name}</span>
+                        <span className="team-score-after-name">{match.team1.teamScore}</span>
+                      </div>
                       <div className="team-country-name">{match.team1.countryName}</div>
                     </div>
                   </div>
                   
                   <div className="scores-section-professional">
-                    <div className="team-scores-container">
-                      <div className="team-score-professional">{match.team1.teamScore}</div>
-                      <div className="scores-separator">-</div>
-                      <div className="team-score-professional team2-score">{match.team2.teamScore}</div>
-                    </div>
                     <div className="vs-section-professional">
                       <div className="vs-circle-static">
                         <span className="vs-text">VS</span>
@@ -13850,13 +13848,15 @@ function App() {
                   
                   <div className="team-professional team2">
                     <div className="team-info-professional team2-info">
-                      <div className="team-score-before-name">{match.team2.teamScore}</div>
-                      <div className="team-name-professional">{match.team2.name}</div>
+                      <div className="team-name-with-score">
+                        <span className="team-score-before-name">{match.team2.teamScore}</span>
+                        <span className="team-name-professional">{match.team2.name}</span>
+                      </div>
                       <div className="team-country-name">{match.team2.countryName}</div>
                     </div>
                     <div className="team-visual">
-                      <div className="team-country-flag">{match.team2.country}</div>
                       <img src={match.team2.logo} alt={match.team2.name} className="team-logo-professional" />
+                      <div className="team-country-flag">{match.team2.country.toUpperCase()}</div>
                     </div>
                   </div>
                 </div>
