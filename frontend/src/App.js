@@ -13373,9 +13373,9 @@ function App() {
           score: 19,
           country: '🇬🇷',
           players: [
-            { id: 4, name: 'CarlBrash', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '6/6', wins: 213, losses: 13, accuracy: '94%' },
-            { id: 5, name: 'MPC', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '4/4', wins: 196, losses: 26, accuracy: '88%' },
-            { id: 6, name: 'Martyn', avatar: 'https://images.unsplash.com/photo-1707414038545-d7885c0efb7b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', level: '1/2', wins: 155, losses: 18, accuracy: '90%' }
+            { id: 4, name: 'CarlBrash', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '6/6', wins: 213, losses: 13, accuracy: '94%', currentScore: '4.80', maxScore: '5.20', trend: 'up' },
+            { id: 5, name: 'MPC', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '4/4', wins: 196, losses: 26, accuracy: '88%', currentScore: '3.60', maxScore: '4.10', trend: 'stable' },
+            { id: 6, name: 'Martyn', avatar: 'https://images.unsplash.com/photo-1707414038545-d7885c0efb7b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', level: '1/2', wins: 155, losses: 18, accuracy: '90%', currentScore: '2.95', maxScore: '3.40', trend: 'up' }
           ]
         }
       },
