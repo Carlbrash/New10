@@ -8037,15 +8037,15 @@ img {
 }
 
 .match-status-professional.status-live {
-  background: rgba(255, 0, 0, 0.2);
-  border: 1px solid rgba(255, 0, 0, 0.5);
-  color: #ff0000;
-  animation: glow-red 2s infinite;
+  background: rgba(0, 255, 0, 0.2);
+  border: 1px solid rgba(0, 255, 0, 0.5);
+  color: #00ff00;
+  animation: glow-green 2s infinite;
 }
 
-@keyframes glow-red {
-  0%, 100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
-  50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); }
+@keyframes glow-green {
+  0%, 100% { box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.8); }
 }
 
 .match-time {
