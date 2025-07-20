@@ -33,7 +33,15 @@ body {
   overflow: hidden;
 }
 
+/* Home Container & Hero Section */
 .home-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.hero-section {
   position: relative;
   width: 100%;
   height: 100vh;
@@ -43,20 +51,15 @@ body {
   overflow: hidden;
 }
 
-.hero-background {
+.hero-image {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
-}
-
-.hero-image {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  opacity: 0.3;
+  opacity: 0.4;
+  z-index: 1;
 }
 
 .hero-overlay {
@@ -67,30 +70,27 @@ body {
   height: 100%;
   background: linear-gradient(
     135deg, 
-    rgba(10, 10, 10, 0.8) 0%, 
-    rgba(30, 30, 30, 0.6) 50%, 
-    rgba(10, 10, 10, 0.9) 100%
+    rgba(10, 10, 10, 0.7) 0%, 
+    rgba(30, 30, 30, 0.5) 50%, 
+    rgba(10, 10, 10, 0.8) 100%
   );
   z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .hero-content {
   position: relative;
   z-index: 3;
   text-align: center;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 900px;
   padding: 2rem;
 }
 
 .hero-title {
-  font-size: 4rem;
+  font-size: 4.5rem;
   font-weight: 900;
   line-height: 1.1;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .gradient-text {
@@ -98,45 +98,49 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  display: inline;
+  display: inline-block;
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
   color: #4fc3f7;
+  font-size: 1.8rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  display: block;
+  margin-top: 1rem;
 }
 
 .hero-description {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: #dddddd;
   line-height: 1.6;
   margin-bottom: 3rem;
-  max-width: 800px;
+  max-width: 700px;
   margin-left: auto;
   margin-right: auto;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .federation-motto {
   position: absolute;
-  bottom: 80px;
+  bottom: 100px;
   right: 50px;
   z-index: 4;
-  background: rgba(79, 195, 247, 0.1);
-  border: 2px solid rgba(79, 195, 247, 0.3);
+  background: rgba(79, 195, 247, 0.15);
+  border: 2px solid rgba(79, 195, 247, 0.4);
   border-radius: 15px;
-  padding: 2rem;
+  padding: 1.5rem 2rem;
   backdrop-filter: blur(10px);
-  max-width: 400px;
+  max-width: 350px;
 }
 
 .motto-text {
   color: #4fc3f7;
   font-size: 1.1rem;
   font-weight: 500;
-  line-height: 1.6;
-  text-align: left;
+  font-style: italic;
+  text-align: center;
+  display: block;
 }
 
 .hero-buttons {
