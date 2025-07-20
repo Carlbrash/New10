@@ -4362,15 +4362,387 @@ body {
   gap: 1rem;
 }
 
+/* =============================================================================
+   ENHANCED USER DASHBOARD STYLES
+============================================================================= */
+
+/* Dashboard Container */
+.dashboard-page {
+  padding: 2rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(20, 20, 20, 0.95));
+  min-height: 100vh;
+}
+
+/* Stats Cards Grid */
+.stats-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Individual Stat Cards */
 .stat-card {
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(50, 50, 50, 0.8));
+  border: 2px solid transparent;
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(10px);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+/* Rank Card */
+.rank-card {
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.rank-card::before {
+  background: linear-gradient(90deg, #ffd700, #ffb000);
+}
+
+.rank-card:hover {
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 15px 40px rgba(255, 215, 0, 0.2);
+}
+
+/* Score Card */
+.score-card {
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+.score-card::before {
+  background: linear-gradient(90deg, #4fc3f7, #29b6f6);
+}
+
+.score-card:hover {
+  border-color: rgba(79, 195, 247, 0.5);
+  box-shadow: 0 15px 40px rgba(79, 195, 247, 0.2);
+}
+
+/* Win Rate Card */
+.winrate-card {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.winrate-card::before {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.winrate-card:hover {
+  border-color: rgba(34, 197, 94, 0.5);
+  box-shadow: 0 15px 40px rgba(34, 197, 94, 0.2);
+}
+
+/* Profit Card */
+.profit-card {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.profit-card::before {
+  background: linear-gradient(90deg, #a855f7, #9333ea);
+}
+
+.profit-card:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 15px 40px rgba(168, 85, 247, 0.2);
+}
+
+/* Stat Card Content */
+.stat-card .stat-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+  text-align: center;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.rank-card .stat-icon {
+  color: #ffd700;
+}
+
+.score-card .stat-icon {
+  color: #4fc3f7;
+}
+
+.winrate-card .stat-icon {
+  color: #22c55e;
+}
+
+.profit-card .stat-icon {
+  color: #a855f7;
+}
+
+.stat-info {
+  text-align: center;
+}
+
+.stat-card .stat-label {
+  color: #999;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-card .stat-value {
+  color: #ffffff;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: block;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+}
+
+.stat-value.positive {
+  color: #22c55e !important;
+}
+
+.stat-value.negative {
+  color: #ef4444 !important;
+}
+
+.stat-change {
+  color: #4fc3f7;
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.stat-change.positive {
+  color: #22c55e;
+}
+
+.stat-change.negative {
+  color: #ef4444;
+}
+
+/* Progress Bar for Win Rate */
+.progress-bar {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  margin-top: 1rem;
+  position: relative;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Progress Section */
+.progress-section {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 3rem;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.progress-section h3 {
+  color: #4fc3f7;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.progress-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.progress-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.progress-label {
+  color: #ddd;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.progress-value {
+  color: #4fc3f7;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Loading State */
+.dashboard-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #4fc3f7;
+}
+
+.loading-spinner {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Dashboard Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 1rem 0.5rem;
+  }
+  
+  .stats-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .stat-card {
+    padding: 1.5rem;
+  }
+  
+  .stat-card .stat-icon {
+    font-size: 2.5rem;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 2rem;
+  }
+  
+  .progress-section {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    padding: 1.2rem;
+  }
+  
+  .stat-card .stat-icon {
+    font-size: 2rem;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 1.8rem;
+  }
+  
+  .progress-section {
+    padding: 1.5rem;
+  }
+}
+
+/* Enhanced Dashboard Card Animations */
+.stat-card {
+  animation: slideInUp 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.rank-card {
+  animation-delay: 0.1s;
+}
+
+.score-card {
+  animation-delay: 0.2s;
+}
+
+.winrate-card {
+  animation-delay: 0.3s;
+}
+
+.profit-card {
+  animation-delay: 0.4s;
+}
+
+@keyframes slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Guild Stats Integration */
+.guild-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.guild-stats .stat-card {
   background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
   border: 1px solid rgba(79, 195, 247, 0.3);
   border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
+  animation: none;
+  opacity: 1;
+  transform: none;
 }
 
-.stat-card .stat-value {
+.guild-stats .stat-card .stat-value {
   display: block;
   font-size: 2rem;
   font-weight: bold;
@@ -4378,7 +4750,7 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.stat-card .stat-label {
+.guild-stats .stat-card .stat-label {
   color: #ddd;
   font-size: 0.9rem;
 }
