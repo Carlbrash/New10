@@ -175,6 +175,7 @@ const translations = {
     tournament: 'Tournament',
     teams: 'Teams',
     tournaments: 'Tournaments',
+    guilds: 'Guilds',  // Added guild
     tournamentTitle: 'Διαθέσιμα Tournaments',
     joinTournament: 'Συμμετοχή',
     leaveTournament: 'Αποχώρηση',
