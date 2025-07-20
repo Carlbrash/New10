@@ -10696,11 +10696,6 @@ function App() {
     const guildId = currentView.replace('guild-', '');
     
     if (!selectedGuild) {
-      // Auto-fetch guild details if not loaded
-      useEffect(() => {
-        fetchGuildDetails(guildId);
-      }, [guildId]);
-      
       return <div className="loading">Loading guild details...</div>;
     }
 
