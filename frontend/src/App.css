@@ -8255,6 +8255,27 @@ img {
 
 .player-avatar-professional {
   position: relative;
+  border-radius: 50%;
+  padding: 3px;
+  transition: all 0.3s ease;
+}
+
+.player-avatar-professional.winning-border {
+  background: linear-gradient(45deg, #00ff00, #22c55e);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+  animation: glow-green-border 2s infinite;
+}
+
+.player-avatar-professional.losing-border {
+  background: linear-gradient(45deg, #ff0000, #ef4444);
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+  animation: glow-red-border 2s infinite;
+}
+
+.player-avatar-professional.tied-border {
+  background: linear-gradient(45deg, #ffff00, #fbbf24);
+  box-shadow: 0 0 15px rgba(255, 255, 0, 0.7);
+  animation: glow-yellow-border 2s infinite;
 }
 
 .player-avatar-professional img {
@@ -8262,7 +8283,26 @@ img {
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: none;
+  display: block;
+}
+
+@keyframes glow-green-border {
+  0% { box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); }
+  50% { box-shadow: 0 0 25px rgba(0, 255, 0, 0.9); }
+  100% { box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); }
+}
+
+@keyframes glow-red-border {
+  0% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.7); }
+  50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.9); }
+  100% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.7); }
+}
+
+@keyframes glow-yellow-border {
+  0% { box-shadow: 0 0 15px rgba(255, 255, 0, 0.7); }
+  50% { box-shadow: 0 0 25px rgba(255, 255, 0, 0.9); }
+  100% { box-shadow: 0 0 15px rgba(255, 255, 0, 0.7); }
 }
 
 .status-indicator {
