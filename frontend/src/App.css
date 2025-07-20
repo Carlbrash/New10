@@ -812,6 +812,72 @@ body {
   font-weight: 600;
 }
 
+/* Avatar Components */
+.avatar-small,
+.avatar-medium, 
+.avatar-large {
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  border: 2px solid #4fc3f7;
+}
+
+.avatar-small {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.avatar-medium {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+}
+
+.avatar-large {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  min-height: 80px;
+}
+
+.avatar-small img,
+.avatar-medium img,
+.avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatar-initials {
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-small .avatar-initials {
+  font-size: 0.8rem;
+}
+
+.avatar-medium .avatar-initials {
+  font-size: 1rem;
+}
+
+.avatar-large .avatar-initials {
+  font-size: 1.5rem;
+}
+
 .my-position-card {
   background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
   border: 1px solid rgba(79, 195, 247, 0.3);
