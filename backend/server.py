@@ -6697,7 +6697,7 @@ async def create_guild_tournament(
         
         guild_tournaments_collection.insert_one(guild_tournament)
         
-        return {"message": "Guild tournament created successfully", "tournament_id": tournament_id, "tournament": guild_tournament}
+        return {"message": "Guild tournament created successfully", "tournament_id": tournament_id, "tournament": serialize_doc(guild_tournament)}
         
     except HTTPException:
         raise
