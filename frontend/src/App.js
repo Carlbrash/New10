@@ -2140,7 +2140,7 @@ function App() {
 
   const getContentByContext = () => {
     const contexts = {};
-    cmsContent.forEach(item => {
+    adminCmsContent.forEach(item => {
       if (!contexts[item.context]) {
         contexts[item.context] = [];
       }
