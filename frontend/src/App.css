@@ -7871,18 +7871,22 @@ img {
 }
 
 .team-logo-image {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
-  border-radius: 50%;
+  border-radius: 8px;
   background: white;
-  padding: 8px;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  padding: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .team-country {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-top: 4px;
 }
 
 .team-score-large {
@@ -8066,14 +8070,14 @@ img {
 .team-logo-circle {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 50%;
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 3px solid rgba(255, 255, 255, 0.8);
   position: relative;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Player Row */
