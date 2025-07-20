@@ -1336,6 +1336,7 @@ function App() {
   const [friendImportEmails, setFriendImportEmails] = useState('');
   const [friendsLoading, setFriendsLoading] = useState(false);
   const [friendActionLoading, setFriendActionLoading] = useState(false);
+  const [friendsModalTab, setFriendsModalTab] = useState('friends'); // Separate state for Friends modal tabs
   
   // Guild System States
   const [guilds, setGuilds] = useState([]);
