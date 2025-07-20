@@ -13502,7 +13502,7 @@ function App() {
                     <div className="team-score-display">
                       <div className="team-logo-circle">
                         <div className="team-badge">
-                          <span className="team-emoji">{match.team1.logo}</span>
+                          <img src={match.team1.logo} alt={match.team1.name} className="team-logo-image" />
                           <span className="team-country">{match.team1.country}</span>
                         </div>
                       </div>
