@@ -13196,6 +13196,16 @@ function App() {
             </div>
           )}
           
+          {/* SportsDuel Menu - only show for logged in users */}
+          {user && (
+            <button 
+              className={`nav-link ${currentView === 'sportsduel' ? 'active' : ''}`}
+              onClick={() => setCurrentView('sportsduel')}
+            >
+              ⚽ SportsDuel
+            </button>
+          )}
+          
           {/* Friends Menu - only show for logged in users */}
           {user && (
             <div className="nav-dropdown">
