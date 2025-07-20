@@ -145,6 +145,17 @@ cms_content_collection = db.cms_content
 cms_translations_collection = db.cms_translations
 cms_themes_collection = db.cms_themes
 
+# SportsDuel System Collections
+sportsduel_leagues_collection = db.sportsduel_leagues
+sportsduel_teams_collection = db.sportsduel_teams  # Sports Cafes
+sportsduel_players_collection = db.sportsduel_players  # Cafe customers
+sportsduel_matches_collection = db.sportsduel_matches
+sportsduel_coupons_collection = db.sportsduel_coupons
+sportsduel_bets_collection = db.sportsduel_bets
+sportsduel_time_slots_collection = db.sportsduel_time_slots
+sportsduel_sports_events_collection = db.sportsduel_sports_events
+sportsduel_match_results_collection = db.sportsduel_match_results
+
 app = FastAPI(title="WoBeRa - World Betting Rank API", default_response_class=CustomJSONResponse)
 
 # CORS configuration
