@@ -1245,6 +1245,15 @@ function App() {
   const [friendsLoading, setFriendsLoading] = useState(false);
   const [friendActionLoading, setFriendActionLoading] = useState(false);
   
+  // Guild System States
+  const [guilds, setGuilds] = useState([]);
+  const [myGuild, setMyGuild] = useState(null);
+  const [guildInvitations, setGuildInvitations] = useState([]);
+  const [guildRankings, setGuildRankings] = useState([]);
+  const [guildWars, setGuildWars] = useState([]);
+  const [guildsLoading, setGuildsLoading] = useState(false);
+  const [selectedGuild, setSelectedGuild] = useState(null);
+  
   // Get current translations
   const t = translations[language];
 
