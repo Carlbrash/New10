@@ -5948,6 +5948,450 @@ async def reset_data():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# =============================================================================
+# GUILD SYSTEM API ENDPOINTS
+# =============================================================================
+
+@app.post("/api/guilds")
+async def create_guild(guild_data: GuildCreate, user_id: str = Depends(verify_token)):
+    """Create a new guild with the current user as leader"""
+    try:
+        # Check if guild name is unique
+        existing_guild = guilds_collection.find_one({"name": guild_data.name})
+        if existing_guild:
+            raise HTTPException(status_code=400, detail="Guild name already exists")
+            
+        # Check if guild tag is unique
+        existing_tag = guilds_collection.find_one({"tag": guild_data.tag.upper()})
+        if existing_tag:
+            raise HTTPException(status_code=400, detail="Guild tag already exists")
+            
+        # Check if user is already in a guild
+        existing_member = guild_members_collection.find_one({"user_id": user_id})
+        if existing_member:
+            raise HTTPException(status_code=400, detail="You are already a member of another guild")
+        
+        # Get user info
+        user = users_collection.find_one({"id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Create guild
+        guild_id = str(uuid.uuid4())
+        new_guild = {
+            "id": guild_id,
+            "name": guild_data.name,
+            "description": guild_data.description,
+            "logo_url": guild_data.logo_url,
+            "tag": guild_data.tag.upper(),
+            "colors": guild_data.colors.dict(),
+            "recruitment_open": guild_data.recruitment_open,
+            "min_level": guild_data.min_level,
+            "country": guild_data.country,
+            "leader_id": user_id,
+            "leader_username": user["username"],
+            "member_count": 1,
+            "max_members": 50,
+            "level": 1,
+            "experience": 0,
+            "trophies": 0,
+            "power_rating": 1000,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        guilds_collection.insert_one(new_guild)
+        
+        # Add user as guild leader
+        guild_member = {
+            "id": str(uuid.uuid4()),
+            "guild_id": guild_id,
+            "user_id": user_id,
+            "username": user["username"],
+            "role": GuildRole.LEADER,
+            "joined_at": datetime.utcnow(),
+            "contributions": 0,
+            "last_active": datetime.utcnow()
+        }
+        guild_members_collection.insert_one(guild_member)
+        
+        # Initialize guild stats
+        guild_stats = {
+            "id": str(uuid.uuid4()),
+            "guild_id": guild_id,
+            "level": 1,
+            "experience": 0,
+            "power_rating": 1000,
+            "total_wars": 0,
+            "wars_won": 0,
+            "wars_lost": 0,
+            "tournament_victories": 0,
+            "total_trophies": 0,
+            "season_trophies": 0,
+            "contributions_this_season": 0,
+            "updated_at": datetime.utcnow()
+        }
+        guild_stats_collection.insert_one(guild_stats)
+        
+        return {"message": "Guild created successfully", "guild_id": guild_id, "guild": new_guild}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating guild: {str(e)}")
+
+@app.get("/api/guilds")
+async def get_all_guilds(
+    country: Optional[str] = None,
+    recruitment_open: Optional[bool] = None,
+    min_level: Optional[int] = None,
+    search: Optional[str] = None
+):
+    """Get all guilds with optional filtering"""
+    try:
+        # Build filter query
+        query = {}
+        if country:
+            query["country"] = country
+        if recruitment_open is not None:
+            query["recruitment_open"] = recruitment_open
+        if min_level is not None:
+            query["min_level"] = {"$lte": min_level}
+        if search:
+            query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"tag": {"$regex": search, "$options": "i"}},
+                {"description": {"$regex": search, "$options": "i"}}
+            ]
+            
+        guilds = list(guilds_collection.find(query))
+        
+        # Add additional info for each guild
+        for guild in guilds:
+            # Get member count
+            member_count = guild_members_collection.count_documents({"guild_id": guild["id"]})
+            guild["member_count"] = member_count
+            
+            # Get guild stats
+            guild_stat = guild_stats_collection.find_one({"guild_id": guild["id"]})
+            if guild_stat:
+                guild.update({
+                    "level": guild_stat.get("level", 1),
+                    "power_rating": guild_stat.get("power_rating", 1000),
+                    "total_wars": guild_stat.get("total_wars", 0),
+                    "wars_won": guild_stat.get("wars_won", 0),
+                    "season_trophies": guild_stat.get("season_trophies", 0)
+                })
+        
+        return {"guilds": guilds}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching guilds: {str(e)}")
+
+@app.get("/api/guilds/{guild_id}")
+async def get_guild_details(guild_id: str):
+    """Get detailed information about a specific guild"""
+    try:
+        # Get guild
+        guild = guilds_collection.find_one({"id": guild_id})
+        if not guild:
+            raise HTTPException(status_code=404, detail="Guild not found")
+        
+        # Get guild members
+        members = list(guild_members_collection.find({"guild_id": guild_id}))
+        
+        # Get user info for each member
+        for member in members:
+            user = users_collection.find_one({"id": member["user_id"]})
+            if user:
+                member["user_info"] = {
+                    "full_name": user.get("full_name"),
+                    "country": user.get("country"),
+                    "profile_picture": user.get("profile_picture")
+                }
+        
+        # Get guild stats
+        guild_stat = guild_stats_collection.find_one({"guild_id": guild_id})
+        if guild_stat:
+            guild.update({
+                "level": guild_stat.get("level", 1),
+                "experience": guild_stat.get("experience", 0),
+                "power_rating": guild_stat.get("power_rating", 1000),
+                "total_wars": guild_stat.get("total_wars", 0),
+                "wars_won": guild_stat.get("wars_won", 0),
+                "wars_lost": guild_stat.get("wars_lost", 0),
+                "tournament_victories": guild_stat.get("tournament_victories", 0),
+                "total_trophies": guild_stat.get("total_trophies", 0),
+                "season_trophies": guild_stat.get("season_trophies", 0)
+            })
+        
+        # Get recent wars
+        recent_wars = list(guild_wars_collection.find({
+            "$or": [{"guild_1_id": guild_id}, {"guild_2_id": guild_id}]
+        }).sort("created_at", -1).limit(5))
+        
+        guild["members"] = members
+        guild["member_count"] = len(members)
+        guild["recent_wars"] = recent_wars
+        
+        return {"guild": guild}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching guild details: {str(e)}")
+
+@app.post("/api/guilds/{guild_id}/invite")
+async def invite_to_guild(guild_id: str, invite_data: GuildInvite, user_id: str = Depends(verify_token)):
+    """Invite a player to join the guild (Leader/Officer only)"""
+    try:
+        # Verify guild exists and user has permission
+        guild = guilds_collection.find_one({"id": guild_id})
+        if not guild:
+            raise HTTPException(status_code=404, detail="Guild not found")
+        
+        # Check if user has permission (leader or officer)
+        member = guild_members_collection.find_one({"guild_id": guild_id, "user_id": user_id})
+        if not member or member["role"] not in [GuildRole.LEADER, GuildRole.OFFICER]:
+            raise HTTPException(status_code=403, detail="Only guild leaders and officers can invite members")
+        
+        # Check if target user exists
+        target_user = users_collection.find_one({"username": invite_data.username})
+        if not target_user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Check if target user is already in a guild
+        existing_member = guild_members_collection.find_one({"user_id": target_user["id"]})
+        if existing_member:
+            raise HTTPException(status_code=400, detail="User is already a member of another guild")
+        
+        # Check if invitation already exists
+        existing_invite = guild_invitations_collection.find_one({
+            "guild_id": guild_id,
+            "user_id": target_user["id"],
+            "status": "pending"
+        })
+        if existing_invite:
+            raise HTTPException(status_code=400, detail="User already has a pending invitation")
+        
+        # Check guild member limit
+        current_member_count = guild_members_collection.count_documents({"guild_id": guild_id})
+        if current_member_count >= guild.get("max_members", 50):
+            raise HTTPException(status_code=400, detail="Guild is at maximum capacity")
+        
+        # Get inviter info
+        inviter = users_collection.find_one({"id": user_id})
+        
+        # Create invitation
+        invitation_id = str(uuid.uuid4())
+        invitation = {
+            "id": invitation_id,
+            "guild_id": guild_id,
+            "guild_name": guild["name"],
+            "guild_tag": guild["tag"],
+            "user_id": target_user["id"],
+            "username": target_user["username"],
+            "inviter_id": user_id,
+            "inviter_username": inviter["username"],
+            "message": invite_data.message,
+            "status": "pending",
+            "created_at": datetime.utcnow(),
+            "expires_at": datetime.utcnow() + timedelta(days=7)
+        }
+        
+        guild_invitations_collection.insert_one(invitation)
+        
+        return {"message": f"Invitation sent to {invite_data.username}", "invitation_id": invitation_id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sending guild invitation: {str(e)}")
+
+@app.get("/api/guilds/my-invitations")
+async def get_my_guild_invitations(user_id: str = Depends(verify_token)):
+    """Get user's pending guild invitations"""
+    try:
+        invitations = list(guild_invitations_collection.find({
+            "user_id": user_id,
+            "status": "pending",
+            "expires_at": {"$gt": datetime.utcnow()}
+        }))
+        
+        return {"invitations": invitations}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching guild invitations: {str(e)}")
+
+@app.post("/api/guilds/invitations/{invitation_id}/accept")
+async def accept_guild_invitation(invitation_id: str, user_id: str = Depends(verify_token)):
+    """Accept a guild invitation"""
+    try:
+        # Get invitation
+        invitation = guild_invitations_collection.find_one({"id": invitation_id})
+        if not invitation:
+            raise HTTPException(status_code=404, detail="Invitation not found")
+        
+        if invitation["user_id"] != user_id:
+            raise HTTPException(status_code=403, detail="This invitation is not for you")
+        
+        if invitation["status"] != "pending":
+            raise HTTPException(status_code=400, detail="Invitation is no longer pending")
+        
+        if invitation["expires_at"] < datetime.utcnow():
+            raise HTTPException(status_code=400, detail="Invitation has expired")
+        
+        # Check if user is already in a guild
+        existing_member = guild_members_collection.find_one({"user_id": user_id})
+        if existing_member:
+            raise HTTPException(status_code=400, detail="You are already a member of another guild")
+        
+        # Get guild and check capacity
+        guild = guilds_collection.find_one({"id": invitation["guild_id"]})
+        if not guild:
+            raise HTTPException(status_code=404, detail="Guild not found")
+        
+        current_member_count = guild_members_collection.count_documents({"guild_id": invitation["guild_id"]})
+        if current_member_count >= guild.get("max_members", 50):
+            raise HTTPException(status_code=400, detail="Guild is at maximum capacity")
+        
+        # Get user info
+        user = users_collection.find_one({"id": user_id})
+        
+        # Add user to guild
+        guild_member = {
+            "id": str(uuid.uuid4()),
+            "guild_id": invitation["guild_id"],
+            "user_id": user_id,
+            "username": user["username"],
+            "role": GuildRole.MEMBER,
+            "joined_at": datetime.utcnow(),
+            "contributions": 0,
+            "last_active": datetime.utcnow()
+        }
+        guild_members_collection.insert_one(guild_member)
+        
+        # Update invitation status
+        guild_invitations_collection.update_one(
+            {"id": invitation_id},
+            {"$set": {"status": "accepted", "accepted_at": datetime.utcnow()}}
+        )
+        
+        # Update guild member count
+        guilds_collection.update_one(
+            {"id": invitation["guild_id"]},
+            {"$inc": {"member_count": 1}, "$set": {"updated_at": datetime.utcnow()}}
+        )
+        
+        return {"message": f"Successfully joined guild {guild['name']}", "guild_id": invitation["guild_id"]}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error accepting guild invitation: {str(e)}")
+
+@app.delete("/api/guilds/invitations/{invitation_id}")
+async def decline_guild_invitation(invitation_id: str, user_id: str = Depends(verify_token)):
+    """Decline a guild invitation"""
+    try:
+        # Get invitation
+        invitation = guild_invitations_collection.find_one({"id": invitation_id})
+        if not invitation:
+            raise HTTPException(status_code=404, detail="Invitation not found")
+        
+        if invitation["user_id"] != user_id:
+            raise HTTPException(status_code=403, detail="This invitation is not for you")
+        
+        if invitation["status"] != "pending":
+            raise HTTPException(status_code=400, detail="Invitation is no longer pending")
+        
+        # Update invitation status
+        guild_invitations_collection.update_one(
+            {"id": invitation_id},
+            {"$set": {"status": "declined", "declined_at": datetime.utcnow()}}
+        )
+        
+        return {"message": "Guild invitation declined"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error declining guild invitation: {str(e)}")
+
+@app.get("/api/guilds/rankings")
+async def get_guild_rankings(
+    country: Optional[str] = None,
+    ranking_type: str = "power_rating",  # power_rating, trophies, wars_won
+    limit: int = 50
+):
+    """Get guild rankings/leaderboard"""
+    try:
+        # Build aggregation pipeline
+        pipeline = []
+        
+        # Match stage for country filter
+        if country:
+            pipeline.append({"$match": {"country": country}})
+        
+        # Lookup guild stats
+        pipeline.extend([
+            {"$lookup": {
+                "from": "guild_stats",
+                "localField": "id",
+                "foreignField": "guild_id",
+                "as": "stats"
+            }},
+            {"$unwind": {"path": "$stats", "preserveNullAndEmptyArrays": True}}
+        ])
+        
+        # Sort based on ranking type
+        sort_field = f"stats.{ranking_type}"
+        if ranking_type == "power_rating":
+            sort_order = -1
+        elif ranking_type == "trophies":
+            sort_field = "stats.season_trophies"
+            sort_order = -1
+        elif ranking_type == "wars_won":
+            sort_order = -1
+        else:
+            sort_order = -1
+            
+        pipeline.extend([
+            {"$sort": {sort_field: sort_order}},
+            {"$limit": limit}
+        ])
+        
+        # Project final fields
+        pipeline.append({
+            "$project": {
+                "_id": 0,
+                "id": 1,
+                "name": 1,
+                "tag": 1,
+                "logo_url": 1,
+                "country": 1,
+                "member_count": 1,
+                "level": "$stats.level",
+                "power_rating": "$stats.power_rating",
+                "season_trophies": "$stats.season_trophies",
+                "total_wars": "$stats.total_wars",
+                "wars_won": "$stats.wars_won",
+                "wars_lost": "$stats.wars_lost",
+                "tournament_victories": "$stats.tournament_victories"
+            }
+        })
+        
+        rankings = list(guilds_collection.aggregate(pipeline))
+        
+        # Add rank numbers
+        for i, guild in enumerate(rankings):
+            guild["rank"] = i + 1
+        
+        return {"rankings": rankings, "ranking_type": ranking_type}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching guild rankings: {str(e)}")
+
 # ============================================================================
 # LIVE CHAT SYSTEM - WEBSOCKET IMPLEMENTATION
 # ============================================================================
