@@ -1915,7 +1915,7 @@ function App() {
       });
       if (response.ok) {
         const data = await response.json();
-        setCmsContent(data.content || []);
+        setAdminCmsContent(data.content || []);
       }
     } catch (error) {
       console.error('Error fetching CMS content:', error);
