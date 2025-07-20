@@ -13861,8 +13861,8 @@ function App() {
                   </div>
                 </div>
 
-                {/* Active 1v1 Matches */}
-                {match.activeMatches.length > 0 && (
+                {/* Active 1v1 Matches or Upcoming Tournament Info */}
+                {match.activeMatches.length > 0 ? (
                   <div className="active-matches-professional">
                     <div className="matches-header-professional">
                       <div className="section-title-professional">
@@ -13969,12 +13969,32 @@ function App() {
                       })}
                     </div>
                   </div>
-                )}
-
-                {/* No Active Matches */}
-                {match.activeMatches.length === 0 && (
-                  <div className="no-matches-professional">
-                    <div className="completion-badge-professional">✅ Tournament Complete</div>
+                ) : (
+                  <div className="upcoming-tournament-professional">
+                    <div className="upcoming-header-professional">
+                      <div className="section-title-professional">
+                        <span className="upcoming-indicator">⏰</span>
+                        <span className="section-text">Upcoming Tournament</span>
+                        <span className="time-until-start">{match.timeRemaining}</span>
+                      </div>
+                    </div>
+                    <div className="upcoming-details-professional">
+                      <div className="upcoming-info">
+                        <div className="upcoming-status">Τόσα λεπτά until tournament begins</div>
+                        <div className="participants-ready">
+                          <span className="ready-icon">✅</span>
+                          <span className="ready-text">All {match.team1.totalMatches} players registered and ready</span>
+                        </div>
+                        <div className="tournament-preview">
+                          <div className="preview-teams">
+                            <span className="team-preview">{match.team1.name}</span>
+                            <span className="vs-preview">vs</span>
+                            <span className="team-preview">{match.team2.name}</span>
+                          </div>
+                          <div className="preview-prize">Prize Pool: {match.tournament.prize}</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
