@@ -1358,6 +1358,274 @@ body {
 }
 
 /* =============================================================================
+   TOURNAMENTS SYSTEM STYLES
+============================================================================= */
+
+.tournaments-container {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.9));
+  min-height: 100vh;
+}
+
+.tournaments-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.tournaments-header h2 {
+  color: #4fc3f7;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.available-tournaments {
+  margin-bottom: 2rem;
+}
+
+.tournaments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.tournament-card {
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.8), rgba(50, 50, 50, 0.6));
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  padding: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tournament-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4fc3f7, #29b6f6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tournament-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(79, 195, 247, 0.3);
+  border-color: rgba(79, 195, 247, 0.5);
+}
+
+.tournament-card:hover::before {
+  opacity: 1;
+}
+
+.tournament-title {
+  color: #4fc3f7;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tournament-description {
+  color: #dddddd;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.tournament-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tournament-detail {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.detail-label {
+  color: #999;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.detail-value {
+  color: #4fc3f7;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.tournament-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.tournament-status {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.status-upcoming {
+  background: rgba(79, 195, 247, 0.2);
+  color: #4fc3f7;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+}
+
+.status-active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-completed {
+  background: rgba(156, 163, 175, 0.2);
+  color: #9ca3af;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
+/* Country Details Page */
+.country-details-container {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.9));
+  min-height: 100vh;
+}
+
+.country-details-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border-radius: 15px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.country-flag-large {
+  font-size: 5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.country-title-section {
+  flex: 1;
+}
+
+.country-code {
+  color: #999;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+}
+
+.country-name {
+  color: #4fc3f7;
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.country-stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.country-stat-card {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.country-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(79, 195, 247, 0.2);
+}
+
+.stat-number {
+  color: #4fc3f7;
+  font-size: 2.5rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.stat-label {
+  color: #dddddd;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.country-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tournaments-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tournament-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .tournament-actions {
+    flex-direction: column;
+  }
+  
+  .country-details-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .country-name {
+    font-size: 2rem;
+  }
+  
+  .country-stats-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .country-actions {
+    flex-direction: column;
+  }
+}
+
+/* =============================================================================
    GUILD SYSTEM STYLES
 ============================================================================= */
 
