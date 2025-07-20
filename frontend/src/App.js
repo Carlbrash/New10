@@ -14763,7 +14763,7 @@ function App() {
                     </div>
                   )}
                   
-                  {currentView === 'friend-recommendations' && (
+                  {friendsModalTab === 'friend-recommendations' && (
                     <div className="friend-recommendations">
                       {friendRecommendations.length === 0 ? (
                         <div className="no-recommendations">
