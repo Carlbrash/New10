@@ -3600,8 +3600,91 @@ body {
   .transaction-item {
     flex-direction: column;
     text-align: center;
+  }
+  
+  /* Affiliate Welcome Mobile */
+  .affiliate-welcome {
+    padding: 2rem 1rem;
+  }
+  
+  .affiliate-welcome h2 {
+    font-size: 2.2rem;
+  }
+  
+  .affiliate-info h3 {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+  }
+  
+  .benefits-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+  
+  .benefit-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .benefit-card h4 {
+    font-size: 1.3rem;
+  }
+  
+  .benefit-card p {
+    font-size: 0.9rem;
+  }
+  
+  .apply-section {
+    margin-top: 3rem;
+    padding: 2rem 1.5rem;
+  }
+  
+  .apply-section h3 {
+    font-size: 1.8rem;
+  }
+  
+  .apply-section p {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .btn-large {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .affiliate-welcome h2 {
+    font-size: 1.8rem;
+  }
+  
+  .benefits-grid {
     gap: 1rem;
   }
+  
+  .benefit-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .benefit-icon {
+    font-size: 2.5rem;
+    height: 60px;
+  }
+  
+  .benefit-card h4 {
+    font-size: 1.2rem;
+  }
+  
+  .apply-section {
+    padding: 1.5rem 1rem;
+  }
+  
+  .apply-section h3 {
+    font-size: 1.5rem;
+  }
+}
   
   .earnings-breakdown {
     grid-template-columns: 1fr;
