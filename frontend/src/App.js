@@ -13613,48 +13613,50 @@ function App() {
                       <span className="section-title">Next Round Players</span>
                     </div>
 
-                    {/* Team 1 Upcoming Players */}
-                    <div className="team-players team1-players">
-                      {match.team1.players.slice(2).map((player, index) => (
-                        <div key={player.id} className="player-row upcoming-player">
-                          <div className="player-avatar-section">
-                            <div className="player-avatar">
-                              <img src={player.avatar} alt={player.name} className="player-photo" />
+                    <div className="upcoming-players-grid">
+                      {/* Team 1 Upcoming Players */}
+                      <div className="team-players team1-players">
+                        {match.team1.players.slice(2).map((player, index) => (
+                          <div key={player.id} className="player-row upcoming-player">
+                            <div className="player-avatar-section">
+                              <div className="player-avatar">
+                                <img src={player.avatar} alt={player.name} className="player-photo" />
+                              </div>
+                              <div className="player-level">{player.level}</div>
                             </div>
-                            <div className="player-level">{player.level}</div>
-                          </div>
-                          <div className="player-info-section">
-                            <div className="player-name">{player.name}</div>
-                            <div className="player-stats">
-                              <span className="stat-wins">🔴 {player.wins}</span>
-                              <span className="stat-losses">🟢 {player.losses}</span>
-                              <span className="stat-accuracy">{player.accuracy}</span>
+                            <div className="player-info-section">
+                              <div className="player-name">{player.name}</div>
+                              <div className="player-stats">
+                                <span className="stat-wins">🔴 {player.wins}</span>
+                                <span className="stat-losses">🟢 {player.losses}</span>
+                                <span className="stat-accuracy">{player.accuracy}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
 
-                    {/* Team 2 Upcoming Players */}
-                    <div className="team-players team2-players">
-                      {match.team2.players.slice(2).map((player, index) => (
-                        <div key={player.id} className="player-row team2-row upcoming-player">
-                          <div className="player-info-section team2-info">
-                            <div className="player-name">{player.name}</div>
-                            <div className="player-stats">
-                              <span className="stat-accuracy">{player.accuracy}</span>
-                              <span className="stat-losses">🟢 {player.losses}</span>
-                              <span className="stat-wins">🔴 {player.wins}</span>
+                      {/* Team 2 Upcoming Players */}
+                      <div className="team-players team2-players">
+                        {match.team2.players.slice(2).map((player, index) => (
+                          <div key={player.id} className="player-row team2-row upcoming-player">
+                            <div className="player-info-section team2-info">
+                              <div className="player-name">{player.name}</div>
+                              <div className="player-stats">
+                                <span className="stat-accuracy">{player.accuracy}</span>
+                                <span className="stat-losses">🟢 {player.losses}</span>
+                                <span className="stat-wins">🔴 {player.wins}</span>
+                              </div>
+                            </div>
+                            <div className="player-avatar-section">
+                              <div className="player-level">{player.level}</div>
+                              <div className="player-avatar">
+                                <img src={player.avatar} alt={player.name} className="player-photo" />
+                              </div>
                             </div>
                           </div>
-                          <div className="player-avatar-section">
-                            <div className="player-level">{player.level}</div>
-                            <div className="player-avatar">
-                              <img src={player.avatar} alt={player.name} className="player-photo" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
