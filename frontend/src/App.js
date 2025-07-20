@@ -13358,24 +13358,24 @@ function App() {
         timeSlot: 'TIME SLOT 15:00',
         team1: { 
           name: 'CHELSEA WIZARDS', 
-          logo: '🧙‍♂️', 
+          logo: 'https://images.unsplash.com/photo-1577223618563-3d858655ab86?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwxfHxzb2NjZXIlMjBsb2dvc3xlbnwwfHx8fDE3NTMwMjc2NDZ8MA&ixlib=rb-4.1.0&q=85', 
           score: 15,
           country: '🇬🇧',
           players: [
-            { id: 1, name: 'LiLinGeo', avatar: '👨‍💼', level: '1/5', wins: 128, losses: 25, accuracy: '85%' },
-            { id: 2, name: 'Emma', avatar: '👩‍🦳', level: '2/5', wins: 156, losses: 30, accuracy: '79%' },
-            { id: 3, name: 'John Snow', avatar: '🧑‍🎤', level: '1/6', wins: 119, losses: 37, accuracy: '76%' }
+            { id: 1, name: 'LiLinGeo', avatar: 'https://images.unsplash.com/photo-1615418674317-2b3674c2b287?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '1/5', wins: 128, losses: 25, accuracy: '85%' },
+            { id: 2, name: 'Emma', avatar: 'https://images.unsplash.com/photo-1724128187740-c70f811cdaf1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', level: '2/5', wins: 156, losses: 30, accuracy: '79%' },
+            { id: 3, name: 'John Snow', avatar: 'https://images.unsplash.com/photo-1605895004737-14ce69410c01?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '1/6', wins: 119, losses: 37, accuracy: '76%' }
           ]
         },
         team2: { 
           name: 'GLYFADA SHARKS', 
-          logo: '🦈', 
+          logo: 'https://images.unsplash.com/photo-1707414038523-b5d1c8294786?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', 
           score: 19,
           country: '🇬🇷',
           players: [
-            { id: 4, name: 'CarlBrash', avatar: '👨‍💻', level: '6/6', wins: 213, losses: 13, accuracy: '94%' },
-            { id: 5, name: 'MPC', avatar: '👩‍🔬', level: '4/4', wins: 196, losses: 26, accuracy: '88%' },
-            { id: 6, name: 'Martyn', avatar: '🧑‍🚀', level: '1/2', wins: 155, losses: 18, accuracy: '90%' }
+            { id: 4, name: 'CarlBrash', avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '6/6', wins: 213, losses: 13, accuracy: '94%' },
+            { id: 5, name: 'MPC', avatar: 'https://images.unsplash.com/photo-1488424138610-252b5576e079?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', level: '4/4', wins: 196, losses: 26, accuracy: '88%' },
+            { id: 6, name: 'Martyn', avatar: 'https://images.unsplash.com/photo-1707414038545-d7885c0efb7b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxmb290YmFsbCUyMGJhZGdlc3xlbnwwfHx8fDE3NTMwMjc2MTl8MA&ixlib=rb-4.1.0&q=85', level: '1/2', wins: 155, losses: 18, accuracy: '90%' }
           ]
         }
       },
