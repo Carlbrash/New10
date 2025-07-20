@@ -6110,6 +6110,80 @@ async def get_all_guilds(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching guilds: {str(e)}")
 
+@app.get("/api/guilds/rankings")
+async def get_guild_rankings(
+    country: Optional[str] = None,
+    ranking_type: str = "power_rating",  # power_rating, trophies, wars_won
+    limit: int = 50
+):
+    """Get guild rankings/leaderboard"""
+    try:
+        # Build aggregation pipeline
+        pipeline = []
+        
+        # Match stage for country filter
+        if country:
+            pipeline.append({"$match": {"country": country}})
+        
+        # Lookup guild stats
+        pipeline.extend([
+            {"$lookup": {
+                "from": "guild_stats",
+                "localField": "id",
+                "foreignField": "guild_id",
+                "as": "stats"
+            }},
+            {"$unwind": {"path": "$stats", "preserveNullAndEmptyArrays": True}}
+        ])
+        
+        # Sort based on ranking type
+        sort_field = f"stats.{ranking_type}"
+        if ranking_type == "power_rating":
+            sort_order = -1
+        elif ranking_type == "trophies":
+            sort_field = "stats.season_trophies"
+            sort_order = -1
+        elif ranking_type == "wars_won":
+            sort_order = -1
+        else:
+            sort_order = -1
+            
+        pipeline.extend([
+            {"$sort": {sort_field: sort_order}},
+            {"$limit": limit}
+        ])
+        
+        # Project final fields
+        pipeline.append({
+            "$project": {
+                "_id": 0,
+                "id": 1,
+                "name": 1,
+                "tag": 1,
+                "logo_url": 1,
+                "country": 1,
+                "member_count": 1,
+                "level": "$stats.level",
+                "power_rating": "$stats.power_rating",
+                "season_trophies": "$stats.season_trophies",
+                "total_wars": "$stats.total_wars",
+                "wars_won": "$stats.wars_won",
+                "wars_lost": "$stats.wars_lost",
+                "tournament_victories": "$stats.tournament_victories"
+            }
+        })
+        
+        rankings = list(guilds_collection.aggregate(pipeline))
+        
+        # Add rank numbers
+        for i, guild in enumerate(rankings):
+            guild["rank"] = i + 1
+        
+        return {"rankings": serialize_doc(rankings), "ranking_type": ranking_type, "total": len(rankings)}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching guild rankings: {str(e)}")
+
 @app.get("/api/guilds/{guild_id}")
 async def get_guild_details(guild_id: str):
     """Get detailed information about a specific guild"""
