@@ -830,7 +830,31 @@ agent_communication:
   - agent: "main"
     message: "🔍 FRIEND SEARCH INVESTIGATION: Investigated friend search functionality issue. BACKEND: Friend search API endpoint '/api/friends/search' exists and appears properly implemented with authentication, search by username/full_name, and proper data filtering. FRONTEND: Friend search UI code exists with search input, debounced search, and result display functionality. ISSUE IDENTIFIED: Frontend Friends modal opens correctly but 'Find Friends' tab click handler may not be working - clicking on '🔍 Find Friends' tab does not render the search interface (currentView state not being set to 'friend-search'). The search interface should display when currentView === 'friend-search' but appears to remain blank. Need to test backend API and investigate frontend state management issue."
 
-user_problem_statement: "Create a comprehensive Content Management System (CMS) tool for the WoBeRa admin panel that allows admin users to easily manage and customize all text content, colors, and visual elements throughout the website. The system should include database schema, backend APIs, admin interface, and dynamic content integration."
+user_problem_statement: "Test the Friend Search backend API functionality. Please test the following:
+
+1. **Friend Search API - GET /api/friends/search**: 
+   - Login as testuser (testuser/test123)
+   - Test search endpoint with query parameter: `/api/friends/search?q=admin`
+   - Should return users matching "admin" username or full_name
+   - Verify response structure includes user_id, username, full_name, avatar_url, country
+   - Should exclude current user (testuser) and existing friends
+
+2. **Authentication Testing**:
+   - Test the endpoint without authentication token (should return 401/403)
+   - Test with invalid token (should return 401/403)
+   - Test with valid testuser token (should work)
+
+3. **Query Parameter Testing**:
+   - Test with very short query (less than 2 characters) - should return 400 error
+   - Test with longer queries like "admin", "test", "demo"
+   - Test with special characters and edge cases
+
+4. **Data Validation**:
+   - Verify that search results exclude the current user
+   - Verify that existing friends are filtered out from results
+   - Check that results are properly limited (should be max 20 results)
+
+Focus on confirming that the backend friend search API is working correctly and returning proper data structures. The issue may be on the frontend side if backend is working."
 
 backend:
   - task: "CMS Database Schema and Collections"
