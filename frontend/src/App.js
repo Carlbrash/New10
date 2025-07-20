@@ -4279,6 +4279,271 @@ function App() {
   };
 
   // =============================================================================
+  // GUILD SYSTEM FUNCTIONS
+  // =============================================================================
+
+  // Fetch all guilds
+  const fetchGuilds = async (filters = {}) => {
+    setGuildsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filters.country) params.append('country', filters.country);
+      if (filters.recruitmentOpen !== undefined) params.append('recruitment_open', filters.recruitmentOpen);
+      if (filters.search) params.append('search', filters.search);
+
+      const response = await fetch(`${API_BASE_URL}/api/guilds?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setGuilds(data.guilds);
+      } else {
+        console.error('Failed to fetch guilds:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching guilds:', error);
+      showToast('Error loading guilds', 'error');
+    } finally {
+      setGuildsLoading(false);
+    }
+  };
+
+  // Fetch guild details
+  const fetchGuildDetails = async (guildId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/guilds/${guildId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedGuild(data.guild);
+        return data.guild;
+      }
+    } catch (error) {
+      console.error('Error fetching guild details:', error);
+      showToast('Error loading guild details', 'error');
+    }
+    return null;
+  };
+
+  // Create a new guild
+  const createGuild = async (guildData) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/guilds`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(guildData)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        showToast('Guild created successfully!', 'success');
+        setMyGuild(data.guild);
+        fetchGuilds();
+        return data.guild;
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to create guild', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating guild:', error);
+      showToast('Error creating guild', 'error');
+    }
+    return null;
+  };
+
+  // Invite player to guild
+  const inviteToGuild = async (guildId, username, message = '') => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/guilds/${guildId}/invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ username, message })
+      });
+      
+      if (response.ok) {
+        showToast(`Invitation sent to ${username}!`, 'success');
+        return true;
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to send invitation', 'error');
+      }
+    } catch (error) {
+      console.error('Error sending guild invitation:', error);
+      showToast('Error sending invitation', 'error');
+    }
+    return false;
+  };
+
+  // Fetch user's guild invitations
+  const fetchGuildInvitations = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/guilds/my-invitations`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setGuildInvitations(data.invitations);
+      }
+    } catch (error) {
+      console.error('Error fetching guild invitations:', error);
+    }
+  };
+
+  // Accept guild invitation
+  const acceptGuildInvitation = async (invitationId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/guilds/invitations/${invitationId}/accept`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        showToast('Successfully joined guild!', 'success');
+        fetchGuildInvitations();
+        fetchMyGuild();
+        return true;
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to join guild', 'error');
+      }
+    } catch (error) {
+      console.error('Error accepting guild invitation:', error);
+      showToast('Error joining guild', 'error');
+    }
+    return false;
+  };
+
+  // Decline guild invitation
+  const declineGuildInvitation = async (invitationId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/guilds/invitations/${invitationId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        showToast('Invitation declined', 'success');
+        fetchGuildInvitations();
+        return true;
+      }
+    } catch (error) {
+      console.error('Error declining guild invitation:', error);
+      showToast('Error declining invitation', 'error');
+    }
+    return false;
+  };
+
+  // Fetch guild rankings
+  const fetchGuildRankings = async (rankingType = 'power_rating', country = null) => {
+    try {
+      const params = new URLSearchParams();
+      params.append('ranking_type', rankingType);
+      if (country) params.append('country', country);
+
+      const response = await fetch(`${API_BASE_URL}/api/guilds/rankings?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setGuildRankings(data.rankings);
+      }
+    } catch (error) {
+      console.error('Error fetching guild rankings:', error);
+      showToast('Error loading guild rankings', 'error');
+    }
+  };
+
+  // Fetch user's guild (if they're in one)
+  const fetchMyGuild = async () => {
+    if (!token || !user) return;
+    
+    try {
+      // This would need to be implemented in backend to get user's current guild
+      // For now, we'll check guild invitations and see if user is in any guild
+      await fetchGuildInvitations();
+    } catch (error) {
+      console.error('Error fetching my guild:', error);
+    }
+  };
+
+  // Challenge guild to war
+  const challengeGuildToWar = async (guildId, targetGuildId, warType = 'classic') => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/guilds/${guildId}/challenge`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          target_guild_id: targetGuildId,
+          war_type: warType
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        showToast('Guild war challenge sent!', 'success');
+        return data.war;
+      } else {
+        const error = await response.json();
+        showToast(error.detail || 'Failed to challenge guild', 'error');
+      }
+    } catch (error) {
+      console.error('Error challenging guild to war:', error);
+      showToast('Error sending challenge', 'error');
+    }
+    return null;
+  };
+
+  // Fetch guild wars
+  const fetchGuildWars = async (guildId, status = null) => {
+    try {
+      const params = new URLSearchParams();
+      if (status) params.append('status', status);
+
+      const response = await fetch(`${API_BASE_URL}/api/guilds/${guildId}/wars?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setGuildWars(data.wars);
+      }
+    } catch (error) {
+      console.error('Error fetching guild wars:', error);
+    }
+  };
+
+  // Load guilds when component mounts or when view changes to guilds
+  useEffect(() => {
+    if (currentView === 'guilds') {
+      fetchGuilds();
+    } else if (currentView === 'guild-rankings') {
+      fetchGuildRankings();
+    }
+  }, [currentView]);
+
+  // Load user's guild data when user logs in
+  useEffect(() => {
+    if (user && token) {
+      fetchMyGuild();
+    }
+  }, [user, token]);
+
+  // =============================================================================
   // AFFILIATE SYSTEM FUNCTIONS
   // =============================================================================
   
