@@ -367,6 +367,57 @@ body {
   animation: slideDown 0.2s ease-out;
 }
 
+/* Deposit Modal Styles */
+.deposit-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+
+.amount-btn {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(29, 182, 246, 0.05));
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  color: #4fc3f7;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.amount-btn:hover {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.2), rgba(29, 182, 246, 0.1));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 195, 247, 0.2);
+}
+
+.custom-amount {
+  margin-top: 1rem;
+}
+
+.amount-input {
+  width: 100%;
+  background: rgba(42, 42, 42, 0.8);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  color: #ffffff;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.amount-input:focus {
+  border-color: #4fc3f7;
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.3);
+}
+
+.amount-input::placeholder {
+  color: #888888;
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
