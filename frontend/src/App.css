@@ -259,6 +259,20 @@ body {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.settings-menu-option div:first-child {
+  font-size: 1.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.settings-menu-option div:last-child {
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .settings-menu-option::before {
