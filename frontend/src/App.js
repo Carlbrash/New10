@@ -1358,6 +1358,9 @@ function App() {
   const [sportsduelEvents, setSportsduelEvents] = useState([]);
   const [sportsduelLoading, setSportsduelLoading] = useState(false);
   
+  // SportsDuel view state
+  const [selectedMatch, setSelectedMatch] = useState(null); // null = show match list, match object = show detailed view
+  
   // Get current translations
   const t = translations[language];
 
