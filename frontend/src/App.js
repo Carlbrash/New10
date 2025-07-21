@@ -15060,31 +15060,15 @@ function App() {
                 )}
               </button>
               
-              {/* Settings Dropdown */}
+              {/* Settings Dropdown - Click-based */}
               <div 
                 className={`nav-dropdown settings-dropdown ${showSettingsDropdown ? 'mobile-open' : ''}`}
-                onMouseEnter={() => {
-                  if (window.innerWidth > 768) {
-                    setShowSettingsDropdown(true);
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (window.innerWidth > 768) {
-                    // Add a small delay before closing
-                    setTimeout(() => {
-                      // Check if mouse is still not in the dropdown area
-                      const dropdown = e.currentTarget.querySelector('.advanced-settings-dropdown');
-                      if (dropdown && !dropdown.matches(':hover') && !e.currentTarget.matches(':hover')) {
-                        setShowSettingsDropdown(false);
-                      }
-                    }, 100);
-                  }
-                }}
                 style={{ position: 'relative' }}
               >
                 <button 
-                  className={`nav-link dropdown-trigger ${(currentView === 'affiliate' || currentView === 'wallet' || showSettings) ? 'active' : ''}`}
-                  onClick={() => {
+                  className={`nav-link dropdown-trigger ${(currentView === 'affiliate' || currentView === 'wallet' || showSettings || showSettingsDropdown) ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setShowSettingsDropdown(!showSettingsDropdown);
                   }}
                 >
@@ -15094,11 +15078,7 @@ function App() {
                 {showSettingsDropdown && (
                   <div 
                     className="dropdown-menu advanced-settings-dropdown"
-                    onMouseEnter={() => setShowSettingsDropdown(true)}
-                    onMouseLeave={() => {
-                      // Close dropdown when leaving dropdown area
-                      setTimeout(() => setShowSettingsDropdown(false), 200);
-                    }}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {/* User Info & Deposit Section */}
                     <div className="settings-user-info">
