@@ -1369,7 +1369,7 @@ function App() {
     if (currentView !== newView) {
       const newHistoryEntry = {
         view: currentView,
-        title: breadcrumb[breadcrumb.length - 1]?.title || currentView,
+        title: breadcrumbPath[breadcrumbPath.length - 1]?.title || currentView,
         timestamp: Date.now()
       };
       
