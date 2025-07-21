@@ -1363,6 +1363,9 @@ function App() {
   // SportsDuel view state
   const [selectedMatch, setSelectedMatch] = useState(null); // null = show match list, match object = show detailed view
   
+  // Get current translations
+  const t = translations[language];
+
   // Mock wallet data for settings display (θα αντικατασταθεί από πραγματικά δεδομένα)
   const mockWalletData = {
     balance: user ? 1250.75 : 0,
