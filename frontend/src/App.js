@@ -2714,6 +2714,10 @@ function App() {
       setShowTeamsDropdown(false);
       setShowGuildsDropdown(false);
       setShowStandingsDropdown(false);
+      // Close account submenu when settings dropdown closes
+      if (showSettingsDropdown) {
+        setShowAccountSubmenu(false);
+      }
     }
   };
 
