@@ -15123,7 +15123,7 @@ function App() {
                         className={`settings-menu-option ${showAccountSubmenu ? 'active' : ''}`}
                         onClick={() => setShowAccountSubmenu(!showAccountSubmenu)}
                       >
-                        <span className="menu-icon">👤</span>
+                        <span className="menu-icon">👨‍💼</span>
                         <span className="menu-text">Account</span>
                       </button>
                       <button 
@@ -15145,7 +15145,7 @@ function App() {
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        <span className="menu-icon">🎁</span>
+                        <span className="menu-icon">🎯</span>
                         <span className="menu-text">Offers</span>
                       </button>
                       <button 
@@ -15183,7 +15183,7 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          <span className="submenu-icon">📧</span>
+                          <span className="submenu-icon">✉️</span>
                           <span className="submenu-text">Messages</span>
                         </button>
                         <button 
@@ -15195,7 +15195,7 @@ function App() {
                           }}
                         >
                           <span className="submenu-icon">👤</span>
-                          <span className="submenu-text">Account</span>
+                          <span className="submenu-text">Profile</span>
                         </button>
                         <button 
                           className="account-submenu-item"
@@ -15206,7 +15206,7 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          <span className="submenu-icon">📋</span>
+                          <span className="submenu-icon">📝</span>
                           <span className="submenu-text">Rules</span>
                         </button>
                         <button 
@@ -15230,7 +15230,7 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          <span className="submenu-icon">📜</span>
+                          <span className="submenu-icon">🕒</span>
                           <span className="submenu-text">History</span>
                         </button>
                         <button 
