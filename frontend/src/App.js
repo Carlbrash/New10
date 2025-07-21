@@ -14753,7 +14753,11 @@ function App() {
           {/* Smart Home/Dashboard Button */}
           <button 
             className={`nav-link ${(currentView === 'home' || currentView === 'dashboard') ? 'active' : ''}`}
-            onClick={() => navigateWithBreadcrumb(user ? 'dashboard' : 'home', user ? 'Dashboard' : 'Home')}
+            onClick={() => {
+              const newView = user ? 'dashboard' : 'home';
+              const title = user ? 'Dashboard' : 'Home';
+              navigateWithHistory(newView, title);
+            }}
           >
             {user ? '🏠 Dashboard' : '🏠 Home'}
           </button>
