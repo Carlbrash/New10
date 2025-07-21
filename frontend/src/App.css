@@ -378,6 +378,71 @@ body {
   transform: translateX(-1px);
 }
 
+/* Chat Input Container Styling */
+.chat-input-container {
+  padding: 1rem;
+  border-top: 1px solid rgba(79, 195, 247, 0.2);
+  background: rgba(15, 15, 15, 0.9);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.chat-input {
+  flex: 1;
+  background: rgba(42, 42, 42, 0.8);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.chat-input:focus {
+  border-color: #4fc3f7;
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.3);
+}
+
+.chat-input::placeholder {
+  color: #888888;
+}
+
+/* Ensure Send button is properly sized and clickable */
+.chat-input-row .btn {
+  flex-shrink: 0;
+  min-width: 60px;
+  padding: 0.75rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.chat-input-row .btn-primary {
+  background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+  border: none;
+  color: #ffffff;
+}
+
+.chat-input-row .btn-primary:hover {
+  background: linear-gradient(135deg, #29b6f6, #0288d1);
+  transform: scale(1.05);
+}
+
+.chat-input-row .btn-secondary {
+  background: rgba(79, 195, 247, 0.2);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  color: #4fc3f7;
+}
+
+.chat-input-row .btn-secondary:hover {
+  background: rgba(79, 195, 247, 0.3);
+}
+
 /* Mobile adjustments for back button */
 @media (max-width: 768px) {
   .back-navigation {
