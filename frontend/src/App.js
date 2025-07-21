@@ -15278,7 +15278,7 @@ function App() {
                         <button 
                           className="account-submenu-item"
                           onClick={() => {
-                            navigateWithHistory('affiliate', 'Affiliate Program');
+                            setCurrentView('affiliate');
                             setShowSettingsDropdown(false);
                             setShowAccountSubmenu(false);
                           }}
