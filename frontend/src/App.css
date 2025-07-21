@@ -129,6 +129,143 @@ body {
   margin: 0.5rem 0;
 }
 
+/* Advanced Settings Dropdown Styles */
+.advanced-settings-dropdown {
+  min-width: 280px;
+  padding: 1rem;
+}
+
+.settings-user-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.settings-user-details {
+  flex: 1;
+}
+
+.settings-username {
+  font-size: 0.9rem;
+  color: #4fc3f7;
+  margin-bottom: 0.25rem;
+  text-transform: lowercase;
+}
+
+.settings-balance {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.settings-deposit-btn {
+  background: rgba(79, 195, 247, 0.2);
+  border: 1px solid #4fc3f7;
+  color: #4fc3f7;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.settings-deposit-btn:hover {
+  background: rgba(79, 195, 247, 0.3);
+}
+
+.settings-balances {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.settings-balance-item {
+  text-align: center;
+  flex: 1;
+}
+
+.settings-balance-label {
+  font-size: 0.75rem;
+  color: #aaaaaa;
+  margin-bottom: 0.2rem;
+}
+
+.settings-balance-amount {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.settings-menu-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.settings-menu-option {
+  background: rgba(42, 42, 42, 0.5);
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  color: #dddddd;
+  padding: 0.6rem 0.4rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.settings-menu-option:hover {
+  background: rgba(79, 195, 247, 0.1);
+  color: #4fc3f7;
+  border-color: #4fc3f7;
+}
+
+.settings-menu-option.active {
+  background: rgba(79, 195, 247, 0.2);
+  color: #4fc3f7;
+  border-color: #4fc3f7;
+}
+
+.account-submenu {
+  background: rgba(15, 15, 15, 0.95);
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.account-submenu-item {
+  padding: 0.5rem 0.75rem;
+  color: #dddddd;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.account-submenu-item:hover {
+  background: rgba(79, 195, 247, 0.1);
+  color: #4fc3f7;
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
