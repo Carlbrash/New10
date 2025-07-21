@@ -146,7 +146,7 @@ body {
 }
 
 /* Hide language selector when settings dropdown is open */
-.nav-dropdown.settings-dropdown.mobile-open ~ .language-dropdown {
+.language-dropdown.hidden-by-settings {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
