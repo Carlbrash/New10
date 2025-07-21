@@ -15065,6 +15065,7 @@ function App() {
                 className={`nav-dropdown ${showSettingsDropdown ? 'mobile-open' : ''}`}
                 onMouseEnter={() => window.innerWidth > 768 && setShowSettingsDropdown(true)}
                 onMouseLeave={() => window.innerWidth > 768 && setShowSettingsDropdown(false)}
+                style={{ position: 'relative' }}
               >
                 <button 
                   className={`nav-link dropdown-trigger ${(currentView === 'affiliate' || currentView === 'wallet' || showSettings) ? 'active' : ''}`}
