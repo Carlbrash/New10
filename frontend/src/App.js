@@ -14762,8 +14762,7 @@ function App() {
                 <button 
                   className="dropdown-item"
                   onClick={() => {
-                    console.log('Clicking Leaderboard - using navigateWithHistory');
-                    navigateWithHistory('rankings', 'Leaderboard');
+                    navigateWithBreadcrumb('rankings', 'Leaderboard');
                     setShowRankingsDropdown(false);
                   }}
                 >
