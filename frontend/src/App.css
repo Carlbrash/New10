@@ -8881,24 +8881,33 @@ img {
   margin-bottom: 0.3rem;
 }
 
-.match-status-mini {
-  font-size: 0.8rem;
-  padding: 0.2rem 0.5rem;
+.match-status-indicator {
+  font-size: 0.9rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 8px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
+  min-width: 35px;
 }
 
-.match-status-mini.status-live {
-  background: rgba(0, 255, 0, 0.2);
+.match-status-indicator.status-live {
+  background: rgba(0, 255, 0, 0.15);
   color: #00ff00;
-  border: 1px solid rgba(0, 255, 0, 0.5);
+  border: 1px solid rgba(0, 255, 0, 0.4);
 }
 
-.match-status-mini.status-upcoming {
-  background: rgba(255, 165, 0, 0.2);
-  color: #ffaa00;
-  border: 1px solid rgba(255, 165, 0, 0.5);
+.match-status-indicator.status-upcoming {
+  background: rgba(128, 128, 128, 0.15);
+  color: #888888;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+}
+
+.match-status-indicator.status-finished {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  font-size: 0.7rem;
+  font-weight: 800;
 }
 
 .match-teams {
