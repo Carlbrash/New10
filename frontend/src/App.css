@@ -129,7 +129,7 @@ body {
   margin: 0.5rem 0;
 }
 
-/* Advanced Settings Dropdown Styles - Fixed Hover Area */
+/* Advanced Settings Dropdown Styles - Adjusted positioning to avoid language selector */
 .advanced-settings-dropdown {
   min-width: 380px;
   width: 380px;
@@ -140,25 +140,16 @@ body {
   overflow: hidden;
   backdrop-filter: blur(10px);
   position: absolute;
-  right: -50px; /* Adjusted to ensure it doesn't go off-screen */
+  right: -80px; /* Moved further left to avoid language selector */
   top: 100%;
-  z-index: 1000;
+  z-index: 1001; /* Higher z-index to stay above language dropdown */
 }
 
-/* Expanded hover area to include dropdown */
-.nav-dropdown.settings-dropdown {
-  position: relative;
-}
-
-.nav-dropdown.settings-dropdown::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: -380px; /* Cover the dropdown area */
-  width: 430px; /* Button width + dropdown width */
-  height: 400px; /* Cover the entire dropdown height */
+/* Hide language selector when settings dropdown is open */
+.nav-dropdown.settings-dropdown.mobile-open ~ .language-dropdown {
+  opacity: 0;
   pointer-events: none;
-  z-index: 999;
+  transition: opacity 0.3s ease;
 }
 
 .settings-user-info {
