@@ -1363,8 +1363,13 @@ function App() {
   // SportsDuel view state
   const [selectedMatch, setSelectedMatch] = useState(null); // null = show match list, match object = show detailed view
   
-  // Get current translations
-  const t = translations[language];
+  // Mock wallet data for settings display (θα αντικατασταθεί από πραγματικά δεδομένα)
+  const mockWalletData = {
+    balance: user ? 1250.75 : 0,
+    withdrawable: user ? 850.50 : 0,
+    betCredits: user ? 125.00 : 0,
+    currency: '€'
+  };
 
   // Check if user is admin
   const isAdmin = user && user.admin_role && ['admin', 'super_admin', 'god'].includes(user.admin_role);
