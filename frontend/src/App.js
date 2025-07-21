@@ -15070,35 +15070,163 @@ function App() {
                 </button>
                 
                 {showSettingsDropdown && (
-                  <div className="dropdown-menu">
-                    <button 
-                      className="dropdown-item"
-                      onClick={() => {
-                        openSettings();
-                        setShowSettingsDropdown(false);
-                      }}
-                    >
-                      👤 Profile Settings
-                    </button>
-                    <div className="dropdown-divider"></div>
-                    <button 
-                      className="dropdown-item"
-                      onClick={() => {
-                        setCurrentView('affiliate');
-                        setShowSettingsDropdown(false);
-                      }}
-                    >
-                      💰 {t.affiliate}
-                    </button>
-                    <button 
-                      className="dropdown-item"
-                      onClick={() => {
-                        setCurrentView('wallet');
-                        setShowSettingsDropdown(false);
-                      }}
-                    >
-                      💳 {t.wallet}
-                    </button>
+                  <div className="dropdown-menu advanced-settings-dropdown">
+                    {/* User Info & Deposit Section */}
+                    <div className="settings-user-info">
+                      <div className="settings-user-details">
+                        <div className="settings-username">
+                          {user?.username || 'guest'}
+                        </div>
+                        <div className="settings-balance">
+                          💰 {mockWalletData.currency}{mockWalletData.balance.toFixed(2)}
+                        </div>
+                      </div>
+                      <button 
+                        className="settings-deposit-btn"
+                        onClick={() => {
+                          // TODO: Navigate to deposit page
+                          console.log('Navigate to Deposit');
+                          setShowSettingsDropdown(false);
+                        }}
+                      >
+                        Deposit
+                      </button>
+                    </div>
+
+                    {/* Withdrawable & Bet Credits */}
+                    <div className="settings-balances">
+                      <div className="settings-balance-item">
+                        <div className="settings-balance-label">Withdrawable</div>
+                        <div className="settings-balance-amount">
+                          {mockWalletData.currency}{mockWalletData.withdrawable.toFixed(2)}
+                        </div>
+                      </div>
+                      <div className="settings-balance-item">
+                        <div className="settings-balance-label">Bet Credits</div>
+                        <div className="settings-balance-amount">
+                          {mockWalletData.currency}{mockWalletData.betCredits.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Main Menu Options */}
+                    <div className="settings-menu-options">
+                      <button 
+                        className={`settings-menu-option ${showAccountSubmenu ? 'active' : ''}`}
+                        onClick={() => setShowAccountSubmenu(!showAccountSubmenu)}
+                      >
+                        Account
+                      </button>
+                      <button 
+                        className="settings-menu-option"
+                        onClick={() => {
+                          // TODO: Navigate to alerts
+                          console.log('Navigate to Alerts');
+                          setShowSettingsDropdown(false);
+                        }}
+                      >
+                        Alerts
+                      </button>
+                      <button 
+                        className="settings-menu-option"
+                        onClick={() => {
+                          // TODO: Navigate to my offers
+                          console.log('Navigate to My Offers');
+                          setShowSettingsDropdown(false);
+                        }}
+                      >
+                        My Offers
+                      </button>
+                      <button 
+                        className="settings-menu-option"
+                        onClick={() => {
+                          openSettings();
+                          setShowSettingsDropdown(false);
+                        }}
+                      >
+                        Preferences
+                      </button>
+                    </div>
+
+                    {/* Account Submenu */}
+                    {showAccountSubmenu && (
+                      <div className="account-submenu">
+                        <button 
+                          className="account-submenu-item"
+                          onClick={() => {
+                            setCurrentView('wallet');
+                            setShowSettingsDropdown(false);
+                            setShowAccountSubmenu(false);
+                          }}
+                        >
+                          🏦 Bank
+                        </button>
+                        <button 
+                          className="account-submenu-item"
+                          onClick={() => {
+                            // TODO: Navigate to messages
+                            console.log('Navigate to Messages');
+                            setShowSettingsDropdown(false);
+                            setShowAccountSubmenu(false);
+                          }}
+                        >
+                          📧 Messages
+                        </button>
+                        <button 
+                          className="account-submenu-item"
+                          onClick={() => {
+                            openSettings();
+                            setShowSettingsDropdown(false);
+                            setShowAccountSubmenu(false);
+                          }}
+                        >
+                          👤 My Account
+                        </button>
+                        <button 
+                          className="account-submenu-item"
+                          onClick={() => {
+                            // TODO: Navigate to rules
+                            console.log('Navigate to Rules');
+                            setShowSettingsDropdown(false);
+                            setShowAccountSubmenu(false);
+                          }}
+                        >
+                          📋 Rules
+                        </button>
+                        <button 
+                          className="account-submenu-item"
+                          onClick={() => {
+                            // TODO: Navigate to my activity
+                            console.log('Navigate to My Activity');
+                            setShowSettingsDropdown(false);
+                            setShowAccountSubmenu(false);
+                          }}
+                        >
+                          📊 My Activity
+                        </button>
+                        <button 
+                          className="account-submenu-item"
+                          onClick={() => {
+                            // TODO: Navigate to history
+                            console.log('Navigate to History');
+                            setShowSettingsDropdown(false);
+                            setShowAccountSubmenu(false);
+                          }}
+                        >
+                          📜 History
+                        </button>
+                        <button 
+                          className="account-submenu-item"
+                          onClick={() => {
+                            setCurrentView('affiliate');
+                            setShowSettingsDropdown(false);
+                            setShowAccountSubmenu(false);
+                          }}
+                        >
+                          💰 Affiliate
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
