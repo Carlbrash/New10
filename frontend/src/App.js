@@ -16828,10 +16828,27 @@ function App() {
             </div>
             <div className="modal-body">
               {selectedTournamentForPayment ? (
-                <div className="payment-summary">
-                  <h4>Tournament: {selectedTournamentForPayment.name}</h4>
-                  <p>Entry Fee: €{selectedTournamentForPayment.entry_fee}</p>
-                </div>
+                <>
+                  <div className="payment-summary">
+                    <h4>Tournament: {selectedTournamentForPayment.name}</h4>
+                    <p>Entry Fee: €{selectedTournamentForPayment.entry_fee}</p>
+                  </div>
+                  
+                  <div className="payment-details">
+                    <div className="detail-row">
+                      <span>Entry Fee:</span>
+                      <span className="amount">€{selectedTournamentForPayment.entry_fee}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span>Prize Pool:</span>
+                      <span className="amount">€{selectedTournamentForPayment.prize_pool}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span>Participants:</span>
+                      <span>{selectedTournamentForPayment.current_participants}/{selectedTournamentForPayment.max_participants}</span>
+                    </div>
+                  </div>
+                </>
               ) : (
                 <div className="payment-summary">
                   <h4>💰 Add Funds to Your Account</h4>
@@ -16857,26 +16874,11 @@ function App() {
                   </div>
                 </div>
               )}
-                <div className="payment-details">
-                  <div className="detail-row">
-                    <span>Entry Fee:</span>
-                    <span className="amount">${selectedTournamentForPayment.entry_fee}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span>Prize Pool:</span>
-                    <span className="amount">${selectedTournamentForPayment.prize_pool}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span>Participants:</span>
-                    <span>{selectedTournamentForPayment.current_participants}/{selectedTournamentForPayment.max_participants}</span>
-                  </div>
-                </div>
-              </div>
               
               <div className="payment-methods">
                 <h4>Choose Payment Method:</h4>
                 <div className="payment-options">
-                  {paymentConfig?.stripe_enabled && (
+                  {(paymentConfig?.stripe_enabled !== false) && (
                     <button 
                       className={`payment-option ${selectedPaymentProvider === 'stripe' ? 'selected' : ''}`}
                       onClick={() => setSelectedPaymentProvider('stripe')}
@@ -16889,7 +16891,7 @@ function App() {
                     </button>
                   )}
                   
-                  {paymentConfig?.paypal_enabled && (
+                  {(paymentConfig?.paypal_enabled !== false) && (
                     <button 
                       className={`payment-option ${selectedPaymentProvider === 'paypal' ? 'selected' : ''}`}
                       onClick={() => setSelectedPaymentProvider('paypal')}
@@ -16902,7 +16904,7 @@ function App() {
                     </button>
                   )}
                   
-                  {paymentConfig?.coinbase_enabled && (
+                  {(paymentConfig?.coinbase_enabled !== false) && (
                     <button 
                       className={`payment-option ${selectedPaymentProvider === 'coinbase' ? 'selected' : ''}`}
                       onClick={() => setSelectedPaymentProvider('coinbase')}
@@ -16916,12 +16918,6 @@ function App() {
                   )}
                 </div>
               </div>
-              
-              {!paymentConfig?.stripe_enabled && !paymentConfig?.paypal_enabled && !paymentConfig?.coinbase_enabled && (
-                <div className="no-payment-methods">
-                  <p>⚠️ No payment methods are currently available. Please contact support.</p>
-                </div>
-              )}
             </div>
             
             <div className="modal-footer">
@@ -16930,6 +16926,7 @@ function App() {
                 onClick={() => {
                   console.log('🚫 Payment modal cancelled by user');
                   setShowPaymentModal(false);
+                  setSelectedTournamentForPayment(null);
                 }}
               >
                 Cancel
@@ -16938,11 +16935,16 @@ function App() {
                 className="btn btn-primary"
                 onClick={() => {
                   console.log('💳 Payment initiated with provider:', selectedPaymentProvider);
-                  createPaymentSession(selectedPaymentProvider);
+                  if (typeof createPaymentSession === 'function') {
+                    createPaymentSession(selectedPaymentProvider);
+                  } else {
+                    console.log('Payment would be processed here');
+                    alert('Payment system integration needed');
+                  }
                 }}
-                disabled={paymentLoading || (!paymentConfig?.stripe_enabled && !paymentConfig?.paypal_enabled && !paymentConfig?.coinbase_enabled)}
+                disabled={paymentLoading}
               >
-                {paymentLoading ? 'Processing...' : `Pay $${selectedTournamentForPayment.entry_fee}`}
+                {paymentLoading ? 'Processing...' : (selectedTournamentForPayment ? `Pay €${selectedTournamentForPayment.entry_fee}` : 'Deposit Funds')}
               </button>
             </div>
           </div>
