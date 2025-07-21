@@ -13367,12 +13367,12 @@ function App() {
           name: 'ELITE WoBeRa Championship 2024', 
           category: 'Premier League', 
           season: 'Spring 2024',
-          country: '10η Αγωνιστική',
+          country: '10th Matchday',
           prize: '€50,000'
         },
         status: 'LIVE',
         timeRemaining: '2h 15m',
-        matchTime: '15:30 - 17:45',
+        matchTime: '15:30',
         duration: '2h 15m',
         team1: { 
           name: 'CHELSEA WIZARDS', 
@@ -13439,30 +13439,6 @@ function App() {
               seriesRecord: { wins: 3, losses: 1 },
               rank: '#5'
             }
-          },
-          {
-            player1: { 
-              name: 'Arya Stark', 
-              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw2fHxhdGhsZXRlJTIwcG9ydHJhaXRzfGVufDB8fHx8MTc1MzAyNzYyOHww&ixlib=rb-4.1.0&q=85', 
-              team: 'team1', 
-              currentScore: 2.23, 
-              maxScore: 5.60, 
-              trend: 'up',
-              record: { wins: 17, losses: 13 },
-              seriesRecord: { wins: 2, losses: 2 },
-              rank: '#8'
-            },
-            player2: { 
-              name: 'Jaime', 
-              avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHw1fHxmb290YmFsbCUyMHBsYXllcnN8ZW58MHx8fHwxNzUzMDI3NjM1fDA&ixlib=rb-4.1.0&q=85', 
-              team: 'team2', 
-              currentScore: 1.76, 
-              maxScore: 8.13, 
-              trend: 'down',
-              record: { wins: 13, losses: 17 },
-              seriesRecord: { wins: 1, losses: 3 },
-              rank: '#16'
-            }
           }
         ]
       },
@@ -13472,12 +13448,12 @@ function App() {
           name: 'EUROPA WoBeRa League 2024', 
           category: 'Europa Conference', 
           season: 'Spring 2024',
-          country: '5η Αγωνιστική',
+          country: '5th Matchday',
           prize: '€25,000'
         },
         status: 'LIVE',
         timeRemaining: '1h 32m',
-        matchTime: '16:00 - 17:30',
+        matchTime: '16:00',
         duration: '1h 30m',
         team1: { 
           name: 'MADRID EAGLES', 
@@ -13528,12 +13504,12 @@ function App() {
           name: 'CHAMPIONS WoBeRa Cup 2024', 
           category: 'Championship Final', 
           season: 'Spring 2024',
-          country: '15η Αγωνιστική',
+          country: '15th Matchday',
           prize: '€100,000'
         },
         status: 'UPCOMING',
         timeRemaining: '45 minutes until start',
-        matchTime: '19:00 - 21:15',
+        matchTime: '19:00',
         duration: '2h 15m',
         team1: { 
           name: 'LIVERPOOL REDS', 
@@ -13559,19 +13535,19 @@ function App() {
           name: 'BUNDESLIGA WoBeRa Championship', 
           category: 'German League', 
           season: 'Spring 2024',
-          country: '8η Αγωνιστική',
+          country: '8th Matchday',
           prize: '€35,000'
         },
-        status: 'UPCOMING',
-        timeRemaining: '2 hours until start',
-        matchTime: '20:30 - 22:45',
+        status: 'FINISHED',
+        timeRemaining: 'Match completed',
+        matchTime: '18:30',
         duration: '2h 15m',
         team1: { 
           name: 'BERLIN THUNDER', 
           logo: 'https://images.unsplash.com/photo-1577223618563-3d858655ab86?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwxfHxzb2NjZXIlMjBsb2dvc3xlbnwwfHx8fDE3NTMwMjc2NDZ8MA&ixlib=rb-4.1.0&q=85', 
           country: '🇩🇪',
           countryName: 'Germany',
-          teamScore: 0,
+          teamScore: 22,
           totalMatches: 25
         },
         team2: { 
@@ -13579,10 +13555,10 @@ function App() {
           logo: 'https://images.unsplash.com/photo-1640182837698-d1dee88748b1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwyfHxzcG9ydHMlMjB0ZWFtJTIwbG9nb3N8ZW58MHx8fHwxNzUzMDI3NjExfDA&ixlib=rb-4.1.0&q=85', 
           country: '🇩🇪',
           countryName: 'Germany',
-          teamScore: 0,
+          teamScore: 3,
           totalMatches: 25
         },
-        activeMatches: [] // No active matches, upcoming tournament
+        activeMatches: [] // No active matches, finished tournament
       }
     ];
 
