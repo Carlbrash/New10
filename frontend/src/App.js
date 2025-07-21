@@ -1363,7 +1363,7 @@ function App() {
   // SportsDuel view state
   const [selectedMatch, setSelectedMatch] = useState(null); // null = show match list, match object = show detailed view
   
-  // Navigation history management - Fixed version
+  // Navigation history management - Using useRef for immediate updates
   const addToHistory = (view, title = '') => {
     const newHistoryEntry = {
       view: view,
@@ -1371,25 +1371,29 @@ function App() {
       timestamp: Date.now()
     };
     
-    // Add to history
-    const newHistory = [...navigationHistory];
-    newHistory.push(newHistoryEntry);
+    // Add to ref (immediate)
+    navigationHistoryRef.current.push(newHistoryEntry);
     
     // Keep only last 10 entries
-    if (newHistory.length > 10) {
-      newHistory.shift();
+    if (navigationHistoryRef.current.length > 10) {
+      navigationHistoryRef.current.shift();
     }
     
-    setNavigationHistory(newHistory);
-    setCurrentHistoryIndex(newHistory.length - 1);
+    // Update state for UI
+    setNavigationHistory([...navigationHistoryRef.current]);
+    setCurrentHistoryIndex(navigationHistoryRef.current.length - 1);
+    
+    console.log('Added to history:', view, 'Current history:', navigationHistoryRef.current);
   };
 
   // Navigate with history tracking
   const navigateWithHistory = (newView, title = '') => {
+    console.log('Navigating from', currentView, 'to', newView);
+    
     // Add current view to history before navigating
-    if (currentView && currentView !== newView) {
-      addToHistory(currentView, breadcrumbPath[breadcrumbPath.length - 1]?.title || currentView);
-      console.log('Added to history:', currentView, 'Total history length:', navigationHistory.length + 1);
+    if (currentView && currentView !== newView && currentView !== 'home') {
+      const currentTitle = breadcrumbPath[breadcrumbPath.length - 1]?.title || currentView;
+      addToHistory(currentView, currentTitle);
     }
     
     // Navigate to new view
@@ -1401,29 +1405,34 @@ function App() {
 
   // Go back to previous view - Fixed version
   const goBack = () => {
-    console.log('Going back, current history:', navigationHistory);
-    if (navigationHistory.length > 0) {
-      const lastEntry = navigationHistory[navigationHistory.length - 1];
+    console.log('Going back, current history:', navigationHistoryRef.current);
+    
+    if (navigationHistoryRef.current.length > 0) {
+      const lastEntry = navigationHistoryRef.current.pop(); // Remove and get last entry
       console.log('Going back to:', lastEntry);
       
-      // Remove the last entry from history
-      const newHistory = navigationHistory.slice(0, -1);
-      setNavigationHistory(newHistory);
-      setCurrentHistoryIndex(newHistory.length - 1);
+      // Update state
+      setNavigationHistory([...navigationHistoryRef.current]);
+      setCurrentHistoryIndex(navigationHistoryRef.current.length - 1);
       
       // Navigate to the previous view
       setCurrentView(lastEntry.view);
-      if (lastEntry.title) {
+      if (lastEntry.title && lastEntry.title !== lastEntry.view) {
         navigateWithBreadcrumb(lastEntry.view, lastEntry.title);
       }
     } else {
       console.log('No history to go back to');
+      // Fallback to dashboard/home
+      const fallbackView = user ? 'dashboard' : 'home';
+      const fallbackTitle = user ? 'Dashboard' : 'Home';
+      setCurrentView(fallbackView);
+      navigateWithBreadcrumb(fallbackView, fallbackTitle);
     }
   };
 
   // Check if we can go back - Fixed version
   const canGoBack = () => {
-    return navigationHistory.length > 0;
+    return navigationHistoryRef.current.length > 0;
   };
 
   // Get current translations
