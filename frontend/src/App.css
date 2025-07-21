@@ -343,8 +343,53 @@ body {
   color: #4fc3f7;
 }
 
-/* Responsive adjustments */
+/* Back Navigation Button */
+.back-navigation {
+  position: fixed;
+  top: 80px; /* Below navbar */
+  left: 20px;
+  z-index: 990;
+}
+
+.back-button {
+  background: rgba(79, 195, 247, 0.9);
+  border: 1px solid rgba(79, 195, 247, 0.5);
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(79, 195, 247, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.back-button:hover {
+  background: rgba(79, 195, 247, 1);
+  transform: translateX(-3px);
+  box-shadow: 0 6px 20px rgba(79, 195, 247, 0.4);
+}
+
+.back-button:active {
+  transform: translateX(-1px);
+}
+
+/* Mobile adjustments for back button */
 @media (max-width: 768px) {
+  .back-navigation {
+    top: 70px;
+    left: 10px;
+  }
+  
+  .back-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
   .advanced-settings-dropdown {
     min-width: 320px;
     width: 320px;
