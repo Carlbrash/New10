@@ -14920,19 +14920,19 @@ function App() {
             </button>
           )}
           
-          {/* Standings (Βαθμολογίες) Dropdown */}
+          {/* Standings & Fixtures Menu */}
           <div 
             className={`nav-dropdown ${showStandingsDropdown ? 'mobile-open' : ''}`}
             onMouseEnter={() => window.innerWidth > 768 && setShowStandingsDropdown(true)}
             onMouseLeave={() => window.innerWidth > 768 && setShowStandingsDropdown(false)}
           >
             <button 
-              className={`nav-link dropdown-trigger ${currentView === 'standings' ? 'active' : ''}`}
+              className={`nav-link dropdown-trigger ${currentView === 'standings' || currentView === 'fixtures' ? 'active' : ''}`}
               onClick={() => {
                 if (window.innerWidth <= 768) {
                   toggleMobileDropdown('standings');
                 } else {
-                  navigateWithBreadcrumb('standings', 'Standings');
+                  setCurrentView('standings');
                 }
               }}
             >
@@ -14940,95 +14940,60 @@ function App() {
             </button>
             
             {showStandingsDropdown && (
-              <div className="dropdown-menu standings-dropdown">
-                {/* Always show default countries, even if leagues aren't created yet */}
-                <>
-                  {/* Fixtures Section */}
-                  <div className="dropdown-section">
-                    <div className="dropdown-section-header">
-                      ⚽ Fixtures
+              <div className="dropdown-menu standings-dropdown-new">
+                <div className="standings-header">
+                  <h4>⚽ Live Championships & Results</h4>
+                  <p>View fixtures, results and standings</p>
+                </div>
+                
+                <div className="standings-countries-grid">
+                  {defaultCountries.slice(0, 6).map((country) => (
+                    <div key={country.name} className="standings-country-card">
+                      <div className="country-header">
+                        <span className="country-flag">{country.flag}</span>
+                        <span className="country-name">{country.name}</span>
+                      </div>
+                      
+                      <div className="league-options">
+                        <button
+                          className="league-btn premier"
+                          onClick={() => {
+                            navigateWithBreadcrumb('fixtures', `${country.name} Premier League`);
+                            setShowStandingsDropdown(false);
+                          }}
+                          title="View fixtures and results"
+                        >
+                          <span className="league-icon">🏆</span>
+                          <span className="league-text">Premier</span>
+                        </button>
+                        
+                        <button
+                          className="league-btn league2"
+                          onClick={() => {
+                            navigateWithBreadcrumb('standings', `${country.name} League 2`);
+                            setShowStandingsDropdown(false);
+                          }}
+                          title="View standings and tables"
+                        >
+                          <span className="league-icon">📊</span>
+                          <span className="league-text">League 2</span>
+                        </button>
+                      </div>
                     </div>
-                    {defaultCountries.slice(0, 4).map((country) => {
-                      const existingLeague = nationalLeagues.find(league => 
-                        league.country.toLowerCase() === country.name.toLowerCase()
-                      );
-                      return (
-                        <div key={`fixtures-${country.name}`} className="dropdown-country">
-                          <div className="dropdown-country-header">
-                            {country.flag} {country.name}
-                          </div>
-                          <button 
-                            className="dropdown-item dropdown-sub-item"
-                            onClick={() => {
-                              navigateWithBreadcrumb('fixtures', `${country.name} Premier Fixtures`);
-                              if (existingLeague?.premier) {
-                                fetchLeagueFixtures(country.name, 'premier');
-                              }
-                              setShowStandingsDropdown(false);
-                            }}
-                          >
-                            📅 {country.name} Premier
-                          </button>
-                          <button 
-                            className="dropdown-item dropdown-sub-item"
-                            onClick={() => {
-                              navigateWithBreadcrumb('fixtures', `${country.name} League 2 Fixtures`);
-                              if (existingLeague?.league_2) {
-                                fetchLeagueFixtures(country.name, 'league_2');
-                              }
-                              setShowStandingsDropdown(false);
-                            }}
-                          >
-                            📅 {country.name} League 2
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  
-                  {/* Standings Section */}
-                  <div className="dropdown-section">
-                    <div className="dropdown-section-header">
-                      📊 Standings
-                    </div>
-                    {defaultCountries.slice(0, 4).map((country) => {
-                      const existingLeague = nationalLeagues.find(league => 
-                        league.country.toLowerCase() === country.name.toLowerCase()
-                      );
-                      return (
-                        <div key={`standings-${country.name}`} className="dropdown-country">
-                          <div className="dropdown-country-header">
-                            {country.flag} {country.name}
-                          </div>
-                          <button 
-                            className="dropdown-item dropdown-sub-item"
-                            onClick={() => {
-                              if (existingLeague?.premier) {
-                                fetchLeagueStandings(country.name, 'premier');
-                              }
-                              navigateWithBreadcrumb('standings', `${country.name} Premier`);
-                              setShowStandingsDropdown(false);
-                            }}
-                          >
-                            🥇 {country.name} Premier
-                          </button>
-                          <button 
-                            className="dropdown-item dropdown-sub-item"
-                            onClick={() => {
-                              if (existingLeague?.league_2) {
-                                fetchLeagueStandings(country.name, 'league_2');
-                              }
-                              navigateWithBreadcrumb('standings', `${country.name} League 2`);
-                              setShowStandingsDropdown(false);
-                            }}
-                          >
-                            🥈 {country.name} League 2
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
+                  ))}
+                </div>
+                
+                <div className="standings-footer">
+                  <button
+                    className="view-all-btn"
+                    onClick={() => {
+                      setCurrentView('standings');
+                      setShowStandingsDropdown(false);
+                    }}
+                  >
+                    📈 View All Championships
+                  </button>
+                </div>
               </div>
             )}
           </div>
