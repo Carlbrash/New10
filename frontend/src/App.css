@@ -4285,6 +4285,7 @@ body {
   background: rgba(20, 20, 20, 0.95);
   border: 1px solid rgba(79, 195, 247, 0.2);
   z-index: 999; /* Lower than settings dropdown */
+  transition: opacity 0.3s ease;
   border-radius: 8px;
   padding: 0.5rem 0;
   min-width: 120px;
