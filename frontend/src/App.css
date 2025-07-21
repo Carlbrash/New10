@@ -123,6 +123,12 @@ body {
   color: #4fc3f7;
 }
 
+.dropdown-divider {
+  height: 1px;
+  background: rgba(79, 195, 247, 0.2);
+  margin: 0.5rem 0;
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
