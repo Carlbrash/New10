@@ -15367,6 +15367,26 @@ function App() {
         </div>
       )}
 
+      {/* Debug Navigation Info - Temporary */}
+      {currentView !== 'home' && currentView !== 'dashboard' && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          left: '20px',
+          background: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '5px',
+          fontSize: '12px',
+          zIndex: 1000
+        }}>
+          <div>Current: {currentView}</div>
+          <div>History: {navigationHistoryRef.current?.length || 0}</div>
+          <div>Can Go Back: {canGoBack() ? 'Yes' : 'No'}</div>
+          <div>Last Entry: {navigationHistoryRef.current?.[navigationHistoryRef.current.length - 1]?.view || 'None'}</div>
+        </div>
+      )}
+
       {/* Site Messages Banner - positioned below navbar */}
       <SiteMessagesBanner />
 
