@@ -5,7 +5,7 @@ import json
 class SportsDuelSystemTester(unittest.TestCase):
     """Test SportsDuel System backend endpoints"""
     
-    base_url = "https://8bac144b-1667-48c8-ab7b-40efd021e91b.preview.emergentagent.com"
+    base_url = "https://b90141f8-e066-4425-bc76-e032fe56376a.preview.emergentagent.com"
     
     # Test user credentials
     test_user_credentials = {

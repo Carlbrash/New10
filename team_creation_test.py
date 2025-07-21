@@ -6,7 +6,7 @@ class TeamCreationTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TeamCreationTest, self).__init__(*args, **kwargs)
         # Use the public endpoint from frontend/.env
-        self.base_url = "https://8bac144b-1667-48c8-ab7b-40efd021e91b.preview.emergentagent.com"
+        self.base_url = "https://b90141f8-e066-4425-bc76-e032fe56376a.preview.emergentagent.com"
         self.token = None
         
     def test_01_login_as_testuser(self):
