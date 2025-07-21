@@ -14722,6 +14722,92 @@ function App() {
               </div>
             )}
           </div>
+
+          {/* Guilds Menu - only show for logged in users */}
+          {user && (
+            <div 
+              className={`nav-dropdown ${showGuildsDropdown ? 'mobile-open' : ''}`}
+              onMouseEnter={() => window.innerWidth > 768 && setShowGuildsDropdown(true)}
+              onMouseLeave={() => window.innerWidth > 768 && setShowGuildsDropdown(false)}
+            >
+              <button 
+                className={`nav-link dropdown-trigger ${(currentView.startsWith('guild') || currentView === 'teams' || currentView.startsWith('team-') || showFriendsModal) ? 'active' : ''}`}
+                onClick={() => {
+                  if (window.innerWidth <= 768) {
+                    toggleMobileDropdown('guilds');
+                  } else {
+                    setShowGuildsDropdown(!showGuildsDropdown);
+                  }
+                }}
+              >
+                🏰 {t.guilds} <span className="dropdown-arrow">▼</span>
+              </button>
+              {showGuildsDropdown && (
+                <div className="dropdown-menu">
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('guilds', 'Browse Guilds');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    🏰 {t.browseGuilds}
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('guild-rankings', 'Guild Rankings');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    🏆 {t.guildRankings}
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('my-guild', 'My Guild');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    ⭐ {t.myGuild}
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('guild-wars', 'Guild Wars');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    ⚔️ {t.guildWars}
+                  </button>
+                  <div className="dropdown-divider"></div>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('teams', 'Browse Teams');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    👥 Teams
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      setShowFriendsModal(true);
+                      fetchFriends();
+                      fetchFriendRequests();
+                      fetchFriendRecommendations();
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    👥 Friends {friendRequests.length > 0 && (
+                      <span className="friend-request-badge">{friendRequests.length}</span>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           
           {/* Tournaments Dropdown */}
           <div 
@@ -14765,6 +14851,16 @@ function App() {
               </div>
             )}
           </div>
+
+          {/* Live Scores Menu - only show for logged in users */}
+          {user && (
+            <button 
+              className={`nav-link ${currentView === 'sportsduel' ? 'active' : ''}`}
+              onClick={() => setCurrentView('sportsduel')}
+            >
+              📈 Live Scores
+            </button>
+          )}
           
           {/* Standings (Βαθμολογίες) Dropdown */}
           <div 
@@ -14879,102 +14975,6 @@ function App() {
             )}
           </div>
           
-          {/* Guilds Menu - only show for logged in users */}
-          {user && (
-            <div 
-              className={`nav-dropdown ${showGuildsDropdown ? 'mobile-open' : ''}`}
-              onMouseEnter={() => window.innerWidth > 768 && setShowGuildsDropdown(true)}
-              onMouseLeave={() => window.innerWidth > 768 && setShowGuildsDropdown(false)}
-            >
-              <button 
-                className={`nav-link dropdown-trigger ${(currentView.startsWith('guild') || currentView === 'teams' || currentView.startsWith('team-') || showFriendsModal) ? 'active' : ''}`}
-                onClick={() => {
-                  if (window.innerWidth <= 768) {
-                    toggleMobileDropdown('guilds');
-                  } else {
-                    setShowGuildsDropdown(!showGuildsDropdown);
-                  }
-                }}
-              >
-                🏰 {t.guilds} <span className="dropdown-arrow">▼</span>
-              </button>
-              {showGuildsDropdown && (
-                <div className="dropdown-menu">
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigateWithBreadcrumb('guilds', 'Browse Guilds');
-                      setShowGuildsDropdown(false);
-                    }}
-                  >
-                    🏰 {t.browseGuilds}
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigateWithBreadcrumb('guild-rankings', 'Guild Rankings');
-                      setShowGuildsDropdown(false);
-                    }}
-                  >
-                    🏆 {t.guildRankings}
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigateWithBreadcrumb('my-guild', 'My Guild');
-                      setShowGuildsDropdown(false);
-                    }}
-                  >
-                    ⭐ {t.myGuild}
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigateWithBreadcrumb('guild-wars', 'Guild Wars');
-                      setShowGuildsDropdown(false);
-                    }}
-                  >
-                    ⚔️ {t.guildWars}
-                  </button>
-                  <div className="dropdown-divider"></div>
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigateWithBreadcrumb('teams', 'Browse Teams');
-                      setShowGuildsDropdown(false);
-                    }}
-                  >
-                    👥 Teams
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => {
-                      setShowFriendsModal(true);
-                      fetchFriends();
-                      fetchFriendRequests();
-                      fetchFriendRecommendations();
-                      setShowGuildsDropdown(false);
-                    }}
-                  >
-                    👥 Friends {friendRequests.length > 0 && (
-                      <span className="friend-request-badge">{friendRequests.length}</span>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* SportsDuel Menu - only show for logged in users */}
-          {user && (
-            <button 
-              className={`nav-link ${currentView === 'sportsduel' ? 'active' : ''}`}
-              onClick={() => setCurrentView('sportsduel')}
-            >
-              📈 Live Scores
-            </button>
-          )}
-          
           {/* Language Selector Dropdown */}
           <div className="language-dropdown">
             <button 
@@ -15022,6 +15022,27 @@ function App() {
                   ⚙️ {t.adminPanel}
                 </button>
               )}
+              
+              {/* Chat Button */}
+              <button 
+                className="nav-link chat-button"
+                onClick={() => {
+                  if (showChatPopup) {
+                    setIsChatMinimized(!isChatMinimized);
+                  } else {
+                    setShowChatPopup(true);
+                    setIsChatMinimized(false);
+                  }
+                  if (!isConnectedToChat) {
+                    initializeChatSocket();
+                  }
+                }}
+              >
+                💬 Chat
+                {unreadMessages > 0 && !showChatPopup && (
+                  <span className="unread-badge">{unreadMessages}</span>
+                )}
+              </button>
               
               {/* Settings Dropdown */}
               <div 
@@ -15075,26 +15096,6 @@ function App() {
                   </div>
                 )}
               </div>
-              
-              <button 
-                className="nav-link chat-button"
-                onClick={() => {
-                  if (showChatPopup) {
-                    setIsChatMinimized(!isChatMinimized);
-                  } else {
-                    setShowChatPopup(true);
-                    setIsChatMinimized(false);
-                  }
-                  if (!isConnectedToChat) {
-                    initializeChatSocket();
-                  }
-                }}
-              >
-                💬 Chat
-                {unreadMessages > 0 && !showChatPopup && (
-                  <span className="unread-badge">{unreadMessages}</span>
-                )}
-              </button>
               
               <button className="btn btn-logout" onClick={handleLogout}>
                 {t.logout}
