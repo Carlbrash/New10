@@ -1363,6 +1363,53 @@ function App() {
   // SportsDuel view state
   const [selectedMatch, setSelectedMatch] = useState(null); // null = show match list, match object = show detailed view
   
+  // Navigation history management
+  const navigateWithHistory = (newView, title = '') => {
+    // Add current view to history if it's different from the new view
+    if (currentView !== newView) {
+      const newHistoryEntry = {
+        view: currentView,
+        title: breadcrumb[breadcrumb.length - 1]?.title || currentView,
+        timestamp: Date.now()
+      };
+      
+      // Remove any entries after current index (if user went back and then navigated to new page)
+      const newHistory = navigationHistory.slice(0, currentHistoryIndex + 1);
+      newHistory.push(newHistoryEntry);
+      
+      // Limit history to last 10 entries
+      if (newHistory.length > 10) {
+        newHistory.shift();
+      }
+      
+      setNavigationHistory(newHistory);
+      setCurrentHistoryIndex(newHistory.length - 1);
+    }
+    
+    // Navigate to new view
+    setCurrentView(newView);
+    if (title) {
+      navigateWithBreadcrumb(newView, title);
+    }
+  };
+
+  // Go back to previous view
+  const goBack = () => {
+    if (currentHistoryIndex >= 0 && navigationHistory[currentHistoryIndex]) {
+      const previousEntry = navigationHistory[currentHistoryIndex];
+      setCurrentView(previousEntry.view);
+      setCurrentHistoryIndex(currentHistoryIndex - 1);
+      
+      // Update breadcrumb
+      navigateWithBreadcrumb(previousEntry.view, previousEntry.title);
+    }
+  };
+
+  // Check if we can go back
+  const canGoBack = () => {
+    return currentHistoryIndex >= 0 && navigationHistory.length > 0;
+  };
+
   // Get current translations
   const t = translations[language];
 
