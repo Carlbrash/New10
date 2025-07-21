@@ -15062,26 +15062,44 @@ function App() {
               
               {/* Settings Dropdown */}
               <div 
-                className={`nav-dropdown ${showSettingsDropdown ? 'mobile-open' : ''}`}
-                onMouseEnter={() => window.innerWidth > 768 && setShowSettingsDropdown(true)}
-                onMouseLeave={() => window.innerWidth > 768 && setShowSettingsDropdown(false)}
+                className={`nav-dropdown settings-dropdown ${showSettingsDropdown ? 'mobile-open' : ''}`}
+                onMouseEnter={() => {
+                  if (window.innerWidth > 768) {
+                    setShowSettingsDropdown(true);
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (window.innerWidth > 768) {
+                    // Add a small delay before closing
+                    setTimeout(() => {
+                      // Check if mouse is still not in the dropdown area
+                      const dropdown = e.currentTarget.querySelector('.advanced-settings-dropdown');
+                      if (dropdown && !dropdown.matches(':hover') && !e.currentTarget.matches(':hover')) {
+                        setShowSettingsDropdown(false);
+                      }
+                    }, 100);
+                  }
+                }}
                 style={{ position: 'relative' }}
               >
                 <button 
                   className={`nav-link dropdown-trigger ${(currentView === 'affiliate' || currentView === 'wallet' || showSettings) ? 'active' : ''}`}
                   onClick={() => {
-                    if (window.innerWidth <= 768) {
-                      toggleMobileDropdown('settings');
-                    } else {
-                      setShowSettingsDropdown(!showSettingsDropdown);
-                    }
+                    setShowSettingsDropdown(!showSettingsDropdown);
                   }}
                 >
                   ⚙️ Settings <span className="dropdown-arrow">▼</span>
                 </button>
                 
                 {showSettingsDropdown && (
-                  <div className="dropdown-menu advanced-settings-dropdown">
+                  <div 
+                    className="dropdown-menu advanced-settings-dropdown"
+                    onMouseEnter={() => setShowSettingsDropdown(true)}
+                    onMouseLeave={() => {
+                      // Close dropdown when leaving dropdown area
+                      setTimeout(() => setShowSettingsDropdown(false), 200);
+                    }}
+                  >
                     {/* User Info & Deposit Section */}
                     <div className="settings-user-info">
                       <div className="settings-user-details">
