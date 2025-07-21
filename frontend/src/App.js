@@ -15323,6 +15323,19 @@ function App() {
           )}
         </div>
       </nav>
+      
+      {/* Back Navigation Button */}
+      {canGoBack() && currentView !== 'home' && currentView !== 'dashboard' && (
+        <div className="back-navigation">
+          <button 
+            className="back-button"
+            onClick={goBack}
+            title="Go back to previous page"
+          >
+            ← Back
+          </button>
+        </div>
+      )}
 
       {/* Site Messages Banner - positioned below navbar */}
       <SiteMessagesBanner />
