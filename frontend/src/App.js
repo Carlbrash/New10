@@ -1389,6 +1389,7 @@ function App() {
     // Add current view to history before navigating
     if (currentView && currentView !== newView) {
       addToHistory(currentView, breadcrumbPath[breadcrumbPath.length - 1]?.title || currentView);
+      console.log('Added to history:', currentView, 'Total history length:', navigationHistory.length + 1);
     }
     
     // Navigate to new view
@@ -1400,8 +1401,10 @@ function App() {
 
   // Go back to previous view - Fixed version
   const goBack = () => {
+    console.log('Going back, current history:', navigationHistory);
     if (navigationHistory.length > 0) {
       const lastEntry = navigationHistory[navigationHistory.length - 1];
+      console.log('Going back to:', lastEntry);
       
       // Remove the last entry from history
       const newHistory = navigationHistory.slice(0, -1);
@@ -1413,6 +1416,8 @@ function App() {
       if (lastEntry.title) {
         navigateWithBreadcrumb(lastEntry.view, lastEntry.title);
       }
+    } else {
+      console.log('No history to go back to');
     }
   };
 
