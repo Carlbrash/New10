@@ -15088,32 +15088,32 @@ function App() {
                           {user?.username || 'guest'}
                         </div>
                         <div className="settings-balance">
-                          💰 {mockWalletData.currency}{mockWalletData.balance.toFixed(2)}
+                          💰 €{mockWalletData.balance.toFixed(2)}
                         </div>
                       </div>
                       <button 
                         className="settings-deposit-btn"
                         onClick={() => {
-                          setShowPaymentModal(true);
+                          setCurrentView('wallet'); // Navigate to wallet page with deposit options
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        💳 Deposit
+                        Deposit
                       </button>
                     </div>
 
                     {/* Withdrawable & Bet Credits */}
                     <div className="settings-balances">
                       <div className="settings-balance-item">
-                        <div className="settings-balance-label">💸 Withdrawable</div>
+                        <div className="settings-balance-label">Withdrawable</div>
                         <div className="settings-balance-amount">
-                          {mockWalletData.currency}{mockWalletData.withdrawable.toFixed(2)}
+                          €{mockWalletData.withdrawable.toFixed(2)}
                         </div>
                       </div>
                       <div className="settings-balance-item">
-                        <div className="settings-balance-label">🎯 Bet Credits</div>
+                        <div className="settings-balance-label">Bet Credits</div>
                         <div className="settings-balance-amount">
-                          {mockWalletData.currency}{mockWalletData.betCredits.toFixed(2)}
+                          €{mockWalletData.betCredits.toFixed(2)}
                         </div>
                       </div>
                     </div>
@@ -15124,8 +15124,8 @@ function App() {
                         className={`settings-menu-option ${showAccountSubmenu ? 'active' : ''}`}
                         onClick={() => setShowAccountSubmenu(!showAccountSubmenu)}
                       >
-                        <div>👤</div>
-                        <div>Account</div>
+                        <span className="menu-icon">👤</span>
+                        <span className="menu-text">Account</span>
                       </button>
                       <button 
                         className="settings-menu-option"
@@ -15135,8 +15135,8 @@ function App() {
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        <div>🔔</div>
-                        <div>Alerts</div>
+                        <span className="menu-icon">🔔</span>
+                        <span className="menu-text">Alerts</span>
                       </button>
                       <button 
                         className="settings-menu-option"
@@ -15146,8 +15146,8 @@ function App() {
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        <div>🎁</div>
-                        <div>My Offers</div>
+                        <span className="menu-icon">🎁</span>
+                        <span className="menu-text">Offers</span>
                       </button>
                       <button 
                         className="settings-menu-option"
@@ -15156,8 +15156,8 @@ function App() {
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        <div>⚙️</div>
-                        <div>Preferences</div>
+                        <span className="menu-icon">⚙️</span>
+                        <span className="menu-text">Settings</span>
                       </button>
                     </div>
 
@@ -15172,7 +15172,8 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          🏦 Bank
+                          <span className="submenu-icon">🏦</span>
+                          <span className="submenu-text">Bank</span>
                         </button>
                         <button 
                           className="account-submenu-item"
@@ -15183,7 +15184,8 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          📧 Messages
+                          <span className="submenu-icon">📧</span>
+                          <span className="submenu-text">Messages</span>
                         </button>
                         <button 
                           className="account-submenu-item"
@@ -15193,7 +15195,8 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          👤 My Account
+                          <span className="submenu-icon">👤</span>
+                          <span className="submenu-text">Account</span>
                         </button>
                         <button 
                           className="account-submenu-item"
@@ -15204,7 +15207,8 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          📋 Rules
+                          <span className="submenu-icon">📋</span>
+                          <span className="submenu-text">Rules</span>
                         </button>
                         <button 
                           className="account-submenu-item"
@@ -15215,7 +15219,8 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          📊 My Activity
+                          <span className="submenu-icon">📊</span>
+                          <span className="submenu-text">Activity</span>
                         </button>
                         <button 
                           className="account-submenu-item"
@@ -15226,7 +15231,8 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          📜 History
+                          <span className="submenu-icon">📜</span>
+                          <span className="submenu-text">History</span>
                         </button>
                         <button 
                           className="account-submenu-item"
@@ -15236,7 +15242,8 @@ function App() {
                             setShowAccountSubmenu(false);
                           }}
                         >
-                          💰 Affiliate
+                          <span className="submenu-icon">💰</span>
+                          <span className="submenu-text">Affiliate</span>
                         </button>
                       </div>
                     )}
