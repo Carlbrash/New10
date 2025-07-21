@@ -15023,12 +15023,58 @@ function App() {
                 </button>
               )}
               
-              <button 
-                className="nav-link"
-                onClick={openSettings}
+              {/* Settings Dropdown */}
+              <div 
+                className={`nav-dropdown ${showSettingsDropdown ? 'mobile-open' : ''}`}
+                onMouseEnter={() => window.innerWidth > 768 && setShowSettingsDropdown(true)}
+                onMouseLeave={() => window.innerWidth > 768 && setShowSettingsDropdown(false)}
               >
-                ⚙️ Settings
-              </button>
+                <button 
+                  className={`nav-link dropdown-trigger ${(currentView === 'affiliate' || currentView === 'wallet' || showSettings) ? 'active' : ''}`}
+                  onClick={() => {
+                    if (window.innerWidth <= 768) {
+                      toggleMobileDropdown('settings');
+                    } else {
+                      setShowSettingsDropdown(!showSettingsDropdown);
+                    }
+                  }}
+                >
+                  ⚙️ Settings <span className="dropdown-arrow">▼</span>
+                </button>
+                
+                {showSettingsDropdown && (
+                  <div className="dropdown-menu">
+                    <button 
+                      className="dropdown-item"
+                      onClick={() => {
+                        openSettings();
+                        setShowSettingsDropdown(false);
+                      }}
+                    >
+                      👤 Profile Settings
+                    </button>
+                    <div className="dropdown-divider"></div>
+                    <button 
+                      className="dropdown-item"
+                      onClick={() => {
+                        setCurrentView('affiliate');
+                        setShowSettingsDropdown(false);
+                      }}
+                    >
+                      💰 {t.affiliate}
+                    </button>
+                    <button 
+                      className="dropdown-item"
+                      onClick={() => {
+                        setCurrentView('wallet');
+                        setShowSettingsDropdown(false);
+                      }}
+                    >
+                      💳 {t.wallet}
+                    </button>
+                  </div>
+                )}
+              </div>
               
               <button 
                 className="nav-link chat-button"
