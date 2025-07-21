@@ -14992,7 +14992,7 @@ function App() {
           </div>
           
           {/* Language Selector Dropdown */}
-          <div className="language-dropdown">
+          <div className={`language-dropdown ${showSettingsDropdown ? 'hidden-by-settings' : ''}`}>
             <button 
               className="language-selector" 
               onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
