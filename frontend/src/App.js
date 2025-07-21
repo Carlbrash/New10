@@ -14732,7 +14732,7 @@ function App() {
             onClick={() => {
               const newView = user ? 'dashboard' : 'home';
               const title = user ? 'Dashboard' : 'Home';
-              navigateWithHistory(newView, title);
+              navigateWithBreadcrumb(newView, title);
             }}
           >
             {user ? '🏠 Dashboard' : '🏠 Home'}
