@@ -13902,9 +13902,9 @@ function App() {
               onClick={() => setSelectedMatch(match)}
             >
               <div className="match-time-info">
-                <div className="match-time">{match.matchTime.split(' - ')[0]}</div>
-                <div className={`match-status-mini status-${match.status.toLowerCase()}`}>
-                  {match.status === 'LIVE' ? '●' : ''}
+                <div className="match-time">{match.matchTime}</div>
+                <div className={`match-status-indicator status-${match.status.toLowerCase()}`}>
+                  {match.status === 'LIVE' ? '●' : match.status === 'FINISHED' ? 'FIN' : '●'}
                 </div>
               </div>
 
