@@ -1363,27 +1363,32 @@ function App() {
   // SportsDuel view state
   const [selectedMatch, setSelectedMatch] = useState(null); // null = show match list, match object = show detailed view
   
-  // Navigation history management
+  // Navigation history management - Fixed version
+  const addToHistory = (view, title = '') => {
+    const newHistoryEntry = {
+      view: view,
+      title: title || view,
+      timestamp: Date.now()
+    };
+    
+    // Add to history
+    const newHistory = [...navigationHistory];
+    newHistory.push(newHistoryEntry);
+    
+    // Keep only last 10 entries
+    if (newHistory.length > 10) {
+      newHistory.shift();
+    }
+    
+    setNavigationHistory(newHistory);
+    setCurrentHistoryIndex(newHistory.length - 1);
+  };
+
+  // Navigate with history tracking
   const navigateWithHistory = (newView, title = '') => {
-    // Add current view to history if it's different from the new view
-    if (currentView !== newView) {
-      const newHistoryEntry = {
-        view: currentView,
-        title: breadcrumbPath[breadcrumbPath.length - 1]?.title || currentView,
-        timestamp: Date.now()
-      };
-      
-      // Remove any entries after current index (if user went back and then navigated to new page)
-      const newHistory = navigationHistory.slice(0, currentHistoryIndex + 1);
-      newHistory.push(newHistoryEntry);
-      
-      // Limit history to last 10 entries
-      if (newHistory.length > 10) {
-        newHistory.shift();
-      }
-      
-      setNavigationHistory(newHistory);
-      setCurrentHistoryIndex(newHistory.length - 1);
+    // Add current view to history before navigating
+    if (currentView && currentView !== newView) {
+      addToHistory(currentView, breadcrumbPath[breadcrumbPath.length - 1]?.title || currentView);
     }
     
     // Navigate to new view
@@ -1393,21 +1398,27 @@ function App() {
     }
   };
 
-  // Go back to previous view
+  // Go back to previous view - Fixed version
   const goBack = () => {
-    if (currentHistoryIndex >= 0 && navigationHistory[currentHistoryIndex]) {
-      const previousEntry = navigationHistory[currentHistoryIndex];
-      setCurrentView(previousEntry.view);
-      setCurrentHistoryIndex(currentHistoryIndex - 1);
+    if (navigationHistory.length > 0) {
+      const lastEntry = navigationHistory[navigationHistory.length - 1];
       
-      // Update breadcrumb
-      navigateWithBreadcrumb(previousEntry.view, previousEntry.title);
+      // Remove the last entry from history
+      const newHistory = navigationHistory.slice(0, -1);
+      setNavigationHistory(newHistory);
+      setCurrentHistoryIndex(newHistory.length - 1);
+      
+      // Navigate to the previous view
+      setCurrentView(lastEntry.view);
+      if (lastEntry.title) {
+        navigateWithBreadcrumb(lastEntry.view, lastEntry.title);
+      }
     }
   };
 
-  // Check if we can go back
+  // Check if we can go back - Fixed version
   const canGoBack = () => {
-    return currentHistoryIndex >= 0 && navigationHistory.length > 0;
+    return navigationHistory.length > 0;
   };
 
   // Get current translations
