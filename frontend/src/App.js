@@ -16810,24 +16810,53 @@ function App() {
       )}
 
       {/* Payment Modal */}
-      {showPaymentModal && selectedTournamentForPayment && (
+      {showPaymentModal && (
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>💳 Payment Required</h3>
+              <h3>💳 {selectedTournamentForPayment ? 'Tournament Payment' : 'Deposit Funds'}</h3>
               <button 
                 className="btn btn-secondary"
                 onClick={() => {
                   console.log('🚫 Payment modal closed by user');
                   setShowPaymentModal(false);
+                  setSelectedTournamentForPayment(null);
                 }}
               >
                 ✕
               </button>
             </div>
             <div className="modal-body">
-              <div className="payment-summary">
-                <h4>Tournament: {selectedTournamentForPayment.name}</h4>
+              {selectedTournamentForPayment ? (
+                <div className="payment-summary">
+                  <h4>Tournament: {selectedTournamentForPayment.name}</h4>
+                  <p>Entry Fee: €{selectedTournamentForPayment.entry_fee}</p>
+                </div>
+              ) : (
+                <div className="payment-summary">
+                  <h4>💰 Add Funds to Your Account</h4>
+                  <p>Choose amount and payment method:</p>
+                  
+                  <div className="deposit-amounts">
+                    <button className="amount-btn">€10</button>
+                    <button className="amount-btn">€25</button>
+                    <button className="amount-btn">€50</button>
+                    <button className="amount-btn">€100</button>
+                    <button className="amount-btn">€250</button>
+                    <button className="amount-btn">€500</button>
+                  </div>
+                  
+                  <div className="custom-amount">
+                    <input 
+                      type="number" 
+                      placeholder="Custom amount..." 
+                      min="5"
+                      max="5000"
+                      className="amount-input"
+                    />
+                  </div>
+                </div>
+              )}
                 <div className="payment-details">
                   <div className="detail-row">
                     <span>Entry Fee:</span>
