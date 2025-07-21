@@ -15217,7 +15217,7 @@ function App() {
                         <button 
                           className="account-submenu-item"
                           onClick={() => {
-                            setCurrentView('wallet');
+                            navigateWithHistory('wallet', 'Bank & Wallet');
                             setShowSettingsDropdown(false);
                             setShowAccountSubmenu(false);
                           }}
