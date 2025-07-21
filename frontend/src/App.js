@@ -1439,6 +1439,7 @@ function App() {
   const t = translations[language];
 
   // Navigation History State
+  const navigationHistoryRef = useRef([]);
   const [navigationHistory, setNavigationHistory] = useState([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
 
