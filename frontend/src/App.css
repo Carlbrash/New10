@@ -129,7 +129,7 @@ body {
   margin: 0.5rem 0;
 }
 
-/* Advanced Settings Dropdown Styles - Fixed Width Version */
+/* Advanced Settings Dropdown Styles - Fixed Hover Area */
 .advanced-settings-dropdown {
   min-width: 380px;
   width: 380px;
@@ -140,9 +140,25 @@ body {
   overflow: hidden;
   backdrop-filter: blur(10px);
   position: absolute;
-  right: 0;
+  right: -50px; /* Adjusted to ensure it doesn't go off-screen */
   top: 100%;
   z-index: 1000;
+}
+
+/* Expanded hover area to include dropdown */
+.nav-dropdown.settings-dropdown {
+  position: relative;
+}
+
+.nav-dropdown.settings-dropdown::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -380px; /* Cover the dropdown area */
+  width: 430px; /* Button width + dropdown width */
+  height: 400px; /* Cover the entire dropdown height */
+  pointer-events: none;
+  z-index: 999;
 }
 
 .settings-user-info {
