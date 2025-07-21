@@ -747,6 +747,7 @@ function App() {
   const [showGuildsDropdown, setShowGuildsDropdown] = useState(false);  // Added guild dropdown
   const [showStandingsDropdown, setShowStandingsDropdown] = useState(false);
   const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);  // Added settings dropdown
+  const [showAccountSubmenu, setShowAccountSubmenu] = useState(false);  // Added account submenu
   
   // National League States
   const [nationalLeagues, setNationalLeagues] = useState([]);
