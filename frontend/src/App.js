@@ -13570,8 +13570,7 @@ function App() {
         match.tournament.name.toLowerCase().includes(sportsduelSearch.toLowerCase());
         
       const countryMatch = sportsduelFilters.country === 'all' || 
-        match.tournament.country.includes(sportsduelFilters.country) ||
-        sportsduelFilters.country === 'all';
+        match.tournament.country.toLowerCase().includes(sportsduelFilters.country.toLowerCase());
         
       const organizationMatch = sportsduelFilters.organization === 'all' || 
         match.tournament.category === sportsduelFilters.organization;
@@ -13582,7 +13581,7 @@ function App() {
       const statusMatch = sportsduelFilters.status === 'all' || 
         match.status.toLowerCase() === sportsduelFilters.status.toLowerCase();
 
-      return searchMatch && countryMatch && tournamentMatch && statusMatch;
+      return searchMatch && countryMatch && organizationMatch && tournamentMatch && statusMatch;
     });
 
     const availableCountries = ['all', ...new Set(teamMatches.map(match => match.tournament.country.split(' ')[0]))];
