@@ -15144,7 +15144,7 @@ function App() {
                       <button 
                         className="settings-deposit-btn"
                         onClick={() => {
-                          setCurrentView('wallet'); // Navigate to wallet page with deposit options
+                          navigateWithHistory('wallet', 'Wallet & Deposits');
                           setShowSettingsDropdown(false);
                         }}
                       >
