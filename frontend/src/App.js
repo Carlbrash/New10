@@ -1386,53 +1386,14 @@ function App() {
     console.log('Added to history:', view, 'Current history:', navigationHistoryRef.current);
   };
 
-  // Navigate with history tracking
-  const navigateWithHistory = (newView, title = '') => {
-    console.log('Navigating from', currentView, 'to', newView);
-    
-    // Add current view to history before navigating
-    if (currentView && currentView !== newView && currentView !== 'home') {
-      const currentTitle = breadcrumbPath[breadcrumbPath.length - 1]?.title || currentView;
-      addToHistory(currentView, currentTitle);
-    }
-    
-    // Navigate to new view
-    setCurrentView(newView);
-    if (title) {
-      navigateWithBreadcrumb(newView, title);
-    }
-  };
-
-  // Go back to previous view - Fixed version
+  // Simple browser history based navigation
   const goBack = () => {
-    console.log('Going back, current history:', navigationHistoryRef.current);
-    
-    if (navigationHistoryRef.current.length > 0) {
-      const lastEntry = navigationHistoryRef.current.pop(); // Remove and get last entry
-      console.log('Going back to:', lastEntry);
-      
-      // Update state
-      setNavigationHistory([...navigationHistoryRef.current]);
-      setCurrentHistoryIndex(navigationHistoryRef.current.length - 1);
-      
-      // Navigate to the previous view
-      setCurrentView(lastEntry.view);
-      if (lastEntry.title && lastEntry.title !== lastEntry.view) {
-        navigateWithBreadcrumb(lastEntry.view, lastEntry.title);
-      }
-    } else {
-      console.log('No history to go back to');
-      // Fallback to dashboard/home
-      const fallbackView = user ? 'dashboard' : 'home';
-      const fallbackTitle = user ? 'Dashboard' : 'Home';
-      setCurrentView(fallbackView);
-      navigateWithBreadcrumb(fallbackView, fallbackTitle);
-    }
+    window.history.back();
   };
 
-  // Check if we can go back - Fixed version
+  // Check if we can go back using browser history
   const canGoBack = () => {
-    return navigationHistoryRef.current.length > 0;
+    return window.history.length > 1;
   };
 
   // Get current translations
