@@ -14866,59 +14866,24 @@ function App() {
             )}
           </div>
           
-          {/* Teams Dropdown */}
-          <div 
-            className={`nav-dropdown ${showTeamsDropdown ? 'mobile-open' : ''}`}
-            onMouseEnter={() => window.innerWidth > 768 && setShowTeamsDropdown(true)}
-            onMouseLeave={() => window.innerWidth > 768 && setShowTeamsDropdown(false)}
-          >
-            <button 
-              className={`nav-link dropdown-trigger ${(currentView === 'teams' || currentView.startsWith('team-')) ? 'active' : ''}`}
-              onClick={() => {
-                if (window.innerWidth <= 768) {
-                  toggleMobileDropdown('teams');
-                } else {
-                  navigateWithBreadcrumb('teams', 'Teams');
-                }
-              }}
-            >
-              👥 Teams <span className="dropdown-arrow">▼</span>
-            </button>
-            
-            {showTeamsDropdown && (
-              <div className="dropdown-menu">
-                <button 
-                  className="dropdown-item"
-                  onClick={() => {
-                    navigateWithBreadcrumb('teams', 'Browse Teams');
-                    setShowTeamsDropdown(false);
-                  }}
-                >
-                  👥 Browse Teams
-                </button>
-                {user && (
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigateWithBreadcrumb('teams', 'My Teams');
-                      setShowTeamsDropdown(false);
-                    }}
-                  >
-                    ⭐ My Teams
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-          
           {/* Guilds Menu - only show for logged in users */}
           {user && (
-            <div className="nav-dropdown">
+            <div 
+              className={`nav-dropdown ${showGuildsDropdown ? 'mobile-open' : ''}`}
+              onMouseEnter={() => window.innerWidth > 768 && setShowGuildsDropdown(true)}
+              onMouseLeave={() => window.innerWidth > 768 && setShowGuildsDropdown(false)}
+            >
               <button 
-                className={`nav-link ${currentView.startsWith('guild') ? 'active' : ''}`}
-                onClick={() => setShowGuildsDropdown(!showGuildsDropdown)}
+                className={`nav-link dropdown-trigger ${(currentView.startsWith('guild') || currentView === 'teams' || currentView.startsWith('team-') || showFriendsModal) ? 'active' : ''}`}
+                onClick={() => {
+                  if (window.innerWidth <= 768) {
+                    toggleMobileDropdown('guilds');
+                  } else {
+                    setShowGuildsDropdown(!showGuildsDropdown);
+                  }
+                }}
               >
-                🏰 {t.guilds} {showGuildsDropdown ? '▼' : '▶'}
+                🏰 {t.guilds} <span className="dropdown-arrow">▼</span>
               </button>
               {showGuildsDropdown && (
                 <div className="dropdown-menu">
@@ -14958,6 +14923,30 @@ function App() {
                   >
                     ⚔️ {t.guildWars}
                   </button>
+                  <div className="dropdown-divider"></div>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigateWithBreadcrumb('teams', 'Browse Teams');
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    👥 Teams
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={() => {
+                      setShowFriendsModal(true);
+                      fetchFriends();
+                      fetchFriendRequests();
+                      fetchFriendRecommendations();
+                      setShowGuildsDropdown(false);
+                    }}
+                  >
+                    👥 Friends {friendRequests.length > 0 && (
+                      <span className="friend-request-badge">{friendRequests.length}</span>
+                    )}
+                  </button>
                 </div>
               )}
             </div>
@@ -14970,45 +14959,6 @@ function App() {
               onClick={() => setCurrentView('sportsduel')}
             >
               📈 Live Scores
-            </button>
-          )}
-          
-          {/* Friends Menu - only show for logged in users */}
-          {user && (
-            <div className="nav-dropdown">
-              <button 
-                className="nav-link"
-                onClick={() => {
-                  setShowFriendsModal(true);
-                  fetchFriends();
-                  fetchFriendRequests();
-                  fetchFriendRecommendations();
-                }}
-              >
-                👥 Friends {friendRequests.length > 0 && (
-                  <span className="friend-request-badge">{friendRequests.length}</span>
-                )}
-              </button>
-            </div>
-          )}
-          
-          {/* Affiliate menu item - only show for logged in users */}
-          {user && (
-            <button 
-              className={`nav-link ${currentView === 'affiliate' ? 'active' : ''}`}
-              onClick={() => setCurrentView('affiliate')}
-            >
-              {t.affiliate}
-            </button>
-          )}
-          
-          {/* Wallet menu item - only show for logged in users */}
-          {user && (
-            <button 
-              className={`nav-link ${currentView === 'wallet' ? 'active' : ''}`}
-              onClick={() => setCurrentView('wallet')}
-            >
-              {t.wallet}
             </button>
           )}
           
