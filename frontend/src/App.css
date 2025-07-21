@@ -129,20 +129,25 @@ body {
   margin: 0.5rem 0;
 }
 
-/* Advanced Settings Dropdown Styles - Elegant Version */
+/* Advanced Settings Dropdown Styles - Fixed Width Version */
 .advanced-settings-dropdown {
-  min-width: 350px;
+  min-width: 380px;
+  width: 380px;
   padding: 0;
   background: rgba(20, 20, 20, 0.98);
   border: 1px solid rgba(79, 195, 247, 0.3);
   border-radius: 8px;
   overflow: hidden;
   backdrop-filter: blur(10px);
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 1000;
 }
 
 .settings-user-info {
   background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
-  padding: 1.2rem;
+  padding: 1.2rem 1.5rem;
   border-bottom: 1px solid rgba(79, 195, 247, 0.1);
   display: flex;
   justify-content: space-between;
@@ -151,6 +156,7 @@ body {
 
 .settings-user-details {
   flex: 1;
+  min-width: 0;
 }
 
 .settings-username {
@@ -160,6 +166,9 @@ body {
   text-transform: lowercase;
   font-weight: 400;
   opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .settings-balance {
@@ -169,21 +178,23 @@ body {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .settings-deposit-btn {
   background: linear-gradient(135deg, #4fc3f7, #29b6f6);
   border: none;
   color: #ffffff;
-  padding: 0.6rem 1rem;
+  padding: 0.7rem 1.2rem;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  min-width: 80px;
+  min-width: 90px;
+  white-space: nowrap;
 }
 
 .settings-deposit-btn:hover {
@@ -193,7 +204,7 @@ body {
 
 .settings-balances {
   display: flex;
-  padding: 1rem;
+  padding: 1.2rem;
   gap: 0;
   border-bottom: 1px solid rgba(79, 195, 247, 0.1);
 }
@@ -215,26 +226,28 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .settings-balance-amount {
   font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
+  white-space: nowrap;
 }
 
 .settings-menu-options {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  padding: 0.8rem;
+  gap: 0.5rem;
+  padding: 1rem;
 }
 
 .settings-menu-option {
   background: transparent;
   border: none;
   color: #cccccc;
-  padding: 1rem 0.5rem;
+  padding: 1rem 0.8rem;
   font-size: 0.75rem;
   font-weight: 500;
   text-align: center;
@@ -244,21 +257,25 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   position: relative;
+  min-height: 70px;
 }
 
 .settings-menu-option .menu-icon {
-  font-size: 1.2rem;
-  margin-bottom: 0.2rem;
+  font-size: 1.3rem;
+  margin-bottom: 0.1rem;
 }
 
 .settings-menu-option .menu-text {
   font-size: 0.7rem;
-  line-height: 1;
+  line-height: 1.1;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .settings-menu-option:hover {
@@ -274,15 +291,15 @@ body {
 .account-submenu {
   background: rgba(15, 15, 15, 0.95);
   border-top: 1px solid rgba(79, 195, 247, 0.1);
-  padding: 0.5rem;
+  padding: 0.8rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.3rem;
+  gap: 0.5rem;
   margin: 0;
 }
 
 .account-submenu-item {
-  padding: 0.6rem 0.4rem;
+  padding: 0.8rem 0.5rem;
   color: #cccccc;
   text-decoration: none;
   border: none;
@@ -294,25 +311,72 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.4rem;
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  min-height: 60px;
 }
 
 .account-submenu-item .submenu-icon {
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .account-submenu-item .submenu-text {
   font-size: 0.65rem;
-  line-height: 1;
+  line-height: 1.1;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .account-submenu-item:hover {
   background: rgba(79, 195, 247, 0.1);
   color: #4fc3f7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .advanced-settings-dropdown {
+    min-width: 320px;
+    width: 320px;
+    right: -50px;
+  }
+  
+  .settings-user-info {
+    padding: 1rem;
+  }
+  
+  .settings-deposit-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    min-width: 80px;
+  }
+  
+  .settings-balances {
+    padding: 1rem;
+  }
+  
+  .settings-menu-options {
+    padding: 0.8rem;
+    gap: 0.3rem;
+  }
+  
+  .settings-menu-option {
+    padding: 0.8rem 0.5rem;
+    min-height: 65px;
+  }
+  
+  .account-submenu {
+    padding: 0.6rem;
+    gap: 0.3rem;
+  }
+  
+  .account-submenu-item {
+    padding: 0.7rem 0.4rem;
+    min-height: 55px;
+  }
 }
 
 /* Animation for dropdown opening */
