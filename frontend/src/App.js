@@ -14950,7 +14950,7 @@ function App() {
               className={`nav-link ${currentView === 'sportsduel' ? 'active' : ''}`}
               onClick={() => setCurrentView('sportsduel')}
             >
-              ⚽ SportsDuel
+              📈 Live Scores
             </button>
           )}
           
