@@ -15094,25 +15094,24 @@ function App() {
                       <button 
                         className="settings-deposit-btn"
                         onClick={() => {
-                          // TODO: Navigate to deposit page
-                          console.log('Navigate to Deposit');
+                          setShowPaymentModal(true);
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        Deposit
+                        💳 Deposit
                       </button>
                     </div>
 
                     {/* Withdrawable & Bet Credits */}
                     <div className="settings-balances">
                       <div className="settings-balance-item">
-                        <div className="settings-balance-label">Withdrawable</div>
+                        <div className="settings-balance-label">💸 Withdrawable</div>
                         <div className="settings-balance-amount">
                           {mockWalletData.currency}{mockWalletData.withdrawable.toFixed(2)}
                         </div>
                       </div>
                       <div className="settings-balance-item">
-                        <div className="settings-balance-label">Bet Credits</div>
+                        <div className="settings-balance-label">🎯 Bet Credits</div>
                         <div className="settings-balance-amount">
                           {mockWalletData.currency}{mockWalletData.betCredits.toFixed(2)}
                         </div>
@@ -15125,7 +15124,8 @@ function App() {
                         className={`settings-menu-option ${showAccountSubmenu ? 'active' : ''}`}
                         onClick={() => setShowAccountSubmenu(!showAccountSubmenu)}
                       >
-                        Account
+                        <div>👤</div>
+                        <div>Account</div>
                       </button>
                       <button 
                         className="settings-menu-option"
@@ -15135,7 +15135,8 @@ function App() {
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        Alerts
+                        <div>🔔</div>
+                        <div>Alerts</div>
                       </button>
                       <button 
                         className="settings-menu-option"
@@ -15145,7 +15146,8 @@ function App() {
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        My Offers
+                        <div>🎁</div>
+                        <div>My Offers</div>
                       </button>
                       <button 
                         className="settings-menu-option"
@@ -15154,7 +15156,8 @@ function App() {
                           setShowSettingsDropdown(false);
                         }}
                       >
-                        Preferences
+                        <div>⚙️</div>
+                        <div>Preferences</div>
                       </button>
                     </div>
 
