@@ -13353,9 +13353,9 @@ function App() {
   // Advanced filtering states for SportsDuel
   const [sportsduelFilters, setSportsduelFilters] = useState({
     country: 'all',
-    tournament: 'all', 
-    status: 'all',
-    showFilters: false
+    organization: 'all', 
+    tournament: 'all',
+    status: 'live'
   });
 
   const renderSportsDuel = () => {
