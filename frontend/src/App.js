@@ -13885,11 +13885,55 @@ function App() {
                 className="search-input-professional"
               />
             </div>
-            <div className="filters-dropdown-professional">
-              <button className="filters-button-professional">
-                ⚙️ Filters ▼
-              </button>
-            </div>
+          </div>
+
+          <div className="filters-panel-professional" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem' }}>
+            <select 
+              value={sportsduelFilters.country}
+              onChange={(e) => setSportsduelFilters(prev => ({ ...prev, country: e.target.value }))}
+              className="filter-select-professional"
+            >
+              <option value="all">All Countries</option>
+              <option value="10th">10th Matchday</option>
+              <option value="5th">5th Matchday</option>
+              <option value="15th">15th Matchday</option>
+              <option value="8th">8th Matchday</option>
+            </select>
+            
+            <select 
+              value={sportsduelFilters.organization}
+              onChange={(e) => setSportsduelFilters(prev => ({ ...prev, organization: e.target.value }))}
+              className="filter-select-professional"
+            >
+              <option value="all">All Organizations</option>
+              <option value="Premier League">Premier League</option>
+              <option value="Europa Conference">Europa Conference</option>
+              <option value="Championship Final">Championship Final</option>
+              <option value="German League">German League</option>
+            </select>
+            
+            <select 
+              value={sportsduelFilters.tournament}
+              onChange={(e) => setSportsduelFilters(prev => ({ ...prev, tournament: e.target.value }))}
+              className="filter-select-professional"
+            >
+              <option value="all">All Matches</option>
+              <option value="Premier League">Premier League</option>
+              <option value="Europa Conference">Europa Conference</option>
+              <option value="Championship Final">Championship Final</option>
+              <option value="German League">German League</option>
+            </select>
+            
+            <select 
+              value={sportsduelFilters.status}
+              onChange={(e) => setSportsduelFilters(prev => ({ ...prev, status: e.target.value }))}
+              className="filter-select-professional"
+            >
+              <option value="live">Live</option>
+              <option value="finished">Finished</option>
+              <option value="upcoming">Upcoming</option>
+              <option value="all">All Status</option>
+            </select>
           </div>
         </div>
 
