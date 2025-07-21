@@ -14771,7 +14771,7 @@ function App() {
                 <button 
                   className="dropdown-item"
                   onClick={() => {
-                    navigateWithHistory('worldmap', 'World Map');
+                    navigateWithBreadcrumb('worldmap', 'World Map');
                     setShowRankingsDropdown(false);
                   }}
                 >
