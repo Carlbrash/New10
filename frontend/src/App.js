@@ -1401,6 +1401,8 @@ function App() {
 
   // Navigation History State
   const navigationHistoryRef = useRef([]);
+  const [navigationHistory, setNavigationHistory] = useState([]);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
 
   // Standings & Fixtures State - Added new states only
   const [selectedLeague, setSelectedLeague] = useState('premier');
