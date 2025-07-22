@@ -11482,296 +11482,248 @@ function App() {
   // =============================================================================
 
   const renderStandings = () => {
-    // Create display countries - merge default with fetched leagues
-    const displayCountries = defaultCountries.map(defaultCountry => {
-      const existingLeague = nationalLeagues.find(league => 
-        league.country.toLowerCase() === defaultCountry.name.toLowerCase()
-      );
-      return existingLeague || {
-        country: defaultCountry.name,
-        flag: defaultCountry.flag,
-        premier: null,
-        league_2: null
-      };
-    });
-
-    // Add other countries if showing all and searching
-    const filteredOtherCountries = nationalLeagues.filter(league => 
-      !defaultCountries.some(def => def.name.toLowerCase() === league.country.toLowerCase()) &&
-      (!countrySearchTerm || league.country.toLowerCase().includes(countrySearchTerm.toLowerCase()))
-    );
-
-    if (showAllCountries) {
-      displayCountries.push(...filteredOtherCountries);
-    }
-
-    return (
-      <motion.div 
-        className="standings-page"
-        initial="initial"
-        animate="in"
-        exit="out"
-        variants={pageVariants}
-        transition={pageTransition}
-      >
-        <div className="container">
-          <motion.div className="standings-header">
-            <h2>📊 National League Standings</h2>
-            <p>Select a country and league to view standings</p>
-            
-            {/* Admin Initialize Button */}
-            {isAdmin && nationalLeagues.length === 0 && (
-              <motion.button 
-                className="btn btn-primary btn-pulse"
-                onClick={initializeDefaultCountries}
-                style={{ marginTop: '20px' }}
+    // If a country is selected, show the detailed view
+    if (selectedCountry) {
+      const countryData = mockStandingsData[selectedCountry];
+      const leagueData = countryData?.[selectedLeague];
+      
+      if (!leagueData) {
+        return (
+          <div className="standings-page">
+            <div className="container">
+              <h2>No data available for {selectedCountry} {selectedLeague}</h2>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setSelectedCountry(null)}
               >
-                🚀 Initialize Default Countries
-              </motion.button>
-            )}
-          </motion.div>
-
-          {/* Search and Filter Controls */}
-          <motion.div className="standings-controls">
-            <div className="search-container">
-              <input
-                type="text"
-                placeholder="🔍 Search for a country..."
-                value={countrySearchTerm}
-                onChange={(e) => setCountrySearchTerm(e.target.value)}
-                className="form-input"
-              />
+                ← Back to Countries
+              </button>
             </div>
-            
-            <button 
-              className={`btn ${showAllCountries ? 'btn-secondary' : 'btn-outline'}`}
-              onClick={() => setShowAllCountries(!showAllCountries)}
-            >
-              {showAllCountries ? '📋 Show Main Countries' : '🌍 Show All Countries'}
-            </button>
-          </motion.div>
+          </div>
+        );
+      }
 
-          {/* Admin Panel for Creating New Leagues */}
-          {isAdmin && (
-            <motion.div 
-              className="admin-league-panel"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="admin-panel-header">
-                <h3>🔧 Admin: League Management</h3>
-                <p>Create and manage national leagues</p>
+      return (
+        <motion.div 
+          className="standings-detail-page"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="container">
+            {/* League Header */}
+            <div className="league-header">
+              <button 
+                className="back-btn"
+                onClick={() => setSelectedCountry(null)}
+              >
+                ← Back
+              </button>
+              <div className="league-title">
+                <h1>{leagueData.name}</h1>
+                <span className="season-badge">{leagueData.season}</span>
               </div>
-              
-              <div className="admin-actions-grid">
-                <div className="admin-action-card">
-                  <h4>🚀 Quick Setup</h4>
-                  <p>Initialize all 8 default countries</p>
-                  <button 
-                    className="btn btn-primary"
-                    onClick={initializeDefaultCountries}
-                  >
-                    Initialize Default Countries
-                  </button>
-                </div>
-                
-                <div className="admin-action-card">
-                  <h4>➕ Create New League</h4>
-                  <p>Create a custom league for any country</p>
-                  <div className="create-league-form">
-                    <input
-                      type="text"
-                      placeholder="Enter country name (e.g., Brazil)"
-                      value={newLeagueCountry}
-                      onChange={(e) => setNewLeagueCountry(e.target.value)}
-                      className="form-input"
-                    />
-                    <button 
-                      className="btn btn-secondary"
-                      onClick={createCustomLeague}
-                      disabled={!newLeagueCountry.trim()}
-                    >
-                      Create League
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="admin-action-card">
-                  <h4>⚽ Auto-Generate Fixtures</h4>
-                  <p>Generate fixtures for leagues with teams</p>
-                  <button 
-                    className="btn btn-accent"
-                    onClick={generateAllFixtures}
-                  >
-                    Generate All Fixtures
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
+            </div>
 
-          {/* Country Selection Grid */}
-          <motion.div className="countries-grid">
-            {displayCountries.length === 0 && nationalLeagues.length === 0 ? (
-              <div className="no-data-message">
-                <h3>🏗️ Setting up leagues...</h3>
-                <p>National leagues will appear here once they are initialized.</p>
-                {isAdmin && (
-                  <button 
-                    className="btn btn-primary"
-                    onClick={initializeDefaultCountries}
-                  >
-                    🚀 Initialize Default Countries
-                  </button>
-                )}
-              </div>
-            ) : displayCountries.length === 0 ? (
-              <div className="no-search-results">
-                <h4>🔍 No countries found</h4>
-                <p>Try a different search term.</p>
-              </div>
-            ) : (
-              displayCountries.map((country, index) => (
-                <motion.div 
-                  key={country.country} 
-                  className="country-card"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <div className="country-header">
-                    <h3>{country.flag || '🏴'} {country.country}</h3>
-                  </div>
-                  
-                  <div className="leagues-list">
-                    {country.premier ? (
-                      <motion.button 
-                        className="league-button premier"
-                        onClick={() => {
-                          fetchLeagueStandings(country.country, 'premier');
-                        }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <span className="league-icon">🥇</span>
-                        <span className="league-name">{country.country} Premier</span>
-                        <span className="team-count">{country.premier.teams?.length || 0} teams</span>
-                      </motion.button>
-                    ) : (
-                      <div className="league-placeholder premier">
-                        <span className="league-icon">🥇</span>
-                        <span className="league-name">{country.country} Premier</span>
-                        <span className="team-count">Not created</span>
-                        {isAdmin && (
-                          <button 
-                            className="create-league-btn"
-                            onClick={() => initializeCountryLeagues(country.country)}
-                          >
-                            Create
-                          </button>
-                        )}
-                      </div>
-                    )}
-                    
-                    {country.league_2 ? (
-                      <motion.button 
-                        className="league-button league2"
-                        onClick={() => {
-                          fetchLeagueStandings(country.country, 'league_2');
-                        }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <span className="league-icon">🥈</span>
-                        <span className="league-name">{country.country} League 2</span>
-                        <span className="team-count">{country.league_2.teams?.length || 0} teams</span>
-                      </motion.button>
-                    ) : (
-                      <div className="league-placeholder league2">
-                        <span className="league-icon">🥈</span>
-                        <span className="league-name">{country.country} League 2</span>
-                        <span className="team-count">Not created</span>
-                        {isAdmin && (
-                          <button 
-                            className="create-league-btn"
-                            onClick={() => initializeCountryLeagues(country.country)}
-                          >
-                            Create
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </motion.div>
+            {/* Navigation Tabs */}
+            <div className="standings-tabs">
+              <button 
+                className={`tab ${standingsView === 'overview' ? 'active' : ''}`}
+                onClick={() => setStandingsView('overview')}
+              >
+                Overview
+              </button>
+              <button 
+                className={`tab ${standingsView === 'standings' ? 'active' : ''}`}
+                onClick={() => setStandingsView('standings')}
+              >
+                Standings
+              </button>
+              <button 
+                className={`tab ${standingsView === 'results' ? 'active' : ''}`}
+                onClick={() => setStandingsView('results')}
+              >
+                Results
+              </button>
+              <button 
+                className={`tab ${standingsView === 'fixtures' ? 'active' : ''}`}
+                onClick={() => setStandingsView('fixtures')}
+              >
+                Fixtures
+              </button>
+              <button 
+                className={`tab ${standingsView === 'stats' ? 'active' : ''}`}
+                onClick={() => setStandingsView('stats')}
+              >
+                Player Stats
+              </button>
+            </div>
 
-          {/* Selected League Standings */}
-          {selectedLeague && (
-            <motion.div 
-              className="league-standings"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="standings-header">
-                <h3>{selectedLeague.name} - Standings</h3>
-                <p className="season-info">Season: {selectedLeague.season}</p>
-              </div>
-              
-              {standingsLoading ? (
-                <EnhancedLoader message="Loading standings..." size="medium" />
-              ) : leagueStandings.length === 0 ? (
-                <div className="no-standings">
-                  <h4>No teams in this league yet</h4>
-                  <p>Teams will appear here once they are assigned by administrators.</p>
-                  {isAdmin && (
-                    <p className="admin-hint">💡 Go to Admin Panel → Team Management to assign teams to leagues</p>
-                  )}
-                </div>
-              ) : (
-                <div className="standings-table">
-                  <div className="table-header">
-                    <div className="col-pos">Pos</div>
-                    <div className="col-team">Team</div>
-                    <div className="col-played">P</div>
-                    <div className="col-won">W</div>
-                    <div className="col-drawn">D</div>
-                    <div className="col-lost">L</div>
-                    <div className="col-gf">GF</div>
-                    <div className="col-ga">GA</div>
-                    <div className="col-gd">GD</div>
-                    <div className="col-points">Pts</div>
-                  </div>
-                  
-                  {leagueStandings.map((standing, index) => (
-                    <motion.div 
-                      key={standing.team_id} 
-                      className={`table-row ${index < 3 ? 'promotion' : index >= leagueStandings.length - 3 ? 'relegation' : ''}`}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <div className="col-pos">{index + 1}</div>
-                      <div className="col-team">
-                        <span className="team-name">{standing.team_name}</span>
+            {/* Round Selector */}
+            <div className="round-selector">
+              <select 
+                value={selectedRound}
+                onChange={(e) => setSelectedRound(parseInt(e.target.value))}
+                className="round-dropdown"
+              >
+                <option value={1}>Round 1</option>
+                <option value={2}>Round 2</option>
+                <option value={3}>Round 3</option>
+              </select>
+              <button className="next-round-btn">Next</button>
+            </div>
+
+            {/* Content based on selected view */}
+            <div className="standings-content">
+              {standingsView === 'fixtures' && (
+                <div className="fixtures-section">
+                  <h3>Round {selectedRound} Fixtures</h3>
+                  <div className="fixtures-list">
+                    {leagueData.rounds[0]?.matches.map((match, index) => (
+                      <div key={index} className="fixture-item">
+                        <div className="fixture-date">
+                          <span className="date">{match.date}</span>
+                          <span className="time">{match.time}</span>
+                        </div>
+                        <div className="fixture-teams">
+                          <span className="home-team">{match.homeTeam}</span>
+                          <span className="vs">vs</span>
+                          <span className="away-team">{match.awayTeam}</span>
+                        </div>
+                        <div className="fixture-score">
+                          {match.homeScore !== null ? 
+                            `${match.homeScore} - ${match.awayScore}` : 
+                            'Not played'
+                          }
+                        </div>
                       </div>
-                      <div className="col-played">{standing.matches_played}</div>
-                      <div className="col-won">{standing.wins}</div>
-                      <div className="col-drawn">{standing.draws}</div>
-                      <div className="col-lost">{standing.losses}</div>
-                      <div className="col-gf">{standing.goals_for}</div>
-                      <div className="col-ga">{standing.goals_against}</div>
-                      <div className="col-gd">{standing.goal_difference}</div>
-                      <div className="col-points">{standing.points}</div>
-                    </motion.div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
-            </motion.div>
-          )}
+
+              {standingsView === 'standings' && (
+                <div className="standings-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Pos</th>
+                        <th>Team</th>
+                        <th>PL</th>
+                        <th>W</th>
+                        <th>D</th>
+                        <th>L</th>
+                        <th>PTS</th>
+                        <th>GF</th>
+                        <th>GA</th>
+                        <th>GD</th>
+                        <th>Form</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {leagueData.standings.map((team, index) => (
+                        <tr key={index}>
+                          <td className="position">{team.pos}</td>
+                          <td className="team-name">{team.team}</td>
+                          <td>{team.pl}</td>
+                          <td>{team.w}</td>
+                          <td>{team.d}</td>
+                          <td>{team.l}</td>
+                          <td className="points">{team.pts}</td>
+                          <td>{team.gf}</td>
+                          <td>{team.ga}</td>
+                          <td className={team.gd > 0 ? 'positive' : team.gd < 0 ? 'negative' : ''}>{team.gd}</td>
+                          <td className="form">
+                            {team.form.length > 0 ? team.form.map((result, i) => (
+                              <span key={i} className={`form-${result.toLowerCase()}`}>{result}</span>
+                            )) : '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {(standingsView === 'overview' || (!standingsView)) && (
+                <div className="overview-section">
+                  <div className="overview-grid">
+                    <div className="overview-card">
+                      <h4>Next Fixtures</h4>
+                      <div className="next-fixtures">
+                        {leagueData.rounds[0]?.matches.slice(0, 3).map((match, index) => (
+                          <div key={index} className="next-fixture">
+                            <span className="teams">{match.homeTeam} vs {match.awayTeam}</span>
+                            <span className="date-time">{match.date} {match.time}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="overview-card">
+                      <h4>Top 4 Teams</h4>
+                      <div className="top-teams">
+                        {leagueData.standings.slice(0, 4).map((team, index) => (
+                          <div key={index} className="top-team">
+                            <span className="pos">{team.pos}</span>
+                            <span className="team">{team.team}</span>
+                            <span className="pts">{team.pts} pts</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      );
+    }
+
+    // Show countries selection
+    return (
+      <motion.div 
+        className="standings-countries-page"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="container">
+          <div className="standings-countries-header">
+            <h1>📊 Championships & Leagues</h1>
+            <p>Select a country to view fixtures, results and standings</p>
+          </div>
+          
+          <div className="countries-selection-grid">
+            {defaultCountries.slice(0, 6).map((country, index) => (
+              <motion.div 
+                key={country.name}
+                className="country-selection-card"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                onClick={() => {
+                  setSelectedCountry(country.name);
+                  setStandingsView('fixtures');
+                }}
+              >
+                <div className="country-flag">{country.flag}</div>
+                <div className="country-name">{country.name}</div>
+                <div className="country-leagues">
+                  <span className="league-badge premier">Premier League</span>
+                  <span className="league-badge">League 2</span>
+                </div>
+                <div className="country-status">
+                  {mockStandingsData[country.name] ? (
+                    <span className="status active">Active Season</span>
+                  ) : (
+                    <span className="status coming">Coming Soon</span>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </motion.div>
     );
