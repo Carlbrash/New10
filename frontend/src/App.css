@@ -4817,6 +4817,59 @@ body {
   font-weight: 500;
 }
 
+/* World Map Country Details Styling */
+.country-stats-detailed {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.stat-card-large {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  border-radius: 15px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-large::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4fc3f7, #29b6f6);
+}
+
+.stat-card-large:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(79, 195, 247, 0.3);
+  border-color: rgba(79, 195, 247, 0.5);
+}
+
+.stat-card-large .stat-number {
+  color: #4fc3f7;
+  font-size: 3rem;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 0.8rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+}
+
+.stat-card-large .stat-label {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 0.5rem;
+}
 .country-actions {
   display: flex;
   gap: 1rem;
