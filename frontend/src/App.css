@@ -4290,6 +4290,13 @@ body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* World Map Container */
+.world-map-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.9));
+  padding: 2rem 1rem;
+}
+
 .countries-list {
   padding: 2rem 1rem;
 }
