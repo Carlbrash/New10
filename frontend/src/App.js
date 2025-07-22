@@ -11650,7 +11650,10 @@ function App() {
               <h2>No data available for {selectedCountry} {selectedLeague}</h2>
               <button 
                 className="btn btn-secondary"
-                onClick={() => setSelectedCountry(null)}
+                onClick={() => {
+                  setSelectedCountry(null);
+                  setSelectedLeague(null);
+                }}
               >
                 ← Back to Countries
               </button>
