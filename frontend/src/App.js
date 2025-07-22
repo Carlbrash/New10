@@ -11736,24 +11736,100 @@ function App() {
                   <h3>Round {selectedRound} Fixtures</h3>
                   <div className="fixtures-list">
                     {leagueData.rounds[0]?.matches.map((match, index) => (
-                      <div key={index} className="fixture-item">
+                      <div key={index} className={`fixture-item ${match.status?.toLowerCase()}`}>
                         <div className="fixture-date">
                           <span className="date">{match.date}</span>
                           <span className="time">{match.time}</span>
                         </div>
                         <div className="fixture-teams">
+                          <div className="team-logo">⚽</div>
                           <span className="home-team">{match.homeTeam}</span>
-                          <span className="vs">vs</span>
+                          <div className="score-section">
+                            {match.status === 'LIVE' ? (
+                              <div className="live-score">
+                                <span className="live-indicator">LIVE {match.liveMinute}'</span>
+                                <span className="score">
+                                  {match.homeScore !== null ? `${match.homeScore} - ${match.awayScore}` : '0 - 0'}
+                                </span>
+                              </div>
+                            ) : match.status === 'FIN' ? (
+                              <span className="final-score">{match.homeScore} - {match.awayScore}</span>
+                            ) : (
+                              <span className="vs">vs</span>
+                            )}
+                          </div>
+                          <div className="team-logo">⚽</div>
                           <span className="away-team">{match.awayTeam}</span>
                         </div>
-                        <div className="fixture-score">
-                          {match.homeScore !== null ? 
-                            `${match.homeScore} - ${match.awayScore}` : 
-                            'Not played'
-                          }
+                        {match.status && (
+                          <div className={`match-status ${match.status.toLowerCase()}`}>
+                            {match.status === 'UP' ? 'Upcoming' : 
+                             match.status === 'LIVE' ? 'Live' : 
+                             match.status === 'FIN' ? 'Finished' : match.status}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {standingsView === 'results' && (
+                <div className="results-section">
+                  <h3>Recent Results</h3>
+                  <div className="results-list">
+                    {leagueData.rounds[0]?.matches
+                      .filter(match => match.status === 'FIN')
+                      .map((match, index) => (
+                      <div key={index} className="result-item">
+                        <div className="result-date">{match.date}</div>
+                        <div className="result-match">
+                          <span className="home-team">{match.homeTeam}</span>
+                          <span className="result-score">{match.homeScore} - {match.awayScore}</span>
+                          <span className="away-team">{match.awayTeam}</span>
+                        </div>
+                        <div className="match-details">
+                          <span className="attendance">Attendance: 45,000</span>
+                          <span className="venue">Venue: Stadium</span>
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {standingsView === 'stats' && (
+                <div className="player-stats-section">
+                  <h3>Player Statistics</h3>
+                  <div className="stats-table-container">
+                    <table className="player-stats-table">
+                      <thead>
+                        <tr>
+                          <th>Rank</th>
+                          <th>Player</th>
+                          <th>Team</th>
+                          <th>Goals</th>
+                          <th>Assists</th>
+                          <th>Minutes</th>
+                          <th>Yellow Cards</th>
+                          <th>Red Cards</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {leagueData.playerStats?.map((player, index) => (
+                          <tr key={index}>
+                            <td className="rank">{player.rank}</td>
+                            <td className="player-name">{player.player}</td>
+                            <td className="team-name">{player.team}</td>
+                            <td className="goals">{player.goals}</td>
+                            <td className="assists">{player.assists}</td>
+                            <td className="minutes">{player.minutes}</td>
+                            <td className="yellow-cards">{player.yellowCards}</td>
+                            <td className="red-cards">{player.redCards}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               )}
