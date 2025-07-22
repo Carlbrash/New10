@@ -4404,8 +4404,34 @@ body {
   flex-wrap: wrap;
 }
 
+.country-details-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.1), rgba(41, 182, 246, 0.05));
+  border-radius: 12px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.country-details-header .country-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.country-details-header .country-title h2 {
+  color: #4fc3f7;
+  font-size: 2.2rem;
+  margin: 0;
+  font-weight: 700;
+}
+
 .country-flag-large {
   font-size: 4rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .country-title {
