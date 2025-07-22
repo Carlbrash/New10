@@ -998,6 +998,363 @@ body {
   font-weight: 500;
 }
 
+/* Enhanced Fixtures Section */
+.fixture-item {
+  background: rgba(42, 42, 42, 0.8);
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.fixture-item:hover {
+  background: rgba(42, 42, 42, 0.9);
+  border-color: rgba(79, 195, 247, 0.4);
+}
+
+.fixture-item.live {
+  border-color: #4caf50;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.fixture-item.fin {
+  border-color: #757575;
+}
+
+.fixture-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+}
+
+.team-logo {
+  font-size: 1.5rem;
+  color: #4fc3f7;
+}
+
+.home-team, .away-team {
+  font-weight: 600;
+  color: #ffffff;
+  flex: 1;
+  text-align: center;
+}
+
+.score-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 1rem;
+  min-width: 100px;
+}
+
+.live-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.live-indicator {
+  background: #4caf50;
+  color: #ffffff;
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.final-score {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #4fc3f7;
+}
+
+.match-status {
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.match-status.live {
+  background: #4caf50;
+  color: #ffffff;
+}
+
+.match-status.fin {
+  background: #757575;
+  color: #ffffff;
+}
+
+.match-status.up {
+  background: #ff9800;
+  color: #ffffff;
+}
+
+/* Results Section */
+.results-section {
+  background: rgba(42, 42, 42, 0.8);
+  border-radius: 10px;
+  padding: 1.5rem;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-item {
+  background: rgba(79, 195, 247, 0.05);
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.result-date {
+  color: #4fc3f7;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.result-match {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.result-score {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.match-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #b0b0b0;
+}
+
+/* Player Stats Section */
+.player-stats-section {
+  background: rgba(42, 42, 42, 0.8);
+  border-radius: 10px;
+  padding: 1.5rem;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.stats-table-container {
+  overflow-x: auto;
+}
+
+.player-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.player-stats-table th {
+  background: rgba(79, 195, 247, 0.1);
+  color: #4fc3f7;
+  padding: 1rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
+}
+
+.player-stats-table td {
+  padding: 1rem 0.8rem;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.1);
+  color: #ffffff;
+}
+
+.player-stats-table tr:hover {
+  background: rgba(79, 195, 247, 0.05);
+}
+
+.player-stats-table .rank {
+  font-weight: 600;
+  color: #4fc3f7;
+  width: 60px;
+}
+
+.player-stats-table .player-name {
+  font-weight: 600;
+  font-size: 1rem;
+  min-width: 150px;
+}
+
+.player-stats-table .goals {
+  font-weight: 600;
+  color: #4caf50;
+}
+
+.player-stats-table .assists {
+  font-weight: 600;
+  color: #ff9800;
+}
+
+.player-stats-table .yellow-cards {
+  color: #ffeb3b;
+}
+
+.player-stats-table .red-cards {
+  color: #f44336;
+}
+
+/* Form indicators in standings table */
+.form {
+  display: flex;
+  gap: 2px;
+}
+
+.form-w {
+  background: #4caf50;
+  color: #ffffff;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+.form-d {
+  background: #ff9800;
+  color: #ffffff;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+.form-l {
+  background: #f44336;
+  color: #ffffff;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+/* League Header Enhancements */
+.league-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(42, 42, 42, 0.8);
+  border-radius: 10px;
+  border: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.back-btn {
+  background: rgba(79, 195, 247, 0.1);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  color: #4fc3f7;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 1rem;
+}
+
+.back-btn:hover {
+  background: rgba(79, 195, 247, 0.2);
+  border-color: rgba(79, 195, 247, 0.5);
+}
+
+.league-title h1 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.season-badge {
+  background: #4fc3f7;
+  color: #1a1a1a;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-left: 1rem;
+}
+
+/* Round Selector */
+.round-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(42, 42, 42, 0.6);
+  border-radius: 8px;
+}
+
+.round-dropdown {
+  background: rgba(79, 195, 247, 0.1);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.next-round-btn {
+  background: #4fc3f7;
+  color: #1a1a1a;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.next-round-btn:hover {
+  background: #29b6f6;
+}
+
+/* Responsive Design for Standings */
+@media (max-width: 768px) {
+  .fixture-teams {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .team-logo {
+    display: none;
+  }
+  
+  .player-stats-table {
+    font-size: 0.8rem;
+  }
+  
+  .league-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .season-badge {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}
 .date-time {
   color: #4fc3f7;
   font-size: 0.9rem;
