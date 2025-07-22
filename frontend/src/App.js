@@ -1456,6 +1456,8 @@ function App() {
         ]
       }
     }
+  };
+
   // Mock wallet data for settings display (θα αντικατασταθεί από πραγματικά δεδομένα)
   const mockWalletData = {
     balance: user ? 1250.75 : 0,
