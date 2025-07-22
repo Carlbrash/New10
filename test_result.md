@@ -920,7 +920,16 @@ metadata:
   all_endpoints_working: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Detailed Standings API - GET /api/standings/countries"
+    - "Detailed Standings API - GET /api/standings/{country}"
+    - "Detailed Standings API - GET /api/standings/{country}/{league}"
+    - "Comprehensive Standings Mock Data Implementation"
+    - "Enhanced Standings Interface - Fixtures Tab"
+    - "Enhanced Standings Interface - Results Tab"
+    - "Enhanced Standings Interface - Player Stats Tab"
+    - "Standings Interface CSS Styling"
+    - "Standings Navigation and State Management"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
