@@ -11674,7 +11674,10 @@ function App() {
             <div className="league-header">
               <button 
                 className="back-btn"
-                onClick={() => setSelectedCountry(null)}
+                onClick={() => {
+                  setSelectedCountry(null);
+                  setSelectedLeague(null);
+                }}
               >
                 ← Back
               </button>
