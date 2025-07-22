@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "SportsDuel System 1v1 Fix: Updated the SportsDuel scoreboard to properly display 1v1 matches instead of showing teams with multiple players side by side. Fixed the progress bar display to show actual percentage (e.g., 2.30/5.20 = 44% filled) instead of showing full green progress. Made the match cards more compact for handling hundreds of matches simultaneously, and added search functionality to find specific teams or players. The system now correctly shows team scores as the number of individual 1v1 matches won by each team."
+user_problem_statement: "Implement Detailed Standings View for all countries in the Standings section. The current standings interface shows a country selection grid but clicking on countries shows 'No data available'. Need to populate with comprehensive mock data including fixtures (with live status indicators), results, standings tables, and player statistics for England, Greece, Italy, Germany, Spain, and France. The interface should match the professional design shown in the screenshot with tabs for Overview, Standings, Results, Fixtures, and Player Stats."
 
 backend:
   - task: "Backend Issues Fix - KeyError team_id in chat rooms"
