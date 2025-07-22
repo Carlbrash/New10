@@ -5423,6 +5423,159 @@ async def get_league_standings(country: str, league_type: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching league standings: {str(e)}")
+# =============================================================================
+# STANDINGS ENDPOINTS - For Detailed Standings Section
+# =============================================================================
+
+@app.get("/api/standings/countries")
+async def get_standings_countries():
+    """Get list of available countries for standings"""
+    try:
+        countries = [
+            {"name": "Greece", "flag": "🇬🇷"},
+            {"name": "Italy", "flag": "🇮🇹"},
+            {"name": "Germany", "flag": "🇩🇪"},
+            {"name": "England", "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {"name": "Spain", "flag": "🇪🇸"},
+            {"name": "France", "flag": "🇫🇷"}
+        ]
+        return {"countries": countries}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching countries: {str(e)}")
+
+@app.get("/api/standings/{country}")
+async def get_country_standings(country: str):
+    """Get standings data for a specific country"""
+    try:
+        # Mock data structure matching frontend
+        standings_data = {
+            'England': {
+                'premier': {
+                    'name': 'England Premier League',
+                    'season': '2025/2026',
+                    'rounds': [
+                        {
+                            'round': 1,
+                            'matches': [
+                                {'date': '15/08', 'time': '22:00', 'homeTeam': 'Liverpool', 'awayTeam': 'Bournemouth', 'homeScore': 3, 'awayScore': 1, 'status': 'FIN'},
+                                {'date': '16/08', 'time': '14:30', 'homeTeam': 'Aston Villa', 'awayTeam': 'Newcastle', 'homeScore': 2, 'awayScore': 1, 'status': 'FIN'},
+                                {'date': '16/08', 'time': '17:00', 'homeTeam': 'Brighton', 'awayTeam': 'Fulham', 'homeScore': 1, 'awayScore': 0, 'status': 'FIN'},
+                                {'date': '16/08', 'time': '17:00', 'homeTeam': 'Sunderland', 'awayTeam': 'West Ham', 'homeScore': None, 'awayScore': None, 'status': 'LIVE', 'liveMinute': '67'},
+                                {'date': '16/08', 'time': '17:00', 'homeTeam': 'Tottenham', 'awayTeam': 'Burnley', 'homeScore': 2, 'awayScore': 0, 'status': 'FIN'},
+                                {'date': '16/08', 'time': '19:30', 'homeTeam': 'Wolverhampton', 'awayTeam': 'Manchester City', 'homeScore': None, 'awayScore': None, 'status': 'LIVE', 'liveMinute': '45+2'},
+                                {'date': '17/08', 'time': '16:00', 'homeTeam': 'Chelsea', 'awayTeam': 'Crystal Palace', 'homeScore': None, 'awayScore': None, 'status': 'UP'},
+                                {'date': '17/08', 'time': '16:00', 'homeTeam': 'Nottingham Forest', 'awayTeam': 'Brentford', 'homeScore': None, 'awayScore': None, 'status': 'UP'},
+                                {'date': '17/08', 'time': '18:30', 'homeTeam': 'Manchester United', 'awayTeam': 'Arsenal', 'homeScore': None, 'awayScore': None, 'status': 'UP'},
+                                {'date': '18/08', 'time': '22:00', 'homeTeam': 'Leeds', 'awayTeam': 'Everton', 'homeScore': None, 'awayScore': None, 'status': 'UP'}
+                            ]
+                        }
+                    ],
+                    'standings': [
+                        {'pos': 1, 'team': 'Liverpool', 'pl': 1, 'w': 1, 'd': 0, 'l': 0, 'gf': 3, 'ga': 1, 'gd': 2, 'pts': 3, 'form': ['W']},
+                        {'pos': 2, 'team': 'Aston Villa', 'pl': 1, 'w': 1, 'd': 0, 'l': 0, 'gf': 2, 'ga': 1, 'gd': 1, 'pts': 3, 'form': ['W']},
+                        {'pos': 3, 'team': 'Brighton', 'pl': 1, 'w': 1, 'd': 0, 'l': 0, 'gf': 1, 'ga': 0, 'gd': 1, 'pts': 3, 'form': ['W']},
+                        {'pos': 4, 'team': 'Tottenham', 'pl': 1, 'w': 1, 'd': 0, 'l': 0, 'gf': 2, 'ga': 0, 'gd': 2, 'pts': 3, 'form': ['W']},
+                        {'pos': 5, 'team': 'Bournemouth', 'pl': 1, 'w': 0, 'd': 0, 'l': 1, 'gf': 1, 'ga': 3, 'gd': -2, 'pts': 0, 'form': ['L']},
+                        {'pos': 6, 'team': 'Newcastle', 'pl': 1, 'w': 0, 'd': 0, 'l': 1, 'gf': 1, 'ga': 2, 'gd': -1, 'pts': 0, 'form': ['L']},
+                        {'pos': 7, 'team': 'Fulham', 'pl': 1, 'w': 0, 'd': 0, 'l': 1, 'gf': 0, 'ga': 1, 'gd': -1, 'pts': 0, 'form': ['L']},
+                        {'pos': 8, 'team': 'Burnley', 'pl': 1, 'w': 0, 'd': 0, 'l': 1, 'gf': 0, 'ga': 2, 'gd': -2, 'pts': 0, 'form': ['L']},
+                        {'pos': 9, 'team': 'Arsenal', 'pl': 0, 'w': 0, 'd': 0, 'l': 0, 'gf': 0, 'ga': 0, 'gd': 0, 'pts': 0, 'form': []},
+                        {'pos': 10, 'team': 'Brentford', 'pl': 0, 'w': 0, 'd': 0, 'l': 0, 'gf': 0, 'ga': 0, 'gd': 0, 'pts': 0, 'form': []}
+                    ],
+                    'playerStats': [
+                        {'rank': 1, 'player': 'Mohamed Salah', 'team': 'Liverpool', 'goals': 15, 'assists': 8, 'yellowCards': 2, 'redCards': 0, 'minutes': 1240},
+                        {'rank': 2, 'player': 'Erling Haaland', 'team': 'Manchester City', 'goals': 18, 'assists': 3, 'yellowCards': 1, 'redCards': 0, 'minutes': 1180},
+                        {'rank': 3, 'player': 'Harry Kane', 'team': 'Tottenham', 'goals': 12, 'assists': 6, 'yellowCards': 3, 'redCards': 0, 'minutes': 1320},
+                        {'rank': 4, 'player': 'Bukayo Saka', 'team': 'Arsenal', 'goals': 9, 'assists': 11, 'yellowCards': 4, 'redCards': 0, 'minutes': 1410},
+                        {'rank': 5, 'player': 'Marcus Rashford', 'team': 'Manchester United', 'goals': 11, 'assists': 4, 'yellowCards': 2, 'redCards': 1, 'minutes': 1200}
+                    ]
+                }
+            },
+            'Greece': {
+                'premier': {
+                    'name': 'Greece Super League',
+                    'season': '2025/2026',
+                    'rounds': [
+                        {
+                            'round': 1,
+                            'matches': [
+                                {'date': '20/08', 'time': '18:00', 'homeTeam': 'Olympiakos', 'awayTeam': 'Panathinaikos', 'homeScore': 2, 'awayScore': 1, 'status': 'FIN'},
+                                {'date': '20/08', 'time': '20:30', 'homeTeam': 'AEK Athens', 'awayTeam': 'PAOK', 'homeScore': 1, 'awayScore': 1, 'status': 'FIN'},
+                                {'date': '21/08', 'time': '19:00', 'homeTeam': 'Aris', 'awayTeam': 'Atromitos', 'homeScore': None, 'awayScore': None, 'status': 'UP'},
+                                {'date': '21/08', 'time': '21:30', 'homeTeam': 'Volos', 'awayTeam': 'OFI Crete', 'homeScore': None, 'awayScore': None, 'status': 'UP'}
+                            ]
+                        }
+                    ],
+                    'standings': [
+                        {'pos': 1, 'team': 'Olympiakos', 'pl': 1, 'w': 1, 'd': 0, 'l': 0, 'gf': 2, 'ga': 1, 'gd': 1, 'pts': 3, 'form': ['W']},
+                        {'pos': 2, 'team': 'AEK Athens', 'pl': 1, 'w': 0, 'd': 1, 'l': 0, 'gf': 1, 'ga': 1, 'gd': 0, 'pts': 1, 'form': ['D']},
+                        {'pos': 3, 'team': 'PAOK', 'pl': 1, 'w': 0, 'd': 1, 'l': 0, 'gf': 1, 'ga': 1, 'gd': 0, 'pts': 1, 'form': ['D']},
+                        {'pos': 4, 'team': 'Panathinaikos', 'pl': 1, 'w': 0, 'd': 0, 'l': 1, 'gf': 1, 'ga': 2, 'gd': -1, 'pts': 0, 'form': ['L']}
+                    ],
+                    'playerStats': [
+                        {'rank': 1, 'player': 'Kostas Fortounis', 'team': 'Olympiakos', 'goals': 8, 'assists': 5, 'yellowCards': 1, 'redCards': 0, 'minutes': 890},
+                        {'rank': 2, 'player': 'Giorgos Giakoumakis', 'team': 'AEK Athens', 'goals': 6, 'assists': 2, 'yellowCards': 2, 'redCards': 0, 'minutes': 780},
+                        {'rank': 3, 'player': 'Andraz Sporar', 'team': 'Panathinaikos', 'goals': 5, 'assists': 3, 'yellowCards': 0, 'redCards': 0, 'minutes': 720}
+                    ]
+                }
+            },
+            'Italy': {
+                'premier': {
+                    'name': 'Serie A',
+                    'season': '2025/2026',
+                    'rounds': [
+                        {
+                            'round': 1,
+                            'matches': [
+                                {'date': '18/08', 'time': '18:00', 'homeTeam': 'Inter Milan', 'awayTeam': 'AC Milan', 'homeScore': 2, 'awayScore': 0, 'status': 'FIN'},
+                                {'date': '18/08', 'time': '20:45', 'homeTeam': 'Juventus', 'awayTeam': 'Napoli', 'homeScore': 1, 'awayScore': 3, 'status': 'FIN'},
+                                {'date': '19/08', 'time': '19:00', 'homeTeam': 'Roma', 'awayTeam': 'Lazio', 'homeScore': None, 'awayScore': None, 'status': 'LIVE', 'liveMinute': '78'},
+                                {'date': '19/08', 'time': '21:30', 'homeTeam': 'Atalanta', 'awayTeam': 'Fiorentina', 'homeScore': None, 'awayScore': None, 'status': 'UP'}
+                            ]
+                        }
+                    ],
+                    'standings': [
+                        {'pos': 1, 'team': 'Napoli', 'pl': 1, 'w': 1, 'd': 0, 'l': 0, 'gf': 3, 'ga': 1, 'gd': 2, 'pts': 3, 'form': ['W']},
+                        {'pos': 2, 'team': 'Inter Milan', 'pl': 1, 'w': 1, 'd': 0, 'l': 0, 'gf': 2, 'ga': 0, 'gd': 2, 'pts': 3, 'form': ['W']},
+                        {'pos': 3, 'team': 'AC Milan', 'pl': 1, 'w': 0, 'd': 0, 'l': 1, 'gf': 0, 'ga': 2, 'gd': -2, 'pts': 0, 'form': ['L']},
+                        {'pos': 4, 'team': 'Juventus', 'pl': 1, 'w': 0, 'd': 0, 'l': 1, 'gf': 1, 'ga': 3, 'gd': -2, 'pts': 0, 'form': ['L']}
+                    ],
+                    'playerStats': [
+                        {'rank': 1, 'player': 'Victor Osimhen', 'team': 'Napoli', 'goals': 12, 'assists': 4, 'yellowCards': 2, 'redCards': 0, 'minutes': 980},
+                        {'rank': 2, 'player': 'Lautaro Martinez', 'team': 'Inter Milan', 'goals': 10, 'assists': 6, 'yellowCards': 1, 'redCards': 0, 'minutes': 1050},
+                        {'rank': 3, 'player': 'Federico Chiesa', 'team': 'Juventus', 'goals': 7, 'assists': 8, 'yellowCards': 3, 'redCards': 0, 'minutes': 920}
+                    ]
+                }
+            }
+        }
+        
+        country_data = standings_data.get(country)
+        if not country_data:
+            raise HTTPException(status_code=404, detail="Country not found")
+        
+        return country_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching standings: {str(e)}")
+
+@app.get("/api/standings/{country}/{league}")
+async def get_league_standings_detail(country: str, league: str):
+    """Get detailed standings for a specific country and league"""
+    try:
+        country_data = await get_country_standings(country)
+        league_data = country_data.get(league)
+        
+        if not league_data:
+            raise HTTPException(status_code=404, detail="League not found")
+            
+        return league_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching league standings: {str(e)}")
 
 @app.post("/api/admin/assign-team-to-league")
 async def assign_team_to_league(assignment_data: dict, admin_id: str = Depends(verify_admin_token(AdminRole.ADMIN))):
