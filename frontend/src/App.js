@@ -1408,7 +1408,7 @@ function App() {
   const [selectedRound, setSelectedRound] = useState(1);
   const [standingsView, setStandingsView] = useState('overview'); // 'overview', 'standings', 'results', 'fixtures', 'stats'
 
-  // Mock data for standings
+  // Mock data for standings - Comprehensive data for all countries
   const mockStandingsData = {
     'England': {
       premier: {
@@ -1418,20 +1418,47 @@ function App() {
           {
             round: 1,
             matches: [
-              { date: '2025-08-15', time: '15:00', homeTeam: 'Manchester City', awayTeam: 'Chelsea', homeScore: null, awayScore: null },
-              { date: '2025-08-15', time: '17:30', homeTeam: 'Liverpool', awayTeam: 'Arsenal', homeScore: null, awayScore: null },
-              { date: '2025-08-16', time: '14:00', homeTeam: 'Manchester United', awayTeam: 'Tottenham', homeScore: null, awayScore: null },
-              { date: '2025-08-16', time: '16:30', homeTeam: 'Newcastle', awayTeam: 'Aston Villa', homeScore: null, awayScore: null },
+              { date: '15/08', time: '22:00', homeTeam: 'Liverpool', awayTeam: 'Bournemouth', homeScore: 3, awayScore: 1, status: 'FIN' },
+              { date: '16/08', time: '14:30', homeTeam: 'Aston Villa', awayTeam: 'Newcastle', homeScore: 2, awayScore: 1, status: 'FIN' },
+              { date: '16/08', time: '17:00', homeTeam: 'Brighton', awayTeam: 'Fulham', homeScore: 1, awayScore: 0, status: 'FIN' },
+              { date: '16/08', time: '17:00', homeTeam: 'Sunderland', awayTeam: 'West Ham', homeScore: null, awayScore: null, status: 'LIVE', liveMinute: '67' },
+              { date: '16/08', time: '17:00', homeTeam: 'Tottenham', awayTeam: 'Burnley', homeScore: 2, awayScore: 0, status: 'FIN' },
+              { date: '16/08', time: '19:30', homeTeam: 'Wolverhampton', awayTeam: 'Manchester City', homeScore: null, awayScore: null, status: 'LIVE', liveMinute: '45+2' },
+              { date: '17/08', time: '16:00', homeTeam: 'Chelsea', awayTeam: 'Crystal Palace', homeScore: null, awayScore: null, status: 'UP' },
+              { date: '17/08', time: '16:00', homeTeam: 'Nottingham Forest', awayTeam: 'Brentford', homeScore: null, awayScore: null, status: 'UP' },
+              { date: '17/08', time: '18:30', homeTeam: 'Manchester United', awayTeam: 'Arsenal', homeScore: null, awayScore: null, status: 'UP' },
+              { date: '18/08', time: '22:00', homeTeam: 'Leeds', awayTeam: 'Everton', homeScore: null, awayScore: null, status: 'UP' }
             ]
           }
         ],
         standings: [
-          { pos: 1, team: 'Manchester City', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
-          { pos: 2, team: 'Liverpool', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
-          { pos: 3, team: 'Chelsea', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
-          { pos: 4, team: 'Arsenal', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
-          { pos: 5, team: 'Manchester United', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
-          { pos: 6, team: 'Tottenham', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 1, team: 'Bournemouth', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 2, team: 'Arsenal', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 3, team: 'Aston Villa', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 4, team: 'Brentford', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 5, team: 'Brighton', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 6, team: 'Burnley', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 7, team: 'Chelsea', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 8, team: 'Crystal Palace', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 9, team: 'Everton', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 10, team: 'Fulham', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 11, team: 'Leeds', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 12, team: 'Liverpool', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 13, team: 'Manchester City', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 14, team: 'Manchester United', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 15, team: 'Newcastle', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 16, team: 'Nottingham Forest', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 17, team: 'Sunderland', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 18, team: 'Tottenham', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 19, team: 'West Ham', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 20, team: 'Wolverhampton', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] }
+        ],
+        playerStats: [
+          { rank: 1, player: 'Mohamed Salah', team: 'Liverpool', goals: 15, assists: 8, yellowCards: 2, redCards: 0, minutes: 1240 },
+          { rank: 2, player: 'Erling Haaland', team: 'Manchester City', goals: 18, assists: 3, yellowCards: 1, redCards: 0, minutes: 1180 },
+          { rank: 3, player: 'Harry Kane', team: 'Tottenham', goals: 12, assists: 6, yellowCards: 3, redCards: 0, minutes: 1320 },
+          { rank: 4, player: 'Bukayo Saka', team: 'Arsenal', goals: 9, assists: 11, yellowCards: 4, redCards: 0, minutes: 1410 },
+          { rank: 5, player: 'Marcus Rashford', team: 'Manchester United', goals: 11, assists: 4, yellowCards: 2, redCards: 1, minutes: 1200 }
         ]
       }
     },
@@ -1443,16 +1470,145 @@ function App() {
           {
             round: 1,
             matches: [
-              { date: '2025-08-20', time: '18:00', homeTeam: 'Olympiakos', awayTeam: 'Panathinaikos', homeScore: null, awayScore: null },
-              { date: '2025-08-20', time: '20:30', homeTeam: 'AEK Athens', awayTeam: 'PAOK', homeScore: null, awayScore: null },
+              { date: '20/08', time: '18:00', homeTeam: 'Olympiakos', awayTeam: 'Panathinaikos', homeScore: 2, awayScore: 1, status: 'FIN' },
+              { date: '20/08', time: '20:30', homeTeam: 'AEK Athens', awayTeam: 'PAOK', homeScore: 1, awayScore: 1, status: 'FIN' },
+              { date: '21/08', time: '19:00', homeTeam: 'Aris', awayTeam: 'Atromitos', homeScore: null, awayScore: null, status: 'UP' },
+              { date: '21/08', time: '21:30', homeTeam: 'Volos', awayTeam: 'OFI Crete', homeScore: null, awayScore: null, status: 'UP' }
             ]
           }
         ],
         standings: [
-          { pos: 1, team: 'Olympiakos', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
-          { pos: 2, team: 'Panathinaikos', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
-          { pos: 3, team: 'AEK Athens', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
-          { pos: 4, team: 'PAOK', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 1, team: 'Olympiakos', pl: 1, w: 1, d: 0, l: 0, gf: 2, ga: 1, gd: 1, pts: 3, form: ['W'] },
+          { pos: 2, team: 'AEK Athens', pl: 1, w: 0, d: 1, l: 0, gf: 1, ga: 1, gd: 0, pts: 1, form: ['D'] },
+          { pos: 3, team: 'PAOK', pl: 1, w: 0, d: 1, l: 0, gf: 1, ga: 1, gd: 0, pts: 1, form: ['D'] },
+          { pos: 4, team: 'Panathinaikos', pl: 1, w: 0, d: 0, l: 1, gf: 1, ga: 2, gd: -1, pts: 0, form: ['L'] },
+          { pos: 5, team: 'Aris', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 6, team: 'Atromitos', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] }
+        ],
+        playerStats: [
+          { rank: 1, player: 'Kostas Fortounis', team: 'Olympiakos', goals: 8, assists: 5, yellowCards: 1, redCards: 0, minutes: 890 },
+          { rank: 2, player: 'Giorgos Giakoumakis', team: 'AEK Athens', goals: 6, assists: 2, yellowCards: 2, redCards: 0, minutes: 780 },
+          { rank: 3, player: 'Andraz Sporar', team: 'Panathinaikos', goals: 5, assists: 3, yellowCards: 0, redCards: 0, minutes: 720 }
+        ]
+      }
+    },
+    'Italy': {
+      premier: {
+        name: 'Serie A',
+        season: '2025/2026',
+        rounds: [
+          {
+            round: 1,
+            matches: [
+              { date: '18/08', time: '18:00', homeTeam: 'Inter Milan', awayTeam: 'AC Milan', homeScore: 2, awayScore: 0, status: 'FIN' },
+              { date: '18/08', time: '20:45', homeTeam: 'Juventus', awayTeam: 'Napoli', homeScore: 1, awayScore: 3, status: 'FIN' },
+              { date: '19/08', time: '19:00', homeTeam: 'Roma', awayTeam: 'Lazio', homeScore: null, awayScore: null, status: 'LIVE', liveMinute: '78' },
+              { date: '19/08', time: '21:30', homeTeam: 'Atalanta', awayTeam: 'Fiorentina', homeScore: null, awayScore: null, status: 'UP' }
+            ]
+          }
+        ],
+        standings: [
+          { pos: 1, team: 'Napoli', pl: 1, w: 1, d: 0, l: 0, gf: 3, ga: 1, gd: 2, pts: 3, form: ['W'] },
+          { pos: 2, team: 'Inter Milan', pl: 1, w: 1, d: 0, l: 0, gf: 2, ga: 0, gd: 2, pts: 3, form: ['W'] },
+          { pos: 3, team: 'AC Milan', pl: 1, w: 0, d: 0, l: 1, gf: 0, ga: 2, gd: -2, pts: 0, form: ['L'] },
+          { pos: 4, team: 'Juventus', pl: 1, w: 0, d: 0, l: 1, gf: 1, ga: 3, gd: -2, pts: 0, form: ['L'] },
+          { pos: 5, team: 'Roma', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 6, team: 'Lazio', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] }
+        ],
+        playerStats: [
+          { rank: 1, player: 'Victor Osimhen', team: 'Napoli', goals: 12, assists: 4, yellowCards: 2, redCards: 0, minutes: 980 },
+          { rank: 2, player: 'Lautaro Martinez', team: 'Inter Milan', goals: 10, assists: 6, yellowCards: 1, redCards: 0, minutes: 1050 },
+          { rank: 3, player: 'Federico Chiesa', team: 'Juventus', goals: 7, assists: 8, yellowCards: 3, redCards: 0, minutes: 920 }
+        ]
+      }
+    },
+    'Germany': {
+      premier: {
+        name: 'Bundesliga',
+        season: '2025/2026',
+        rounds: [
+          {
+            round: 1,
+            matches: [
+              { date: '22/08', time: '15:30', homeTeam: 'Bayern Munich', awayTeam: 'Borussia Dortmund', homeScore: 3, awayScore: 1, status: 'FIN' },
+              { date: '22/08', time: '18:00', homeTeam: 'RB Leipzig', awayTeam: 'Bayer Leverkusen', homeScore: 2, awayScore: 2, status: 'FIN' },
+              { date: '23/08', time: '15:30', homeTeam: 'Schalke 04', awayTeam: 'Borussia M\'gladbach', homeScore: null, awayScore: null, status: 'UP' },
+              { date: '23/08', time: '17:30', homeTeam: 'Eintracht Frankfurt', awayTeam: 'VfL Wolfsburg', homeScore: null, awayScore: null, status: 'UP' }
+            ]
+          }
+        ],
+        standings: [
+          { pos: 1, team: 'Bayern Munich', pl: 1, w: 1, d: 0, l: 0, gf: 3, ga: 1, gd: 2, pts: 3, form: ['W'] },
+          { pos: 2, team: 'RB Leipzig', pl: 1, w: 0, d: 1, l: 0, gf: 2, ga: 2, gd: 0, pts: 1, form: ['D'] },
+          { pos: 3, team: 'Bayer Leverkusen', pl: 1, w: 0, d: 1, l: 0, gf: 2, ga: 2, gd: 0, pts: 1, form: ['D'] },
+          { pos: 4, team: 'Borussia Dortmund', pl: 1, w: 0, d: 0, l: 1, gf: 1, ga: 3, gd: -2, pts: 0, form: ['L'] },
+          { pos: 5, team: 'Schalke 04', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 6, team: 'Borussia M\'gladbach', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] }
+        ],
+        playerStats: [
+          { rank: 1, player: 'Robert Lewandowski', team: 'Bayern Munich', goals: 16, assists: 3, yellowCards: 1, redCards: 0, minutes: 1150 },
+          { rank: 2, player: 'Erling Haaland', team: 'Borussia Dortmund', goals: 14, assists: 5, yellowCards: 2, redCards: 0, minutes: 1080 },
+          { rank: 3, player: 'Christopher Nkunku', team: 'RB Leipzig', goals: 9, assists: 7, yellowCards: 4, redCards: 0, minutes: 990 }
+        ]
+      }
+    },
+    'Spain': {
+      premier: {
+        name: 'La Liga',
+        season: '2025/2026',
+        rounds: [
+          {
+            round: 1,
+            matches: [
+              { date: '25/08', time: '21:00', homeTeam: 'Real Madrid', awayTeam: 'Barcelona', homeScore: 2, awayScore: 3, status: 'FIN' },
+              { date: '25/08', time: '19:30', homeTeam: 'Atletico Madrid', awayTeam: 'Sevilla', homeScore: 1, awayScore: 0, status: 'FIN' },
+              { date: '26/08', time: '17:00', homeTeam: 'Valencia', awayTeam: 'Athletic Bilbao', homeScore: null, awayScore: null, status: 'UP' },
+              { date: '26/08', time: '21:30', homeTeam: 'Real Sociedad', awayTeam: 'Villarreal', homeScore: null, awayScore: null, status: 'UP' }
+            ]
+          }
+        ],
+        standings: [
+          { pos: 1, team: 'Barcelona', pl: 1, w: 1, d: 0, l: 0, gf: 3, ga: 2, gd: 1, pts: 3, form: ['W'] },
+          { pos: 2, team: 'Atletico Madrid', pl: 1, w: 1, d: 0, l: 0, gf: 1, ga: 0, gd: 1, pts: 3, form: ['W'] },
+          { pos: 3, team: 'Real Madrid', pl: 1, w: 0, d: 0, l: 1, gf: 2, ga: 3, gd: -1, pts: 0, form: ['L'] },
+          { pos: 4, team: 'Sevilla', pl: 1, w: 0, d: 0, l: 1, gf: 0, ga: 1, gd: -1, pts: 0, form: ['L'] },
+          { pos: 5, team: 'Valencia', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 6, team: 'Athletic Bilbao', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] }
+        ],
+        playerStats: [
+          { rank: 1, player: 'Robert Lewandowski', team: 'Barcelona', goals: 18, assists: 2, yellowCards: 3, redCards: 0, minutes: 1200 },
+          { rank: 2, player: 'Karim Benzema', team: 'Real Madrid', goals: 13, assists: 9, yellowCards: 1, redCards: 0, minutes: 1100 },
+          { rank: 3, player: 'Antoine Griezmann', team: 'Atletico Madrid', goals: 11, assists: 6, yellowCards: 2, redCards: 0, minutes: 1050 }
+        ]
+      }
+    },
+    'France': {
+      premier: {
+        name: 'Ligue 1',
+        season: '2025/2026',
+        rounds: [
+          {
+            round: 1,
+            matches: [
+              { date: '28/08', time: '21:00', homeTeam: 'Paris Saint-Germain', awayTeam: 'Marseille', homeScore: 4, awayScore: 0, status: 'FIN' },
+              { date: '28/08', time: '19:00', homeTeam: 'Lyon', awayTeam: 'Monaco', homeScore: 2, awayScore: 1, status: 'FIN' },
+              { date: '29/08', time: '17:00', homeTeam: 'Lille', awayTeam: 'Rennes', homeScore: null, awayScore: null, status: 'LIVE', liveMinute: '23' },
+              { date: '29/08', time: '20:00', homeTeam: 'Nice', awayTeam: 'Montpellier', homeScore: null, awayScore: null, status: 'UP' }
+            ]
+          }
+        ],
+        standings: [
+          { pos: 1, team: 'Paris Saint-Germain', pl: 1, w: 1, d: 0, l: 0, gf: 4, ga: 0, gd: 4, pts: 3, form: ['W'] },
+          { pos: 2, team: 'Lyon', pl: 1, w: 1, d: 0, l: 0, gf: 2, ga: 1, gd: 1, pts: 3, form: ['W'] },
+          { pos: 3, team: 'Monaco', pl: 1, w: 0, d: 0, l: 1, gf: 1, ga: 2, gd: -1, pts: 0, form: ['L'] },
+          { pos: 4, team: 'Marseille', pl: 1, w: 0, d: 0, l: 1, gf: 0, ga: 4, gd: -4, pts: 0, form: ['L'] },
+          { pos: 5, team: 'Lille', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 6, team: 'Rennes', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] }
+        ],
+        playerStats: [
+          { rank: 1, player: 'Kylian Mbappe', team: 'Paris Saint-Germain', goals: 20, assists: 8, yellowCards: 2, redCards: 0, minutes: 1250 },
+          { rank: 2, player: 'Alexandre Lacazette', team: 'Lyon', goals: 14, assists: 4, yellowCards: 3, redCards: 0, minutes: 1100 },
+          { rank: 3, player: 'Wissam Ben Yedder', team: 'Monaco', goals: 12, assists: 6, yellowCards: 1, redCards: 0, minutes: 980 }
         ]
       }
     }
