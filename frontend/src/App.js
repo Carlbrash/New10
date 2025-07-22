@@ -11937,6 +11937,7 @@ function App() {
                 transition={{ delay: index * 0.1 }}
                 onClick={() => {
                   setSelectedCountry(country.name);
+                  setSelectedLeague('premier'); // Set default league to 'premier'
                   setStandingsView('fixtures');
                 }}
               >
