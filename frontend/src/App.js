@@ -1404,6 +1404,62 @@ function App() {
   const [navigationHistory, setNavigationHistory] = useState([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
 
+  // Standings & Fixtures State
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedLeague, setSelectedLeague] = useState('premier');
+  const [selectedRound, setSelectedRound] = useState(1);
+  const [standingsView, setStandingsView] = useState('overview'); // 'overview', 'standings', 'results', 'fixtures', 'stats'
+
+  // Mock data for standings
+  const mockStandingsData = {
+    'England': {
+      premier: {
+        name: 'England Premier League',
+        season: '2025/2026',
+        rounds: [
+          {
+            round: 1,
+            matches: [
+              { date: '2025-08-15', time: '15:00', homeTeam: 'Manchester City', awayTeam: 'Chelsea', homeScore: null, awayScore: null },
+              { date: '2025-08-15', time: '17:30', homeTeam: 'Liverpool', awayTeam: 'Arsenal', homeScore: null, awayScore: null },
+              { date: '2025-08-16', time: '14:00', homeTeam: 'Manchester United', awayTeam: 'Tottenham', homeScore: null, awayScore: null },
+              { date: '2025-08-16', time: '16:30', homeTeam: 'Newcastle', awayTeam: 'Aston Villa', homeScore: null, awayScore: null },
+            ]
+          }
+        ],
+        standings: [
+          { pos: 1, team: 'Manchester City', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 2, team: 'Liverpool', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 3, team: 'Chelsea', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 4, team: 'Arsenal', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 5, team: 'Manchester United', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 6, team: 'Tottenham', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+        ]
+      }
+    },
+    'Greece': {
+      premier: {
+        name: 'Greece Super League',
+        season: '2025/2026',
+        rounds: [
+          {
+            round: 1,
+            matches: [
+              { date: '2025-08-20', time: '18:00', homeTeam: 'Olympiakos', awayTeam: 'Panathinaikos', homeScore: null, awayScore: null },
+              { date: '2025-08-20', time: '20:30', homeTeam: 'AEK Athens', awayTeam: 'PAOK', homeScore: null, awayScore: null },
+            ]
+          }
+        ],
+        standings: [
+          { pos: 1, team: 'Olympiakos', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 2, team: 'Panathinaikos', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 3, team: 'AEK Athens', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+          { pos: 4, team: 'PAOK', pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0, form: [] },
+        ]
+      }
+    }
+  };
+
   // Mock wallet data for settings display (θα αντικατασταθεί από πραγματικά δεδομένα)
   const mockWalletData = {
     balance: user ? 1250.75 : 0,
