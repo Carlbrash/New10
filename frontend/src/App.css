@@ -4974,6 +4974,31 @@ body {
     flex-direction: column;
   }
 }
+  .country-stats-detailed {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .stat-card-large {
+    padding: 1.5rem;
+  }
+  
+  .stat-card-large .stat-number {
+    font-size: 2.2rem;
+  }
+  
+  .country-details-header,
+  .country-rankings-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .country-details-header .country-title,
+  .country-rankings-header .country-title {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
 /* =============================================================================
    STANDINGS SYSTEM STYLES
