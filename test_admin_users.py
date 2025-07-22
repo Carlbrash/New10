@@ -2,7 +2,7 @@ import requests
 import json
 
 # Base URL
-base_url = "https://b90141f8-e066-4425-bc76-e032fe56376a.preview.emergentagent.com"
+base_url = "https://49f63d92-acd8-4e16-a4be-50baa0fb091a.preview.emergentagent.com"
 
 # Test God login
 print("\n=== Testing God login ===")
